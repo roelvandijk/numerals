@@ -113,10 +113,10 @@ data NumSymbol = NumSym { sumType :: SymbolType
                         } deriving Show
 
 data NumConfig = NumConfig { ncMax   :: Maybe Integer
-                           , ncTable :: [NumSymbol]
-                           , ncOne   :: NumSymbol -> String
-                           , ncAdd   :: (Integer, String) -> (Integer, String) -> String
-                           , ncMul   :: (Integer, String) -> (Integer, String) -> String
+                           , ncCardinal :: Integer -> Maybe NumSymbol
+                           , ncOne   :: NumSymbol -> ShowS
+                           , ncAdd   :: (Integer, ShowS) -> (Integer, ShowS) -> ShowS
+                           , ncMul   :: (Integer, ShowS) -> (Integer, ShowS) -> ShowS
                            }
 
 b, t :: Integer -> String -> NumSymbol
@@ -137,17 +137,18 @@ ppCardinal nc x | x < 0     = Nothing
                 | otherwise = do m <- ncMax nc
                                  guard (x <= m)
                                  fmap toString $ go x
-    where go n = do sym@(NumSym _ v v') <- findSym (ncTable nc) n
+    where go n = do sym@(NumSym _ v v') <- (ncCardinal nc) n
+                    let vs = showString v'
                     case n `divMod` v of
                       (1, 0) -> return $ one sym
-                      (1, r) -> do r' <- go r
-                                   return $ (v, one sym) `add` (r, r')
+                      (1, r) -> do rs <- go r
+                                   return $ (v, one sym) `add` (r, rs)
                       (q, r) | q > v     -> Nothing
-                             | otherwise -> do q' <- go q
+                             | otherwise -> do qs <- go q
                                                if r == 0
-                                                 then return $ (q, q') `mul` (v, vs)
-                                                 else do r' <- go r
-                                                         return $ (q*v, (q, q') `mul` (v, vs)) `add` (r, r')
+                                                 then return $ (q, qs) `mul` (v, vs)
+                                                 else do rs <- go r
+                                                         return $ (q*v, (q, qs) `mul` (v, vs)) `add` (r, rs)
           one = ncOne nc
           add = ncAdd nc
           mul = ncMul nc
@@ -186,11 +187,14 @@ testSome nc start amount = test nc . genericTake amount . testNums $ start
 -- Numeral configurations
 -------------------------------------------------------------------------------
 
-nlOne = symStr
-nlAdd (x, x') (_, y') | x < 20    = y' ++ x'
-                      | x < 100   = y' ++ "en" ++ x'
-                      | otherwise = x' ++ " " ++ y'
-nlMul (_, x') (_, y') = x' ++ " " ++ y'
+nlOne = showString . symStr
+nlAdd (x, x') (y, y') | x < 20    = y' . x'
+                      | x < 100   = case y of
+                                      2 -> showString "tweëen" . x'
+                                      3 -> showString "driëen" . x'
+                                      _ -> y' . showString "en" . x'
+                      | otherwise = x' . showChar ' ' . y'
+nlMul (_, x') (_, y') = x' . showChar ' ' .  y'
 
 nlTable = [ t 0       "nul"
           , t 1       "een"

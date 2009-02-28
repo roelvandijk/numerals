@@ -331,6 +331,7 @@ enAdd (x, x') (_, y') | x < 100   = x' . showChar '-' . y'
 
 enMul (_, x') (_, y') = x' . showChar ' ' . y'
 
+shortEnTable :: [NumSymbol]
 shortEnTable = enTable ++
                [ b (d 6)  "million"
                , b (d 9)  "billion"
@@ -362,6 +363,7 @@ shortEn = NumConfig { ncMax      = Just $ d 66 - 1
                     , ncCardinal = findSym shortEnTable
                     }
 
+longEnTable :: [NumSymbol]
 longEnTable = enTable ++
               [ b (d 6)   "million"
               , b (d 9)   "milliard"
@@ -400,6 +402,7 @@ latinOne = showString . symStr
 latinAdd (_, x') (_, y') = x' . showString " A " . y'
 latinMul (_, x') (_, y') = x' . showString " M " . y'
 
+latinTable :: [NumSymbol]
 latinTable = [ t 0     "nulla"
              , t 1     "unus"
              , t 2     "duo"
@@ -465,6 +468,54 @@ latin = NumConfig { ncMax      = Just $ d 6
                   , ncMul      = latinMul
                   , ncCardinal = findSym latinTable
                   }
+
+frOne sym = showString $ symStr sym
+frAdd (x, x') (y, y') | x < 80 && y == 1 = x' . showString " et " . y'
+                      | x < 100          = x' . showChar '-' . y'
+                      | otherwise        = x' . showChar ' ' . y'
+frMul (_, x') (y, y') | y == 100  = xy' . showChar 's'
+                      | otherwise = xy'
+    where xy' = x' . showChar ' ' . y'
+
+frTable :: [NumSymbol]
+frTable = [ t 0     "zéro"
+          , t 1     "un"
+          , t 2     "deux"
+          , t 3     "trois"
+          , t 4     "quatre"
+          , t 5     "cinq"
+          , t 6     "six"
+          , t 7     "sept"
+          , t 8     "huit"
+          , t 9     "neuf"
+          , b 10    "dix"
+          , t 11    "onze"
+          , t 12    "douze"
+          , t 13    "treize"
+          , t 14    "quatorze"
+          , t 15    "quinze"
+          , t 16    "seize"
+          , b 20    "vingt"
+          , b 30    "trente"
+          , b 40    "quarante"
+          , b 50    "cinquante"
+          , b 60    "soixante"
+          , t 71    "soixante et onze"
+          , t 80    "quatre-vingts"
+          , b 80    "quatre-vingt"
+          , b 100   "cent"
+          , b 1000  "mille"
+          , b (d 6) "million"
+          , b (d 9) "millard"
+          ]
+
+fr :: NumConfig
+fr = NumConfig { ncMax      = Nothing
+               , ncOne      = frOne
+               , ncAdd      = frAdd
+               , ncMul      = frMul
+               , ncCardinal = findSym frTable
+               }
 
 
 {-

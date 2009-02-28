@@ -71,37 +71,47 @@ Automatically generate a list of symbol names using latin.
   short scale: 10 ^ (3 * n + 3)
   long  scale: 10 ^ (6 * n)
   number scale n == latin n ++ "illion"
-  Should work for at least English and Dutch.
+  Should work for at least English, Dutch and French.
+
+
+Expose deeper structure of numerals. It would be nice if the algorithm
+could exploit the deeper structure of numerals in various
+languages. But even a relatively complex language like French can be
+described in less than 30 entries in a symbol table. So it is probably
+easier to just use the symbol table in its present form.
+
+Dutch
+  1:  een / e
+  2:  twee / twaa / twin
+  3:  drie / der
+  4:  vier / veer
+  8:  acht / tach
+  10: tien / lf / tig
+
+English
+  2:  two / twen
+  3:  three / thir
+  4:  four / for
+  5:  five / fif
+  8:  eight / eigh
+  10: ten / teen / ty
+
+French
+  1:  un / on
+  2:  deux / dou / ving
+  3:  trois / trei / tren
+  4:  quatre / quator / quaran
+  5:  cinq / quin / cinquan
+  6:  six / sei / soixan
+  10: dix / ze / t / te
 -}
 
 import Data.List
-
-import Control.Monad (guard)
 
 -------------------------------------------------------------------------------
 -- Types
 -------------------------------------------------------------------------------
 
--- Allomorphs (alternatives for morphemes)
--- Prefixes and suffixes.
-
--- Dutch
---   prefix: twee -> twin
---   prefix: drie -> der
---   prefix: vier -> veer
---   prefix: acht -> tach
---   suffix: tien -> tig
-
--- English
---   prefix: two   -> twen
---   prefix: three -> thir
---   prefix: four  -> for
---   prefix: five  -> fif
---   prefix: eight -> eigh
---   suffix: ten   -> ty
-
--- Use morpheme  for addition
--- Use allomorph for multiplication
 
 data SymbolType = Base     -- Multiplication base
                 | Terminal
@@ -112,16 +122,17 @@ data NumSymbol = NumSym { sumType :: SymbolType
                         , symStr  :: String
                         } deriving Show
 
-data NumConfig = NumConfig { ncMax   :: Maybe Integer
+data NumConfig = NumConfig { ncMax      :: Maybe Integer
                            , ncCardinal :: Integer -> Maybe NumSymbol
-                           , ncOne   :: NumSymbol -> ShowS
-                           , ncAdd   :: (Integer, ShowS) -> (Integer, ShowS) -> ShowS
-                           , ncMul   :: (Integer, ShowS) -> (Integer, ShowS) -> ShowS
+                           , ncOne      :: NumSymbol -> ShowS
+                           , ncAdd      :: (Integer, ShowS) -> (Integer, ShowS) -> ShowS
+                           , ncMul      :: (Integer, ShowS) -> (Integer, ShowS) -> ShowS
                            }
 
+-- Easy construction of NumSymbols
 b, t :: Integer -> String -> NumSymbol
-b v s = NumSym { sumType = Base,     symVal = v, symStr = s }
-t v s = NumSym { sumType = Terminal, symVal = v, symStr = s }
+b = NumSym Base
+t = NumSym Terminal
 
 d :: Integer -> Integer
 d = (10 ^)
@@ -130,13 +141,17 @@ d = (10 ^)
 --
 -------------------------------------------------------------------------------
 
-ppCardinal :: NumConfig -> Integer -> Maybe String
-ppCardinal nc 0 = do zero <- ncCardinal nc $ 0
-                     return $ symStr zero
-ppCardinal nc x | x < 0     = Nothing
-                | otherwise = do m <- ncMax nc
-                                 guard (x <= m)
-                                 fmap toString $ go x
+
+cardinal :: NumConfig -> Integer -> Maybe String
+cardinal nc 0 = do zero <- ncCardinal nc $ 0
+                   return $ symStr zero
+cardinal nc x | x < 0     = Nothing
+              | otherwise = maybe (fmap toString $ go x)
+                                  (\m -> if (x <= m)
+                                         then fmap toString $ go x
+                                         else Nothing
+                                  )
+                                  $ ncMax nc
     where go n = do sym@(NumSym _ v v') <- (ncCardinal nc) n
                     let vs = showString v'
                     case n `divMod` v of
@@ -177,8 +192,8 @@ testNums 0 = 0 : testNums 1
 testNums n = n : testNums (1 + n + n `mod` 7)
 
 test :: NumConfig -> [Integer] -> IO ()
-test nc = mapM_ (putStrLn . pp)
-    where pp n = show n ++ " == " ++ (maybe "-" id $ ppCardinal nc n)
+test nc = mapM_ (putStrLn . pretty)
+    where pretty n = show n ++ " == " ++ (maybe "-" id $ cardinal nc n)
 
 testSome :: NumConfig -> Integer -> Integer -> IO ()
 testSome nc start amount = test nc . genericTake amount . testNums $ start

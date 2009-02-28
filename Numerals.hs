@@ -76,6 +76,8 @@ Automatically generate a list of symbol names using latin.
 
 import Data.List
 
+import Control.Monad (guard)
+
 -------------------------------------------------------------------------------
 -- Types
 -------------------------------------------------------------------------------
@@ -110,11 +112,11 @@ data NumSymbol = NumSym { sumType :: SymbolType
                         , symStr  :: String
                         } deriving Show
 
-data NumConfig = NumConfig { ncMax      :: Maybe Integer
-                           , ncOne      :: NumSymbol -> String
-                           , ncAdd      :: (Integer, String) -> (Integer, String) -> String
-                           , ncMul      :: (Integer, String) -> (Integer, String) -> String
-                           , ncCardinal :: Integer -> Maybe NumSymbol
+data NumConfig = NumConfig { ncMax   :: Maybe Integer
+                           , ncTable :: [NumSymbol]
+                           , ncOne   :: NumSymbol -> String
+                           , ncAdd   :: (Integer, String) -> (Integer, String) -> String
+                           , ncMul   :: (Integer, String) -> (Integer, String) -> String
                            }
 
 b, t :: Integer -> String -> NumSymbol
@@ -132,10 +134,10 @@ ppCardinal :: NumConfig -> Integer -> Maybe String
 ppCardinal nc 0 = do zero <- ncCardinal nc $ 0
                      return $ symStr zero
 ppCardinal nc x | x < 0     = Nothing
-                | otherwise = maybe (go x)
-                                    (\m -> if x > m then Nothing else go x)
-                                    $ ncMax nc
-    where go n = do sym@(NumSym _ v v') <- (ncCardinal nc) n
+                | otherwise = do m <- ncMax nc
+                                 guard (x <= m)
+                                 fmap toString $ go x
+    where go n = do sym@(NumSym _ v v') <- findSym (ncTable nc) n
                     case n `divMod` v of
                       (1, 0) -> return $ one sym
                       (1, r) -> do r' <- go r
@@ -143,12 +145,15 @@ ppCardinal nc x | x < 0     = Nothing
                       (q, r) | q > v     -> Nothing
                              | otherwise -> do q' <- go q
                                                if r == 0
-                                                 then return $ (q, q') `mul` (v, v')
+                                                 then return $ (q, q') `mul` (v, vs)
                                                  else do r' <- go r
-                                                         return $ (q*v, (q, q') `mul` (v, v')) `add` (r, r')
+                                                         return $ (q*v, (q, q') `mul` (v, vs)) `add` (r, r')
           one = ncOne nc
           add = ncAdd nc
           mul = ncMul nc
+
+toString :: ShowS -> String
+toString = ($ [])
 
 -- | Find the first symbol which has exactly the requested value. If
 --   none is found find the last multiplication base which is smaller
@@ -182,11 +187,8 @@ testSome nc start amount = test nc . genericTake amount . testNums $ start
 -------------------------------------------------------------------------------
 
 nlOne = symStr
-nlAdd (x, x') (y, y') | x < 20    = y' ++ x'
-                      | x < 100   = case y of
-                                      2 -> "tweëen" ++ x'
-                                      3 -> "driëen" ++ x'
-                                      _ -> y' ++ "en" ++ x'
+nlAdd (x, x') (_, y') | x < 20    = y' ++ x'
+                      | x < 100   = y' ++ "en" ++ x'
                       | otherwise = x' ++ " " ++ y'
 nlMul (_, x') (_, y') = x' ++ " " ++ y'
 
@@ -298,12 +300,17 @@ enTable = [ t 0    "zero"
           , b 1000 "thousand"
           ]
 
-enOne (NumSym Base v v') | v >= 100  = "one " ++ v'
-                         | otherwise = v'
-enOne sym = symStr sym
-enAdd (x, x') (_, y') | x < 100   = x' ++ "-" ++ y'
-                      | otherwise = x' ++ " " ++ y'
-enMul (_, x') (_, y') = x' ++ " " ++ y'
+enOne (NumSym Base v v') | v >= 100  = showString "one " . vs
+                         | otherwise = vs
+    where
+      vs = showString v'
+
+enOne sym = showString $ symStr sym
+
+enAdd (x, x') (_, y') | x < 100   = x' . showChar '-' . y'
+                      | otherwise = x' . showChar ' ' . y'
+
+enMul (_, x') (_, y') = x' . showChar ' ' . y'
 
 shortEnTable = enTable ++
                [ b (d 6)  "million"
@@ -370,9 +377,9 @@ longEn = NumConfig { ncMax      = Just $ d 126 - 1
                    , ncCardinal = findSym longEnTable
                    }
 
-latinOne = symStr
-latinAdd (_, x') (_, y') = x' ++ " A " ++ y'
-latinMul (_, x') (_, y') = x' ++ " M " ++ y'
+latinOne = showString . symStr
+latinAdd (_, x') (_, y') = x' . showString " A " . y'
+latinMul (_, x') (_, y') = x' . showString " M " . y'
 
 latinTable = [ t 0     "nulla"
              , t 1     "unus"

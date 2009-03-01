@@ -475,10 +475,111 @@ de = NumConfig { ncOne      = deOne
 
 -------------------------------------------------------------------------------
 
+seOne = showString . symStr
+seAdd (_, x') (_, y') = x' . y'
+seMul (_, x') (_, y') = x' . y'
+
+seTable :: [NumSymbol]
+seTable = [ term 0           "noll"
+          , term 1           "ett"
+          , term 2           "två"
+          , term 3           "tre"
+          , term 4           "fyra"
+          , term 5           "fem"
+          , term 6           "sex"
+          , term 7           "sju"
+          , term 8           "åtta"
+          , term 9           "nio"
+          , mul  10    10    "tio"
+          , term 11          "elva"
+          , term 12          "tolv"
+          , term 13          "fretton"
+          , term 14          "fjorton"
+          , term 15          "femton"
+          , term 16          "sexton"
+          , term 17          "sjutton"
+          , term 18          "arton"
+          , term 19          "nitton"
+          , add  20    10    "tjugo"
+          , add  30    10    "trettio"
+          , add  40    10    "fyrtio"
+          , add  50    10    "femtio"
+          , add  60    10    "sextio"
+          , add  70    10    "sjuttio"
+          , add  80    10    "åttio"
+          , add  90    10    "nittio"
+          , mul  100   10    "hundra"
+          , mul  (d 3) (d 3) "tusen"
+          , add  (d 6) (d 6) "miljon"
+          , mul  (d 6) (d 3) "miljoner"
+          , add  (d 9) (d 9) "miljard"
+          , mul  (d 9) (d 3) "miljarder"
+          ]
+
+se :: NumConfig
+se = NumConfig { ncOne      = seOne
+               , ncAdd      = seAdd
+               , ncMul      = seMul
+               , ncCardinal = findSym seTable
+               }
+
+-------------------------------------------------------------------------------
+
+noOne (NumSym _ v v') | v >= (d 6) = showString "én " . showString v'
+                      | otherwise  = showString v'
+noAdd (x, x') (_, y') | x == 100  = x' . showString " og " . y'
+                      | otherwise = x' . y'
+noMul (_, x') (_, y') = x' . y'
+
+noTable :: [NumSymbol]
+noTable = [ term 0           "null"
+          , term 1           "én"
+          , term 2           "to"
+          , term 3           "tre"
+          , term 4           "fire"
+          , term 5           "fem"
+          , term 6           "seks"
+          , term 7           "sju"
+          , term 8           "åtte"
+          , term 9           "ni"
+          , mul  10    10    "ti"
+          , term 11          "elleve"
+          , term 12          "tolv"
+          , term 13          "tretten"
+          , term 14          "fjorten"
+          , term 15          "femten"
+          , term 16          "seksten"
+          , term 17          "sytten"
+          , term 18          "atten"
+          , term 19          "nitten"
+          , add  20    10    "tjue"
+          , add  30    10    "tretti"
+          , add  40    10    "førti"
+          , add  50    10    "femti"
+          , add  60    10    "seksti"
+          , add  70    10    "sytti"
+          , add  80    10    "åtti"
+          , add  90    10    "nitti"
+          , mul  100   10    "hundre"
+          , mul  (d 3) (d 3) "tusen"
+          , add  (d 6) (d 6) "million"
+          , mul  (d 6) (d 3) "millioner"
+          , add  (d 9) (d 9) "milliard"
+          , mul  (d 9) (d 3) "milliarder"
+          ]
+
+no :: NumConfig
+no = NumConfig { ncOne      = noOne
+               , ncAdd      = noAdd
+               , ncMul      = noMul
+               , ncCardinal = findSym noTable
+               }
+
+-------------------------------------------------------------------------------
+
 latinOne = showString . symStr
 latinAdd (_, x') (_, y') = x' . showChar ' ' . y'
-latinMul (_, x') (y, y') | y == 1000 = x' . showString " millia"
-                         | otherwise = x' . showChar ' ' . y'
+latinMul (_, x') (_, y') = x' . showChar ' ' . y'
 
 latinTable :: [NumSymbol]
 latinTable = [ term 0         "nulla"
@@ -534,7 +635,8 @@ latinTable = [ term 0         "nulla"
              , add  700  100  "septingenti"
              , add  800  100  "octigenti"
              , add  900  100  "nongenti"
-             , mul  1000 1000 "mille"
+             , add  1000 1000 "mille"
+             , mul  1000 1000 "millia"
              , term (d 6)     "decies centena milia"
              ]
 
@@ -547,13 +649,11 @@ latin = NumConfig { ncOne      = latinOne
 
 -------------------------------------------------------------------------------
 
-frOne sym = showString $ symStr sym
+frOne = showString . symStr
 frAdd (x, x') (y, y') | x < 80 && y == 1 = x' . showString " et " . y'
                       | x < 100          = x' . showChar '-' . y'
                       | otherwise        = x' . showChar ' ' . y'
-frMul (_, x') (y, y') | y == 100  = xy' . showChar 's'
-                      | otherwise = xy'
-    where xy' = x' . showChar ' ' . y'
+frMul (_, x') (_, y') = x' . showChar ' ' . y'
 
 frTable :: [NumSymbol]
 frTable = [ term 0           "zéro"
@@ -581,7 +681,8 @@ frTable = [ term 0           "zéro"
           , term 71          "soixante et onze"
           , term 80          "quatre-vingts"
           , add  80    10    "quatre-vingt"
-          , mul  100   10    "cent"
+          , add  100   100   "cent"
+          , mul  100   10    "cents"
           , mul  1000  (d 3) "mille"
           , mul  (d 6) (d 3) "million"
           , mul  (d 9) (d 3) "millard"
@@ -596,7 +697,7 @@ fr = NumConfig { ncOne      = frOne
 
 -------------------------------------------------------------------------------
 
-spOne sym = showString $ symStr sym
+spOne = showString . symStr
 
 spAdd (x, x') (_, y') | x < 100   =  x' . showString " y " . y'
                       | otherwise  = x' . showChar ' ' . y'
@@ -650,7 +751,78 @@ sp = NumConfig { ncOne      = spOne
 
 -------------------------------------------------------------------------------
 
-eoOne sym = showString $ symStr sym
+itOne = showString . symStr
+
+itAdd (_, x') (y, y') | y == 3    = x' . showString "tré"
+                      | otherwise = x' . y'
+
+itMul (_, x') (y, y') | y < d 6   = x' . y'
+                      | otherwise = x' . showChar ' ' . y'
+
+itTable :: [NumSymbol]
+itTable = [ term 0           "zero"
+          , term 1           "uno"
+          , term 2           "due"
+          , term 3           "tre"
+          , term 4           "quattro"
+          , term 5           "cinque"
+          , term 6           "sei"
+          , term 7           "sette"
+          , term 8           "otto"
+          , term 9           "nove"
+          , mul  10    10    "dieci"
+          , term 11          "undici"
+          , term 12          "dodici"
+          , term 13          "tredici"
+          , term 14          "quattordici"
+          , term 15          "quindici"
+          , term 16          "sedici"
+          , term 17          "diciassette"
+          , term 18          "diciotto"
+          , term 19          "diciannove"
+          , add  20    10    "venti"
+          , term 21          "ventuno"
+          , term 28          "ventotto"
+          , add  30    10    "trenta"
+          , term 31          "trentuno"
+          , term 38          "trentotto"
+          , add  40    10    "quaranta"
+          , term 41          "quarantuno"
+          , term 48          "quarantotto"
+          , add  50    10    "cinquanta"
+          , term 51          "cinquantuno"
+          , term 58          "cinquantotto"
+          , add  60    10    "sessanta"
+          , term 61          "sessantuno"
+          , term 68          "sessantotto"
+          , add  70    10    "settanta"
+          , term 71          "settantuno"
+          , term 78          "settantotto"
+          , add  80    10    "ottanta"
+          , term 81          "ottantuno"
+          , term 88          "ottantotto"
+          , add  90    10    "novanta"
+          , term 91          "novantuno"
+          , term 98          "novantotto"
+          , mul  100   10    "cento"
+          , add  1000  1000  "mille"
+          , mul  1000  (d 3) "mila"
+          , add  (d 6) (d 6) "milione"
+          , mul  (d 6) (d 3) "milioni"
+          , add  (d 9) (d 9) "miliardo"
+          , mul  (d 9) (d 3) "miliardi"
+          ]
+
+it :: NumConfig
+it = NumConfig { ncOne      = itOne
+               , ncAdd      = itAdd
+               , ncMul      = itMul
+               , ncCardinal = findSym itTable
+               }
+
+-------------------------------------------------------------------------------
+
+eoOne = showString . symStr
 eoAdd (_, x') (_, y') = x' . showChar ' ' . y'
 eoMul (_, x') (_, y') = x' . y'
 
@@ -678,3 +850,50 @@ eo = NumConfig { ncOne      = eoOne
                , ncCardinal = findSym eoTable
                }
 
+-------------------------------------------------------------------------------
+
+jaOne (NumSym _ v v') | v < 100 || (300 >= v && v < 400) = showString v'
+                      | otherwise = showString "ichi-" . showString v'
+jaAdd (_, x') (_, y') = x' . showChar ' ' . y'
+jaMul (_, x') (_, y') = x' . showChar '-' . y'
+
+jaTable :: [NumSymbol]
+jaTable = [ term 0           "zero"
+          , term 1           "ichi"
+          , term 2           "ni"
+          , term 3           "san"
+          , term 4           "yon"
+          , term 5           "go"
+          , term 6           "roku"
+          , term 7           "nana"
+          , term 8           "hachi"
+          , term 9           "kyū"
+          , mul 10     10    "jū"
+          , mul 100    10    "hyaku"
+          , add 300    100   "san-byaku" -- rendaku
+          , mul 1000   10    "sen"
+          , mul (d 4)  (d 4) "man"
+          , mul (d 8)  (d 4) "oku"
+          , mul (d 12) (d 4) "chō"
+          , mul (d 16) (d 4) "kei"
+          , mul (d 20) (d 4) "gai"
+          , mul (d 24) (d 4) "jo"
+          , mul (d 28) (d 4) "jō"
+          , mul (d 32) (d 4) "kō"
+          , mul (d 36) (d 4) "kan"
+          , mul (d 40) (d 4) "sei"
+          , mul (d 44) (d 4) "sai"
+          , mul (d 48) (d 4) "goku"
+          , mul (d 52) (d 4) "gōgasha"
+          , mul (d 56) (d 4) "asōgi"
+          , mul (d 60) (d 4) "nayuta"
+          , mul (d 64) (d 4) "fukashigi"
+          , mul (d 68) (d 4) "muryōtaisū"
+          ]
+
+ja :: NumConfig
+ja = NumConfig { ncOne      = jaOne
+               , ncAdd      = jaAdd
+               , ncMul      = jaMul
+               , ncCardinal = findSym jaTable
+               }

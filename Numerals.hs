@@ -1,5 +1,10 @@
 -- -*- coding: utf-8 -*-
 
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 module Numerals where
 
 
@@ -107,6 +112,9 @@ French
 -}
 
 import Data.List
+import qualified Data.DString as DS
+import Data.String
+import Data.Monoid
 
 -------------------------------------------------------------------------------
 -- Types
@@ -127,12 +135,30 @@ data NumSymbol = NumSym { symType     :: SymbolType
 -- "ten" is in the additive scope for [10 .. 10 + 10 - 1]
 -- "ten" is in the multiplicative scope for [10 .. 10 * 10 - 1]
 
-
-data NumConfig = NumConfig { ncCardinal :: Integer -> Maybe NumSymbol
-                           , ncOne      :: NumSymbol -> ShowS
-                           , ncAdd      :: (Integer, ShowS) -> (Integer, ShowS) -> ShowS
-                           , ncMul      :: (Integer, ShowS) -> (Integer, ShowS) -> ShowS
+data NumConfig = forall s. (IsString s, Stringable s) =>
+                 NumConfig { ncCardinal :: Integer -> Maybe NumSymbol
+                           , ncOne      :: NumSymbol -> s
+                           , ncAdd      :: (Integer, s) -> (Integer, s) -> s
+                           , ncMul      :: (Integer, s) -> (Integer, s) -> s
                            }
+
+-- TODO: Better names:
+type OneCombinator = NumSymbol -> DS.DString
+type Combinator    = (Integer, DS.DString) -> (Integer, DS.DString) -> DS.DString
+
+(+++) :: Monoid m => m -> m -> m
+(+++) = mappend
+
+infixr 5 +++ -- Same as ++
+
+class Stringable s where
+    toString :: s -> String
+
+instance Stringable String where
+    toString = id
+
+instance Stringable DS.DString where
+    toString = DS.toString
 
 -- Easy construction of NumSymbols
 term :: Integer -> String -> NumSymbol
@@ -153,28 +179,21 @@ d = (10 ^)
 
 
 cardinal :: NumConfig -> Integer -> Maybe String
-cardinal nc 0 = do zero <- ncCardinal nc $ 0
-                   return $ symStr zero
-cardinal nc x | x < 0     = Nothing
-              | otherwise =fmap toString $ go x
-    where go n = do sym@(NumSym _ v v') <- (ncCardinal nc) n
-                    let vs = showString v'
+cardinal NumConfig {..} 0 = fmap symStr $ ncCardinal 0
+cardinal NumConfig {..} x | x < 0     = Nothing
+                          | otherwise = fmap toString $ go x
+    where go n = do sym@(NumSym _ v v') <- ncCardinal n
+                    let vs = fromString v'
                     case n `divMod` v of
-                      (1, 0) -> return $ one sym
+                      (1, 0) -> return $ ncOne sym
                       (1, r) -> do rs <- go r
-                                   return $ (v, one sym) `add` (r, rs)
+                                   return $ (v, ncOne sym) `ncAdd` (r, rs)
                       (q, r) | q > v     -> Nothing
                              | otherwise -> do qs <- go q
                                                if r == 0
-                                                 then return $ (q, qs) `mul` (v, vs)
+                                                 then return $ (q, qs) `ncMul` (v, vs)
                                                  else do rs <- go r
-                                                         return $ (q*v, (q, qs) `mul` (v, vs)) `add` (r, rs)
-          one = ncOne nc
-          add = ncAdd nc
-          mul = ncMul nc
-
-toString :: ShowS -> String
-toString = ($ [])
+                                                         return $ (q*v, (q, qs) `ncMul` (v, vs)) `ncAdd` (r, rs)
 
 findSym :: [NumSymbol] -> Integer -> Maybe NumSymbol
 findSym []     _ = Nothing
@@ -225,14 +244,19 @@ testSome nc start amount = test nc . genericTake amount . testNums $ start
 -- Numeral configurations
 -------------------------------------------------------------------------------
 
-nlOne = showString . symStr
-nlAdd (x, x') (y, y') | x < 20    = y' . x'
+nlOne :: OneCombinator
+nlOne = fromString . symStr
+
+nlAdd :: Combinator
+nlAdd (x, x') (y, y') | x < 20    = y' +++ x'
                       | x < 100   = case y of
-                                      2 -> showString "tweëen" . x'
-                                      3 -> showString "driëen" . x'
-                                      _ -> y' . showString "en" . x'
-                      | otherwise = x' . showChar ' ' . y'
-nlMul (_, x') (_, y') = x' . showChar ' ' .  y'
+                                      2 -> "tweëen" +++ x'
+                                      3 -> "driëen" +++ x'
+                                      _ -> y' +++ "en" +++ x'
+                      | otherwise = x' +++ " " +++ y'
+
+nlMul :: Combinator
+nlMul (_, x') (_, y') = x' +++ " " +++ y'
 
 nlTable :: [NumSymbol]
 nlTable = [ term 0             "nul"
@@ -344,16 +368,19 @@ enTable = [ term 0         "zero"
           , mul  1000 1000 "thousand"
           ]
 
-enOne (NumSym (Mul _ _) v v') | v >= 100  = showString "one " . vs
+enOne :: OneCombinator
+enOne (NumSym (Mul _ _) v v') | v >= 100  = "one" +++ " " +++ vs
                               | otherwise = vs
-    where vs = showString v'
+    where vs = fromString v'
 
-enOne sym = showString $ symStr sym
+enOne sym = fromString $ symStr sym
 
-enAdd (x, x') (_, y') | x < 100   = x' . showChar '-' . y'
-                      | otherwise = x' . showChar ' ' . y'
+enAdd :: Combinator
+enAdd (x, x') (_, y') | x < 100   = x' +++ "-" +++ y'
+                      | otherwise = x' +++ " " +++ y'
 
-enMul (_, x') (_, y') = x' . showChar ' ' . y'
+enMul :: Combinator
+enMul (_, x') (_, y') = x' +++ " " +++ y'
 
 shortEnTable :: [NumSymbol]
 shortEnTable = enTable ++
@@ -423,18 +450,22 @@ longEn = NumConfig { ncOne      = enOne
 -------------------------------------------------------------------------------
 
 
+deOne :: OneCombinator
+deOne (NumSym _ v v') | v >= (d 6) = "eine" +++ " " +++ vs
+                      | v >= 100   = "ein" +++ vs
+                      | otherwise  = vs
+    where vs = fromString v'
 
-deOne (NumSym _ v v') | v >= (d 6) = showString "eine " . showString v'
-                      | v >= 100   = showString "ein" . showString v'
-                      | otherwise  = showString v'
-deAdd (x, x') (y, y') | x < 20    = y' . x'
+deAdd :: Combinator
+deAdd (x, x') (y, y') | x < 20    = y' +++ x'
                       | x < 100   = case y of
-                                      1 -> showString "einund". x'
-                                      _ -> y' . showString "und" . x'
-                      | otherwise = x' . y'
+                                      1 -> "einund" +++ x'
+                                      _ -> y' +++ "und" +++ x'
+                      | otherwise = x' +++ y'
 
-deMul (_, x') (y, y') | y < (d 6) = x' . y'
-                      | otherwise = x' . y' -- x' . showChar ' ' . y'
+deMul :: Combinator
+deMul (_, x') (y, y') | y < (d 6) = x' +++ y'
+                      | otherwise = x' +++ y' -- x' +++ " " +++ y'
 
 deTable :: [NumSymbol]
 deTable = [ term 0           "null"
@@ -475,9 +506,14 @@ de = NumConfig { ncOne      = deOne
 
 -------------------------------------------------------------------------------
 
-seOne = showString . symStr
-seAdd (_, x') (_, y') = x' . y'
-seMul (_, x') (_, y') = x' . y'
+seOne :: OneCombinator
+seOne = fromString . symStr
+
+seAdd :: Combinator
+seAdd (_, x') (_, y') = x' +++ y'
+
+seMul :: Combinator
+seMul (_, x') (_, y') = x' +++ y'
 
 seTable :: [NumSymbol]
 seTable = [ term 0           "noll"
@@ -525,11 +561,17 @@ se = NumConfig { ncOne      = seOne
 
 -------------------------------------------------------------------------------
 
-noOne (NumSym _ v v') | v >= (d 6) = showString "én " . showString v'
-                      | otherwise  = showString v'
-noAdd (x, x') (_, y') | x == 100  = x' . showString " og " . y'
-                      | otherwise = x' . y'
-noMul (_, x') (_, y') = x' . y'
+noOne :: OneCombinator
+noOne (NumSym _ v v') | v >= (d 6) = "én" +++ " " +++ vs
+                      | otherwise  = vs
+    where vs = fromString v'
+
+noAdd :: Combinator
+noAdd (x, x') (_, y') | x == 100  = x' +++ " " +++ "og" +++ " " +++ y'
+                      | otherwise = x' +++ y'
+
+noMul :: Combinator
+noMul (_, x') (_, y') = x' +++ y'
 
 noTable :: [NumSymbol]
 noTable = [ term 0           "null"
@@ -577,9 +619,14 @@ no = NumConfig { ncOne      = noOne
 
 -------------------------------------------------------------------------------
 
-latinOne = showString . symStr
-latinAdd (_, x') (_, y') = x' . showChar ' ' . y'
-latinMul (_, x') (_, y') = x' . showChar ' ' . y'
+latinOne :: OneCombinator
+latinOne = fromString . symStr
+
+latinAdd :: Combinator
+latinAdd (_, x') (_, y') = x' +++ " " +++ y'
+
+latinMul :: Combinator
+latinMul (_, x') (_, y') = x' +++ " " +++ y'
 
 latinTable :: [NumSymbol]
 latinTable = [ term 0         "nulla"
@@ -649,11 +696,16 @@ latin = NumConfig { ncOne      = latinOne
 
 -------------------------------------------------------------------------------
 
-frOne = showString . symStr
-frAdd (x, x') (y, y') | x < 80 && y == 1 = x' . showString " et " . y'
-                      | x < 100          = x' . showChar '-' . y'
-                      | otherwise        = x' . showChar ' ' . y'
-frMul (_, x') (_, y') = x' . showChar ' ' . y'
+frOne :: OneCombinator
+frOne = fromString . symStr
+
+frAdd :: Combinator
+frAdd (x, x') (y, y') | x < 80 && y == 1 = x' +++ " " +++ "et" +++ " " +++ y'
+                      | x < 100          = x' +++ "-" +++ y'
+                      | otherwise        = x' +++ " " +++ y'
+
+frMul :: Combinator
+frMul (_, x') (_, y') = x' +++ " " +++ y'
 
 frTable :: [NumSymbol]
 frTable = [ term 0           "zéro"
@@ -697,12 +749,15 @@ fr = NumConfig { ncOne      = frOne
 
 -------------------------------------------------------------------------------
 
-spOne = showString . symStr
+spOne :: OneCombinator
+spOne = fromString . symStr
 
-spAdd (x, x') (_, y') | x < 100   =  x' . showString " y " . y'
-                      | otherwise  = x' . showChar ' ' . y'
+spAdd :: Combinator
+spAdd (x, x') (_, y') | x < 100   =  x' +++ " " +++ "y" +++ " " +++ y'
+                      | otherwise  = x' +++ " " +++ y'
 
-spMul (_, x') (_, y') = x' . showChar ' ' . y'
+spMul :: Combinator
+spMul (_, x') (_, y') = x' +++ " " +++ y'
 
 spTable :: [NumSymbol]
 spTable = [ term 0           "cero"
@@ -751,13 +806,16 @@ sp = NumConfig { ncOne      = spOne
 
 -------------------------------------------------------------------------------
 
-itOne = showString . symStr
+itOne :: OneCombinator
+itOne = fromString . symStr
 
-itAdd (_, x') (y, y') | y == 3    = x' . showString "tré"
-                      | otherwise = x' . y'
+itAdd :: Combinator
+itAdd (_, x') (y, y') | y == 3    = x' +++ "tré"
+                      | otherwise = x' +++ y'
 
-itMul (_, x') (y, y') | y < d 6   = x' . y'
-                      | otherwise = x' . showChar ' ' . y'
+itMul :: Combinator
+itMul (_, x') (y, y') | y < d 6   = x' +++ y'
+                      | otherwise = x' +++ " " +++ y'
 
 itTable :: [NumSymbol]
 itTable = [ term 0           "zero"
@@ -822,9 +880,14 @@ it = NumConfig { ncOne      = itOne
 
 -------------------------------------------------------------------------------
 
-eoOne = showString . symStr
-eoAdd (_, x') (_, y') = x' . showChar ' ' . y'
-eoMul (_, x') (_, y') = x' . y'
+eoOne :: OneCombinator
+eoOne = fromString . symStr
+
+eoAdd :: Combinator
+eoAdd (_, x') (_, y') = x' +++ " " +++ y'
+
+eoMul :: Combinator
+eoMul (_, x') (_, y') = x' +++ y'
 
 eoTable :: [NumSymbol]
 eoTable = [ term 0          "nulo"
@@ -852,10 +915,16 @@ eo = NumConfig { ncOne      = eoOne
 
 -------------------------------------------------------------------------------
 
-jaOne (NumSym _ v v') | v < 100 || (300 >= v && v < 400) = showString v'
-                      | otherwise = showString "ichi-" . showString v'
-jaAdd (_, x') (_, y') = x' . showChar ' ' . y'
-jaMul (_, x') (_, y') = x' . showChar '-' . y'
+jaOne :: OneCombinator
+jaOne (NumSym _ v v') | v < 100 || (300 >= v && v < 400) = vs
+                      | otherwise = "ichi" +++ "-" +++ vs
+    where vs = fromString v'
+
+jaAdd :: Combinator
+jaAdd (_, x') (_, y') = x' +++ " " +++ y'
+
+jaMul :: Combinator
+jaMul (_, x') (_, y') = x' +++ "-" +++ y'
 
 jaTable :: [NumSymbol]
 jaTable = [ term 0           "zero"

@@ -273,6 +273,7 @@ nlMul (_, x') (_, y') = x' <+> y'
 
 nlTable :: [NumSymbol]
 nlTable = [ term 0          "nul"
+
           , term 1          "één"
           , term 2          "twee"
           , term 3          "drie"
@@ -282,61 +283,90 @@ nlTable = [ term 0          "nul"
           , term 7          "zeven"
           , term 8          "acht"
           , term 9          "negen"
+
           , mul  10         "tien"
+
           , term 11         "elf"
           , term 12         "twaalf"
           , term 13         "dertien"
           , term 14         "veertien"
-          , add  20      10 "twintig"
-          , add  30      10 "dertig"
-          , add  40      10 "veertig"
-          , add  50      10 "vijftig"
-          , add  60      10 "zestig"
-          , add  70      10 "zeventig"
-          , add  80      10 "tachtig"
-          , add  90      10 "negentig"
+
+          , add  20  10     "twintig"
+          , add  30  10     "dertig"
+          , add  40  10     "veertig"
+          , add  50  10     "vijftig"
+          , add  60  10     "zestig"
+          , add  70  10     "zeventig"
+          , add  80  10     "tachtig"
+          , add  90  10     "negentig"
+
           , mul  (d 2)      "honderd"
+
           , mul  (d 3)      "duizend"
-          , mul  (d 6)      "miljoen"
-          , mul  (d 9)      "miljard"
-          , mul  (d 12)     "biljoen"
-          , mul  (d 15)     "biljard"
-          , mul  (d 18)     "triljoen"
-          , mul  (d 21)     "triljard"
-          , mul  (d 24)     "quadriljoen"
-          , mul  (d 27)     "quadriljard"
-          , mul  (d 30)     "quintiljoen"
-          , mul  (d 33)     "quintiljard"
-          , mul  (d 36)     "sextiljoen"
-          , mul  (d 39)     "sextiljard"
-          , mul  (d 42)     "septiljoen"
-          , mul  (d 45)     "septiljard"
-          , mul  (d 48)     "octiljoen"
-          , mul  (d 51)     "octiljard"
-          , mul  (d 54)     "noniljoen"
-          , mul  (d 57)     "noniljard"
-          , mul  (d 60)     "deciljoen"
-          , mul  (d 63)     "deciljard"
-          , mul  (d 66)     "undeciljoen"
-          , mul  (d 69)     "undeciljard"
-          , mul  (d 72)     "duodeciljoen"
-          , mul  (d 75)     "duodeciljard"
-          , mul  (d 78)     "tredeciljoen"
-          , mul  (d 81)     "tredeciljard"
-          , mul  (d 84)     "quattuordeciljoen"
-          , mul  (d 87)     "quattuordeciljard"
-          , mul  (d 90)     "quindeciljoen"
-          , mul  (d 93)     "quindeciljard"
-          , mul  (d 96)     "sexdeciljoen"
-          , mul  (d 99)     "sexdeciljard"
-          , mul  (d 102)    "septendeciljoen"
-          , mul  (d 105)    "septendeciljard"
-          , mul  (d 108)    "octodeciljoen"
-          , mul  (d 111)    "octodeciljard"
-          , mul  (d 114)    "novemdeciljoen"
-          , mul  (d 117)    "novemdeciljard"
-          , mul  (d 120)    "vigintiljoen"
-          , mul  (d 123)    "vigintiljard"
+
+          , mul  (d 6)      "miljoen"              -- m 1         where m = (d 6 ^)
+          , mul  (d 9)      "miljard"              -- m 1  * d 3
+          , mul  (d 12)     "biljoen"              -- m 2
+          , mul  (d 15)     "biljard"              -- m 2  * d 3
+          , mul  (d 18)     "triljoen"             -- m 3
+          , mul  (d 21)     "triljard"             -- m 3  * d 3
+          , mul  (d 24)     "quadriljoen"          -- m 4
+          , mul  (d 27)     "quadriljard"          -- m 4  * d 3
+          , mul  (d 30)     "quintiljoen"          -- m 5
+          , mul  (d 33)     "quintiljard"          -- m 5  * d 3
+          , mul  (d 36)     "sextiljoen"           -- m 6
+          , mul  (d 39)     "sextiljard"           -- m 6  * d 3
+          , mul  (d 42)     "septiljoen"           -- m 7
+          , mul  (d 45)     "septiljard"           -- m 7  * d 3
+          , mul  (d 48)     "octiljoen"            -- m 8
+          , mul  (d 51)     "octiljard"            -- m 8  * d 3
+          , mul  (d 54)     "noniljoen"            -- m 9
+          , mul  (d 57)     "noniljard"            -- m 9  * d 3
+
+          , mul  (d 60)     "deciljoen"            -- m 10
+          , mul  (d 63)     "deciljard"            -- m 10  * d 3
+
+          , mul  (d 66)     "undeciljoen"          -- m 11
+          , mul  (d 69)     "undeciljard"          -- m 11  * d 3
+          , mul  (d 72)     "duodeciljoen"         -- m 12
+          , mul  (d 75)     "duodeciljard"         -- m 12  * d 3
+          , mul  (d 78)     "tredeciljoen"         -- m 13
+          , mul  (d 81)     "tredeciljard"         -- m 13  * d 3
+          , mul  (d 84)     "quattuordeciljoen"    -- m 14
+          , mul  (d 87)     "quattuordeciljard"    -- m 14  * d 3
+          , mul  (d 90)     "quindeciljoen"        -- m 15
+          , mul  (d 93)     "quindeciljard"        -- m 15  * d 3
+          , mul  (d 96)     "sexdeciljoen"         -- m 16
+          , mul  (d 99)     "sexdeciljard"         -- m 16  * d 3
+          , mul  (d 102)    "septendeciljoen"      -- m 17
+          , mul  (d 105)    "septendeciljard"      -- m 17  * d 3
+          , mul  (d 108)    "octodeciljoen"        -- m 18
+          , mul  (d 111)    "octodeciljard"        -- m 18  * d 3
+          , mul  (d 114)    "novemdeciljoen"       -- m 19
+          , mul  (d 117)    "novemdeciljard"       -- m 19  * d 3
+
+          , mul  (d 120)    "vigintiljoen"         -- m 20
+          , mul  (d 123)    "vigintiljard"         -- m 20  * d 3
+          , mul  (d 180)    "trigintiljoen"        -- m 30
+          , mul  (d 183)    "trigintiljard"        -- m 30  * d 3
+          , mul  (d 240)    "quadragintiljoen"     -- m 40
+          , mul  (d 243)    "quadragintiljard"     -- m 40  * d 3
+          , mul  (d 300)    "quindragintiljoen"    -- m 50
+          , mul  (d 303)    "quindragintiljard"    -- m 50  * d 3
+          , mul  (d 360)    "sexagintiljoen"       -- m 60
+          , mul  (d 363)    "sexagintiljard"       -- m 60  * d 3
+          , mul  (d 420)    "septuagintiljoen"     -- m 70
+          , mul  (d 423)    "septuagintiljard"     -- m 70  * d 3
+          , mul  (d 480)    "octogintiljoen"       -- m 80
+          , mul  (d 483)    "octogintiljard"       -- m 80  * d 3
+          , mul  (d 540)    "nonagintiljoen"       -- m 90
+          , mul  (d 543)    "nonagintiljard"       -- m 90  * d 3
+
+          , mul (d 600)     "centiljoen"           -- m (d 2)
+          , mul (d 603)     "centiljard"           -- m (d 2) * d 3
+
+          , mul (d 6000)    "milliljoen"           -- m (d 3)
+          , mul (d 6003)    "milliljard"           -- m (d 3) * d 3
           ]
 
 nl :: NumConfig

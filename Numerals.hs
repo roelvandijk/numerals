@@ -109,6 +109,22 @@ French
   5:  cinq / quin / cinquan
   6:  six / sei / soixan
   10: dix / ze / t / te
+
+Negative numbers:
+
+nl: min
+en: minus
+fr: moins
+de: minus
+sp:
+it:
+se:
+no:
+eo:
+la:
+ja: mainasu
+
+
 -}
 
 import Data.List
@@ -122,41 +138,11 @@ import Data.Monoid
 
 data SymbolType = Terminal | Add | Mul deriving Show
 
-data NumSymbol = NumSym { symType     :: SymbolType
-                        , symVal      :: Integer
-                        , symScope    :: Integer
-                        , symStr      :: String
+data NumSymbol = NumSym { symType  :: SymbolType
+                        , symVal   :: Integer
+                        , symScope :: Integer
+                        , symStr   :: String
                         } deriving Show
-
--- Scope is given as a size. So a scope of 10 includes the value of the symbol itself.
--- NumSym 10 10 10 "ten"
--- "ten" is in the additive scope for [10 .. 10 + 10 - 1]
--- "ten" is in the multiplicative scope for [10 .. 10 * 10 - 1]
-
-data NumConfig = forall s. (IsString s, Stringable s) =>
-                 NumConfig { ncCardinal :: Integer -> Maybe NumSymbol
-                           , ncOne      :: (Integer, s) -> s
-                           , ncAdd      :: (Integer, s) -> (Integer, s) -> s
-                           , ncMul      :: (Integer, s) -> (Integer, s) -> s
-                           }
-
--- TODO: Better names:
-type OneCombinator = (Integer, DS.DString) -> DS.DString
-type Combinator    = (Integer, DS.DString) -> (Integer, DS.DString) -> DS.DString
-
-(+++) :: Monoid m => m -> m -> m
-(+++) = mappend
-
-infixr 5 +++ -- Same as ++
-
-class Stringable s where
-    toString :: s -> String
-
-instance Stringable String where
-    toString = id
-
-instance Stringable DS.DString where
-    toString = DS.toString
 
 -- Easy construction of NumSymbols
 term :: Integer -> String -> NumSymbol
@@ -168,6 +154,43 @@ add = NumSym Add
 mul :: Integer -> String -> NumSymbol
 mul v = NumSym Mul v v
 
+-- Scope is given as a size. So a scope of 10 includes the value of the symbol itself.
+-- NumSym 10 10 10 "ten"
+-- "ten" is in the additive scope for [10 .. 10 + 10 - 1]
+-- "ten" is in the multiplicative scope for [10 .. 10 * 10 - 1]
+
+data NumConfig = forall s. (IsString s, Stringable s) =>
+                 NumConfig { ncCardinal :: Integer -> Maybe NumSymbol
+                           , ncNeg      :: s -> s
+                           , ncOne      :: (Integer, s) -> s
+                           , ncAdd      :: (Integer, s) -> (Integer, s) -> s
+                           , ncMul      :: (Integer, s) -> (Integer, s) -> s
+                           }
+
+-- TODO: Better names:
+type NegCombinator = DS.DString -> DS.DString
+type OneCombinator = (Integer, DS.DString) -> DS.DString
+type Combinator    = (Integer, DS.DString) -> (Integer, DS.DString) -> DS.DString
+
+(<>) :: Monoid s => s -> s -> s
+(<>) = mappend
+
+(<+>), (<->) :: (Monoid s, IsString s) => s -> s -> s
+
+x <+> y = x <> " " <> y
+x <-> y = x <> "-" <> y
+
+infixr 5 <>, <+>, <-> -- Same as ++
+
+class Stringable s where
+    toString :: s -> String
+
+instance Stringable String where
+    toString = id
+
+instance Stringable DS.DString where
+    toString = DS.toString
+
 d :: Integer -> Integer
 d = (10 ^)
 
@@ -177,7 +200,7 @@ d = (10 ^)
 
 cardinal :: NumConfig -> Integer -> Maybe String
 cardinal NumConfig {..} 0 = fmap symStr $ ncCardinal 0
-cardinal NumConfig {..} x | x < 0     = Nothing
+cardinal NumConfig {..} x | x < 0     = fmap (toString . ncNeg) $ go $ abs x
                           | otherwise = fmap toString $ go x
     where go n = do (NumSym _ v _ v') <- ncCardinal n
                     let vs = fromString v'
@@ -231,19 +254,22 @@ testSome nc start amount = test nc . genericTake amount . testNums $ start
 -- Numeral configurations
 -------------------------------------------------------------------------------
 
+nlNeg :: NegCombinator
+nlNeg s = "min" <+> s
+
 nlOne :: OneCombinator
 nlOne = snd
 
 nlAdd :: Combinator
-nlAdd (x, x') (y, y') | x < 20    = y' +++ x'
-                      | x < 100   = case y of
-                                      2 -> "tweëen" +++ x'
-                                      3 -> "driëen" +++ x'
-                                      _ -> y' +++ "en" +++ x'
-                      | otherwise = x' +++ " " +++ y'
+nlAdd (x, x') (y, y') | x < 20    = y' <> x'
+                      | x < 100   = y' <> (if y == 2 || y == 3
+                                           then "ën"
+                                           else "en")
+                                       <> x'
+                      | otherwise = x' <+> y'
 
 nlMul :: Combinator
-nlMul (_, x') (_, y') = x' +++ " " +++ y'
+nlMul (_, x') (_, y') = x' <+> y'
 
 nlTable :: [NumSymbol]
 nlTable = [ term 0          "nul"
@@ -314,13 +340,28 @@ nlTable = [ term 0          "nul"
           ]
 
 nl :: NumConfig
-nl = NumConfig { ncOne      = nlOne
+nl = NumConfig { ncNeg      = nlNeg
+               , ncOne      = nlOne
                , ncAdd      = nlAdd
                , ncMul      = nlMul
                , ncCardinal = findSym nlTable
                }
 
 -------------------------------------------------------------------------------
+
+enNeg :: NegCombinator
+enNeg s = "minus" <+> s
+
+enOne :: OneCombinator
+enOne (v,  v') | v >= 100  = "one" <+> v'
+               | otherwise = v'
+
+enAdd :: Combinator
+enAdd (x, x') (_, y') | x < 100   = x' <-> y'
+                      | otherwise = x' <+> y'
+
+enMul :: Combinator
+enMul (_, x') (_, y') = x' <+> y'
 
 enTable :: [NumSymbol]
 enTable = [ term 0       "zero"
@@ -355,17 +396,6 @@ enTable = [ term 0       "zero"
           , mul  1000    "thousand"
           ]
 
-enOne :: OneCombinator
-enOne (v,  v') | v >= 100  = "one" +++ " " +++ v'
-               | otherwise = v'
-
-enAdd :: Combinator
-enAdd (x, x') (_, y') | x < 100   = x' +++ "-" +++ y'
-                      | otherwise = x' +++ " " +++ y'
-
-enMul :: Combinator
-enMul (_, x') (_, y') = x' +++ " " +++ y'
-
 enShortTable :: [NumSymbol]
 enShortTable = enTable ++
                [ mul (d 6)  "million"
@@ -391,7 +421,8 @@ enShortTable = enTable ++
                ]
 
 enShort :: NumConfig
-enShort = NumConfig { ncOne      = enOne
+enShort = NumConfig { ncNeg      = enNeg
+                    , ncOne      = enOne
                     , ncAdd      = enAdd
                     , ncMul      = enMul
                     , ncCardinal = findSym enShortTable
@@ -425,7 +456,8 @@ enLongTable = enTable ++
               ]
 
 enLong :: NumConfig
-enLong = NumConfig { ncOne      = enOne
+enLong = NumConfig { ncNeg      = enNeg
+                   , ncOne      = enOne
                    , ncAdd      = enAdd
                    , ncMul      = enMul
                    , ncCardinal = findSym enLongTable
@@ -433,22 +465,24 @@ enLong = NumConfig { ncOne      = enOne
 
 -------------------------------------------------------------------------------
 
+deNeg :: NegCombinator
+deNeg s = "minus" <+> s
 
 deOne :: OneCombinator
-deOne (v, v') | v >= (d 6) = "eine" +++ " " +++ v'
-              | v >= 100   = "ein" +++ v'
+deOne (v, v') | v >= (d 6) = "eine" <+> v'
+              | v >= 100   = "ein"  <>  v'
               | otherwise  = v'
 
 deAdd :: Combinator
-deAdd (x, x') (y, y') | x < 20    = y' +++ x'
-                      | x < 100   = case y of
-                                      1 -> "einund" +++ x'
-                                      _ -> y' +++ "und" +++ x'
-                      | otherwise = x' +++ y'
+deAdd (x, x') (y, y') | x < 20    = y' <> x'
+                      | x < 100   = (if y == 1
+                                     then "ein"
+                                     else y') <> "und" <> x'
+                      | otherwise = x' <> y'
 
 deMul :: Combinator
-deMul (_, x') (y, y') | y < (d 6) = x' +++ y'
-                      | otherwise = x' +++ y'
+deMul (_, x') (y, y') | y < (d 6) = x' <> y'
+                      | otherwise = x' <> y'
 
 deTable :: [NumSymbol]
 deTable = [ term 0        "null"
@@ -481,7 +515,8 @@ deTable = [ term 0        "null"
           ]
 
 de :: NumConfig
-de = NumConfig { ncOne      = deOne
+de = NumConfig { ncNeg      = deNeg
+               , ncOne      = deOne
                , ncAdd      = deAdd
                , ncMul      = deMul
                , ncCardinal = findSym deTable
@@ -489,14 +524,17 @@ de = NumConfig { ncOne      = deOne
 
 -------------------------------------------------------------------------------
 
+seNeg :: NegCombinator
+seNeg = error "seNeg: not defined yet you fool!"
+
 seOne :: OneCombinator
 seOne = snd
 
 seAdd :: Combinator
-seAdd (_, x') (_, y') = x' +++ y'
+seAdd (_, x') (_, y') = x' <> y'
 
 seMul :: Combinator
-seMul (_, x') (_, y') = x' +++ y'
+seMul (_, x') (_, y') = x' <> y'
 
 seTable :: [NumSymbol]
 seTable = [ term 0           "noll"
@@ -536,7 +574,8 @@ seTable = [ term 0           "noll"
           ]
 
 se :: NumConfig
-se = NumConfig { ncOne      = seOne
+se = NumConfig { ncNeg      = seNeg
+               , ncOne      = seOne
                , ncAdd      = seAdd
                , ncMul      = seMul
                , ncCardinal = findSym seTable
@@ -544,16 +583,19 @@ se = NumConfig { ncOne      = seOne
 
 -------------------------------------------------------------------------------
 
+noNeg :: NegCombinator
+noNeg = error "noNeg: not defined yet you fool!"
+
 noOne :: OneCombinator
-noOne (v, v') | v >= (d 6) = "én" +++ " " +++ v'
+noOne (v, v') | v >= (d 6) = "én" <+> v'
               | otherwise  = v'
 
 noAdd :: Combinator
-noAdd (x, x') (_, y') | x == 100  = x' +++ " " +++ "og" +++ " " +++ y'
-                      | otherwise = x' +++ y'
+noAdd (x, x') (_, y') | x == 100  = x' <+> "og" <+> y'
+                      | otherwise = x' <> y'
 
 noMul :: Combinator
-noMul (_, x') (_, y') = x' +++ y'
+noMul (_, x') (_, y') = x' <> y'
 
 noTable :: [NumSymbol]
 noTable = [ term 0           "null"
@@ -593,7 +635,8 @@ noTable = [ term 0           "null"
           ]
 
 no :: NumConfig
-no = NumConfig { ncOne      = noOne
+no = NumConfig { ncNeg      = noNeg
+               , ncOne      = noOne
                , ncAdd      = noAdd
                , ncMul      = noMul
                , ncCardinal = findSym noTable
@@ -601,93 +644,100 @@ no = NumConfig { ncOne      = noOne
 
 -------------------------------------------------------------------------------
 
-latinOne :: OneCombinator
-latinOne = snd
+laNeg :: NegCombinator
+laNeg = error "laNeg: not defined yet you fool!"
 
-latinAdd :: Combinator
-latinAdd (_, x') (_, y') = x' +++ " " +++ y'
+laOne :: OneCombinator
+laOne = snd
 
-latinMul :: Combinator
-latinMul (_, x') (_, y') = x' +++ " " +++ y'
+laAdd :: Combinator
+laAdd (_, x') (_, y') = x' <+> y'
 
-latinTable :: [NumSymbol]
-latinTable = [ term 0         "nulla"
-             , term 1         "unus"
-             , term 2         "duo"
-             , term 3         "tres"
-             , term 4         "quattuor"
-             , term 5         "quinque"
-             , term 6         "sex"
-             , term 7         "septem"
-             , term 8         "octo"
-             , term 9         "novem"
-             , mul  10        "decem"
-             , term 11        "undecim"
-             , term 12        "duodecim"
-             , term 13        "tredecim"
-             , term 14        "quattuordecim"
-             , term 15        "quindecim"
-             , term 16        "sedecim"
-             , term 17        "septendecim"
-             , term 18        "duodeviginti"
-             , term 19        "undeviginti"
-             , add  20   10   "viginti"
-             , term 28        "duodetriginta"
-             , term 29        "undetriginta"
-             , add  30   10   "triginta"
-             , term 38        "duodequadraginta"
-             , term 39        "undequadraginta"
-             , add  40   10   "quadraginta"
-             , term 48        "duodequinquaginta"
-             , term 49        "undequinquaginta"
-             , add  50   10   "quinquaginta"
-             , term 58        "duodesexaginta"
-             , term 59        "undesexaginta"
-             , add  60   10   "sexaginta"
-             , term 68        "duodeseptuaginta"
-             , term 69        "undeseptuaginta"
-             , add  70   10   "septuaginta"
-             , term 78        "duodeoctoginta"
-             , term 79        "undeoctoginta"
-             , add  80   10   "octoginta"
-             , term 88        "duodenonaginta"
-             , term 89        "undenonaginta"
-             , add  90   10   "nonaginta"
-             , term 98        "duodecentum"
-             , term 99        "undecentum"
-             , mul  100       "centum"
-             , add  200  100  "ducenti"
-             , add  300  100  "trecenti"
-             , add  400  100  "quadrigenti"
-             , add  500  100  "quingenti"
-             , add  600  100  "sescenti"
-             , add  700  100  "septingenti"
-             , add  800  100  "octigenti"
-             , add  900  100  "nongenti"
-             , add  1000 1000 "mille"
-             , mul  1000      "millia"
-             , term (d 6)     "decies centena milia"
-             ]
+laMul :: Combinator
+laMul (_, x') (_, y') = x' <+> y'
 
-latin :: NumConfig
-latin = NumConfig { ncOne      = latinOne
-                  , ncAdd      = latinAdd
-                  , ncMul      = latinMul
-                  , ncCardinal = findSym latinTable
-                  }
+laTable :: [NumSymbol]
+laTable = [ term 0         "nulla"
+          , term 1         "unus"
+          , term 2         "duo"
+          , term 3         "tres"
+          , term 4         "quattuor"
+          , term 5         "quinque"
+          , term 6         "sex"
+          , term 7         "septem"
+          , term 8         "octo"
+          , term 9         "novem"
+          , mul  10        "decem"
+          , term 11        "undecim"
+          , term 12        "duodecim"
+          , term 13        "tredecim"
+          , term 14        "quattuordecim"
+          , term 15        "quindecim"
+          , term 16        "sedecim"
+          , term 17        "septendecim"
+          , term 18        "duodeviginti"
+          , term 19        "undeviginti"
+          , add  20   10   "viginti"
+          , term 28        "duodetriginta"
+          , term 29        "undetriginta"
+          , add  30   10   "triginta"
+          , term 38        "duodequadraginta"
+          , term 39        "undequadraginta"
+          , add  40   10   "quadraginta"
+          , term 48        "duodequinquaginta"
+          , term 49        "undequinquaginta"
+          , add  50   10   "quinquaginta"
+          , term 58        "duodesexaginta"
+          , term 59        "undesexaginta"
+          , add  60   10   "sexaginta"
+          , term 68        "duodeseptuaginta"
+          , term 69        "undeseptuaginta"
+          , add  70   10   "septuaginta"
+          , term 78        "duodeoctoginta"
+          , term 79        "undeoctoginta"
+          , add  80   10   "octoginta"
+          , term 88        "duodenonaginta"
+          , term 89        "undenonaginta"
+          , add  90   10   "nonaginta"
+          , term 98        "duodecentum"
+          , term 99        "undecentum"
+          , mul  100       "centum"
+          , add  200  100  "ducenti"
+          , add  300  100  "trecenti"
+          , add  400  100  "quadrigenti"
+          , add  500  100  "quingenti"
+          , add  600  100  "sescenti"
+          , add  700  100  "septingenti"
+          , add  800  100  "octigenti"
+          , add  900  100  "nongenti"
+          , add  1000 1000 "mille"
+          , mul  1000      "millia"
+          , term (d 6)     "decies centena milia"
+          ]
+
+la :: NumConfig
+la = NumConfig { ncNeg      = laNeg
+               , ncOne      = laOne
+               , ncAdd      = laAdd
+               , ncMul      = laMul
+               , ncCardinal = findSym laTable
+               }
 
 -------------------------------------------------------------------------------
+
+frNeg :: NegCombinator
+frNeg s = "moins" <+> s
 
 frOne :: OneCombinator
 frOne = snd
 
 frAdd :: Combinator
-frAdd (x, x') (y, y') | x < 80 && y == 1 = x' +++ " " +++ "et" +++ " " +++ y'
-                      | x < 100          = x' +++ "-" +++ y'
-                      | otherwise        = x' +++ " " +++ y'
+frAdd (x, x') (y, y') | x < 80 && y == 1 = x' <+> "et" <+> y'
+                      | x < 100          = x' <-> y'
+                      | otherwise        = x' <+> y'
 
 frMul :: Combinator
-frMul (_, x') (_, y') = x' +++ " " +++ y'
+frMul (_, x') (_, y') = x' <+> y'
 
 frTable :: [NumSymbol]
 frTable = [ term 0         "zéro"
@@ -723,7 +773,8 @@ frTable = [ term 0         "zéro"
           ]
 
 fr :: NumConfig
-fr = NumConfig { ncOne      = frOne
+fr = NumConfig { ncNeg      = frNeg
+               , ncOne      = frOne
                , ncAdd      = frAdd
                , ncMul      = frMul
                , ncCardinal = findSym frTable
@@ -731,15 +782,18 @@ fr = NumConfig { ncOne      = frOne
 
 -------------------------------------------------------------------------------
 
+spNeg :: NegCombinator
+spNeg = error "spNeg: not defined yet you fool!"
+
 spOne :: OneCombinator
 spOne = snd
 
 spAdd :: Combinator
-spAdd (x, x') (_, y') | x < 100   =  x' +++ " " +++ "y" +++ " " +++ y'
-                      | otherwise  = x' +++ " " +++ y'
+spAdd (x, x') (_, y') | x < 100   =  x' <+> "y" <+> y'
+                      | otherwise  = x' <+> y'
 
 spMul :: Combinator
-spMul (_, x') (_, y') = x' +++ " " +++ y'
+spMul (_, x') (_, y') = x' <+> y'
 
 spTable :: [NumSymbol]
 spTable = [ term 0         "cero"
@@ -780,7 +834,8 @@ spTable = [ term 0         "cero"
           ]
 
 sp :: NumConfig
-sp = NumConfig { ncOne      = spOne
+sp = NumConfig { ncNeg      = spNeg
+               , ncOne      = spOne
                , ncAdd      = spAdd
                , ncMul      = spMul
                , ncCardinal = findSym spTable
@@ -788,16 +843,19 @@ sp = NumConfig { ncOne      = spOne
 
 -------------------------------------------------------------------------------
 
+itNeg :: NegCombinator
+itNeg = error "itNeg: not defined yet you fool!"
+
 itOne :: OneCombinator
 itOne = snd
 
 itAdd :: Combinator
-itAdd (_, x') (y, y') | y == 3    = x' +++ "tré"
-                      | otherwise = x' +++ y'
+itAdd (_, x') (y, y') | y == 3    = x' <> "tré"
+                      | otherwise = x' <> y'
 
 itMul :: Combinator
-itMul (_, x') (y, y') | y < d 6   = x' +++ y'
-                      | otherwise = x' +++ " " +++ y'
+itMul (_, x') (y, y') | y < d 6   = x' <> y'
+                      | otherwise = x' <+> y'
 
 itTable :: [NumSymbol]
 itTable = [ term 0           "zero"
@@ -854,7 +912,8 @@ itTable = [ term 0           "zero"
           ]
 
 it :: NumConfig
-it = NumConfig { ncOne      = itOne
+it = NumConfig { ncNeg      = itNeg
+               , ncOne      = itOne
                , ncAdd      = itAdd
                , ncMul      = itMul
                , ncCardinal = findSym itTable
@@ -862,14 +921,17 @@ it = NumConfig { ncOne      = itOne
 
 -------------------------------------------------------------------------------
 
+eoNeg :: NegCombinator
+eoNeg = error "eoNeg: not defined yet you fool!"
+
 eoOne :: OneCombinator
 eoOne = snd
 
 eoAdd :: Combinator
-eoAdd (_, x') (_, y') = x' +++ " " +++ y'
+eoAdd (_, x') (_, y') = x' <+> y'
 
 eoMul :: Combinator
-eoMul (_, x') (_, y') = x' +++ y'
+eoMul (_, x') (_, y') = x' <> y'
 
 eoTable :: [NumSymbol]
 eoTable = [ term 0    "nulo"
@@ -889,7 +951,8 @@ eoTable = [ term 0    "nulo"
           ]
 
 eo :: NumConfig
-eo = NumConfig { ncOne      = eoOne
+eo = NumConfig { ncNeg      = eoNeg
+               , ncOne      = eoOne
                , ncAdd      = eoAdd
                , ncMul      = eoMul
                , ncCardinal = findSym eoTable
@@ -897,18 +960,21 @@ eo = NumConfig { ncOne      = eoOne
 
 -------------------------------------------------------------------------------
 
+jaNeg :: NegCombinator
+jaNeg s = "mainasu" <+> s
+
 jaOne :: OneCombinator
 jaOne (v, v') | v < 100 || (300 >= v && v < 400) = v'
-              | otherwise = "ichi" +++ "-" +++ v'
+              | otherwise = "ichi" <-> v'
 
 jaAdd :: Combinator
-jaAdd (_, x') (_, y') = x' +++ " " +++ y'
+jaAdd (_, x') (_, y') = x' <+> y'
 
 jaMul :: Combinator
-jaMul (_, x') (_, y') = x' +++ "-" +++ y'
+jaMul (_, x') (_, y') = x' <-> y'
 
 jaTable :: [NumSymbol]
-jaTable = [ term 0         "zero"
+jaTable = [ term 0         "rei"
           , term 1         "ichi"
           , term 2         "ni"
           , term 3         "san"
@@ -942,8 +1008,10 @@ jaTable = [ term 0         "zero"
           ]
 
 ja :: NumConfig
-ja = NumConfig { ncOne      = jaOne
+ja = NumConfig { ncNeg      = jaNeg
+               , ncOne      = jaOne
                , ncAdd      = jaAdd
                , ncMul      = jaMul
                , ncCardinal = findSym jaTable
                }
+

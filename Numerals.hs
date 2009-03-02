@@ -120,13 +120,11 @@ import Data.Monoid
 -- Types
 -------------------------------------------------------------------------------
 
-data SymbolType = Terminal
-                | Add Integer
-                | Mul Integer Integer
-                  deriving Show
+data SymbolType = Terminal | Add | Mul deriving Show
 
 data NumSymbol = NumSym { symType     :: SymbolType
                         , symVal      :: Integer
+                        , symScope    :: Integer
                         , symStr      :: String
                         } deriving Show
 
@@ -137,13 +135,13 @@ data NumSymbol = NumSym { symType     :: SymbolType
 
 data NumConfig = forall s. (IsString s, Stringable s) =>
                  NumConfig { ncCardinal :: Integer -> Maybe NumSymbol
-                           , ncOne      :: NumSymbol -> s
+                           , ncOne      :: (Integer, s) -> s
                            , ncAdd      :: (Integer, s) -> (Integer, s) -> s
                            , ncMul      :: (Integer, s) -> (Integer, s) -> s
                            }
 
 -- TODO: Better names:
-type OneCombinator = NumSymbol -> DS.DString
+type OneCombinator = (Integer, DS.DString) -> DS.DString
 type Combinator    = (Integer, DS.DString) -> (Integer, DS.DString) -> DS.DString
 
 (+++) :: Monoid m => m -> m -> m
@@ -162,13 +160,13 @@ instance Stringable DS.DString where
 
 -- Easy construction of NumSymbols
 term :: Integer -> String -> NumSymbol
-term = NumSym Terminal
+term v = NumSym Terminal v 1
 
 add :: Integer -> Integer -> String -> NumSymbol
-add v aScope = NumSym (Add aScope) v
+add = NumSym Add
 
-mul :: Integer -> Integer -> String -> NumSymbol
-mul v mScope = NumSym (Mul v mScope) v
+mul :: Integer -> String -> NumSymbol
+mul v = NumSym Mul v v
 
 d :: Integer -> Integer
 d = (10 ^)
@@ -177,18 +175,17 @@ d = (10 ^)
 --
 -------------------------------------------------------------------------------
 
-
 cardinal :: NumConfig -> Integer -> Maybe String
 cardinal NumConfig {..} 0 = fmap symStr $ ncCardinal 0
 cardinal NumConfig {..} x | x < 0     = Nothing
                           | otherwise = fmap toString $ go x
-    where go n = do sym@(NumSym _ v v') <- ncCardinal n
+    where go n = do (NumSym _ v _ v') <- ncCardinal n
                     let vs = fromString v'
                     case n `divMod` v of
-                      (1, 0) -> return $ ncOne sym
+                      (1, 0) -> return $ ncOne (v, vs)
                       (1, r) -> do rs <- go r
-                                   return $ (v, ncOne sym) `ncAdd` (r, rs)
-                      (q, r) | q > v     -> Nothing
+                                   return $ (v, ncOne (v, vs)) `ncAdd` (r, rs)
+                      (q, r) | q >= v    -> Nothing
                              | otherwise -> do qs <- go q
                                                if r == 0
                                                  then return $ (q, qs) `ncMul` (v, vs)
@@ -200,28 +197,18 @@ findSym []     _ = Nothing
 findSym (e:es) n = go e e es
     where go :: NumSymbol -> NumSymbol -> [NumSymbol] -> Maybe NumSymbol
           go a m [] = stop a m
-          go a m (x@(NumSym t v _) : xs)
+          go a m (x@(NumSym t v _ _) : xs)
               | v == n    = Just x
               | otherwise = case t of
-                              Terminal              -> go a m xs
-                              Add aS    | v > n     -> stop a m
-                                        | otherwise -> go x m xs
-                              Mul aS mS | v > n     -> stop a m
-                                        | otherwise -> go a x xs
+                              Terminal        -> go a m xs
+                              Add | v > n     -> stop a m
+                                  | otherwise -> go x m xs
+                              Mul | v > n     -> stop a m
+                                  | otherwise -> go x x xs
 
           stop :: NumSymbol -> NumSymbol -> Maybe NumSymbol
-          stop a m | inAddScope a = return a
-                   | inMulScope m = return m
-                   | otherwise    = Nothing
-
-          inAddScope :: NumSymbol -> Bool
-          inAddScope (NumSym (Add a)   v _) = n < v + a
-          inAddScope (NumSym (Mul a _) v _) = n < v + a
-          inAddScope _                      = False
-
-          inMulScope :: NumSymbol -> Bool
-          inMulScope (NumSym (Mul _ m) v _) = n < m * v
-          inMulScope _                      = False
+          stop a@(NumSym {..}) m | n < symVal + symScope = return a
+                                 | otherwise             = return m
 
 -------------------------------------------------------------------------------
 -- Debug
@@ -245,7 +232,7 @@ testSome nc start amount = test nc . genericTake amount . testNums $ start
 -------------------------------------------------------------------------------
 
 nlOne :: OneCombinator
-nlOne = fromString . symStr
+nlOne = snd
 
 nlAdd :: Combinator
 nlAdd (x, x') (y, y') | x < 20    = y' +++ x'
@@ -259,71 +246,71 @@ nlMul :: Combinator
 nlMul (_, x') (_, y') = x' +++ " " +++ y'
 
 nlTable :: [NumSymbol]
-nlTable = [ term 0             "nul"
-          , term 1             "één"
-          , term 2             "twee"
-          , term 3             "drie"
-          , term 4             "vier"
-          , term 5             "vijf"
-          , term 6             "zes"
-          , term 7             "zeven"
-          , term 8             "acht"
-          , term 9             "negen"
-          , mul  10      10    "tien"
-          , term 11            "elf"
-          , term 12            "twaalf"
-          , term 13            "dertien"
-          , term 14            "veertien"
-          , add  20      10    "twintig"
-          , add  30      10    "dertig"
-          , add  40      10    "veertig"
-          , add  50      10    "vijftig"
-          , add  60      10    "zestig"
-          , add  70      10    "zeventig"
-          , add  80      10    "tachtig"
-          , add  90      10    "negentig"
-          , mul  (d 2)   10    "honderd"
-          , mul  (d 3)   (d 3) "duizend"
-          , mul  (d 6)   (d 3) "miljoen"
-          , mul  (d 9)   (d 3) "miljard"
-          , mul  (d 12)  (d 3) "biljoen"
-          , mul  (d 15)  (d 3) "biljard"
-          , mul  (d 18)  (d 3) "triljoen"
-          , mul  (d 21)  (d 3) "triljard"
-          , mul  (d 24)  (d 3) "quadriljoen"
-          , mul  (d 27)  (d 3) "quadriljard"
-          , mul  (d 30)  (d 3) "quintiljoen"
-          , mul  (d 33)  (d 3) "quintiljard"
-          , mul  (d 36)  (d 3) "sextiljoen"
-          , mul  (d 39)  (d 3) "sextiljard"
-          , mul  (d 42)  (d 3) "septiljoen"
-          , mul  (d 45)  (d 3) "septiljard"
-          , mul  (d 48)  (d 3) "octiljoen"
-          , mul  (d 51)  (d 3) "octiljard"
-          , mul  (d 54)  (d 3) "noniljoen"
-          , mul  (d 57)  (d 3) "noniljard"
-          , mul  (d 60)  (d 3) "deciljoen"
-          , mul  (d 63)  (d 3) "deciljard"
-          , mul  (d 66)  (d 3) "undeciljoen"
-          , mul  (d 69)  (d 3) "undeciljard"
-          , mul  (d 72)  (d 3) "duodeciljoen"
-          , mul  (d 75)  (d 3) "duodeciljard"
-          , mul  (d 78)  (d 3) "tredeciljoen"
-          , mul  (d 81)  (d 3) "tredeciljard"
-          , mul  (d 84)  (d 3) "quattuordeciljoen"
-          , mul  (d 87)  (d 3) "quattuordeciljard"
-          , mul  (d 90)  (d 3) "quindeciljoen"
-          , mul  (d 93)  (d 3) "quindeciljard"
-          , mul  (d 96)  (d 3) "sexdeciljoen"
-          , mul  (d 99)  (d 3) "sexdeciljard"
-          , mul  (d 102) (d 3) "septendeciljoen"
-          , mul  (d 105) (d 3) "septendeciljard"
-          , mul  (d 108) (d 3) "octodeciljoen"
-          , mul  (d 111) (d 3) "octodeciljard"
-          , mul  (d 114) (d 3) "novemdeciljoen"
-          , mul  (d 117) (d 3) "novemdeciljard"
-          , mul  (d 120) (d 3) "vigintiljoen"
-          , mul  (d 123) (d 3) "vigintiljard"
+nlTable = [ term 0          "nul"
+          , term 1          "één"
+          , term 2          "twee"
+          , term 3          "drie"
+          , term 4          "vier"
+          , term 5          "vijf"
+          , term 6          "zes"
+          , term 7          "zeven"
+          , term 8          "acht"
+          , term 9          "negen"
+          , mul  10         "tien"
+          , term 11         "elf"
+          , term 12         "twaalf"
+          , term 13         "dertien"
+          , term 14         "veertien"
+          , add  20      10 "twintig"
+          , add  30      10 "dertig"
+          , add  40      10 "veertig"
+          , add  50      10 "vijftig"
+          , add  60      10 "zestig"
+          , add  70      10 "zeventig"
+          , add  80      10 "tachtig"
+          , add  90      10 "negentig"
+          , mul  (d 2)      "honderd"
+          , mul  (d 3)      "duizend"
+          , mul  (d 6)      "miljoen"
+          , mul  (d 9)      "miljard"
+          , mul  (d 12)     "biljoen"
+          , mul  (d 15)     "biljard"
+          , mul  (d 18)     "triljoen"
+          , mul  (d 21)     "triljard"
+          , mul  (d 24)     "quadriljoen"
+          , mul  (d 27)     "quadriljard"
+          , mul  (d 30)     "quintiljoen"
+          , mul  (d 33)     "quintiljard"
+          , mul  (d 36)     "sextiljoen"
+          , mul  (d 39)     "sextiljard"
+          , mul  (d 42)     "septiljoen"
+          , mul  (d 45)     "septiljard"
+          , mul  (d 48)     "octiljoen"
+          , mul  (d 51)     "octiljard"
+          , mul  (d 54)     "noniljoen"
+          , mul  (d 57)     "noniljard"
+          , mul  (d 60)     "deciljoen"
+          , mul  (d 63)     "deciljard"
+          , mul  (d 66)     "undeciljoen"
+          , mul  (d 69)     "undeciljard"
+          , mul  (d 72)     "duodeciljoen"
+          , mul  (d 75)     "duodeciljard"
+          , mul  (d 78)     "tredeciljoen"
+          , mul  (d 81)     "tredeciljard"
+          , mul  (d 84)     "quattuordeciljoen"
+          , mul  (d 87)     "quattuordeciljard"
+          , mul  (d 90)     "quindeciljoen"
+          , mul  (d 93)     "quindeciljard"
+          , mul  (d 96)     "sexdeciljoen"
+          , mul  (d 99)     "sexdeciljard"
+          , mul  (d 102)    "septendeciljoen"
+          , mul  (d 105)    "septendeciljard"
+          , mul  (d 108)    "octodeciljoen"
+          , mul  (d 111)    "octodeciljard"
+          , mul  (d 114)    "novemdeciljoen"
+          , mul  (d 117)    "novemdeciljard"
+          , mul  (d 120)    "vigintiljoen"
+          , mul  (d 123)    "vigintiljard"
           ]
 
 nl :: NumConfig
@@ -336,44 +323,41 @@ nl = NumConfig { ncOne      = nlOne
 -------------------------------------------------------------------------------
 
 enTable :: [NumSymbol]
-enTable = [ term 0         "zero"
-          , term 1         "one"
-          , term 2         "two"
-          , term 3         "three"
-          , term 4         "four"
-          , term 5         "five"
-          , term 6         "six"
-          , term 7         "seven"
-          , term 8         "eight"
-          , term 9         "nine"
-          , mul  10   10   "ten"
-          , term 11        "eleven"
-          , term 12        "twelve"
-          , term 13        "thirteen"
-          , term 14        "fourteen"
-          , term 15        "fifteen"
-          , term 16        "sixteen"
-          , term 17        "seventeen"
-          , term 18        "eighteen"
-          , term 19        "nineteen"
-          , add  20   10   "twenty"
-          , add  30   10   "thirty"
-          , add  40   10   "forty"
-          , add  50   10   "fifty"
-          , add  60   10   "sixty"
-          , add  70   10   "seventy"
-          , add  80   10   "eighty"
-          , add  90   10   "ninety"
-          , mul  100  10   "hundred"
-          , mul  1000 1000 "thousand"
+enTable = [ term 0       "zero"
+          , term 1       "one"
+          , term 2       "two"
+          , term 3       "three"
+          , term 4       "four"
+          , term 5       "five"
+          , term 6       "six"
+          , term 7       "seven"
+          , term 8       "eight"
+          , term 9       "nine"
+          , mul  10      "ten"
+          , term 11      "eleven"
+          , term 12      "twelve"
+          , term 13      "thirteen"
+          , term 14      "fourteen"
+          , term 15      "fifteen"
+          , term 16      "sixteen"
+          , term 17      "seventeen"
+          , term 18      "eighteen"
+          , term 19      "nineteen"
+          , add  20   10 "twenty"
+          , add  30   10 "thirty"
+          , add  40   10 "forty"
+          , add  50   10 "fifty"
+          , add  60   10 "sixty"
+          , add  70   10 "seventy"
+          , add  80   10 "eighty"
+          , add  90   10 "ninety"
+          , mul  100     "hundred"
+          , mul  1000    "thousand"
           ]
 
 enOne :: OneCombinator
-enOne (NumSym (Mul _ _) v v') | v >= 100  = "one" +++ " " +++ vs
-                              | otherwise = vs
-    where vs = fromString v'
-
-enOne sym = fromString $ symStr sym
+enOne (v,  v') | v >= 100  = "one" +++ " " +++ v'
+               | otherwise = v'
 
 enAdd :: Combinator
 enAdd (x, x') (_, y') | x < 100   = x' +++ "-" +++ y'
@@ -382,79 +366,78 @@ enAdd (x, x') (_, y') | x < 100   = x' +++ "-" +++ y'
 enMul :: Combinator
 enMul (_, x') (_, y') = x' +++ " " +++ y'
 
-shortEnTable :: [NumSymbol]
-shortEnTable = enTable ++
-               [ mul (d 6)  (d 3) "million"
-               , mul (d 9)  (d 3) "billion"
-               , mul (d 12) (d 3) "trillion"
-               , mul (d 15) (d 3) "quadrillion"
-               , mul (d 18) (d 3) "quintillion"
-               , mul (d 21) (d 3) "sextillion"
-               , mul (d 24) (d 3) "septillion"
-               , mul (d 27) (d 3) "octillion"
-               , mul (d 30) (d 3) "nonillion"
-               , mul (d 33) (d 3) "decillion"
-               , mul (d 36) (d 3) "undecillion"
-               , mul (d 39) (d 3) "duodecillion"
-               , mul (d 42) (d 3) "tredecillion"
-               , mul (d 45) (d 3) "quattuordecillion"
-               , mul (d 48) (d 3) "quindecillion"
-               , mul (d 51) (d 3) "sexdecillion"
-               , mul (d 54) (d 3) "septendecillion"
-               , mul (d 57) (d 3) "octodecillion"
-               , mul (d 60) (d 3) "novemdecillion"
-               , mul (d 63) (d 3) "vigintillion"
+enShortTable :: [NumSymbol]
+enShortTable = enTable ++
+               [ mul (d 6)  "million"
+               , mul (d 9)  "billion"
+               , mul (d 12) "trillion"
+               , mul (d 15) "quadrillion"
+               , mul (d 18) "quintillion"
+               , mul (d 21) "sextillion"
+               , mul (d 24) "septillion"
+               , mul (d 27) "octillion"
+               , mul (d 30) "nonillion"
+               , mul (d 33) "decillion"
+               , mul (d 36) "undecillion"
+               , mul (d 39) "duodecillion"
+               , mul (d 42) "tredecillion"
+               , mul (d 45) "quattuordecillion"
+               , mul (d 48) "quindecillion"
+               , mul (d 51) "sexdecillion"
+               , mul (d 54) "septendecillion"
+               , mul (d 57) "octodecillion"
+               , mul (d 60) "novemdecillion"
+               , mul (d 63) "vigintillion"
                ]
 
-shortEn :: NumConfig
-shortEn = NumConfig { ncOne      = enOne
+enShort :: NumConfig
+enShort = NumConfig { ncOne      = enOne
                     , ncAdd      = enAdd
                     , ncMul      = enMul
-                    , ncCardinal = findSym shortEnTable
+                    , ncCardinal = findSym enShortTable
                     }
 
-longEnTable :: [NumSymbol]
-longEnTable = enTable ++
-              [ mul (d 6)   (d 3) "million"
-              , mul (d 9)   (d 3) "milliard"
-              , mul (d 12)  (d 3) "billion"
-              , mul (d 15)  (d 3) "billiard"
-              , mul (d 18)  (d 3) "trillion"
-              , mul (d 21)  (d 3) "trilliard"
-              , mul (d 24)  (d 6) "quadrillion"
-              , mul (d 30)  (d 6) "quintillion"
-              , mul (d 36)  (d 6) "sextillion"
-              , mul (d 42)  (d 6) "septillion"
-              , mul (d 48)  (d 6) "octillion"
-              , mul (d 54)  (d 6) "nonillion"
-              , mul (d 60)  (d 6) "decillion"
-              , mul (d 66)  (d 6) "undecillion"
-              , mul (d 72)  (d 6) "duodecillion"
-              , mul (d 78)  (d 6) "tredecillion"
-              , mul (d 84)  (d 6) "quattuordecillion"
-              , mul (d 90)  (d 6) "quinquadecillion"
-              , mul (d 96)  (d 6) "sedecillion"
-              , mul (d 102) (d 6) "septendecillion"
-              , mul (d 108) (d 6) "octodecillion"
-              , mul (d 114) (d 6) "novendecillion"
-              , mul (d 120) (d 6) "vigintillion"
+enLongTable :: [NumSymbol]
+enLongTable = enTable ++
+              [ mul (d 6)   "million"
+              , mul (d 9)   "milliard"
+              , mul (d 12)  "billion"
+              , mul (d 15)  "billiard"
+              , mul (d 18)  "trillion"
+              , mul (d 21)  "trilliard"
+              , mul (d 24)  "quadrillion"
+              , mul (d 30)  "quintillion"
+              , mul (d 36)  "sextillion"
+              , mul (d 42)  "septillion"
+              , mul (d 48)  "octillion"
+              , mul (d 54)  "nonillion"
+              , mul (d 60)  "decillion"
+              , mul (d 66)  "undecillion"
+              , mul (d 72)  "duodecillion"
+              , mul (d 78)  "tredecillion"
+              , mul (d 84)  "quattuordecillion"
+              , mul (d 90)  "quinquadecillion"
+              , mul (d 96)  "sedecillion"
+              , mul (d 102) "septendecillion"
+              , mul (d 108) "octodecillion"
+              , mul (d 114) "novendecillion"
+              , mul (d 120) "vigintillion"
               ]
 
-longEn :: NumConfig
-longEn = NumConfig { ncOne      = enOne
+enLong :: NumConfig
+enLong = NumConfig { ncOne      = enOne
                    , ncAdd      = enAdd
                    , ncMul      = enMul
-                   , ncCardinal = findSym longEnTable
+                   , ncCardinal = findSym enLongTable
                    }
 
 -------------------------------------------------------------------------------
 
 
 deOne :: OneCombinator
-deOne (NumSym _ v v') | v >= (d 6) = "eine" +++ " " +++ vs
-                      | v >= 100   = "ein" +++ vs
-                      | otherwise  = vs
-    where vs = fromString v'
+deOne (v, v') | v >= (d 6) = "eine" +++ " " +++ v'
+              | v >= 100   = "ein" +++ v'
+              | otherwise  = v'
 
 deAdd :: Combinator
 deAdd (x, x') (y, y') | x < 20    = y' +++ x'
@@ -465,36 +448,36 @@ deAdd (x, x') (y, y') | x < 20    = y' +++ x'
 
 deMul :: Combinator
 deMul (_, x') (y, y') | y < (d 6) = x' +++ y'
-                      | otherwise = x' +++ y' -- x' +++ " " +++ y'
+                      | otherwise = x' +++ y'
 
 deTable :: [NumSymbol]
-deTable = [ term 0           "null"
-          , term 1           "eins"
-          , term 2           "zwei"
-          , term 3           "drei"
-          , term 4           "vier"
-          , term 5           "fünf"
-          , term 6           "sechs"
-          , term 7           "sieben"
-          , term 8           "acht"
-          , term 9           "neun"
-          , mul  10    10    "zehn"
-          , term 11          "elf"
-          , term 12          "zwölf"
-          , term 16          "sechzehn"
-          , term 17          "siebzehn"
-          , add  20    10    "zwanzig"
-          , add  30    10    "dreißig"
-          , add  40    10    "vierzig"
-          , add  50    10    "fünfzig"
-          , add  60    10    "sechzig"
-          , add  70    10    "siebzig"
-          , add  80    10    "achtzig"
-          , add  90    10    "neunzig"
-          , mul  100   10    "hundert"
-          , mul  1000  1000  "tausend"
-          , mul  (d 6) (d 3) "million"
-          , mul  (d 9) (d 3) "milliarde"
+deTable = [ term 0        "null"
+          , term 1        "eins"
+          , term 2        "zwei"
+          , term 3        "drei"
+          , term 4        "vier"
+          , term 5        "fünf"
+          , term 6        "sechs"
+          , term 7        "sieben"
+          , term 8        "acht"
+          , term 9        "neun"
+          , mul  10       "zehn"
+          , term 11       "elf"
+          , term 12       "zwölf"
+          , term 16       "sechzehn"
+          , term 17       "siebzehn"
+          , add  20    10 "zwanzig"
+          , add  30    10 "dreißig"
+          , add  40    10 "vierzig"
+          , add  50    10 "fünfzig"
+          , add  60    10 "sechzig"
+          , add  70    10 "siebzig"
+          , add  80    10 "achtzig"
+          , add  90    10 "neunzig"
+          , mul  100      "hundert"
+          , mul  1000     "tausend"
+          , mul  (d 6)    "million"
+          , mul  (d 9)    "milliarde"
           ]
 
 de :: NumConfig
@@ -507,7 +490,7 @@ de = NumConfig { ncOne      = deOne
 -------------------------------------------------------------------------------
 
 seOne :: OneCombinator
-seOne = fromString . symStr
+seOne = snd
 
 seAdd :: Combinator
 seAdd (_, x') (_, y') = x' +++ y'
@@ -526,7 +509,7 @@ seTable = [ term 0           "noll"
           , term 7           "sju"
           , term 8           "åtta"
           , term 9           "nio"
-          , mul  10    10    "tio"
+          , mul  10          "tio"
           , term 11          "elva"
           , term 12          "tolv"
           , term 13          "fretton"
@@ -544,12 +527,12 @@ seTable = [ term 0           "noll"
           , add  70    10    "sjuttio"
           , add  80    10    "åttio"
           , add  90    10    "nittio"
-          , mul  100   10    "hundra"
-          , mul  (d 3) (d 3) "tusen"
+          , mul  100         "hundra"
+          , mul  (d 3)       "tusen"
           , add  (d 6) (d 6) "miljon"
-          , mul  (d 6) (d 3) "miljoner"
+          , mul  (d 6)       "miljoner"
           , add  (d 9) (d 9) "miljard"
-          , mul  (d 9) (d 3) "miljarder"
+          , mul  (d 9)       "miljarder"
           ]
 
 se :: NumConfig
@@ -562,9 +545,8 @@ se = NumConfig { ncOne      = seOne
 -------------------------------------------------------------------------------
 
 noOne :: OneCombinator
-noOne (NumSym _ v v') | v >= (d 6) = "én" +++ " " +++ vs
-                      | otherwise  = vs
-    where vs = fromString v'
+noOne (v, v') | v >= (d 6) = "én" +++ " " +++ v'
+              | otherwise  = v'
 
 noAdd :: Combinator
 noAdd (x, x') (_, y') | x == 100  = x' +++ " " +++ "og" +++ " " +++ y'
@@ -584,7 +566,7 @@ noTable = [ term 0           "null"
           , term 7           "sju"
           , term 8           "åtte"
           , term 9           "ni"
-          , mul  10    10    "ti"
+          , mul  10          "ti"
           , term 11          "elleve"
           , term 12          "tolv"
           , term 13          "tretten"
@@ -602,12 +584,12 @@ noTable = [ term 0           "null"
           , add  70    10    "sytti"
           , add  80    10    "åtti"
           , add  90    10    "nitti"
-          , mul  100   10    "hundre"
-          , mul  (d 3) (d 3) "tusen"
+          , mul  100         "hundre"
+          , mul  (d 3)       "tusen"
           , add  (d 6) (d 6) "million"
-          , mul  (d 6) (d 3) "millioner"
+          , mul  (d 6)       "millioner"
           , add  (d 9) (d 9) "milliard"
-          , mul  (d 9) (d 3) "milliarder"
+          , mul  (d 9)       "milliarder"
           ]
 
 no :: NumConfig
@@ -620,7 +602,7 @@ no = NumConfig { ncOne      = noOne
 -------------------------------------------------------------------------------
 
 latinOne :: OneCombinator
-latinOne = fromString . symStr
+latinOne = snd
 
 latinAdd :: Combinator
 latinAdd (_, x') (_, y') = x' +++ " " +++ y'
@@ -639,7 +621,7 @@ latinTable = [ term 0         "nulla"
              , term 7         "septem"
              , term 8         "octo"
              , term 9         "novem"
-             , mul  10   10   "decem"
+             , mul  10        "decem"
              , term 11        "undecim"
              , term 12        "duodecim"
              , term 13        "tredecim"
@@ -673,7 +655,7 @@ latinTable = [ term 0         "nulla"
              , add  90   10   "nonaginta"
              , term 98        "duodecentum"
              , term 99        "undecentum"
-             , mul  100  10   "centum"
+             , mul  100       "centum"
              , add  200  100  "ducenti"
              , add  300  100  "trecenti"
              , add  400  100  "quadrigenti"
@@ -683,7 +665,7 @@ latinTable = [ term 0         "nulla"
              , add  800  100  "octigenti"
              , add  900  100  "nongenti"
              , add  1000 1000 "mille"
-             , mul  1000 1000 "millia"
+             , mul  1000      "millia"
              , term (d 6)     "decies centena milia"
              ]
 
@@ -697,7 +679,7 @@ latin = NumConfig { ncOne      = latinOne
 -------------------------------------------------------------------------------
 
 frOne :: OneCombinator
-frOne = fromString . symStr
+frOne = snd
 
 frAdd :: Combinator
 frAdd (x, x') (y, y') | x < 80 && y == 1 = x' +++ " " +++ "et" +++ " " +++ y'
@@ -708,36 +690,36 @@ frMul :: Combinator
 frMul (_, x') (_, y') = x' +++ " " +++ y'
 
 frTable :: [NumSymbol]
-frTable = [ term 0           "zéro"
-          , term 1           "un"
-          , term 2           "deux"
-          , term 3           "trois"
-          , term 4           "quatre"
-          , term 5           "cinq"
-          , term 6           "six"
-          , term 7           "sept"
-          , term 8           "huit"
-          , term 9           "neuf"
-          , mul  10    10    "dix"
-          , term 11          "onze"
-          , term 12          "douze"
-          , term 13          "treize"
-          , term 14          "quatorze"
-          , term 15          "quinze"
-          , term 16          "seize"
-          , add  20    10    "vingt"
-          , add  30    10    "trente"
-          , add  40    10    "quarante"
-          , add  50    10    "cinquante"
-          , add  60    10    "soixante"
-          , term 71          "soixante et onze"
-          , term 80          "quatre-vingts"
-          , add  80    10    "quatre-vingt"
-          , add  100   100   "cent"
-          , mul  100   10    "cents"
-          , mul  1000  (d 3) "mille"
-          , mul  (d 6) (d 3) "million"
-          , mul  (d 9) (d 3) "millard"
+frTable = [ term 0         "zéro"
+          , term 1         "un"
+          , term 2         "deux"
+          , term 3         "trois"
+          , term 4         "quatre"
+          , term 5         "cinq"
+          , term 6         "six"
+          , term 7         "sept"
+          , term 8         "huit"
+          , term 9         "neuf"
+          , mul  10        "dix"
+          , term 11        "onze"
+          , term 12        "douze"
+          , term 13        "treize"
+          , term 14        "quatorze"
+          , term 15        "quinze"
+          , term 16        "seize"
+          , add  20    10  "vingt"
+          , add  30    10  "trente"
+          , add  40    10  "quarante"
+          , add  50    10  "cinquante"
+          , add  60    10  "soixante"
+          , term 71        "soixante et onze"
+          , term 80        "quatre-vingts"
+          , add  80    10  "quatre-vingt"
+          , add  100   100 "cent"
+          , mul  100       "cents"
+          , mul  1000      "mille"
+          , mul  (d 6)     "million"
+          , mul  (d 9)     "millard"
           ]
 
 fr :: NumConfig
@@ -750,7 +732,7 @@ fr = NumConfig { ncOne      = frOne
 -------------------------------------------------------------------------------
 
 spOne :: OneCombinator
-spOne = fromString . symStr
+spOne = snd
 
 spAdd :: Combinator
 spAdd (x, x') (_, y') | x < 100   =  x' +++ " " +++ "y" +++ " " +++ y'
@@ -760,41 +742,41 @@ spMul :: Combinator
 spMul (_, x') (_, y') = x' +++ " " +++ y'
 
 spTable :: [NumSymbol]
-spTable = [ term 0           "cero"
-          , term 1           "uno"
-          , term 2           "dos"
-          , term 3           "tres"
-          , term 4           "cuatro"
-          , term 5           "cinco"
-          , term 6           "seis"
-          , term 7           "siete"
-          , term 8           "ocho"
-          , term 9           "nueve"
-          , mul  10    10    "diez"
-          , term 11          "once"
-          , term 12          "doce"
-          , term 13          "trece"
-          , term 14          "catorce"
-          , term 15          "quince"
-          , term 16          "dieciseis"
-          , term 17          "diecisiete"
-          , term 18          "dieciocho"
-          , term 19          "diecinueve"
-          , add  20    10    "veinte"
-          , add  30    10    "treinta"
-          , add  40    10    "cuarenta"
-          , add  50    10    "cincuenta"
-          , add  60    10    "sesenta"
-          , add  70    10    "setenta"
-          , add  80    10    "ochenta"
-          , add  90    10    "noventa"
-          , term 100         "cien"
-          , mul  100   10    "ciento"
-          , add  500   100   "quinientos"
-          , add  700   100   "setecientos"
-          , add  900   100   "novocientos"
-          , mul  1000  (d 3) "mil"
-          , mul  (d 6) (d 3) "un millón"
+spTable = [ term 0         "cero"
+          , term 1         "uno"
+          , term 2         "dos"
+          , term 3         "tres"
+          , term 4         "cuatro"
+          , term 5         "cinco"
+          , term 6         "seis"
+          , term 7         "siete"
+          , term 8         "ocho"
+          , term 9         "nueve"
+          , mul  10        "diez"
+          , term 11        "once"
+          , term 12        "doce"
+          , term 13        "trece"
+          , term 14        "catorce"
+          , term 15        "quince"
+          , term 16        "dieciseis"
+          , term 17        "diecisiete"
+          , term 18        "dieciocho"
+          , term 19        "diecinueve"
+          , add  20    10  "veinte"
+          , add  30    10  "treinta"
+          , add  40    10  "cuarenta"
+          , add  50    10  "cincuenta"
+          , add  60    10  "sesenta"
+          , add  70    10  "setenta"
+          , add  80    10  "ochenta"
+          , add  90    10  "noventa"
+          , term 100       "cien"
+          , mul  100       "ciento"
+          , add  500   100 "quinientos"
+          , add  700   100 "setecientos"
+          , add  900   100 "novocientos"
+          , mul  1000      "mil"
+          , mul  (d 6)     "un millón"
           ]
 
 sp :: NumConfig
@@ -807,7 +789,7 @@ sp = NumConfig { ncOne      = spOne
 -------------------------------------------------------------------------------
 
 itOne :: OneCombinator
-itOne = fromString . symStr
+itOne = snd
 
 itAdd :: Combinator
 itAdd (_, x') (y, y') | y == 3    = x' +++ "tré"
@@ -828,7 +810,7 @@ itTable = [ term 0           "zero"
           , term 7           "sette"
           , term 8           "otto"
           , term 9           "nove"
-          , mul  10    10    "dieci"
+          , mul  10          "dieci"
           , term 11          "undici"
           , term 12          "dodici"
           , term 13          "tredici"
@@ -862,13 +844,13 @@ itTable = [ term 0           "zero"
           , add  90    10    "novanta"
           , term 91          "novantuno"
           , term 98          "novantotto"
-          , mul  100   10    "cento"
+          , mul  100         "cento"
           , add  1000  1000  "mille"
-          , mul  1000  (d 3) "mila"
+          , mul  1000        "mila"
           , add  (d 6) (d 6) "milione"
-          , mul  (d 6) (d 3) "milioni"
+          , mul  (d 6)       "milioni"
           , add  (d 9) (d 9) "miliardo"
-          , mul  (d 9) (d 3) "miliardi"
+          , mul  (d 9)       "miliardi"
           ]
 
 it :: NumConfig
@@ -881,7 +863,7 @@ it = NumConfig { ncOne      = itOne
 -------------------------------------------------------------------------------
 
 eoOne :: OneCombinator
-eoOne = fromString . symStr
+eoOne = snd
 
 eoAdd :: Combinator
 eoAdd (_, x') (_, y') = x' +++ " " +++ y'
@@ -890,20 +872,20 @@ eoMul :: Combinator
 eoMul (_, x') (_, y') = x' +++ y'
 
 eoTable :: [NumSymbol]
-eoTable = [ term 0          "nulo"
-          , term 1          "unu"
-          , term 2          "du"
-          , term 3          "tri"
-          , term 4          "kvar"
-          , term 5          "kvin"
-          , term 6          "ses"
-          , term 7          "sep"
-          , term 8          "ok"
-          , term 9          "naŭ"
-          , mul 10    10    "dek"
-          , mul 100   10    "cent"
-          , mul 1000  (d 3) "mil"
-          , mul (d 6) (d 3) "miliono"
+eoTable = [ term 0    "nulo"
+          , term 1    "unu"
+          , term 2    "du"
+          , term 3    "tri"
+          , term 4    "kvar"
+          , term 5    "kvin"
+          , term 6    "ses"
+          , term 7    "sep"
+          , term 8    "ok"
+          , term 9    "naŭ"
+          , mul 10    "dek"
+          , mul 100   "cent"
+          , mul 1000  "mil"
+          , mul (d 6) "miliono"
           ]
 
 eo :: NumConfig
@@ -916,9 +898,8 @@ eo = NumConfig { ncOne      = eoOne
 -------------------------------------------------------------------------------
 
 jaOne :: OneCombinator
-jaOne (NumSym _ v v') | v < 100 || (300 >= v && v < 400) = vs
-                      | otherwise = "ichi" +++ "-" +++ vs
-    where vs = fromString v'
+jaOne (v, v') | v < 100 || (300 >= v && v < 400) = v'
+              | otherwise = "ichi" +++ "-" +++ v'
 
 jaAdd :: Combinator
 jaAdd (_, x') (_, y') = x' +++ " " +++ y'
@@ -927,37 +908,37 @@ jaMul :: Combinator
 jaMul (_, x') (_, y') = x' +++ "-" +++ y'
 
 jaTable :: [NumSymbol]
-jaTable = [ term 0           "zero"
-          , term 1           "ichi"
-          , term 2           "ni"
-          , term 3           "san"
-          , term 4           "yon"
-          , term 5           "go"
-          , term 6           "roku"
-          , term 7           "nana"
-          , term 8           "hachi"
-          , term 9           "kyū"
-          , mul 10     10    "jū"
-          , mul 100    10    "hyaku"
-          , add 300    100   "san-byaku" -- rendaku
-          , mul 1000   10    "sen"
-          , mul (d 4)  (d 4) "man"
-          , mul (d 8)  (d 4) "oku"
-          , mul (d 12) (d 4) "chō"
-          , mul (d 16) (d 4) "kei"
-          , mul (d 20) (d 4) "gai"
-          , mul (d 24) (d 4) "jo"
-          , mul (d 28) (d 4) "jō"
-          , mul (d 32) (d 4) "kō"
-          , mul (d 36) (d 4) "kan"
-          , mul (d 40) (d 4) "sei"
-          , mul (d 44) (d 4) "sai"
-          , mul (d 48) (d 4) "goku"
-          , mul (d 52) (d 4) "gōgasha"
-          , mul (d 56) (d 4) "asōgi"
-          , mul (d 60) (d 4) "nayuta"
-          , mul (d 64) (d 4) "fukashigi"
-          , mul (d 68) (d 4) "muryōtaisū"
+jaTable = [ term 0         "zero"
+          , term 1         "ichi"
+          , term 2         "ni"
+          , term 3         "san"
+          , term 4         "yon"
+          , term 5         "go"
+          , term 6         "roku"
+          , term 7         "nana"
+          , term 8         "hachi"
+          , term 9         "kyū"
+          , mul 10         "jū"
+          , mul 100        "hyaku"
+          , add 300    100 "san-byaku" -- rendaku
+          , mul 1000       "sen"
+          , mul (d 4)      "man"
+          , mul (d 8)      "oku"
+          , mul (d 12)     "chō"
+          , mul (d 16)     "kei"
+          , mul (d 20)     "gai"
+          , mul (d 24)     "jo"
+          , mul (d 28)     "jō"
+          , mul (d 32)     "kō"
+          , mul (d 36)     "kan"
+          , mul (d 40)     "sei"
+          , mul (d 44)     "sai"
+          , mul (d 48)     "goku"
+          , mul (d 52)     "gōgasha"
+          , mul (d 56)     "asōgi"
+          , mul (d 60)     "nayuta"
+          , mul (d 64)     "fukashigi"
+          , mul (d 68)     "muryōtaisū"
           ]
 
 ja :: NumConfig

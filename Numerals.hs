@@ -5,7 +5,17 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Numerals where
+module Numerals
+    ( SymbolType(..)
+    , NumSymbol(..)
+    , NumConfig(..)
+    , term, add, mul
+
+    , cardinal
+
+    , nl
+    )
+    where
 
 
 {-
@@ -138,20 +148,20 @@ import Data.Monoid
 
 data SymbolType = Terminal | Add | Mul deriving Show
 
-data NumSymbol = NumSym { symType  :: SymbolType
-                        , symVal   :: Integer
-                        , symScope :: Integer
-                        , symStr   :: String
-                        } deriving Show
+data NumSymbol s = NumSym { symType  :: SymbolType
+                          , symVal   :: Integer
+                          , symScope :: Integer
+                          , symStr   :: s
+                          } deriving Show
 
 -- Easy construction of NumSymbols
-term :: Integer -> String -> NumSymbol
+term :: Integer -> s -> NumSymbol s
 term v = NumSym Terminal v 1
 
-add :: Integer -> Integer -> String -> NumSymbol
+add :: Integer -> Integer -> s -> NumSymbol s
 add = NumSym Add
 
-mul :: Integer -> String -> NumSymbol
+mul :: Integer -> s -> NumSymbol s
 mul v = NumSym Mul v v
 
 -- Scope is given as a size. So a scope of 10 includes the value of the symbol itself.
@@ -159,13 +169,17 @@ mul v = NumSym Mul v v
 -- "ten" is in the additive scope for [10 .. 10 + 10 - 1]
 -- "ten" is in the multiplicative scope for [10 .. 10 * 10 - 1]
 
-data NumConfig = forall s. (IsString s, Stringable s) =>
-                 NumConfig { ncCardinal :: Integer -> Maybe NumSymbol
-                           , ncNeg      :: s -> s
-                           , ncOne      :: (Integer, s) -> s
-                           , ncAdd      :: (Integer, s) -> (Integer, s) -> s
-                           , ncMul      :: (Integer, s) -> (Integer, s) -> s
-                           }
+data NumConfig s = NumConfig { ncCardinal :: Integer -> Maybe (NumSymbol s)
+                             , ncNeg      :: Neg s
+                             , ncOne      :: One s
+                             , ncAdd      :: Add s
+                             , ncMul      :: Mul s
+                             }
+
+type Neg s = s -> s
+type One s = (Integer, s) -> s
+type Add s = (Integer, s) -> (Integer, s) -> s
+type Mul s = (Integer, s) -> (Integer, s) -> s
 
 -- TODO: Better names:
 type NegCombinator = DS.DString -> DS.DString
@@ -198,12 +212,11 @@ d = (10 ^)
 --
 -------------------------------------------------------------------------------
 
-cardinal :: NumConfig -> Integer -> Maybe String
+cardinal :: NumConfig s -> Integer -> Maybe s
 cardinal NumConfig {..} 0 = fmap symStr $ ncCardinal 0
-cardinal NumConfig {..} x | x < 0     = fmap (toString . ncNeg) $ go $ abs x
-                          | otherwise = fmap toString $ go x
-    where go n = do (NumSym _ v _ v') <- ncCardinal n
-                    let vs = fromString v'
+cardinal NumConfig {..} x | x < 0     = fmap ncNeg $ go $ abs x
+                          | otherwise = go x
+    where go n = do (NumSym _ v _ vs) <- ncCardinal n
                     case n `divMod` v of
                       (1, 0) -> return $ ncOne (v, vs)
                       (1, r) -> do rs <- go r
@@ -215,10 +228,10 @@ cardinal NumConfig {..} x | x < 0     = fmap (toString . ncNeg) $ go $ abs x
                                                  else do rs <- go r
                                                          return $ (q*v, (q, qs) `ncMul` (v, vs)) `ncAdd` (r, rs)
 
-findSym :: [NumSymbol] -> Integer -> Maybe NumSymbol
+findSym :: [NumSymbol s] -> Integer -> Maybe (NumSymbol s)
 findSym []     _ = Nothing
 findSym (e:es) n = go e e es
-    where go :: NumSymbol -> NumSymbol -> [NumSymbol] -> Maybe NumSymbol
+    where go :: NumSymbol s -> NumSymbol s -> [NumSymbol s] -> Maybe (NumSymbol s)
           go a m [] = stop a m
           go a m (x@(NumSym t v _ _) : xs)
               | v == n    = Just x
@@ -229,7 +242,7 @@ findSym (e:es) n = go e e es
                               Mul | v > n     -> stop a m
                                   | otherwise -> go x x xs
 
-          stop :: NumSymbol -> NumSymbol -> Maybe NumSymbol
+          stop :: NumSymbol s -> NumSymbol s -> Maybe (NumSymbol s)
           stop a@(NumSym {..}) m | n < symVal + symScope = return a
                                  | otherwise             = return m
 
@@ -243,24 +256,24 @@ testNums :: Integer -> [Integer]
 testNums 0 = 0 : testNums 1
 testNums n = n : testNums (1 + n + n `mod` 7)
 
-test :: NumConfig -> [Integer] -> IO ()
+test :: Stringable s => NumConfig s -> [Integer] -> IO ()
 test nc = mapM_ (putStrLn . pretty)
-    where pretty n = show n ++ " == " ++ (maybe "-" id $ cardinal nc n)
+    where pretty n = show n ++ " == " ++ (maybe "-" id $ fmap toString $ cardinal nc n)
 
-testSome :: NumConfig -> Integer -> Integer -> IO ()
+testSome :: Stringable s => NumConfig s -> Integer -> Integer -> IO ()
 testSome nc start amount = test nc . genericTake amount . testNums $ start
 
 -------------------------------------------------------------------------------
 -- Numeral configurations
 -------------------------------------------------------------------------------
 
-nlNeg :: NegCombinator
+nlNeg :: (IsString s, Monoid s) => Neg s
 nlNeg s = "min" <+> s
 
-nlOne :: OneCombinator
+nlOne :: One s
 nlOne = snd
 
-nlAdd :: Combinator
+nlAdd :: (IsString s, Monoid s) => Add s
 nlAdd (x, x') (y, y') | x < 20    = y' <> x'
                       | x < 100   = y' <> (if y == 2 || y == 3
                                            then "ën"
@@ -268,10 +281,10 @@ nlAdd (x, x') (y, y') | x < 20    = y' <> x'
                                        <> x'
                       | otherwise = x' <+> y'
 
-nlMul :: Combinator
+nlMul :: (IsString s, Monoid s) => Mul s
 nlMul (_, x') (_, y') = x' <+> y'
 
-nlTable :: [NumSymbol]
+nlTable :: IsString s => [NumSymbol s]
 nlTable = [ term 0          "nul"
 
           , term 1          "één"
@@ -369,7 +382,7 @@ nlTable = [ term 0          "nul"
           , mul (d 6003)    "milliljard"           -- m (d 3) * d 3
           ]
 
-nl :: NumConfig
+nl :: NumConfig DS.DString
 nl = NumConfig { ncNeg      = nlNeg
                , ncOne      = nlOne
                , ncAdd      = nlAdd
@@ -379,21 +392,21 @@ nl = NumConfig { ncNeg      = nlNeg
 
 -------------------------------------------------------------------------------
 
-enNeg :: NegCombinator
+enNeg :: (IsString s, Monoid s) => Neg s
 enNeg s = "minus" <+> s
 
-enOne :: OneCombinator
-enOne (v,  v') | v >= 100  = "one" <+> v'
-               | otherwise = v'
+enOne :: (IsString s, Monoid s) => One s
+enOne (v,  vs) | v >= 100  = "one" <+> vs
+               | otherwise = vs
 
-enAdd :: Combinator
+enAdd :: (IsString s, Monoid s) => Add s
 enAdd (x, x') (_, y') | x < 100   = x' <-> y'
                       | otherwise = x' <+> y'
 
-enMul :: Combinator
+enMul :: (IsString s, Monoid s) => Mul s
 enMul (_, x') (_, y') = x' <+> y'
 
-enTable :: [NumSymbol]
+enTable :: IsString s => [NumSymbol s]
 enTable = [ term 0       "zero"
           , term 1       "one"
           , term 2       "two"
@@ -426,7 +439,7 @@ enTable = [ term 0       "zero"
           , mul  1000    "thousand"
           ]
 
-enShortTable :: [NumSymbol]
+enShortTable :: IsString s => [NumSymbol s]
 enShortTable = enTable ++
                [ mul (d 6)  "million"
                , mul (d 9)  "billion"
@@ -450,7 +463,7 @@ enShortTable = enTable ++
                , mul (d 63) "vigintillion"
                ]
 
-enShort :: NumConfig
+enShort :: NumConfig DS.DString
 enShort = NumConfig { ncNeg      = enNeg
                     , ncOne      = enOne
                     , ncAdd      = enAdd
@@ -458,7 +471,7 @@ enShort = NumConfig { ncNeg      = enNeg
                     , ncCardinal = findSym enShortTable
                     }
 
-enLongTable :: [NumSymbol]
+enLongTable :: IsString s => [NumSymbol s]
 enLongTable = enTable ++
               [ mul (d 6)   "million"
               , mul (d 9)   "milliard"
@@ -485,7 +498,7 @@ enLongTable = enTable ++
               , mul (d 120) "vigintillion"
               ]
 
-enLong :: NumConfig
+enLong :: NumConfig DS.DString
 enLong = NumConfig { ncNeg      = enNeg
                    , ncOne      = enOne
                    , ncAdd      = enAdd
@@ -495,26 +508,26 @@ enLong = NumConfig { ncNeg      = enNeg
 
 -------------------------------------------------------------------------------
 
-deNeg :: NegCombinator
+deNeg :: (IsString s, Monoid s) => Neg s
 deNeg s = "minus" <+> s
 
-deOne :: OneCombinator
-deOne (v, v') | v >= (d 6) = "eine" <+> v'
-              | v >= 100   = "ein"  <>  v'
-              | otherwise  = v'
+deOne :: (IsString s, Monoid s) => One s
+deOne (v, vs) | v >= (d 6) = "eine" <+> vs
+              | v >= 100   = "ein"  <>  vs
+              | otherwise  = vs
 
-deAdd :: Combinator
+deAdd :: (IsString s, Monoid s) => Add s
 deAdd (x, x') (y, y') | x < 20    = y' <> x'
                       | x < 100   = (if y == 1
                                      then "ein"
                                      else y') <> "und" <> x'
                       | otherwise = x' <> y'
 
-deMul :: Combinator
+deMul :: (IsString s, Monoid s) => Mul s
 deMul (_, x') (y, y') | y < (d 6) = x' <> y'
                       | otherwise = x' <> y'
 
-deTable :: [NumSymbol]
+deTable :: IsString s => [NumSymbol s]
 deTable = [ term 0        "null"
           , term 1        "eins"
           , term 2        "zwei"
@@ -544,7 +557,7 @@ deTable = [ term 0        "null"
           , mul  (d 9)    "milliarde"
           ]
 
-de :: NumConfig
+de :: NumConfig DS.DString
 de = NumConfig { ncNeg      = deNeg
                , ncOne      = deOne
                , ncAdd      = deAdd
@@ -554,19 +567,19 @@ de = NumConfig { ncNeg      = deNeg
 
 -------------------------------------------------------------------------------
 
-seNeg :: NegCombinator
+seNeg :: (IsString s, Monoid s) => Neg s
 seNeg = error "seNeg: not defined yet you fool!"
 
-seOne :: OneCombinator
+seOne :: One s
 seOne = snd
 
-seAdd :: Combinator
+seAdd :: (IsString s, Monoid s) => Add s
 seAdd (_, x') (_, y') = x' <> y'
 
-seMul :: Combinator
+seMul :: (IsString s, Monoid s) => Mul s
 seMul (_, x') (_, y') = x' <> y'
 
-seTable :: [NumSymbol]
+seTable :: IsString s => [NumSymbol s]
 seTable = [ term 0           "noll"
           , term 1           "ett"
           , term 2           "två"
@@ -603,7 +616,7 @@ seTable = [ term 0           "noll"
           , mul  (d 9)       "miljarder"
           ]
 
-se :: NumConfig
+se :: NumConfig DS.DString
 se = NumConfig { ncNeg      = seNeg
                , ncOne      = seOne
                , ncAdd      = seAdd
@@ -613,21 +626,21 @@ se = NumConfig { ncNeg      = seNeg
 
 -------------------------------------------------------------------------------
 
-noNeg :: NegCombinator
+noNeg :: (IsString s, Monoid s) => Neg s
 noNeg = error "noNeg: not defined yet you fool!"
 
-noOne :: OneCombinator
-noOne (v, v') | v >= (d 6) = "én" <+> v'
-              | otherwise  = v'
+noOne :: (IsString s, Monoid s) => One s
+noOne (v, vs) | v >= (d 6) = "én" <+> vs
+              | otherwise  = vs
 
-noAdd :: Combinator
+noAdd :: (IsString s, Monoid s) => Add s
 noAdd (x, x') (_, y') | x == 100  = x' <+> "og" <+> y'
                       | otherwise = x' <> y'
 
-noMul :: Combinator
+noMul :: (IsString s, Monoid s) => Mul s
 noMul (_, x') (_, y') = x' <> y'
 
-noTable :: [NumSymbol]
+noTable :: IsString s => [NumSymbol s]
 noTable = [ term 0           "null"
           , term 1           "én"
           , term 2           "to"
@@ -664,7 +677,7 @@ noTable = [ term 0           "null"
           , mul  (d 9)       "milliarder"
           ]
 
-no :: NumConfig
+no :: NumConfig DS.DString
 no = NumConfig { ncNeg      = noNeg
                , ncOne      = noOne
                , ncAdd      = noAdd
@@ -674,19 +687,19 @@ no = NumConfig { ncNeg      = noNeg
 
 -------------------------------------------------------------------------------
 
-laNeg :: NegCombinator
+laNeg :: (IsString s, Monoid s) => Neg s
 laNeg = error "laNeg: not defined yet you fool!"
 
-laOne :: OneCombinator
+laOne :: One s
 laOne = snd
 
-laAdd :: Combinator
+laAdd :: (IsString s, Monoid s) => Add s
 laAdd (_, x') (_, y') = x' <+> y'
 
-laMul :: Combinator
+laMul :: (IsString s, Monoid s) => Mul s
 laMul (_, x') (_, y') = x' <+> y'
 
-laTable :: [NumSymbol]
+laTable :: IsString s => [NumSymbol s]
 laTable = [ term 0         "nulla"
           , term 1         "unus"
           , term 2         "duo"
@@ -745,7 +758,7 @@ laTable = [ term 0         "nulla"
           , term (d 6)     "decies centena milia"
           ]
 
-la :: NumConfig
+la :: NumConfig DS.DString
 la = NumConfig { ncNeg      = laNeg
                , ncOne      = laOne
                , ncAdd      = laAdd
@@ -755,21 +768,21 @@ la = NumConfig { ncNeg      = laNeg
 
 -------------------------------------------------------------------------------
 
-frNeg :: NegCombinator
+frNeg :: (IsString s, Monoid s) => Neg s
 frNeg s = "moins" <+> s
 
-frOne :: OneCombinator
+frOne :: One s
 frOne = snd
 
-frAdd :: Combinator
+frAdd :: (IsString s, Monoid s) => Add s
 frAdd (x, x') (y, y') | x < 80 && y == 1 = x' <+> "et" <+> y'
                       | x < 100          = x' <-> y'
                       | otherwise        = x' <+> y'
 
-frMul :: Combinator
+frMul :: (IsString s, Monoid s) => Mul s
 frMul (_, x') (_, y') = x' <+> y'
 
-frTable :: [NumSymbol]
+frTable :: IsString s => [NumSymbol s]
 frTable = [ term 0         "zéro"
           , term 1         "un"
           , term 2         "deux"
@@ -802,7 +815,7 @@ frTable = [ term 0         "zéro"
           , mul  (d 9)     "millard"
           ]
 
-fr :: NumConfig
+fr :: NumConfig DS.DString
 fr = NumConfig { ncNeg      = frNeg
                , ncOne      = frOne
                , ncAdd      = frAdd
@@ -812,20 +825,20 @@ fr = NumConfig { ncNeg      = frNeg
 
 -------------------------------------------------------------------------------
 
-spNeg :: NegCombinator
+spNeg :: (IsString s, Monoid s) => Neg s
 spNeg = error "spNeg: not defined yet you fool!"
 
-spOne :: OneCombinator
+spOne :: One s
 spOne = snd
 
-spAdd :: Combinator
+spAdd :: (IsString s, Monoid s) => Add s
 spAdd (x, x') (_, y') | x < 100   =  x' <+> "y" <+> y'
                       | otherwise  = x' <+> y'
 
-spMul :: Combinator
+spMul :: (IsString s, Monoid s) => Mul s
 spMul (_, x') (_, y') = x' <+> y'
 
-spTable :: [NumSymbol]
+spTable :: IsString s => [NumSymbol s]
 spTable = [ term 0         "cero"
           , term 1         "uno"
           , term 2         "dos"
@@ -863,7 +876,7 @@ spTable = [ term 0         "cero"
           , mul  (d 6)     "un millón"
           ]
 
-sp :: NumConfig
+sp :: NumConfig DS.DString
 sp = NumConfig { ncNeg      = spNeg
                , ncOne      = spOne
                , ncAdd      = spAdd
@@ -873,21 +886,21 @@ sp = NumConfig { ncNeg      = spNeg
 
 -------------------------------------------------------------------------------
 
-itNeg :: NegCombinator
+itNeg :: (IsString s, Monoid s) => Neg s
 itNeg = error "itNeg: not defined yet you fool!"
 
-itOne :: OneCombinator
+itOne :: One s
 itOne = snd
 
-itAdd :: Combinator
+itAdd :: (IsString s, Monoid s) => Add s
 itAdd (_, x') (y, y') | y == 3    = x' <> "tré"
                       | otherwise = x' <> y'
 
-itMul :: Combinator
+itMul :: (IsString s, Monoid s) => Mul s
 itMul (_, x') (y, y') | y < d 6   = x' <> y'
                       | otherwise = x' <+> y'
 
-itTable :: [NumSymbol]
+itTable :: IsString s => [NumSymbol s]
 itTable = [ term 0           "zero"
           , term 1           "uno"
           , term 2           "due"
@@ -941,7 +954,7 @@ itTable = [ term 0           "zero"
           , mul  (d 9)       "miliardi"
           ]
 
-it :: NumConfig
+it :: NumConfig DS.DString
 it = NumConfig { ncNeg      = itNeg
                , ncOne      = itOne
                , ncAdd      = itAdd
@@ -951,19 +964,19 @@ it = NumConfig { ncNeg      = itNeg
 
 -------------------------------------------------------------------------------
 
-eoNeg :: NegCombinator
+eoNeg :: (IsString s, Monoid s) => Neg s
 eoNeg = error "eoNeg: not defined yet you fool!"
 
-eoOne :: OneCombinator
+eoOne :: One s
 eoOne = snd
 
-eoAdd :: Combinator
+eoAdd :: (IsString s, Monoid s) => Add s
 eoAdd (_, x') (_, y') = x' <+> y'
 
-eoMul :: Combinator
+eoMul :: (IsString s, Monoid s) => Mul s
 eoMul (_, x') (_, y') = x' <> y'
 
-eoTable :: [NumSymbol]
+eoTable :: IsString s => [NumSymbol s]
 eoTable = [ term 0    "nulo"
           , term 1    "unu"
           , term 2    "du"
@@ -980,7 +993,7 @@ eoTable = [ term 0    "nulo"
           , mul (d 6) "miliono"
           ]
 
-eo :: NumConfig
+eo :: NumConfig DS.DString
 eo = NumConfig { ncNeg      = eoNeg
                , ncOne      = eoOne
                , ncAdd      = eoAdd
@@ -990,20 +1003,20 @@ eo = NumConfig { ncNeg      = eoNeg
 
 -------------------------------------------------------------------------------
 
-jaNeg :: NegCombinator
+jaNeg :: (IsString s, Monoid s) => Neg s
 jaNeg s = "mainasu" <+> s
 
-jaOne :: OneCombinator
-jaOne (v, v') | v < 100 || (300 >= v && v < 400) = v'
-              | otherwise = "ichi" <-> v'
+jaOne :: (IsString s, Monoid s) => One s
+jaOne (v, vs) | v < 100 || (300 >= v && v < 400) = vs
+              | otherwise = "ichi" <-> vs
 
-jaAdd :: Combinator
+jaAdd :: (IsString s, Monoid s) => Add s
 jaAdd (_, x') (_, y') = x' <+> y'
 
-jaMul :: Combinator
+jaMul :: (IsString s, Monoid s) => Mul s
 jaMul (_, x') (_, y') = x' <-> y'
 
-jaTable :: [NumSymbol]
+jaTable :: IsString s => [NumSymbol s]
 jaTable = [ term 0         "rei"
           , term 1         "ichi"
           , term 2         "ni"
@@ -1037,7 +1050,7 @@ jaTable = [ term 0         "rei"
           , mul (d 68)     "muryōtaisū"
           ]
 
-ja :: NumConfig
+ja :: NumConfig DS.DString
 ja = NumConfig { ncNeg      = jaNeg
                , ncOne      = jaOne
                , ncAdd      = jaAdd

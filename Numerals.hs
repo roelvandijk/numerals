@@ -192,6 +192,8 @@ type Add s = (Integer, s) -> (Integer, s) -> s
 type Mul s = (Integer, s) -> (Integer, s) -> s
 
 
+----------------------------------------
+
 class Joinable s where
     (<>)  :: s -> s -> s
     (<+>) :: s -> s -> s
@@ -205,6 +207,10 @@ instance Joinable String where
     (<>)    = (++)
     x <+> y = x <> " " <> y
 
+instance Joinable ShowS where
+    (<>)    = (.)
+    x <+> y = x <> " " <> y
+
 instance Joinable DS.DString where
     (<>)    = mappend
     x <+> y = x <> " " <> y
@@ -213,6 +219,7 @@ instance Joinable PP.Doc where
     (<>)  = (PP.<>)
     (<+>) = (PP.<+>)
 
+----------------------------------------
 
 class Stringable s where
     toString :: s -> String
@@ -220,20 +227,27 @@ class Stringable s where
 instance Stringable String where
     toString = id
 
+instance Stringable ShowS where
+    toString s = s []
+
 instance Stringable DS.DString where
     toString = DS.toString
 
 instance Stringable PP.Doc where
     toString = PP.render
 
+----------------------------------------
+
+instance IsString ShowS where
+    fromString = showString
 
 instance IsString PP.Doc where
     fromString = PP.text
 
+----------------------------------------
 
 d :: Integer -> Integer
 d = (10 ^)
-
 
 -------------------------------------------------------------------------------
 --
@@ -289,6 +303,9 @@ test nc = mapM_ (putStrLn . pretty)
 
 testS :: NumConfig String -> [Integer] -> IO ()
 testS = test
+
+testSS :: NumConfig ShowS -> [Integer] -> IO ()
+testSS = test
 
 testDS :: NumConfig DS.DString -> [Integer] -> IO ()
 testDS = test

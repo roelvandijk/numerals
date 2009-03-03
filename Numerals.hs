@@ -587,8 +587,7 @@ deAdd (x, x') (y, y') | x < 20    = y' <> x'
                       | otherwise = x' <> y'
 
 deMul :: (IsString s, Joinable s) => Mul s
-deMul (_, x') (y, y') | y < (d 6) = x' <> y'
-                      | otherwise = x' <> y'
+deMul (_, x') (_, y') = x' <> y'
 
 deTable :: (IsString s, Joinable s) => [NumSymbol s]
 deTable = [ term  0        "null"
@@ -676,6 +675,7 @@ seTable = [ term  0           "noll"
                                           _     -> "tio"
           , term  11          "elva"
           , term  12          "tolv"
+          -- 20 is a special case. Not defined in terms of 10.
           , add   20    10    "tjugo"
           , mul   100         "hundra"
           , mul   (d 3)       "tusen"
@@ -705,9 +705,10 @@ noOne :: (IsString s, Joinable s) => One s
 noOne (v, vs) | v >= (d 6) = "én" <+> vs
               | otherwise  = vs
 
+-- TODO: What are the rules for conjunction in Norse? When do you put
+-- "og" between numbers?
 noAdd :: (IsString s, Joinable s) => Add s
 noAdd (x, x') (_, y') | x < 20    = y' <> x'
---                       | x == 100  = x' <+> "og" <+> y'
                       | otherwise = x' <> y'
 
 noMul :: (IsString s, Joinable s) => Mul s
@@ -744,6 +745,7 @@ noTable = [ term  0           "null"
                                           _    -> "ti"
           , term  11          "elleve"
           , term  12          "tolv"
+          -- 20 is a special case. Not defined in terms of 10.
           , add   20    10    "tjue"
           , mul   100         "hundre"
           , mul   (d 3)       "tusen"
@@ -851,44 +853,57 @@ frOne :: One s
 frOne = snd
 
 frAdd :: (IsString s, Joinable s) => Add s
-frAdd (x, x') (y, y') | x < 80 && y == 1 = x' <+> "et" <+> y'
+frAdd (x, x') (y, y') | x == 10 && y < 7 = y' <> x'
+                      | x < 80 && y == 1 = x' <+> "et" <+> y'
                       | x < 100          = x' <-> y'
                       | otherwise        = x' <+> y'
 
 frMul :: (IsString s, Joinable s) => Mul s
-frMul (_, x') (_, y') = x' <+> y'
+frMul (_, x') (y, y') | y == 10   = x' <> y'
+                      | otherwise = x' <+> y'
 
 frTable :: (IsString s, Joinable s) => [NumSymbol s]
-frTable = [ term 0         "zéro"
-          , term 1         "un"
-          , term 2         "deux"
-          , term 3         "trois"
-          , term 4         "quatre"
-          , term 5         "cinq"
-          , term 6         "six"
-          , term 7         "sept"
-          , term 8         "huit"
-          , term 9         "neuf"
-          , mul  10        "dix"
-          , term 11        "onze"
-          , term 12        "douze"
-          , term 13        "treize"
-          , term 14        "quatorze"
-          , term 15        "quinze"
-          , term 16        "seize"
-          , add  20    10  "vingt"
-          , add  30    10  "trente"
-          , add  40    10  "quarante"
-          , add  50    10  "cinquante"
-          , add  60    10  "soixante"
-          , term 71        "soixante et onze"
-          , term 80        "quatre-vingts"
-          , add  80    10  "quatre-vingt"
-          , add  100   100 "cent"
-          , mul  100       "cents"
-          , mul  1000      "mille"
-          , mul  (d 6)     "million"
-          , mul  (d 9)     "millard"
+frTable = [ term  0         "zéro"
+          , term' 1         $ \ctx -> case ctx of
+                                        RA 10 -> "on"
+                                        _     -> "un"
+          , term' 2         $ \ctx -> case ctx of
+                                        RA 10 -> "dou"
+                                        _     -> "deux"
+          , term' 3         $ \ctx -> case ctx of
+                                        RA 10 -> "trei"
+                                        LM 10 -> "tren"
+                                        _     -> "trois"
+          , term' 4         $ \ctx -> case ctx of
+                                        RA 10 -> "quator"
+                                        LM 10 -> "quaran"
+                                        _     -> "quatre"
+          , term' 5         $ \ctx -> case ctx of
+                                        RA 10 -> "quin"
+                                        LM 10 -> "cinquan"
+                                        _     -> "cinq"
+          , term' 6         $ \ctx -> case ctx of
+                                        RA 10 -> "sei"
+                                     -- LM 10 -> "soixan"
+                                        _     -> "six"
+          , term  7         "sept"
+          , term  8         "huit"
+          , term  9         "neuf"
+          , mul'  10        $ \ctx -> case ctx of
+                                        LA n | n < 7     -> "ze"
+                                             | otherwise -> "dix"
+                                        RM _ -> "te"
+                                        _    -> "dix"
+          , add   20    10  "vingt"
+          , add   60    20  "soixante"
+          , term  71        "soixante et onze"
+          , term  80        "quatre-vingts"
+          , add   80    20  "quatre-vingt"
+          , add   100   100 "cent"
+          , mul   100       "cents"
+          , mul   1000      "mille"
+          , mul   (d 6)     "million"
+          , mul   (d 9)     "millard"
           ]
 
 fr :: (IsString s, Joinable s) => NumConfig s

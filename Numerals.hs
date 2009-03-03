@@ -151,8 +151,8 @@ import Data.Monoid
 import qualified Data.DString as DS
 import Data.String
 import qualified Data.ByteString.Char8 as B
+import qualified Data.Text as T
 import qualified Text.PrettyPrint as PP
-
 
 -------------------------------------------------------------------------------
 -- Types
@@ -213,6 +213,10 @@ instance Joinable B.ByteString where
     (<>)    = mappend
     x <+> y = x <> " " <> y
 
+instance Joinable T.Text where
+    (<>)    = mappend
+    x <+> y = x <> " " <> y
+
 instance Joinable ShowS where
     (<>)    = mappend
     x <+> y = x <> " " <> y
@@ -235,6 +239,9 @@ instance Stringable String where
 
 instance Stringable B.ByteString where
     toString = B.unpack
+
+instance Stringable T.Text where
+    toString = T.unpack
 
 instance Stringable ShowS where
     toString s = s []
@@ -311,6 +318,9 @@ testS = test
 
 testBS :: Test B.ByteString
 testBS = test
+
+testT :: Test T.Text
+testT = test
 
 testSS :: Test ShowS
 testSS = test

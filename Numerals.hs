@@ -174,8 +174,50 @@ type One s = (Integer, s) -> s
 type Add s = (Integer, s) -> (Integer, s) -> s
 type Mul s = (Integer, s) -> (Integer, s) -> s
 
+d :: Integer -> Integer
+d = (10 ^)
 
-----------------------------------------
+-------------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------------
+
+cardinal :: NumConfig s -> Integer -> Maybe s
+cardinal NumConfig {..} 0 = fmap symStr $ ncCardinal 0
+cardinal NumConfig {..} x | x < 0     = fmap ncNeg $ go $ abs x
+                          | otherwise = go x
+    where go n = do (NumSym _ v _ vs) <- ncCardinal n
+                    case n `divMod` v of
+                      (1, 0) -> return $ ncOne (v, vs)
+                      (1, r) -> do rs <- go r
+                                   return $ (v, ncOne (v, vs)) `ncAdd` (r, rs)
+                      (q, r) | q >= v    -> Nothing
+                             | otherwise -> do qs <- go q
+                                               if r == 0
+                                                 then return $ (q, qs) `ncMul` (v, vs)
+                                                 else do rs <- go r
+                                                         return $ (q*v, (q, qs) `ncMul` (v, vs)) `ncAdd` (r, rs)
+
+findSym :: [NumSymbol s] -> Integer -> Maybe (NumSymbol s)
+findSym []     _ = Nothing
+findSym (e:es) n = go e e es
+    where go :: NumSymbol s -> NumSymbol s -> [NumSymbol s] -> Maybe (NumSymbol s)
+          go a m [] = stop a m
+          go a m (x@(NumSym t v _ _) : xs)
+              | v == n    = Just x
+              | otherwise = case t of
+                              Terminal        -> go a m xs
+                              Add | v > n     -> stop a m
+                                  | otherwise -> go x m xs
+                              Mul | v > n     -> stop a m
+                                  | otherwise -> go a x xs
+
+          stop :: NumSymbol s -> NumSymbol s -> Maybe (NumSymbol s)
+          stop a@(NumSym {..}) m | n < symVal + symScope = return a
+                                 | otherwise             = return m
+
+-------------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------------
 
 class Joinable s where
     (<>)  :: s -> s -> s
@@ -251,22 +293,20 @@ d = (10 ^)
 -------------------------------------------------------------------------------
 
 cardinal :: NumConfig s -> Integer -> Maybe s
-cardinal NumConfig {..} 0 = fmap (\sym -> symRepr sym O) $ ncCardinal 0
-cardinal NumConfig {..} x | x < 0     = fmap ncNeg $ go O $ abs x
-                          | otherwise = go O x
-    where go ctx n = do (NumSym _ v _ rv) <- ncCardinal n
-                        let vs = rv ctx
-                        case n `divMod` v of
-                          (1, 0) -> return $ ncOne (v, vs)
-                          (1, r) -> do rs <- go (RA v) r
-                                       return $ (v, ncOne (v, rv (LA r))) `ncAdd` (r, rs)
-                          (q, r) | q >= v    -> Nothing
-                                 | otherwise -> do qs <- go (LM v) q
-                                                   if r == 0
-                                                     then return $ (q, qs) `ncMul` (v, rv (RM q))
-                                                     else do let qv = q * v
-                                                             rs <- go (RA qv) r
-                                                             return $ (qv, (q, qs) `ncMul` (v, rv (RM q))) `ncAdd` (r, rs)
+cardinal NumConfig {..} 0 = fmap symStr $ ncCardinal 0
+cardinal NumConfig {..} x | x < 0     = fmap ncNeg $ go $ abs x
+                          | otherwise = go x
+    where go n = do (NumSym _ v _ vs) <- ncCardinal n
+                    case n `divMod` v of
+                      (1, 0) -> return $ ncOne (v, vs)
+                      (1, r) -> do rs <- go r
+                                   return $ (v, ncOne (v, vs)) `ncAdd` (r, rs)
+                      (q, r) | q >= v    -> Nothing
+                             | otherwise -> do qs <- go q
+                                               if r == 0
+                                                 then return $ (q, qs) `ncMul` (v, vs)
+                                                 else do rs <- go r
+                                                         return $ (q*v, (q, qs) `ncMul` (v, vs)) `ncAdd` (r, rs)
 
 findSym :: [NumSymbol s] -> Integer -> Maybe (NumSymbol s)
 findSym []     _ = Nothing

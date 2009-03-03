@@ -13,7 +13,16 @@ module Numerals
 
     , cardinal
 
-    , nl
+    -- *West Germanic
+    , nl, enShort, enLong, de
+    -- *North Germanic
+    , se, no
+    -- *Romance
+    , la, fr, it, sp, pt
+    -- *Japonic
+    , ja
+    -- *Constructed
+    , eo
     )
     where
 
@@ -240,7 +249,7 @@ findSym (e:es) n = go e e es
                               Add | v > n     -> stop a m
                                   | otherwise -> go x m xs
                               Mul | v > n     -> stop a m
-                                  | otherwise -> go x x xs
+                                  | otherwise -> go a x xs
 
           stop :: NumSymbol s -> NumSymbol s -> Maybe (NumSymbol s)
           stop a@(NumSym {..}) m | n < symVal + symScope = return a
@@ -262,6 +271,9 @@ test nc = mapM_ (putStrLn . pretty)
 
 testSome :: Stringable s => NumConfig s -> Integer -> Integer -> IO ()
 testSome nc start amount = test nc . genericTake amount . testNums $ start
+
+testFind :: Stringable s => NumConfig s -> Integer -> Maybe String
+testFind nc i = fmap (toString . symStr) $ (ncCardinal nc) i
 
 -------------------------------------------------------------------------------
 -- Numeral configurations
@@ -825,67 +837,6 @@ fr = NumConfig { ncNeg      = frNeg
 
 -------------------------------------------------------------------------------
 
-spNeg :: (IsString s, Monoid s) => Neg s
-spNeg = error "spNeg: not defined yet you fool!"
-
-spOne :: One s
-spOne = snd
-
-spAdd :: (IsString s, Monoid s) => Add s
-spAdd (x, x') (_, y') | x < 100   =  x' <+> "y" <+> y'
-                      | otherwise  = x' <+> y'
-
-spMul :: (IsString s, Monoid s) => Mul s
-spMul (_, x') (_, y') = x' <+> y'
-
-spTable :: IsString s => [NumSymbol s]
-spTable = [ term 0         "cero"
-          , term 1         "uno"
-          , term 2         "dos"
-          , term 3         "tres"
-          , term 4         "cuatro"
-          , term 5         "cinco"
-          , term 6         "seis"
-          , term 7         "siete"
-          , term 8         "ocho"
-          , term 9         "nueve"
-          , mul  10        "diez"
-          , term 11        "once"
-          , term 12        "doce"
-          , term 13        "trece"
-          , term 14        "catorce"
-          , term 15        "quince"
-          , term 16        "dieciseis"
-          , term 17        "diecisiete"
-          , term 18        "dieciocho"
-          , term 19        "diecinueve"
-          , add  20    10  "veinte"
-          , add  30    10  "treinta"
-          , add  40    10  "cuarenta"
-          , add  50    10  "cincuenta"
-          , add  60    10  "sesenta"
-          , add  70    10  "setenta"
-          , add  80    10  "ochenta"
-          , add  90    10  "noventa"
-          , term 100       "cien"
-          , mul  100       "ciento"
-          , add  500   100 "quinientos"
-          , add  700   100 "setecientos"
-          , add  900   100 "novocientos"
-          , mul  1000      "mil"
-          , mul  (d 6)     "un millón"
-          ]
-
-sp :: NumConfig DS.DString
-sp = NumConfig { ncNeg      = spNeg
-               , ncOne      = spOne
-               , ncAdd      = spAdd
-               , ncMul      = spMul
-               , ncCardinal = findSym spTable
-               }
-
--------------------------------------------------------------------------------
-
 itNeg :: (IsString s, Monoid s) => Neg s
 itNeg = error "itNeg: not defined yet you fool!"
 
@@ -964,41 +915,135 @@ it = NumConfig { ncNeg      = itNeg
 
 -------------------------------------------------------------------------------
 
-eoNeg :: (IsString s, Monoid s) => Neg s
-eoNeg = error "eoNeg: not defined yet you fool!"
+spNeg :: (IsString s, Monoid s) => Neg s
+spNeg = error "spNeg: not defined yet you fool!"
 
-eoOne :: One s
-eoOne = snd
+spOne :: One s
+spOne = snd
 
-eoAdd :: (IsString s, Monoid s) => Add s
-eoAdd (_, x') (_, y') = x' <+> y'
+spAdd :: (IsString s, Monoid s) => Add s
+spAdd (x, x') (_, y') | x < 100   =  x' <+> "y" <+> y'
+                      | otherwise  = x' <+> y'
 
-eoMul :: (IsString s, Monoid s) => Mul s
-eoMul (_, x') (_, y') = x' <> y'
+spMul :: (IsString s, Monoid s) => Mul s
+spMul (_, x') (_, y') = x' <+> y'
 
-eoTable :: IsString s => [NumSymbol s]
-eoTable = [ term 0    "nulo"
-          , term 1    "unu"
-          , term 2    "du"
-          , term 3    "tri"
-          , term 4    "kvar"
-          , term 5    "kvin"
-          , term 6    "ses"
-          , term 7    "sep"
-          , term 8    "ok"
-          , term 9    "naŭ"
-          , mul 10    "dek"
-          , mul 100   "cent"
-          , mul 1000  "mil"
-          , mul (d 6) "miliono"
+spTable :: IsString s => [NumSymbol s]
+spTable = [ term 0         "cero"
+          , term 1         "uno"
+          , term 2         "dos"
+          , term 3         "tres"
+          , term 4         "cuatro"
+          , term 5         "cinco"
+          , term 6         "seis"
+          , term 7         "siete"
+          , term 8         "ocho"
+          , term 9         "nueve"
+          , mul  10        "diez"
+          , term 11        "once"
+          , term 12        "doce"
+          , term 13        "trece"
+          , term 14        "catorce"
+          , term 15        "quince"
+          , term 16        "dieciseis"
+          , term 17        "diecisiete"
+          , term 18        "dieciocho"
+          , term 19        "diecinueve"
+          , add  20    10  "veinte"
+          , add  30    10  "treinta"
+          , add  40    10  "cuarenta"
+          , add  50    10  "cincuenta"
+          , add  60    10  "sesenta"
+          , add  70    10  "setenta"
+          , add  80    10  "ochenta"
+          , add  90    10  "noventa"
+          , add  100   100 "cien"
+          , mul  100       "ciento"
+          , add  500   100 "quinientos"
+          , add  700   100 "setecientos"
+          , add  900   100 "novocientos"
+          , mul  1000      "mil"
+          , mul  (d 6)     "un millón"
           ]
 
-eo :: NumConfig DS.DString
-eo = NumConfig { ncNeg      = eoNeg
-               , ncOne      = eoOne
-               , ncAdd      = eoAdd
-               , ncMul      = eoMul
-               , ncCardinal = findSym eoTable
+sp :: NumConfig DS.DString
+sp = NumConfig { ncNeg      = spNeg
+               , ncOne      = spOne
+               , ncAdd      = spAdd
+               , ncMul      = spMul
+               , ncCardinal = findSym spTable
+               }
+
+-------------------------------------------------------------------------------
+
+-- Sources:
+--   http://www.sonia-portuguese.com/text/numerals.htm
+--   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
+
+ptNeg :: (IsString s, Monoid s) => Neg s
+ptNeg = error "ptNeg: not defined yet you fool!"
+
+ptOne :: (IsString s, Monoid s) => One s
+ptOne (x, x') | x <= 1000 = x'
+              | otherwise = "um" <+> x'
+
+ptAdd :: (IsString s, Monoid s) => Add s
+ptAdd (_, x') (_, y') =  x' <+> "e" <+> y'
+
+ptMul :: (IsString s, Monoid s) => Mul s
+ptMul (_, x') (y, y') | y < 1000  = x' <> y'
+                      | otherwise = x' <+> y'
+
+ptTable :: IsString s => [NumSymbol s]
+ptTable = [ term 0            "zero"
+          , term 1            "um"
+          , term 2            "dois"
+          , term 3            "três"
+          , term 4            "quatro"
+          , term 5            "cinco"
+          , term 6            "seis"
+          , term 7            "sete"
+          , term 8            "oito"
+          , term 9            "nove"
+          , mul  10           "dez"
+          , term 11           "onze"
+          , term 12           "doze"
+          , term 13           "treze"
+          , term 14           "catorze"
+          , term 15           "quinze"
+          , term 16           "dezesseis"
+          , term 17           "dezessete"
+          , term 18           "dezoito"
+          , term 19           "dezenove"
+          , add  20    10     "vinte"
+          , add  30    10     "trinta"
+          , add  40    10     "quarenta"
+          , add  50    10     "cinqüenta"
+          , add  60    10     "sessenta"
+          , add  70    10     "setenta"
+          , add  80    10     "oitenta"
+          , add  90    10     "noventa"
+          , term 100          "cem"
+          , add  100   100    "cento"
+          , mul  100          "centos"
+          , add  200   100    "duzentos"
+          , add  300   100    "trezentos"
+          , add  500   100    "quinhentos"
+          , mul  1000         "mil"
+          , add (d 6)  (d 6)  "milhão"
+          , mul (d 6)         "milhões"
+          , add (d 9)  (d 9)  "bilhão"
+          , mul (d 9)         "bilhões"
+          , add (d 12) (d 12) "trilhão"
+          , mul (d 12)        "trilhões"
+          ]
+
+pt :: NumConfig DS.DString
+pt = NumConfig { ncNeg      = ptNeg
+               , ncOne      = ptOne
+               , ncAdd      = ptAdd
+               , ncMul      = ptMul
+               , ncCardinal = findSym ptTable
                }
 
 -------------------------------------------------------------------------------
@@ -1056,5 +1101,44 @@ ja = NumConfig { ncNeg      = jaNeg
                , ncAdd      = jaAdd
                , ncMul      = jaMul
                , ncCardinal = findSym jaTable
+               }
+
+-------------------------------------------------------------------------------
+
+eoNeg :: (IsString s, Monoid s) => Neg s
+eoNeg = error "eoNeg: not defined yet you fool!"
+
+eoOne :: One s
+eoOne = snd
+
+eoAdd :: (IsString s, Monoid s) => Add s
+eoAdd (_, x') (_, y') = x' <+> y'
+
+eoMul :: (IsString s, Monoid s) => Mul s
+eoMul (_, x') (_, y') = x' <> y'
+
+eoTable :: IsString s => [NumSymbol s]
+eoTable = [ term 0    "nulo"
+          , term 1    "unu"
+          , term 2    "du"
+          , term 3    "tri"
+          , term 4    "kvar"
+          , term 5    "kvin"
+          , term 6    "ses"
+          , term 7    "sep"
+          , term 8    "ok"
+          , term 9    "naŭ"
+          , mul 10    "dek"
+          , mul 100   "cent"
+          , mul 1000  "mil"
+          , mul (d 6) "miliono"
+          ]
+
+eo :: NumConfig DS.DString
+eo = NumConfig { ncNeg      = eoNeg
+               , ncOne      = eoOne
+               , ncAdd      = eoAdd
+               , ncMul      = eoMul
+               , ncCardinal = findSym eoTable
                }
 

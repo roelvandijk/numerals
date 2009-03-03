@@ -147,10 +147,12 @@ ja: mainasu
 -}
 
 import Data.List
+import Data.Monoid
 import qualified Data.DString as DS
 import Data.String
-import Data.Monoid
+import qualified Data.ByteString.Char8 as B
 import qualified Text.PrettyPrint as PP
+
 
 -------------------------------------------------------------------------------
 -- Types
@@ -204,11 +206,15 @@ infixr 5 <>, <+>, <-> -- Same as ++
 x <-> y = x <> "-" <> y
 
 instance Joinable String where
-    (<>)    = (++)
+    (<>)    = mappend
+    x <+> y = x <> " " <> y
+
+instance Joinable B.ByteString where
+    (<>)    = mappend
     x <+> y = x <> " " <> y
 
 instance Joinable ShowS where
-    (<>)    = (.)
+    (<>)    = mappend
     x <+> y = x <> " " <> y
 
 instance Joinable DS.DString where
@@ -226,6 +232,9 @@ class Stringable s where
 
 instance Stringable String where
     toString = id
+
+instance Stringable B.ByteString where
+    toString = B.unpack
 
 instance Stringable ShowS where
     toString s = s []
@@ -291,26 +300,25 @@ findSym (e:es) n = go e e es
 -- Debug
 -------------------------------------------------------------------------------
 
--- A047357
--- Numbers that are congruent to {0, 1, 3} mod 7
-testNums :: Integer -> [Integer]
-testNums 0 = 0 : testNums 1
-testNums n = n : testNums (1 + n + n `mod` 7)
+type Test s = NumConfig s -> [Integer] -> IO ()
 
-test :: Stringable s => NumConfig s -> [Integer] -> IO ()
+test :: Stringable s => Test s
 test nc = mapM_ (putStrLn . pretty)
     where pretty n = show n ++ " == " ++ (maybe "-" id $ fmap toString $ cardinal nc n)
 
-testS :: NumConfig String -> [Integer] -> IO ()
+testS :: Test String
 testS = test
 
-testSS :: NumConfig ShowS -> [Integer] -> IO ()
+testBS :: Test B.ByteString
+testBS = test
+
+testSS :: Test ShowS
 testSS = test
 
-testDS :: NumConfig DS.DString -> [Integer] -> IO ()
+testDS :: Test DS.DString
 testDS = test
 
-testDoc :: NumConfig PP.Doc -> [Integer] -> IO ()
+testDoc :: Test PP.Doc
 testDoc = test
 
 testDocWithStyle :: PP.Style -> NumConfig PP.Doc -> [Integer] -> IO ()
@@ -319,6 +327,12 @@ testDocWithStyle s nc = mapM_ (putStrLn . pretty)
 
 testSome :: Stringable s => NumConfig s -> Integer -> Integer -> IO ()
 testSome nc start amount = test nc . genericTake amount . testNums $ start
+
+-- A047357
+-- Numbers that are congruent to {0, 1, 3} mod 7
+testNums :: Integer -> [Integer]
+testNums 0 = 0 : testNums 1
+testNums n = n : testNums (1 + n + n `mod` 7)
 
 testFind :: Stringable s => NumConfig s -> Integer -> Maybe String
 testFind nc i = fmap (toString . symStr) $ (ncCardinal nc) i

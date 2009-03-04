@@ -316,6 +316,11 @@ testDoc = test
 testNSS :: Test (NS String)
 testNSS = test
 
+
+testNumS :: Test String
+testNumS = testNSS . nummify
+
+
 testDocWithStyle :: PP.Style -> NumConfig PP.Doc -> [Integer] -> IO ()
 testDocWithStyle s nc = mapM_ (putStrLn . pretty)
     where pretty n = show n ++ " == " ++ (maybe "-" id $ fmap (PP.renderStyle s) $ cardinal nc n)
@@ -332,39 +337,30 @@ test8 = [0, 8, 10, 18, 80, 88, 100, 108, 118, 180, 188, 800, 808, 818, 880, 888,
 test9 = [0, 9, 10, 19, 90, 99, 100, 109, 119, 190, 199, 900, 909, 919, 990, 999, 9000, 9999]
 
 -------------------------------------------------------------------------------
--- Numeral configurations
+-- Miscellaneous functions
 -------------------------------------------------------------------------------
+
+withSnd :: (a -> b -> c) -> (d, a) -> (e, b) -> c
+withSnd f (_, x) (_, y) = f x y
 
 d :: Integer -> Integer
 d = (10 ^)
 
 -------------------------------------------------------------------------------
+-- Numeral configurations
+-------------------------------------------------------------------------------
 
-numNeg :: (Num s) => Neg s
-numNeg s = negate s
-
-numOne :: One s
-numOne = snd
-
-numAdd :: (Num s) => Add s
-numAdd (_, x') (_, y') = x' + y'
-
-numMul :: (Num s) => Mul s
-numMul (_, x') (_, y') = x' * y'
-
-numTable :: (Num s) => [NumSymbol s]
-numTable =  num term [0..9]
-         ++ num mul ([10, d 2] ++ iterate (* d 3) (d 3))
+nummify :: Num n => NumConfig s -> NumConfig n
+nummify nc@(NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym . ncCardinal
+                                        , ncNeg      = negate
+                                        , ncOne      = snd
+                                        , ncAdd      = withSnd (+)
+                                        , ncMul      = withSnd (*)
+                                        }
     where
-      num t ns = [t n (fromInteger n) | n <- ns]
+      transformSym :: (Num n) => NumSymbol s -> NumSymbol n
+      transformSym sym = sym { symRepr = const . fromInteger $ symVal sym}
 
-num :: (Num s) => NumConfig s
-num = NumConfig { ncNeg      = numNeg
-                , ncOne      = numOne
-                , ncAdd      = numAdd
-                , ncMul      = numMul
-                , ncCardinal = findSym numTable
-                }
 
 newtype NS s = NS {unS :: s} deriving (Show,  Eq)
 
@@ -375,14 +371,14 @@ instance (Eq s, Show s, IsString s, Joinable s) => Num (NS s) where
     (-) = bin "-"
     (*) = bin "*"
 
-    negate = uno "negate"
-    abs    = uno "abs"
-    signum = uno "signum"
+    negate = un "negate"
+    abs    = un "abs"
+    signum = un "signum"
 
-uno :: (IsString s, Joinable s) => s -> NS s -> NS s
-uno fun x = NS (fun <+> unS x)
+un :: (IsString s, Joinable s) => s -> (NS s -> NS s)
+un fun x = NS (fun <+> unS x)
 
-bin :: (IsString s, Joinable s) => s -> NS s -> NS s -> NS s
+bin :: (IsString s, Joinable s) => s -> (NS s -> NS s -> NS s)
 bin op x y = NS (p (unS x <> op <> unS y))
 
 p s = "(" <> s <> ")"

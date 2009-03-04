@@ -131,7 +131,7 @@ import qualified Text.PrettyPrint as PP
 
 data SymbolType = Terminal | Add | Mul deriving Show
 
-data SymbolContext = O
+data SymbolContext = EmptyContext
                    | LA Integer
                    | RA Integer
                    | LM Integer
@@ -160,9 +160,29 @@ mul val s = NumSym Mul val val (const s)
 mul' :: Integer -> (SymbolContext -> s) -> NumSymbol s
 mul' val fs = NumSym Mul val val fs
 
--- Use 'foo' instead of 'const' in the previous functions to expose
--- some of the structure of numerals.
--- foo s = \ctx -> "(" <> fromString (show ctx) <+> s <> ")"
+-- |Constructs a symbol representation based on the relation of the
+--  symbol with the number 10.
+--  The chosen representation depends on the context in which the
+--  symbol is used:
+--    d) default: x
+--    a) additive: 10 + x
+--    m) multiplicative: x * 10
+tenForms :: s -> s -> s -> (SymbolContext -> s)
+tenForms d a m ctx = case ctx of
+                       RA 10 -> a
+                       LM 10 -> m
+                       _     -> d
+
+tenForms' :: s -> s -> s -> s -> (SymbolContext -> s)
+tenForms' d a mt mh ctx = case ctx of
+                            RA 10  -> a
+                            LM 10  -> mt
+                            LM 100 -> mh
+                            _      -> d
+
+mulForms :: s -> s -> (SymbolContext -> s)
+mulForms _ p (RM _) = p
+mulForms s _ _      = s
 
 
 data NumConfig s = NumConfig { ncCardinal :: Integer -> Maybe (NumSymbol s)
@@ -182,13 +202,12 @@ type Mul s = (Integer, s) -> (Integer, s) -> s
 -------------------------------------------------------------------------------
 
 cardinal :: NumConfig s -> Integer -> Maybe s
-cardinal NumConfig {..} 0 = fmap (\sym -> symRepr sym O) $ ncCardinal 0
-cardinal NumConfig {..} x | x < 0     = fmap ncNeg $ go O $ abs x
-                          | otherwise = go O x
+cardinal NumConfig {..} 0 = fmap (\sym -> symRepr sym EmptyContext) $ ncCardinal 0
+cardinal NumConfig {..} x | x < 0     = fmap ncNeg $ go EmptyContext $ abs x
+                          | otherwise = go EmptyContext x
     where go ctx n = do (NumSym _ v _ rv) <- ncCardinal n
-                        let vs = rv ctx
                         case n `divMod` v of
-                          (1, 0) -> return $ ncOne (v, vs)
+                          (1, 0) -> return $ ncOne (v, rv ctx)
                           (1, r) -> do rs <- go (RA v) r
                                        return $ (v, ncOne (v, rv (LA r))) `ncAdd` (r, rs)
                           (q, r) | q >= v    -> Nothing
@@ -326,7 +345,7 @@ testDocWithStyle s nc = mapM_ (putStrLn . pretty)
     where pretty n = show n ++ " == " ++ (maybe "-" id $ fmap (PP.renderStyle s) $ cardinal nc n)
 
 -- test data
-test1 = [0, 1, 10, 11, 10, 11, 100, 101, 111, 110, 111, 100, 101, 111, 110, 111, 1000, 1111]
+test1 = [0, 1, 10, 11, 100, 101, 110, 111, 1000, 1001, 1010, 1011, 1100, 1101, 1110, 1111]
 test2 = [0, 2, 10, 12, 20, 22, 100, 102, 112, 120, 122, 200, 202, 212, 220, 222, 2000, 2222]
 test3 = [0, 3, 10, 13, 30, 33, 100, 103, 113, 130, 133, 300, 303, 313, 330, 333, 3000, 3333]
 test4 = [0, 4, 10, 14, 40, 44, 100, 104, 114, 140, 144, 400, 404, 414, 440, 444, 4000, 4444]
@@ -388,12 +407,6 @@ instance Stringable s => Stringable (NS s) where
 
 -------------------------------------------------------------------------------
 
-nlNeg :: (IsString s, Joinable s) => Neg s
-nlNeg s = "min" <+> s
-
-nlOne :: One s
-nlOne = snd
-
 nlAdd :: (IsString s, Joinable s) => Add s
 nlAdd (x, x') (y, y') | x < 20    = y' <> x'
                       | x < 100   = y' <> (if y == 2 || y == 3
@@ -409,23 +422,13 @@ nlMul (_, x') (y, y') | y <= 10   = x' <> y'
 nlTable :: (IsString s, Joinable s) => [NumSymbol s]
 nlTable = [ term  0       "nul"
           , term  1       "één"
-          , term' 2       $ \ctx -> case ctx of
-                                      LM 10 -> "twin"
-                                      _     -> "twee"
-          , term' 3       $ \ctx -> case ctx of
-                                      RA 10 -> "der"
-                                      LM 10 -> "der"
-                                      _     -> "drie"
-          , term' 4       $ \ctx -> case ctx of
-                                      RA 10 -> "veer"
-                                      LM 10 -> "veer"
-                                      _     -> "vier"
+          , term' 2       $ tenForms "twee" "twin" "twee"
+          , term' 3       $ tenForms "drie" "der"  "der"
+          , term' 4       $ tenForms "vier" "veer" "veer"
           , term  5       "vijf"
           , term  6       "zes"
           , term  7       "zeven"
-          , term' 8       $ \ctx -> case ctx of
-                                      LM 10 -> "tach"
-                                      _     -> "acht"
+          , term' 8       $ tenForms "acht" "tach" "acht"
           , term  9       "negen"
           , mul'  10      $ \ctx -> case ctx of
                                       RM _ -> "tig"
@@ -497,8 +500,8 @@ nlTable = [ term  0       "nul"
           ]
 
 nl :: (IsString s, Joinable s) => NumConfig s
-nl = NumConfig { ncNeg      = nlNeg
-               , ncOne      = nlOne
+nl = NumConfig { ncNeg      = ("min" <+>)
+               , ncOne      = snd
                , ncAdd      = nlAdd
                , ncMul      = nlMul
                , ncCardinal = findSym nlTable
@@ -507,7 +510,7 @@ nl = NumConfig { ncNeg      = nlNeg
 -------------------------------------------------------------------------------
 
 enNeg :: (IsString s, Joinable s) => Neg s
-enNeg s = "minus" <+> s
+enNeg = ("minus" <+>)
 
 enOne :: (IsString s, Joinable s) => One s
 enOne (v,  vs) | v >= 100  = "one" <+> vs
@@ -525,31 +528,18 @@ enMul (_, x') (y, y') | y == 10   = x' <> y'
 enTable :: (IsString s, Joinable s) => [NumSymbol s]
 enTable = [ term  0       "zero"
           , term  1       "one"
-          , term' 2       $ \ctx -> case ctx of
-                                      LM 10   -> "twen"
-                                      _       -> "two"
-          , term' 3       $ \ctx -> case ctx of
-                                      RA 10   -> "thir"
-                                      LM 10   -> "thir"
-                                      _       -> "three"
-          , term' 4       $ \ctx -> case ctx of
-                                      LM 10   -> "for"
-                                      _       -> "four"
-          , term' 5       $ \ctx -> case ctx of
-                                      RA 10   -> "fif"
-                                      LM 10   -> "fif"
-                                      _       -> "five"
+          , term' 2       $ tenForms "two"   "twen" "two"
+          , term' 3       $ tenForms "three" "thir" "thir"
+          , term' 4       $ tenForms "four"  "for"  "four"
+          , term' 5       $ tenForms "five"  "fif"  "fif"
           , term  6       "six"
           , term  7       "seven"
-          , term' 8       $ \ctx -> case ctx of
-                                      RA 10   -> "eigh"
-                                      LM 10   -> "eigh"
-                                      _       -> "eight"
+          , term' 8       $ tenForms "eight" "eigh" "eigh"
           , term  9       "nine"
           , mul'  10      $ \ctx -> case ctx of
-                                      LA _    -> "teen"
-                                      RM _    -> "ty"
-                                      _       -> "ten"
+                                      LA _ -> "teen"
+                                      RM _ -> "ty"
+                                      _    -> "ten"
           , term  11      "eleven"
           , term  12      "twelve"
           , mul   100     "hundred"
@@ -625,9 +615,6 @@ enLong = NumConfig { ncNeg      = enNeg
 
 -------------------------------------------------------------------------------
 
-deNeg :: (IsString s, Joinable s) => Neg s
-deNeg s = "minus" <+> s
-
 deOne :: (IsString s, Joinable s) => One s
 deOne (v, vs) | v >= (d 6) = "eine" <+> vs
               | v >= 100   = "ein"  <>  vs
@@ -640,28 +627,18 @@ deAdd (x, x') (y, y') | x < 20    = y' <> x'
                                      else y') <> "und" <> x'
                       | otherwise = x' <> y'
 
-deMul :: (IsString s, Joinable s) => Mul s
-deMul (_, x') (_, y') = x' <> y'
-
 deTable :: (IsString s, Joinable s) => [NumSymbol s]
 deTable = [ term  0        "null"
           , term  1        "eins"
-          , term' 2        $ \ctx -> case ctx of
-                                       LM 10 -> "zwan"
-                                       _     -> "zwei"
+          , term' 2        $ tenForms "zwei" "zwei" "zwan"
           , term  3        "drei"
           , term  4        "vier"
           , term  5        "fünf"
           , term  6        "sechs"
-          , term' 7        $ \ctx -> case ctx of
-                                       RA 10 -> "sieb"
-                                       LM 10 -> "sieb"
-                                       _     -> "sieben"
+          , term' 7        $ tenForms "sieben" "sieb" "sieb"
           , term  8        "acht"
           , term  9        "neun"
-          , mul'  10       $ \ctx -> case ctx of
-                                       RM _ -> "zig"
-                                       _    -> "zehn"
+          , mul'  10       $ mulForms "zehn" "zig"
           , term  11       "elf"
           , term  12       "zwölf"
           , add   30    10 "dreißig"
@@ -672,10 +649,10 @@ deTable = [ term  0        "null"
           ]
 
 de :: (IsString s, Joinable s) => NumConfig s
-de = NumConfig { ncNeg      = deNeg
+de = NumConfig { ncNeg      = ("minus" <+>)
                , ncOne      = deOne
                , ncAdd      = deAdd
-               , ncMul      = deMul
+               , ncMul      = withSnd (<>)
                , ncCardinal = findSym deTable
                }
 
@@ -685,65 +662,38 @@ de = NumConfig { ncNeg      = deNeg
 --   http://en.wikibooks.org/wiki/Swedish/Numerals
 --   http://longstrom.com/swedishtoenglish.htm#numbers
 
-seNeg :: (IsString s, Joinable s) => Neg s
-seNeg = error "seNeg: not defined yet you fool!"
-
-seOne :: One s
-seOne = snd
-
 seAdd :: (IsString s, Joinable s) => Add s
 seAdd (x, x') (_, y') | x < 20    = y' <> x'
                       | otherwise = x' <> y'
 
-seMul :: (IsString s, Joinable s) => Mul s
-seMul (_, x') (_, y') = x' <> y'
-
 seTable :: (IsString s, Joinable s) => [NumSymbol s]
-seTable = [ term  0           "noll"
-          , term  1           "ett"
-          , term  2           "två"
-          , term' 3           $ \ctx -> case ctx of
-                                          RA 10 -> "tret"
-                                          LM 10 -> "tret"
-                                          _     -> "tre"
-          , term' 4           $ \ctx -> case ctx of
-                                          RA 10 -> "fjor"
-                                          LM 10 -> "fyr"
-                                          _     -> "fyra"
-          , term  5           "fem"
-          , term  6           "sex"
-          , term' 7           $ \ctx -> case ctx of
-                                          RA 10 -> "sjut"
-                                          LM 10 -> "sjut"
-                                          _     -> "sju"
-          , term' 8           $ \ctx -> case ctx of
-                                          RA 10 -> "ar"
-                                          LM 10 -> "åt"
-                                          _     -> "åtta"
-          , term' 9           $ \ctx -> case ctx of
-                                          RA 10 -> "nit"
-                                          LM 10 -> "nit"
-                                          _     -> "nio"
-          , mul'  10          $ \ctx -> case ctx of
-                                          LA _  -> "ton"
-                                          _     -> "tio"
-          , term  11          "elva"
-          , term  12          "tolv"
-          -- 20 is a special case. Not defined in terms of 10.
-          , add   20    10    "tjugo"
-          , mul   100         "hundra"
-          , mul   (d 3)       "tusen"
-          , add   (d 6) (d 6) "miljon"
-          , mul   (d 6)       "miljoner"
-          , add   (d 9) (d 9) "miljard"
-          , mul   (d 9)       "miljarder"
+seTable = [ term  0        "noll"
+          , term  1        "ett"
+          , term  2        "två"
+          , term' 3        $ tenForms "tre"  "tret" "tret"
+          , term' 4        $ tenForms "fyra" "fjor" "fyr"
+          , term  5        "fem"
+          , term  6        "sex"
+          , term' 7        $ tenForms "sju"  "sjut" "sjut"
+          , term' 8        $ tenForms "åtta" "ar"   "åt"
+          , term' 9        $ tenForms "nio"  "nit"  "nit"
+          , mul'  10       $ \ctx -> case ctx of
+                                       LA _  -> "ton"
+                                       _     -> "tio"
+          , term  11       "elva"
+          , term  12       "tolv"
+          , add   20    10 "tjugo"
+          , mul   100      "hundra"
+          , mul   (d 3)    "tusen"
+          , mul'  (d 6)    $ mulForms "miljon" "miljoner"
+          , mul'  (d 9)    $ mulForms "miljard" "miljarder"
           ]
 
 se :: (IsString s, Joinable s) => NumConfig s
-se = NumConfig { ncNeg      = seNeg
-               , ncOne      = seOne
+se = NumConfig { ncNeg      = error "seNeg: undefined"
+               , ncOne      = snd
                , ncAdd      = seAdd
-               , ncMul      = seMul
+               , ncMul      = withSnd (<>)
                , ncCardinal = findSym seTable
                }
 
@@ -751,9 +701,6 @@ se = NumConfig { ncNeg      = seNeg
 
 -- Sources:
 --   http://en.wikibooks.org/wiki/Norwegian_Numbers
-
-noNeg :: (IsString s, Joinable s) => Neg s
-noNeg = error "noNeg: not defined yet you fool!"
 
 noOne :: (IsString s, Joinable s) => One s
 noOne (v, vs) | v >= (d 6) = "én" <+> vs
@@ -765,146 +712,98 @@ noAdd :: (IsString s, Joinable s) => Add s
 noAdd (x, x') (_, y') | x < 20    = y' <> x'
                       | otherwise = x' <> y'
 
-noMul :: (IsString s, Joinable s) => Mul s
-noMul (_, x') (_, y') = x' <> y'
-
 noTable :: (IsString s, Joinable s) => [NumSymbol s]
-noTable = [ term  0           "null"
-          , term  1           "én"
-          , term  2           "to"
-          , term' 3           $ \ctx -> case ctx of
-                                          RA 10 -> "tret"
-                                          LM 10 -> "tret"
-                                          _     -> "tre"
-          , term' 4           $ \ctx -> case ctx of
-                                          RA 10 -> "fjor"
-                                          LM 10 -> "før"
-                                          _     -> "fire"
-          , term  5           "fem"
-          , term  6           "seks"
-          , term' 7           $ \ctx -> case ctx of
-                                          RA 10 -> "syt"
-                                          LM 10 -> "syt"
-                                          _     -> "sju"
-          , term' 8           $ \ctx -> case ctx of
-                                          RA 10 -> "at"
-                                          LM 10 -> "åt"
-                                          _     -> "åtte"
-          , term' 9           $ \ctx -> case ctx of
-                                          RA 10 -> "nit"
-                                          LM 10 -> "nit"
-                                          _     -> "ni"
-          , mul'  10          $ \ctx -> case ctx of
-                                          LA _ -> "ten"
-                                          _    -> "ti"
-          , term  11          "elleve"
-          , term  12          "tolv"
-          -- 20 is a special case. Not defined in terms of 10.
-          , add   20    10    "tjue"
-          , mul   100         "hundre"
-          , mul   (d 3)       "tusen"
-          , add   (d 6) (d 6) "million"
-          , mul   (d 6)       "millioner"
-          , add   (d 9) (d 9) "milliard"
-          , mul   (d 9)       "milliarder"
+noTable = [ term  0        "null"
+          , term  1        "én"
+          , term  2        "to"
+          , term' 3        $ tenForms "tre"  "tret" "tret"
+          , term' 4        $ tenForms "fire" "fjor" "før"
+          , term  5        "fem"
+          , term  6        "seks"
+          , term' 7        $ tenForms "sju"  "syt" "syt"
+          , term' 8        $ tenForms "åtte" "at"  "åt"
+          , term' 9        $ tenForms "ni"   "nit" "nit"
+          , mul'  10       $ \ctx -> case ctx of
+                                       LA _ -> "ten"
+                                       _    -> "ti"
+          , term  11       "elleve"
+          , term  12       "tolv"
+          , add   20    10 "tjue"
+          , mul   100      "hundre"
+          , mul   (d 3)    "tusen"
+          , mul'  (d 6)    $ mulForms "million"  "millioner"
+          , mul'  (d 9)    $ mulForms "milliard" "milliarder"
           ]
 
 no :: (IsString s, Joinable s) => NumConfig s
-no = NumConfig { ncNeg      = noNeg
+no = NumConfig { ncNeg      = error "noNeg: undefined"
                , ncOne      = noOne
                , ncAdd      = noAdd
-               , ncMul      = noMul
+               , ncMul      = withSnd (<>)
                , ncCardinal = findSym noTable
                }
 
 -------------------------------------------------------------------------------
 
-laNeg :: (IsString s, Joinable s) => Neg s
-laNeg = error "laNeg: not defined yet you fool!"
-
-laOne :: One s
-laOne = snd
-
 laAdd :: (IsString s, Joinable s) => Add s
-laAdd (_, x') (_, y') = x' <+> y'
+laAdd (x, x') (_, y') | x == 10   = y' <> x'
+                      | otherwise = x' <+> y'
 
 laMul :: (IsString s, Joinable s) => Mul s
-laMul (_, x') (_, y') = x' <+> y'
+laMul (_, x') (y, y') | y < 1000  = x' <> y'
+                      | otherwise = x' <+> y'
 
 laTable :: (IsString s, Joinable s) => [NumSymbol s]
-laTable = [ term 0         "nulla"
-          , term 1         "unus"
-          , term 2         "duo"
-          , term 3         "tres"
-          , term 4         "quattuor"
-          , term 5         "quinque"
-          , term 6         "sex"
-          , term 7         "septem"
-          , term 8         "octo"
-          , term 9         "novem"
-          , mul  10        "decem"
-          , term 11        "undecim"
-          , term 12        "duodecim"
-          , term 13        "tredecim"
-          , term 14        "quattuordecim"
-          , term 15        "quindecim"
-          , term 16        "sedecim"
-          , term 17        "septendecim"
-          , term 18        "duodeviginti"
-          , term 19        "undeviginti"
-          , add  20   10   "viginti"
-          , term 28        "duodetriginta"
-          , term 29        "undetriginta"
-          , add  30   10   "triginta"
-          , term 38        "duodequadraginta"
-          , term 39        "undequadraginta"
-          , add  40   10   "quadraginta"
-          , term 48        "duodequinquaginta"
-          , term 49        "undequinquaginta"
-          , add  50   10   "quinquaginta"
-          , term 58        "duodesexaginta"
-          , term 59        "undesexaginta"
-          , add  60   10   "sexaginta"
-          , term 68        "duodeseptuaginta"
-          , term 69        "undeseptuaginta"
-          , add  70   10   "septuaginta"
-          , term 78        "duodeoctoginta"
-          , term 79        "undeoctoginta"
-          , add  80   10   "octoginta"
-          , term 88        "duodenonaginta"
-          , term 89        "undenonaginta"
-          , add  90   10   "nonaginta"
-          , term 98        "duodecentum"
-          , term 99        "undecentum"
-          , mul  100       "centum"
-          , add  200  100  "ducenti"
-          , add  300  100  "trecenti"
-          , add  400  100  "quadrigenti"
-          , add  500  100  "quingenti"
-          , add  600  100  "sescenti"
-          , add  700  100  "septingenti"
-          , add  800  100  "octigenti"
-          , add  900  100  "nongenti"
-          , add  1000 1000 "mille"
-          , mul  1000      "millia"
-          , term (d 6)     "decies centena milia"
+laTable = [ term  0         "nulla"
+          , term' 1         $ tenForms  "unus"     "un"       "unus"
+          , term' 2         $ tenForms' "duo"      "duo"      "vi"      "du"
+          , term' 3         $ tenForms' "tres"     "tre"      "tri"     "tre"
+          , term' 4         $ tenForms' "quattuor" "quattuor" "quadra"  "quadri"
+          , term' 5         $ tenForms' "quinque"  "quin"     "quinqua" "quin"
+          , term' 6         $ tenForms' "sex"      "se"       "sexa"    "ses"
+          , term' 7         $ tenForms' "septem"   "septen"   "septua"  "septin"
+          , term  8                     "octo"
+          , term' 9         $ tenForms' "novem"    "novem"    "nona"    "non"
+          , mul'  10        $ \ctx -> case ctx of
+                                        LA _ -> "decim"
+                                        RM 2 -> "ginti"
+                                        RM _ -> "ginta"
+                                        _    -> "decem"
+          , term  18        "duodeviginti"
+          , term  19        "undeviginti"
+          , term  28        "duodetriginta"
+          , term  29        "undetriginta"
+          , term  38        "duodequadraginta"
+          , term  39        "undequadraginta"
+          , term  48        "duodequinquaginta"
+          , term  49        "undequinquaginta"
+          , term  58        "duodesexaginta"
+          , term  59        "undesexaginta"
+          , term  68        "duodeseptuaginta"
+          , term  69        "undeseptuaginta"
+          , term  78        "duodeoctoginta"
+          , term  79        "undeoctoginta"
+          , term  88        "duodenonaginta"
+          , term  89        "undenonaginta"
+          , term  98        "duodecentum"
+          , term  99        "undecentum"
+          , mul'  100       $ \ctx -> case ctx of
+                                        RM n | n `elem` [2, 3, 6] -> "centi"
+                                             | otherwise          -> "genti"
+                                        _                         -> "centum"
+          , mul'  1000      $ mulForms "mille" "millia"
+          , term  (d 6)     "decies centena milia"
           ]
 
 la :: (IsString s, Joinable s) => NumConfig s
-la = NumConfig { ncNeg      = laNeg
-               , ncOne      = laOne
+la = NumConfig { ncNeg      = error "laNeg: undefined"
+               , ncOne      = snd
                , ncAdd      = laAdd
                , ncMul      = laMul
                , ncCardinal = findSym laTable
                }
 
 -------------------------------------------------------------------------------
-
-frNeg :: (IsString s, Joinable s) => Neg s
-frNeg s = "moins" <+> s
-
-frOne :: One s
-frOne = snd
 
 frAdd :: (IsString s, Joinable s) => Add s
 frAdd (x, x') (y, y') | x == 10 && y < 7 = y' <> x'
@@ -918,51 +817,35 @@ frMul (_, x') (y, y') | y == 10   = x' <> y'
 
 frTable :: (IsString s, Joinable s) => [NumSymbol s]
 frTable = [ term  0         "zéro"
-          , term' 1         $ \ctx -> case ctx of
-                                        RA 10 -> "on"
-                                        _     -> "un"
-          , term' 2         $ \ctx -> case ctx of
-                                        RA 10 -> "dou"
-                                        _     -> "deux"
-          , term' 3         $ \ctx -> case ctx of
-                                        RA 10 -> "trei"
-                                        LM 10 -> "tren"
-                                        _     -> "trois"
-          , term' 4         $ \ctx -> case ctx of
-                                        RA 10 -> "quator"
-                                        LM 10 -> "quaran"
-                                        _     -> "quatre"
-          , term' 5         $ \ctx -> case ctx of
-                                        RA 10 -> "quin"
-                                        LM 10 -> "cinquan"
-                                        _     -> "cinq"
-          , term' 6         $ \ctx -> case ctx of
-                                        RA 10 -> "sei"
-                                     -- LM 10 -> "soixan"
-                                        _     -> "six"
+          , term' 1         $ tenForms "un"     "un"     "on"
+          , term' 2         $ tenForms "deux"   "deux"   "dou"
+          , term' 3         $ tenForms "trois"  "trei"   "tren"
+          , term' 4         $ tenForms "quatre" "quator" "quar"
+          , term' 5         $ tenForms "cinq"   "quin"   "cinqu"
+          , term' 6         $ tenForms "six"    "sei"    "soix"
           , term  7         "sept"
           , term  8         "huit"
           , term  9         "neuf"
           , mul'  10        $ \ctx -> case ctx of
                                         LA n | n < 7     -> "ze"
                                              | otherwise -> "dix"
-                                        RM _ -> "te"
+                                        RM 3 -> "te"
+                                        RM _ -> "ante"
                                         _    -> "dix"
           , add   20    10  "vingt"
           , add   60    20  "soixante"
           , term  71        "soixante et onze"
           , term  80        "quatre-vingts"
           , add   80    20  "quatre-vingt"
-          , add   100   100 "cent"
-          , mul   100       "cents"
+          , mul'  100       $ mulForms "cent" "cents"
           , mul   1000      "mille"
           , mul   (d 6)     "million"
           , mul   (d 9)     "millard"
           ]
 
 fr :: (IsString s, Joinable s) => NumConfig s
-fr = NumConfig { ncNeg      = frNeg
-               , ncOne      = frOne
+fr = NumConfig { ncNeg      = ("moins" <+>)
+               , ncOne      = snd
                , ncAdd      = frAdd
                , ncMul      = frMul
                , ncCardinal = findSym frTable
@@ -970,14 +853,12 @@ fr = NumConfig { ncNeg      = frNeg
 
 -------------------------------------------------------------------------------
 
-itNeg :: (IsString s, Joinable s) => Neg s
-itNeg = error "itNeg: not defined yet you fool!"
-
-itOne :: One s
-itOne = snd
+-- Sources:
+--   http://italian.about.com/library/weekly/aa042600a.htm
 
 itAdd :: (IsString s, Joinable s) => Add s
-itAdd (_, x') (y, y') | y == 3    = x' <> "tré"
+itAdd (x, x') (y, y') | x == 10 && y < 7 = y' <> x'
+                      | y == 3    = x' <> "tré"
                       | otherwise = x' <> y'
 
 itMul :: (IsString s, Joinable s) => Mul s
@@ -985,62 +866,47 @@ itMul (_, x') (y, y') | y < d 6   = x' <> y'
                       | otherwise = x' <+> y'
 
 itTable :: (IsString s, Joinable s) => [NumSymbol s]
-itTable = [ term 0           "zero"
-          , term 1           "uno"
-          , term 2           "due"
-          , term 3           "tre"
-          , term 4           "quattro"
-          , term 5           "cinque"
-          , term 6           "sei"
-          , term 7           "sette"
-          , term 8           "otto"
-          , term 9           "nove"
-          , mul  10          "dieci"
-          , term 11          "undici"
-          , term 12          "dodici"
-          , term 13          "tredici"
-          , term 14          "quattordici"
-          , term 15          "quindici"
-          , term 16          "sedici"
-          , term 17          "diciassette"
-          , term 18          "diciotto"
-          , term 19          "diciannove"
-          , add  20    10    "venti"
-          , term 21          "ventuno"
-          , term 28          "ventotto"
-          , add  30    10    "trenta"
-          , term 31          "trentuno"
-          , term 38          "trentotto"
-          , add  40    10    "quaranta"
-          , term 41          "quarantuno"
-          , term 48          "quarantotto"
-          , add  50    10    "cinquanta"
-          , term 51          "cinquantuno"
-          , term 58          "cinquantotto"
-          , add  60    10    "sessanta"
-          , term 61          "sessantuno"
-          , term 68          "sessantotto"
-          , add  70    10    "settanta"
-          , term 71          "settantuno"
-          , term 78          "settantotto"
-          , add  80    10    "ottanta"
-          , term 81          "ottantuno"
-          , term 88          "ottantotto"
-          , add  90    10    "novanta"
-          , term 91          "novantuno"
-          , term 98          "novantotto"
-          , mul  100         "cento"
-          , add  1000  1000  "mille"
-          , mul  1000        "mila"
-          , add  (d 6) (d 6) "milione"
-          , mul  (d 6)       "milioni"
-          , add  (d 9) (d 9) "miliardo"
-          , mul  (d 9)       "miliardi"
+itTable = [ term  0           "zero"
+          , term' 1           $ tenForms "uno"     "un"      "uno"
+          , term' 2           $ tenForms "due"     "do"      "due"
+          , term' 3           $ tenForms "tre"     "tre"     "ten"
+          , term' 4           $ tenForms "quattro" "quattor" "quar"
+          , term' 5           $ tenForms "cinque"  "quin"    "cinqu"
+          , term' 6           $ tenForms "sei"     "se"      "sess"
+          , term' 7           $ tenForms "sette"   "assette" "sett"
+          , term' 8           $ tenForms "otto"    "otto"    "ott"
+          , term' 9           $ tenForms "nove"    "annove"  "nove"
+          , mul'  10          $ \ctx -> case ctx of
+                                          LA _ -> "dici"
+                                          RM 3 -> "ta"
+                                          RM _ -> "anta"
+                                          _    -> "dieci"
+          , add   20    10    "venti"
+          , term  21          "ventuno"
+          , term  28          "ventotto"
+          , term  31          "trentuno"
+          , term  38          "trentotto"
+          , term  41          "quarantuno"
+          , term  48          "quarantotto"
+          , term  51          "cinquantuno"
+          , term  58          "cinquantotto"
+          , term  61          "sessantuno"
+          , term  68          "sessantotto"
+          , term  71          "settantuno"
+          , term  78          "settantotto"
+          , term  81          "ottantuno"
+          , term  88          "ottantotto"
+          , term  91          "novantuno"
+          , term  98          "novantotto"
+          , mul   100         "cento"
+          , mul'  1000        $ mulForms "mille"    "mila"
+          , mul'  (d 6)       $ mulForms "milione"  "milioni"
+          , mul'  (d 9)       $ mulForms "miliardo" "miliardi"
           ]
 
 it :: (IsString s, Joinable s) => NumConfig s
-it = NumConfig { ncNeg      = itNeg
-               , ncOne      = itOne
+it = NumConfig { ncNeg      = error "itNeg: undefined"
+               , ncOne      = snd
                , ncAdd      = itAdd
                , ncMul      = itMul
                , ncCardinal = findSym itTable
@@ -1048,60 +914,45 @@ it = NumConfig { ncNeg      = itNeg
 
 -------------------------------------------------------------------------------
 
-spNeg :: (IsString s, Joinable s) => Neg s
-spNeg = error "spNeg: not defined yet you fool!"
-
-spOne :: One s
-spOne = snd
+-- Sources:
+--   http://spanish.about.com/cs/forbeginners/a/cardinalnum_beg.htm
 
 spAdd :: (IsString s, Joinable s) => Add s
-spAdd (x, x') (_, y') | x < 100   =  x' <+> "y" <+> y'
+spAdd (x, x') (y, y') | x == 10 && y < 6 = y' <> x'
+                      | x == 10    = x' <> y'
+                      | x < 100    = x' <+> "y" <+> y'
                       | otherwise  = x' <+> y'
 
 spMul :: (IsString s, Joinable s) => Mul s
-spMul (_, x') (_, y') = x' <+> y'
+spMul (_, x') (y, y') | y < 1000  = x' <> y'
+                      | otherwise = x' <+> y'
 
 spTable :: (IsString s, Joinable s) => [NumSymbol s]
-spTable = [ term 0         "cero"
-          , term 1         "uno"
-          , term 2         "dos"
-          , term 3         "tres"
-          , term 4         "cuatro"
-          , term 5         "cinco"
-          , term 6         "seis"
-          , term 7         "siete"
-          , term 8         "ocho"
-          , term 9         "nueve"
-          , mul  10        "diez"
-          , term 11        "once"
-          , term 12        "doce"
-          , term 13        "trece"
-          , term 14        "catorce"
-          , term 15        "quince"
-          , term 16        "dieciseis"
-          , term 17        "diecisiete"
-          , term 18        "dieciocho"
-          , term 19        "diecinueve"
-          , add  20    10  "veinte"
-          , add  30    10  "treinta"
-          , add  40    10  "cuarenta"
-          , add  50    10  "cincuenta"
-          , add  60    10  "sesenta"
-          , add  70    10  "setenta"
-          , add  80    10  "ochenta"
-          , add  90    10  "noventa"
-          , add  100   100 "cien"
-          , mul  100       "ciento"
-          , add  500   100 "quinientos"
-          , add  700   100 "setecientos"
-          , add  900   100 "novocientos"
-          , mul  1000      "mil"
-          , mul  (d 6)     "un millón"
+spTable = [ term  0         "cero"
+          , term' 1         $ tenForms  "uno"    "on"    "uno"
+          , term' 2         $ tenForms  "dos"    "do"    "dos"
+          , term' 3         $ tenForms  "tres"   "tre"   "trein"
+          , term' 4         $ tenForms  "cuatro" "cator" "cuaren"
+          , term' 5         $ tenForms  "cinco"  "quin"  "cincuen"
+          , term' 6         $ tenForms  "seis"   "seis"  "sesen"
+          , term' 7         $ tenForms' "siete"  "siete" "seten" "sete"
+          , term' 8         $ tenForms  "ocho"   "ocho"  "ochen"
+          , term' 9         $ tenForms' "nueve"  "nueve" "noven" "novo"
+          , mul'  10        $ \ctx -> case ctx of
+                                        LA n | n < 6     -> "ce"
+                                             | otherwise -> "dieci"
+                                        RM _ -> "ta"
+                                        _    -> "diez"
+          , add   20    10  "veinte"
+          , mul'  100       $ mulForms "ciento" "cientos"
+          , add   500   100 "quinientos"
+          , mul   1000      "mil"
+          , mul'  (d 6)     $ mulForms "millón" "millones"
           ]
 
 sp :: (IsString s, Joinable s) => NumConfig s
-sp = NumConfig { ncNeg      = spNeg
-               , ncOne      = spOne
+sp = NumConfig { ncNeg      = error "spNeg: undefined"
+               , ncOne      = snd
                , ncAdd      = spAdd
                , ncMul      = spMul
                , ncCardinal = findSym spTable
@@ -1113,66 +964,55 @@ sp = NumConfig { ncNeg      = spNeg
 --   http://www.sonia-portuguese.com/text/numerals.htm
 --   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
 
-ptNeg :: (IsString s, Joinable s) => Neg s
-ptNeg = error "ptNeg: not defined yet you fool!"
-
 ptOne :: (IsString s, Joinable s) => One s
 ptOne (x, x') | x <= 1000 = x'
               | otherwise = "um" <+> x'
 
-ptAdd :: (IsString s, Joinable s) => Add s
-ptAdd (_, x') (_, y') =  x' <+> "e" <+> y'
+-- TODO: When to use "e" is still unclear.
+ptAdd :: (IsString s, Joinable s) => Mul s
+ptAdd (x, x') (_, y') | x == 10   = y' <> x'
+                      | otherwise = x' <+> "e" <+> y'
 
 ptMul :: (IsString s, Joinable s) => Mul s
 ptMul (_, x') (y, y') | y < 1000  = x' <> y'
                       | otherwise = x' <+> y'
 
 ptTable :: (IsString s, Joinable s) => [NumSymbol s]
-ptTable = [ term 0            "zero"
-          , term 1            "um"
-          , term 2            "dois"
-          , term 3            "três"
-          , term 4            "quatro"
-          , term 5            "cinco"
-          , term 6            "seis"
-          , term 7            "sete"
-          , term 8            "oito"
-          , term 9            "nove"
-          , mul  10           "dez"
-          , term 11           "onze"
-          , term 12           "doze"
-          , term 13           "treze"
-          , term 14           "catorze"
-          , term 15           "quinze"
-          , term 16           "dezesseis"
-          , term 17           "dezessete"
-          , term 18           "dezoito"
-          , term 19           "dezenove"
-          , add  20    10     "vinte"
-          , add  30    10     "trinta"
-          , add  40    10     "quarenta"
-          , add  50    10     "cinqüenta"
-          , add  60    10     "sessenta"
-          , add  70    10     "setenta"
-          , add  80    10     "oitenta"
-          , add  90    10     "noventa"
-          , term 100          "cem"
-          , add  100   100    "cento"
-          , mul  100          "centos"
-          , add  200   100    "duzentos"
-          , add  300   100    "trezentos"
-          , add  500   100    "quinhentos"
-          , mul  1000         "mil"
-          , add (d 6)  (d 6)  "milhão"
-          , mul (d 6)         "milhões"
-          , add (d 9)  (d 9)  "bilhão"
-          , mul (d 9)         "bilhões"
-          , add (d 12) (d 12) "trilhão"
-          , mul (d 12)        "trilhões"
+ptTable = [ term  0             "zero"
+          , term' 1             $ tenForms "um"     "on"    "um"
+          , term' 2             $ tenForms "dois"   "do"    "dois"
+          , term' 3             $ tenForms "três"   "tre"   "trin"
+          , term' 4             $ tenForms "quatro" "cator" "quar"
+          , term' 5             $ tenForms "cinco"  "quin"  "cinqü"
+          , term' 6             $ tenForms "seis"   "seis"  "sess"
+          , term' 7             $ tenForms "sete"   "sete"  "set"
+          , term' 8             $ tenForms "oito"   "oito"  "oit"
+          , term' 9             $ tenForms "nove"   "nove"  "nov"
+          , mul'  10            $ \ctx -> case ctx of
+                                            LA _ -> "ze"
+                                            RM 3 -> "ta"
+                                            RM _ -> "enta"
+                                            _    -> "dez"
+          , term  16            "dezesseis"
+          , term  17            "dezessete"
+          , term  18            "dezoito"
+          , term  19            "dezenove"
+          , add   20    10      "vinte"
+          , mul'  100           $ \ctx -> case ctx of
+                                            RM _ -> "centos"
+                                            LA _ -> "cento"
+                                            _    -> "cem"
+          , add   200   100     "duzentos"
+          , add   300   100     "trezentos"
+          , add   500   100     "quinhentos"
+          , mul   1000          "mil"
+          , mul'  (d 6)         $ mulForms "milhão"  "milhões"
+          , mul'  (d 9)         $ mulForms "bilhão"  "bilhões"
+          , mul'  (d 12)        $ mulForms "trilhão" "trilhões"
           ]
 
 pt :: (IsString s, Joinable s) => NumConfig s
-pt = NumConfig { ncNeg      = ptNeg
+pt = NumConfig { ncNeg      = error "ptNeg: undefined"
                , ncOne      = ptOne
                , ncAdd      = ptAdd
                , ncMul      = ptMul
@@ -1181,18 +1021,9 @@ pt = NumConfig { ncNeg      = ptNeg
 
 -------------------------------------------------------------------------------
 
-jaNeg :: (IsString s, Joinable s) => Neg s
-jaNeg s = "mainasu" <+> s
-
 jaOne :: (IsString s, Joinable s) => One s
 jaOne (v, vs) | v < 100 || (300 >= v && v < 400) = vs
               | otherwise = "ichi" <-> vs
-
-jaAdd :: (IsString s, Joinable s) => Add s
-jaAdd (_, x') (_, y') = x' <+> y'
-
-jaMul :: (IsString s, Joinable s) => Mul s
-jaMul (_, x') (_, y') = x' <-> y'
 
 jaTable :: (IsString s, Joinable s) => [NumSymbol s]
 jaTable = [ term 0         "rei"
@@ -1229,26 +1060,14 @@ jaTable = [ term 0         "rei"
           ]
 
 ja :: (IsString s, Joinable s) => NumConfig s
-ja = NumConfig { ncNeg      = jaNeg
+ja = NumConfig { ncNeg      = ("mainasu" <+>)
                , ncOne      = jaOne
-               , ncAdd      = jaAdd
-               , ncMul      = jaMul
+               , ncAdd      = withSnd (<+>)
+               , ncMul      = withSnd (<->)
                , ncCardinal = findSym jaTable
                }
 
 -------------------------------------------------------------------------------
-
-eoNeg :: (IsString s, Joinable s) => Neg s
-eoNeg = error "eoNeg: not defined yet you fool!"
-
-eoOne :: One s
-eoOne = snd
-
-eoAdd :: (IsString s, Joinable s) => Add s
-eoAdd (_, x') (_, y') = x' <+> y'
-
-eoMul :: (IsString s, Joinable s) => Mul s
-eoMul (_, x') (_, y') = x' <> y'
 
 eoTable :: (IsString s, Joinable s) => [NumSymbol s]
 eoTable = [ term 0    "nulo"
@@ -1268,9 +1087,9 @@ eoTable = [ term 0    "nulo"
           ]
 
 eo :: (IsString s, Joinable s) => NumConfig s
-eo = NumConfig { ncNeg      = eoNeg
-               , ncOne      = eoOne
-               , ncAdd      = eoAdd
-               , ncMul      = eoMul
+eo = NumConfig { ncNeg      = error "eoNeg: undefined"
+               , ncOne      = snd
+               , ncAdd      = withSnd (<+>)
+               , ncMul      = withSnd (<>)
                , ncCardinal = findSym eoTable
                }

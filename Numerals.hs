@@ -28,6 +28,8 @@ module Numerals
 
 
 {-
+Also see: http://conway.rutgers.edu/~ccshan/wiki/blog/posts/WordNumbers1/
+
 TODO
 
 Types of numerals
@@ -111,7 +113,8 @@ eo:
 la:
 ja: mainasu
 
-
+7654321 == 7    * 1000000 + (6  *100    + 5*10 + 4)    * 1000 +  3   *100 +   2*10 + 1
+           zeven miljoen     zes honderd  vierenvijftig  duizend drie honderd eenentwintig
 -}
 
 import Data.List
@@ -142,19 +145,19 @@ data NumSymbol s = NumSym { symType  :: SymbolType
                           }
 
 -- Easy construction of NumSymbols
-term :: (IsString s, Joinable s) => Integer -> s -> NumSymbol s
+term :: Integer -> s -> NumSymbol s
 term val s = NumSym Terminal val 1 (const s)
 
-term' :: (IsString s, Joinable s) => Integer -> (SymbolContext -> s) -> NumSymbol s
+term' :: Integer -> (SymbolContext -> s) -> NumSymbol s
 term' val fs = NumSym Terminal val 1 fs
 
-add :: (IsString s, Joinable s) => Integer -> Integer -> s -> NumSymbol s
+add :: Integer -> Integer -> s -> NumSymbol s
 add scope val s = NumSym Add scope val (const s)
 
-mul :: (IsString s, Joinable s) => Integer -> s -> NumSymbol s
+mul :: Integer -> s -> NumSymbol s
 mul val s = NumSym Mul val val (const s)
 
-mul' :: (IsString s, Joinable s) => Integer -> (SymbolContext -> s) -> NumSymbol s
+mul' :: Integer -> (SymbolContext -> s) -> NumSymbol s
 mul' val fs = NumSym Mul val val fs
 
 -- Use 'foo' instead of 'const' in the previous functions to expose
@@ -310,6 +313,9 @@ testDS = test
 testDoc :: Test PP.Doc
 testDoc = test
 
+testNSS :: Test (NS String)
+testNSS = test
+
 testDocWithStyle :: PP.Style -> NumConfig PP.Doc -> [Integer] -> IO ()
 testDocWithStyle s nc = mapM_ (putStrLn . pretty)
     where pretty n = show n ++ " == " ++ (maybe "-" id $ fmap (PP.renderStyle s) $ cardinal nc n)
@@ -331,6 +337,58 @@ test9 = [0, 9, 10, 19, 90, 99, 100, 109, 119, 190, 199, 900, 909, 919, 990, 999,
 
 d :: Integer -> Integer
 d = (10 ^)
+
+-------------------------------------------------------------------------------
+
+numNeg :: (Num s) => Neg s
+numNeg s = negate s
+
+numOne :: One s
+numOne = snd
+
+numAdd :: (Num s) => Add s
+numAdd (_, x') (_, y') = x' + y'
+
+numMul :: (Num s) => Mul s
+numMul (_, x') (_, y') = x' * y'
+
+numTable :: (Num s) => [NumSymbol s]
+numTable =  num term [0..9]
+         ++ num mul ([10, d 2] ++ iterate (* d 3) (d 3))
+    where
+      num t ns = [t n (fromInteger n) | n <- ns]
+
+num :: (Num s) => NumConfig s
+num = NumConfig { ncNeg      = numNeg
+                , ncOne      = numOne
+                , ncAdd      = numAdd
+                , ncMul      = numMul
+                , ncCardinal = findSym numTable
+                }
+
+newtype NS s = NS {unS :: s} deriving (Show,  Eq)
+
+instance (Eq s, Show s, IsString s, Joinable s) => Num (NS s) where
+    fromInteger = NS . fromString . show
+
+    (+) = bin "+"
+    (-) = bin "-"
+    (*) = bin "*"
+
+    negate = uno "negate"
+    abs    = uno "abs"
+    signum = uno "signum"
+
+uno :: (IsString s, Joinable s) => s -> NS s -> NS s
+uno fun x = NS (fun <+> unS x)
+
+bin :: (IsString s, Joinable s) => s -> NS s -> NS s -> NS s
+bin op x y = NS (p (unS x <> op <> unS y))
+
+p s = "(" <> s <> ")"
+
+instance Stringable s => Stringable (NS s) where
+    toString = toString . unS
 
 -------------------------------------------------------------------------------
 

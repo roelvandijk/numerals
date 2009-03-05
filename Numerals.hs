@@ -332,14 +332,6 @@ testDS = test
 testDoc :: Test PP.Doc
 testDoc = test
 
-testNSS :: Test (NS String)
-testNSS = test
-
-
-testNumS :: Test String
-testNumS = testNSS . nummify
-
-
 testDocWithStyle :: PP.Style -> NumConfig PP.Doc -> [Integer] -> IO ()
 testDocWithStyle s nc = mapM_ (putStrLn . pretty)
     where pretty n = show n ++ " == " ++ (maybe "-" id $ fmap (PP.renderStyle s) $ cardinal nc n)
@@ -380,6 +372,7 @@ nummify nc@(NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym . ncCar
       transformSym :: (Num n) => NumSymbol s -> NumSymbol n
       transformSym sym = sym { symRepr = const . fromInteger $ symVal sym}
 
+-------------------------------------------------------------------------------
 
 newtype NS s = NS {unS :: s} deriving (Show,  Eq)
 
@@ -404,6 +397,36 @@ p s = "(" <> s <> ")"
 
 instance Stringable s => Stringable (NS s) where
     toString = toString . unS
+
+testNSS :: Test (NS String)
+testNSS = test
+
+testNumS :: Test String
+testNumS = testNSS . nummify
+
+-------------------------------------------------------------------------------
+
+newtype Lst s = Lst {unLst :: [s]}
+
+instance Joinable s => Joinable (Lst s) where
+    x <>  y = Lst $ appendUnionWith (<>) (unLst x) (unLst y)
+    x <+> y = Lst $ unLst x ++ unLst y
+
+-- | appendUnionWith f [a, b, c] [d, e, f] => [a, b, c `f` d, e, f]
+appendUnionWith :: (a -> a -> a) -> [a] -> [a] -> [a]
+appendUnionWith _ []     ys     = ys
+appendUnionWith _ xs     []     = xs
+appendUnionWith f [x]    (y:ys) = x `f` y : ys
+appendUnionWith f (x:xs) ys     = x : appendUnionWith f xs ys
+
+instance IsString s => IsString (Lst s) where
+    fromString s = Lst [fromString s]
+
+instance Stringable s => Stringable (Lst s) where
+    toString = show . map toString . unLst
+
+testLst :: Test (Lst String)
+testLst = test
 
 -------------------------------------------------------------------------------
 

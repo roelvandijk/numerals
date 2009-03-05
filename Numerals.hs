@@ -517,14 +517,14 @@ bigNumTable = [ term  0         "nulla"
               , term' 8         $ forms "oct"   "octo"     "octo"     "octo"    "octin"
               , term' 9         $ forms "non"   "novem"    "novem"    "nona"    "non"
               , mul'  10        $ \ctx -> case ctx of
-                                            RM _ -> "ginti"
-                                            _    -> "deci"
+                                            RM _ -> "gint"
+                                            _    -> "dec"
               , mul'  100       $ \ctx -> case ctx of
-                                            RM n | n `elem` [2, 3, 6] -> "centi"
-                                                 | otherwise          -> "genti"
-                                            _                         -> "centi"
-              , mul   1000      $ "milli"
-              , mul   10000     $ "myri"
+                                            RM n | n `elem` [2, 3, 6] -> "cent"
+                                                 | otherwise          -> "gent"
+                                            _                         -> "cent"
+              , mul   1000      $ "mill"
+              , mul   10000     $ "myr"
               ]
     where forms d a1 a2 m1 m2 ctx = case ctx of
                                       RA 10  -> a1

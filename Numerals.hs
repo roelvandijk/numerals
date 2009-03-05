@@ -357,6 +357,18 @@ withSnd f (_, x) (_, y) = f x y
 d :: Integer -> Integer
 d = (10 ^)
 
+const2 :: a -> b -> c -> a
+const2 = const . const
+
+weave :: [a] -> [a] -> [a]
+weave []     ys = ys
+weave (x:xs) ys = x : weave ys xs
+
+untilNothing :: [Maybe a] -> [a]
+untilNothing []             = []
+untilNothing (Just x  : xs) = x : untilNothing xs
+untilNothing (Nothing : _)  = []
+
 -------------------------------------------------------------------------------
 -- Numeral configurations
 -------------------------------------------------------------------------------
@@ -393,6 +405,7 @@ un fun x = NS (fun <+> unS x)
 bin :: (IsString s, Joinable s) => s -> (NS s -> NS s -> NS s)
 bin op x y = NS (p (unS x <> op <> unS y))
 
+p :: (IsString s, Joinable s) => s -> s
 p s = "(" <> s <> ")"
 
 instance Stringable s => Stringable (NS s) where
@@ -443,84 +456,24 @@ nlMul (_, x') (y, y') | y <= 10   = x' <> y'
                       | otherwise = x' <+> y'
 
 nlTable :: (IsString s, Joinable s) => [NumSymbol s]
-nlTable = [ term  0       "nul"
-          , term  1       "één"
-          , term' 2       $ tenForms "twee" "twin" "twee"
-          , term' 3       $ tenForms "drie" "der"  "der"
-          , term' 4       $ tenForms "vier" "veer" "veer"
-          , term  5       "vijf"
-          , term  6       "zes"
-          , term  7       "zeven"
-          , term' 8       $ tenForms "acht" "tach" "acht"
-          , term  9       "negen"
-          , mul'  10      $ \ctx -> case ctx of
-                                      RM _ -> "tig"
-                                      _    -> "tien"
-          , term 11       "elf"
-          , term 12       "twaalf"
-          , mul  (d 2)    "honderd"
-          , mul  (d 3)    "duizend"
-          , mul  (d 6)    "miljoen"              -- m 1         where m = (d 6 ^)
-          , mul  (d 9)    "miljard"              -- m 1  * d 3
-          , mul  (d 12)   "biljoen"              -- m 2
-          , mul  (d 15)   "biljard"              -- m 2  * d 3
-          , mul  (d 18)   "triljoen"             -- m 3
-          , mul  (d 21)   "triljard"             -- m 3  * d 3
-          , mul  (d 24)   "quadriljoen"          -- m 4
-          , mul  (d 27)   "quadriljard"          -- m 4  * d 3
-          , mul  (d 30)   "quintiljoen"          -- m 5
-          , mul  (d 33)   "quintiljard"          -- m 5  * d 3
-          , mul  (d 36)   "sextiljoen"           -- m 6
-          , mul  (d 39)   "sextiljard"           -- m 6  * d 3
-          , mul  (d 42)   "septiljoen"           -- m 7
-          , mul  (d 45)   "septiljard"           -- m 7  * d 3
-          , mul  (d 48)   "octiljoen"            -- m 8
-          , mul  (d 51)   "octiljard"            -- m 8  * d 3
-          , mul  (d 54)   "noniljoen"            -- m 9
-          , mul  (d 57)   "noniljard"            -- m 9  * d 3
-          , mul  (d 60)   "deciljoen"            -- m 10
-          , mul  (d 63)   "deciljard"            -- m 10  * d 3
-          , mul  (d 66)   "undeciljoen"          -- m 11
-          , mul  (d 69)   "undeciljard"          -- m 11  * d 3
-          , mul  (d 72)   "duodeciljoen"         -- m 12
-          , mul  (d 75)   "duodeciljard"         -- m 12  * d 3
-          , mul  (d 78)   "tredeciljoen"         -- m 13
-          , mul  (d 81)   "tredeciljard"         -- m 13  * d 3
-          , mul  (d 84)   "quattuordeciljoen"    -- m 14
-          , mul  (d 87)   "quattuordeciljard"    -- m 14  * d 3
-          , mul  (d 90)   "quindeciljoen"        -- m 15
-          , mul  (d 93)   "quindeciljard"        -- m 15  * d 3
-          , mul  (d 96)   "sexdeciljoen"         -- m 16
-          , mul  (d 99)   "sexdeciljard"         -- m 16  * d 3
-          , mul  (d 102)  "septendeciljoen"      -- m 17
-          , mul  (d 105)  "septendeciljard"      -- m 17  * d 3
-          , mul  (d 108)  "octodeciljoen"        -- m 18
-          , mul  (d 111)  "octodeciljard"        -- m 18  * d 3
-          , mul  (d 114)  "novemdeciljoen"       -- m 19
-          , mul  (d 117)  "novemdeciljard"       -- m 19  * d 3
-          , mul  (d 120)  "vigintiljoen"         -- m 20
-          , mul  (d 123)  "vigintiljard"         -- m 20  * d 3
-          , mul  (d 180)  "trigintiljoen"        -- m 30
-          , mul  (d 183)  "trigintiljard"        -- m 30  * d 3
-          , mul  (d 240)  "quadragintiljoen"     -- m 40
-          , mul  (d 243)  "quadragintiljard"     -- m 40  * d 3
-          , mul  (d 300)  "quindragintiljoen"    -- m 50
-          , mul  (d 303)  "quindragintiljard"    -- m 50  * d 3
-          , mul  (d 360)  "sexagintiljoen"       -- m 60
-          , mul  (d 363)  "sexagintiljard"       -- m 60  * d 3
-          , mul  (d 420)  "septuagintiljoen"     -- m 70
-          , mul  (d 423)  "septuagintiljard"     -- m 70  * d 3
-          , mul  (d 480)  "octogintiljoen"       -- m 80
-          , mul  (d 483)  "octogintiljard"       -- m 80  * d 3
-          , mul  (d 540)  "nonagintiljoen"       -- m 90
-          , mul  (d 543)  "nonagintiljard"       -- m 90  * d 3
-
-          , mul  (d 600)  "centiljoen"           -- m (d 2)
-          , mul  (d 603)  "centiljard"           -- m (d 2) * d 3
-
-          , mul  (d 6000) "milliljoen"           -- m (d 3)
-          , mul  (d 6003) "milliljard"           -- m (d 3) * d 3
-          ]
+nlTable = [ term  0    "nul"
+          , term  1    "één"
+          , term' 2    $ tenForms "twee" "twin" "twin"
+          , term' 3    $ tenForms "drie" "der"  "der"
+          , term' 4    $ tenForms "vier" "veer" "veer"
+          , term  5    "vijf"
+          , term  6    "zes"
+          , term  7    "zeven"
+          , term' 8    $ tenForms "acht" "tach" "acht"
+          , term  9    "negen"
+          , mul'  10   $ \ctx -> case ctx of
+                                   RM _ -> "tig"
+                                   _    -> "tien"
+          , term 11    "elf"
+          , term 12    "twaalf"
+          , mul  (d 2) "honderd"
+          , mul  (d 3) "duizend"
+          ] ++ (longScale "iljoen" "iljard")
 
 nl :: (IsString s, Joinable s) => NumConfig s
 nl = NumConfig { ncNeg      = ("min" <+>)
@@ -529,6 +482,64 @@ nl = NumConfig { ncNeg      = ("min" <+>)
                , ncMul      = nlMul
                , ncCardinal = findSym nlTable
                }
+
+-------------------------------------------------------------------------------
+
+bigCardinal :: (IsString s, Joinable s) => Integer -> Maybe s
+bigCardinal = cardinal bigNum Masculine
+
+longScale :: (IsString s, Joinable s) => s -> s -> [NumSymbol s]
+longScale a b = longScale' a a b b
+
+longScale' :: (IsString s, Joinable s) => s -> s -> s -> s -> [NumSymbol s]
+longScale' a as b bs = untilNothing $ weave (map illion [1..]) (map illiard [1..])
+    where illion  n = fmap (\s -> mul' (d 6 ^ n)       $ mulForms (s <> a) (s <> as)) $ bigCardinal n
+          illiard n = fmap (\s -> mul' (d 6 ^ n * d 3) $ mulForms (s <> b) (s <> bs)) $ bigCardinal n
+
+shortScale :: (IsString s, Joinable s) => s -> [NumSymbol s]
+shortScale a = shortScale' a a
+
+shortScale' :: (IsString s, Joinable s) => s -> s -> [NumSymbol s]
+shortScale' a as = untilNothing $ map illion [1..]
+    where illion n = fmap (\s -> mul' (d 3 * (d 3 ^ n)) $ mulForms (s <> a) (s <> as)) $ bigCardinal n
+
+-------------------------------------------------------------------------------
+
+bigNumTable :: (IsString s, Joinable s) => [NumSymbol s]
+bigNumTable = [ term  0         "nulla"
+              , term' 1         $ forms "m"     "un"       "un"       "mi"      "mi"
+              , term' 2         $ forms "b"     "duo"      "duo"      "vi"      "du"
+              , term' 3         $ forms "tr"    "tre"      "tres"     "tri"     "tre"
+              , term' 4         $ forms "quadr" "quattuor" "quattuor" "quadra"  "quadrin"
+              , term' 5         $ forms "quint" "quin"     "quinqua"  "quinqua" "quin"
+              , term' 6         $ forms "sext"  "sex"      "ses"      "sexa"    "ses"
+              , term' 7         $ forms "sept"  "septen"   "septem"   "septua"  "septin"
+              , term' 8         $ forms "oct"   "octo"     "octo"     "octo"    "octin"
+              , term' 9         $ forms "non"   "novem"    "novem"    "nona"    "non"
+              , mul'  10        $ \ctx -> case ctx of
+                                            RM _ -> "ginti"
+                                            _    -> "deci"
+              , mul'  100       $ \ctx -> case ctx of
+                                            RM n | n `elem` [2, 3, 6] -> "centi"
+                                                 | otherwise          -> "genti"
+                                            _                         -> "centi"
+              , mul   1000      $ "milli"
+              , mul   10000     $ "myri"
+              ]
+    where forms d a1 a2 m1 m2 ctx = case ctx of
+                                      RA 10  -> a1
+                                      RA _   -> a2
+                                      LM 100 -> m2
+                                      LM _   -> m1
+                                      _      -> d
+
+bigNum :: (IsString s, Joinable s) => NumConfig s
+bigNum = NumConfig { ncNeg      = error "bigNumNeg: undefined"
+                   , ncOne      = snd
+                   , ncAdd      = withSnd . flip $ (<>)
+                   , ncMul      = withSnd (<>)
+                   , ncCardinal = findSym bigNumTable
+                   }
 
 -------------------------------------------------------------------------------
 
@@ -551,7 +562,7 @@ enMul (_, x') (y, y') | y == 10   = x' <> y'
 enTable :: (IsString s, Joinable s) => [NumSymbol s]
 enTable = [ term  0       "zero"
           , term  1       "one"
-          , term' 2       $ tenForms "two"   "twen" "two"
+          , term' 2       $ tenForms "two"   "twen" "twen"
           , term' 3       $ tenForms "three" "thir" "thir"
           , term' 4       $ tenForms "four"  "for"  "four"
           , term' 5       $ tenForms "five"  "fif"  "fif"
@@ -569,71 +580,20 @@ enTable = [ term  0       "zero"
           , mul   1000    "thousand"
           ]
 
-enShortTable :: (IsString s, Joinable s) => [NumSymbol s]
-enShortTable = enTable ++
-               [ mul (d 6)  "million"
-               , mul (d 9)  "billion"
-               , mul (d 12) "trillion"
-               , mul (d 15) "quadrillion"
-               , mul (d 18) "quintillion"
-               , mul (d 21) "sextillion"
-               , mul (d 24) "septillion"
-               , mul (d 27) "octillion"
-               , mul (d 30) "nonillion"
-               , mul (d 33) "decillion"
-               , mul (d 36) "undecillion"
-               , mul (d 39) "duodecillion"
-               , mul (d 42) "tredecillion"
-               , mul (d 45) "quattuordecillion"
-               , mul (d 48) "quindecillion"
-               , mul (d 51) "sexdecillion"
-               , mul (d 54) "septendecillion"
-               , mul (d 57) "octodecillion"
-               , mul (d 60) "novemdecillion"
-               , mul (d 63) "vigintillion"
-               ]
-
 enShort :: (IsString s, Joinable s) => NumConfig s
 enShort = NumConfig { ncNeg      = enNeg
                     , ncOne      = enOne
                     , ncAdd      = enAdd
                     , ncMul      = enMul
-                    , ncCardinal = findSym enShortTable
+                    , ncCardinal = findSym $ enTable ++ shortScale "illion"
                     }
-
-enLongTable :: (IsString s, Joinable s) => [NumSymbol s]
-enLongTable = enTable ++
-              [ mul (d 6)   "million"
-              , mul (d 9)   "milliard"
-              , mul (d 12)  "billion"
-              , mul (d 15)  "billiard"
-              , mul (d 18)  "trillion"
-              , mul (d 21)  "trilliard"
-              , mul (d 24)  "quadrillion"
-              , mul (d 30)  "quintillion"
-              , mul (d 36)  "sextillion"
-              , mul (d 42)  "septillion"
-              , mul (d 48)  "octillion"
-              , mul (d 54)  "nonillion"
-              , mul (d 60)  "decillion"
-              , mul (d 66)  "undecillion"
-              , mul (d 72)  "duodecillion"
-              , mul (d 78)  "tredecillion"
-              , mul (d 84)  "quattuordecillion"
-              , mul (d 90)  "quinquadecillion"
-              , mul (d 96)  "sedecillion"
-              , mul (d 102) "septendecillion"
-              , mul (d 108) "octodecillion"
-              , mul (d 114) "novendecillion"
-              , mul (d 120) "vigintillion"
-              ]
 
 enLong :: (IsString s, Joinable s) => NumConfig s
 enLong = NumConfig { ncNeg      = enNeg
                    , ncOne      = enOne
                    , ncAdd      = enAdd
                    , ncMul      = enMul
-                   , ncCardinal = findSym enLongTable
+                   , ncCardinal = findSym $ enTable ++ longScale "illion" "illiard"
                    }
 
 -------------------------------------------------------------------------------
@@ -862,9 +822,7 @@ frTable = [ term  0         "zéro"
           , add   80    20  "quatre-vingt"
           , mul'  100       $ mulForms "cent" "cents"
           , mul   1000      "mille"
-          , mul   (d 6)     "million"
-          , mul   (d 9)     "millard"
-          ]
+          ] ++ longScale "illion" "illard"
 
 fr :: (IsString s, Joinable s) => NumConfig s
 fr = NumConfig { ncNeg      = ("moins" <+>)
@@ -923,9 +881,7 @@ itTable = [ term  0           "zero"
           , term  98          "novantotto"
           , mul   100         "cento"
           , mul'  1000        $ mulForms "mille"    "mila"
-          , mul'  (d 6)       $ mulForms "milione"  "milioni"
-          , mul'  (d 9)       $ mulForms "miliardo" "miliardi"
-          ]
+          ] ++ longScale' "ilione" "ilioni" "iliardo" "iliardi"
 
 it :: (IsString s, Joinable s) => NumConfig s
 it = NumConfig { ncNeg      = error "itNeg: undefined"
@@ -1029,10 +985,7 @@ ptTable = [ term  0             "zero"
           , add   300   100     "trezentos"
           , add   500   100     "quinhentos"
           , mul   1000          "mil"
-          , mul'  (d 6)         $ mulForms "milhão"  "milhões"
-          , mul'  (d 9)         $ mulForms "bilhão"  "bilhões"
-          , mul'  (d 12)        $ mulForms "trilhão" "trilhões"
-          ]
+          ] ++ shortScale' "ilhão" "ilhões"
 
 pt :: (IsString s, Joinable s) => NumConfig s
 pt = NumConfig { ncNeg      = error "ptNeg: undefined"

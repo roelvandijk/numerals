@@ -100,15 +100,16 @@ import qualified Text.PrettyPrint as PP
 -- Types
 -------------------------------------------------------------------------------
 
+-- | Grammatical gender
 data Gender = Masculine | Feminine deriving Show
 
 data SymbolType = Terminal | Add | Mul deriving Show
 
 data SymbolContext = EmptyContext
-                   | LA Integer
-                   | RA Integer
-                   | LM Integer
-                   | RM Integer
+                   | LA Integer SymbolContext
+                   | RA Integer SymbolContext
+                   | LM Integer SymbolContext
+                   | RM Integer SymbolContext
                      deriving Show
 
 data NumSymbol s = NumSym { symType  :: SymbolType
@@ -151,26 +152,26 @@ gender _ f Feminine  = f
 --    m) multiplicative: x * 10
 tenForms :: s -> s -> s -> (SymbolContext -> s)
 tenForms d a m ctx = case ctx of
-                       RA 10 -> a
-                       LM 10 -> m
-                       _     -> d
+                       RA 10 _ -> a
+                       LM 10 _ -> m
+                       _       -> d
 
 tenFormsG :: (Gender -> s) -> (Gender -> s) -> (Gender -> s) -> (Gender -> SymbolContext -> s)
 tenFormsG d a m g ctx = case ctx of
-                          RA 10 -> a g
-                          LM 10 -> m g
-                          _     -> d g
+                          RA 10 _ -> a g
+                          LM 10 _ -> m g
+                          _       -> d g
 
 tenForms' :: s -> s -> s -> s -> (SymbolContext -> s)
 tenForms' d a mt mh ctx = case ctx of
-                            RA 10  -> a
-                            LM 10  -> mt
-                            LM 100 -> mh
-                            _      -> d
+                            RA 10  _ -> a
+                            LM 10  _ -> mt
+                            LM 100 _ -> mh
+                            _        -> d
 
 mulForms :: s -> s -> (SymbolContext -> s)
-mulForms _ p (RM _) = p
-mulForms s _ _      = s
+mulForms _ p (RM _ _) = p
+mulForms s _ _        = s
 
 
 data NumConfig s = NumConfig { ncCardinal :: Integer -> Maybe (NumSymbol s)
@@ -190,21 +191,25 @@ type Mul s = (Integer, s) -> (Integer, s) -> s
 -------------------------------------------------------------------------------
 
 cardinal :: NumConfig s -> Gender -> Integer -> Maybe s
-cardinal NumConfig {..} g 0 = fmap (\sym -> symRepr sym g EmptyContext) $ ncCardinal 0
 cardinal NumConfig {..} g x | x < 0     = fmap ncNeg $ go EmptyContext $ abs x
+                            | x == 0    = fmap (\sym -> symRepr sym g EmptyContext) $ ncCardinal 0
                             | otherwise = go EmptyContext x
     where go ctx n = do (NumSym _ v _ rv) <- ncCardinal n
                         case n `divMod` v of
                           (1, 0) -> return $ ncOne (v, rv g ctx)
-                          (1, r) -> do rs <- go (RA v) r
-                                       return $ (v, ncOne (v, rv g (LA r))) `ncAdd` (r, rs)
+                          (1, r) -> do rs <- go (RA v ctx) r
+                                       return $ (v, ncOne (v, rv g (LA r ctx))) `ncAdd` (r, rs)
                           (q, r) | q >= v    -> Nothing
-                                 | otherwise -> do qs <- go (LM v) q
+                                 | otherwise -> do qs <- go (LM v ctx) q
                                                    if r == 0
-                                                     then return $ (q, qs) `ncMul` (v, rv g (RM q))
+                                                     then return $ (q, qs) `ncMul` (v, rv g (RM q ctx))
                                                      else do let qv = q * v
-                                                             rs <- go (RA qv) r
-                                                             return $ (qv, (q, qs) `ncMul` (v, rv g (RM q))) `ncAdd` (r, rs)
+                                                             rs <- go (RA qv ctx) r
+                                                             return $ (qv, (q, qs) `ncMul` (v, rv g (RM q (LA qv ctx)))) `ncAdd` (r, rs)
+
+-------------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------------
 
 findSym :: [NumSymbol s] -> Integer -> Maybe (NumSymbol s)
 findSym []     _ = Nothing
@@ -444,8 +449,8 @@ nlTable = [ term 0    $ const "nul"
           , term 8    $ tenForms "acht" "tach" "acht"
           , term 9    $ const "negen"
           , mul  10   $ \ctx -> case ctx of
-                                   RM _ -> "tig"
-                                   _    -> "tien"
+                                   RM _ _ -> "tig"
+                                   _      -> "tien"
           , term 11   $ const "elf"
           , term 12   $ const "twaalf"
           , mul  100  $ const "honderd"
@@ -494,21 +499,21 @@ bigNumTable = [ term 0     $ const "nulla"
               , term 8     $ forms "oct"   "octo"     "octo"     "octo"    "octin"
               , term 9     $ forms "non"   "novem"    "novem"    "nona"    "non"
               , mul  10    $ \ctx -> case ctx of
-                                        RM _ -> "gint"
-                                        _    -> "dec"
+                                        RM _ _ -> "gint"
+                                        _      -> "dec"
               , mul  100   $ \ctx -> case ctx of
-                                        RM n | n `elem` [2, 3, 6] -> "cent"
-                                             | otherwise          -> "gent"
-                                        _                         -> "cent"
+                                        RM n _ | n `elem` [2, 3, 6] -> "cent"
+                                               | otherwise          -> "gent"
+                                        _                           -> "cent"
               , mul  1000  $ const "mill"
               , mul  10000 $ const "myr"
               ]
     where forms d a1 a2 m1 m2 ctx = case ctx of
-                                      RA 10  -> a1
-                                      RA _   -> a2
-                                      LM 100 -> m2
-                                      LM _   -> m1
-                                      _      -> d
+                                      RA 10  _ -> a1
+                                      RA _   _ -> a2
+                                      LM 100 _ -> m2
+                                      LM _   _ -> m1
+                                      _        -> d
 
 bigNum :: (IsString s, Joinable s) => NumConfig s
 bigNum = NumConfig { ncNeg      = error "bigNumNeg: undefined"
@@ -548,9 +553,9 @@ enTable = [ term 0    $ const "zero"
           , term 8    $ tenForms "eight" "eigh" "eigh"
           , term 9    $ const "nine"
           , mul  10   $ \ctx -> case ctx of
-                                   LA _ -> "teen"
-                                   RM _ -> "ty"
-                                   _    -> "ten"
+                                   LA _ _ -> "teen"
+                                   RM _ _ -> "ty"
+                                   _      -> "ten"
           , term 11   $ const "eleven"
           , term 12   $ const "twelve"
           , mul  100  $ const "hundred"
@@ -646,8 +651,8 @@ seTable = [ term 0        $ const "noll"
           , term 8        $ tenForms "åtta" "ar"   "åt"
           , term 9        $ tenForms "nio"  "nit"  "nit"
           , mul  10       $ \ctx -> case ctx of
-                                       LA _  -> "ton"
-                                       _     -> "tio"
+                                       LA _ _ -> "ton"
+                                       _      -> "tio"
           , term 11       $ const "elva"
           , term 12       $ const "tolv"
           , add  20    10 $ const "tjugo"
@@ -700,8 +705,8 @@ noTable = [ term 0        $ const "null"
           , term 8        $ tenForms "åtte" "at"  "åt"
           , term 9        $ tenForms "ni"   "nit" "nit"
           , mul  10       $ \ctx -> case ctx of
-                                       LA _ -> "ten"
-                                       _    -> "ti"
+                                       LA _ _ -> "ten"
+                                       _      -> "ti"
           , term 11       $ const "elleve"
           , term 12       $ const "tolv"
           , add  20    10 $ const "tjue"
@@ -741,10 +746,10 @@ laTable = [ term 0     $ const "nulla"
           , term 8     $ const "octo"
           , term 9     $ tenForms' "novem"    "novem"    "nona"    "non"
           , mul  10    $ \ctx -> case ctx of
-                                    LA _ -> "decim"
-                                    RM 2 -> "ginti"
-                                    RM _ -> "ginta"
-                                    _    -> "decem"
+                                    LA _ _ -> "decim"
+                                    RM 2 _ -> "ginti"
+                                    RM _ _ -> "ginta"
+                                    _      -> "decem"
           , term 18    $ const "duodeviginti"
           , term 19    $ const "undeviginti"
           , term 28    $ const "duodetriginta"
@@ -764,9 +769,9 @@ laTable = [ term 0     $ const "nulla"
           , term 98    $ const "duodecentum"
           , term 99    $ const "undecentum"
           , mul  100   $ \ctx -> case ctx of
-                                    RM n | n `elem` [2, 3, 6] -> "centi"
-                                         | otherwise          -> "genti"
-                                    _                         -> "centum"
+                                    RM n _ | n `elem` [2, 3, 6] -> "centi"
+                                           | otherwise          -> "genti"
+                                    _                           -> "centum"
           , mul  1000  $ mulForms "mille" "millia"
           , term (d 6) $ const "decies centena milia"
           ]
@@ -806,17 +811,22 @@ frTable = [ term  0        $ const "zéro"
           , term  8        $ const "huit"
           , term  9        $ const "neuf"
           , mul   10       $ \ctx -> case ctx of
-                                        LA n | n < 7     -> "ze"
-                                             | otherwise -> "dix"
-                                        RM 3 -> "te"
-                                        RM _ -> "ante"
-                                        _    -> "dix"
+                                        LA n _ | n < 7     -> "ze"
+                                               | otherwise -> "dix"
+                                        RM 3 _ -> "te"
+                                        RM _ _ -> "ante"
+                                        _      -> "dix"
           , add   20    10 $ const "vingt"
           , add   60    20 $ const "soixante"
           , term  71       $ const "soixante et onze"
           , term  80       $ const "quatre-vingts"
           , add   80    20 $ const "quatre-vingt"
-          , mul   100      $ mulForms "cent" "cents"
+          , mul   100      $ let c = "cent"
+                             in \ctx -> case ctx of
+                                          RM _ (LA _ _) -> c
+                                          RM _ (LM _ _) -> c
+                                          RM _ _        -> c <> "s"
+                                          _             -> c
           , mul   1000     $ const "mille"
           ] ++ longScale' "illion" "illions" "illiard" "illiards"
 
@@ -854,10 +864,10 @@ itTable = [ term 0       $ const "zero"
           , term 8       $ tenForms "otto"    "otto"    "ott"
           , term 9       $ tenForms "nove"    "annove"  "nove"
           , mul  10      $ \ctx -> case ctx of
-                                      LA _ -> "dici"
-                                      RM 3 -> "ta"
-                                      RM _ -> "anta"
-                                      _    -> "dieci"
+                                      LA _ _ -> "dici"
+                                      RM 3 _ -> "ta"
+                                      RM _ _ -> "anta"
+                                      _      -> "dieci"
           , add  20   10 $ const "venti"
           , term 21      $ const "ventuno"
           , term 28      $ const "ventotto"
@@ -909,33 +919,33 @@ spTable :: (IsString s, Joinable s) => [NumSymbol s]
 spTable = [ term 0         $ const "cero"
           , term 1         $ tenForms  "uno"    "on"    "uno"
           , term 2         $ \ctx -> case ctx of
-                                        RA 10 -> "do"
-                                        RA 20 -> "dós"
-                                        _     -> "dos"
+                                        RA 10 _ -> "do"
+                                        RA 20 _ -> "dós"
+                                        _       -> "dos"
           , term 3         $ \ctx -> case ctx of
-                                        RA n | n == 10 -> "tre"
-                                             | n < 100 -> "trés"
-                                        LM 10 -> "trein"
-                                        _     -> "tres"
+                                        RA n _ | n == 10 -> "tre"
+                                               | n < 100 -> "trés"
+                                        LM 10 _ -> "trein"
+                                        _       -> "tres"
           , term 4         $ tenForms  "cuatro" "cator" "cuaren"
           , term 5         $ tenForms  "cinco"  "quin"  "cincuen"
           , term 6         $ \ctx -> case ctx of
-                                        RA n | n <= 20 -> "séis"
-                                        LM 10 -> "sesen"
-                                        _     -> "seis"
+                                        RA n _ | n <= 20 -> "séis"
+                                        LM 10 _ -> "sesen"
+                                        _       -> "seis"
           , term 7         $ tenForms' "siete"  "siete" "seten" "sete"
           , term 8         $ tenForms  "ocho"   "ocho"  "ochen"
           , term 9         $ tenForms' "nueve"  "nueve" "noven" "novo"
           , mul  10        $ \ctx -> case ctx of
-                                        LA n | n < 6     -> "ce"
-                                             | otherwise -> "dieci"
-                                        RM _ -> "ta"
-                                        _    -> "diez"
+                                        LA n _ | n < 6     -> "ce"
+                                               | otherwise -> "dieci"
+                                        RM _ _ -> "ta"
+                                        _      -> "diez"
           , add  20    10  $ const "veint"
           , mul  100       $ \ctx -> case ctx of
-                                        RM _ -> "cientos"
-                                        LA _ -> "ciento"
-                                        _    -> "cien"
+                                        RM _ _ -> "cientos"
+                                        LA _ _ -> "ciento"
+                                        _      -> "cien"
           , add  500   100 $ const "quinientos"
           , mul  1000      $ const "mil"
           , mul  (d 6)     $ mulForms "millón" "millones"
@@ -980,19 +990,19 @@ ptTable = [ term 0         $ const "zero"
           , term 8         $ tenForms "oito"   "oito"  "oit"
           , term 9         $ tenForms "nove"   "nove"  "nov"
           , mul  10        $ \ctx -> case ctx of
-                                        LA _ -> "ze"
-                                        RM 3 -> "ta"
-                                        RM _ -> "enta"
-                                        _    -> "dez"
+                                        LA _ _ -> "ze"
+                                        RM 3 _ -> "ta"
+                                        RM _ _ -> "enta"
+                                        _      -> "dez"
           , term 16        $ const "dezesseis"
           , term 17        $ const "dezessete"
           , term 18        $ const "dezoito"
           , term 19        $ const "dezenove"
           , add  20    10  $ const "vinte"
           , mul  100       $ \ctx -> case ctx of
-                                        RM _ -> "centos"
-                                        LA _ -> "cento"
-                                        _    -> "cem"
+                                        RM _ _ -> "centos"
+                                        LA _ _ -> "cento"
+                                        _      -> "cem"
           , add  200   100 $ const "duzentos"
           , add  300   100 $ const "trezentos"
           , add  500   100 $ const "quinhentos"

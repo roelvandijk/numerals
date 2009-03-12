@@ -1,0 +1,35 @@
+name:          numerals
+version:       0.1
+cabal-version: >= 1.6
+build-type:    Simple
+stability:     provisional
+author:        Roel van Dijk, Bas van Dijk
+maintainer:    vandijk.roel@gmail.com
+copyright:     (c) 2009 Roel van Dijk, Bas van Dijk
+license:       BSD3
+license-file:  LICENSE
+category:      Numerical
+synopsis:      TODO
+description:
+  TODO
+
+library
+  build-depends:   base, dstring, pretty, text, bytestring
+  exposed-modules: Text.Numeral
+                   , Text.Numeral.Language
+                     , Text.Numeral.Language.NL
+                     , Text.Numeral.Language.DE
+                     , Text.Numeral.Language.EN
+                     , Text.Numeral.Language.SV
+                     , Text.Numeral.Language.NO
+                     , Text.Numeral.Language.FR
+                     , Text.Numeral.Language.IT
+                     , Text.Numeral.Language.LA
+                     , Text.Numeral.Language.PT
+                     , Text.Numeral.Language.SP
+                     , Text.Numeral.Language.JA
+                     , Text.Numeral.Language.EO
+                   , Text.Numeral.Pelletier
+                   , Text.Numeral.Joinable
+                   , Text.Numeral.Misc
+                   , Text.Numeral.Debug

@@ -355,6 +355,11 @@ untilNothing (Nothing : _)  = []
 -- Numeral configurations
 -------------------------------------------------------------------------------
 
+-- | @nummify@ transforms the given NumConfig to a numeric NumConfig
+-- such that 'prop_cardinal_nummify' holds.  @nummify@ is thus usefull
+-- as a testing aid.  @nummify@ is also usefull as a debugging aid
+-- when you use a suitable numeric type such as 'NS' which renders a
+-- numeric expression to a string representing the same expression.
 nummify :: Num n => NumConfig s -> NumConfig n
 nummify nc@(NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym . ncCardinal
                                         , ncNeg      = negate
@@ -365,6 +370,10 @@ nummify nc@(NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym . ncCar
     where
       transformSym :: (Num n) => NumSymbol s -> NumSymbol n
       transformSym sym = sym { symRepr = const2 . fromInteger . symVal $ sym}
+
+-- | 'prop_cardinal_nummify' specifies the correctness of 'cardinal'.
+prop_cardinal_nummify :: NumConfig String -> Gender -> Integer -> Bool
+prop_cardinal_nummify nc g n = maybe True (== n) $ cardinal (nummify nc) g n
 
 -------------------------------------------------------------------------------
 

@@ -368,30 +368,47 @@ nummify nc@(NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym . ncCar
 
 -------------------------------------------------------------------------------
 
-newtype NS s = NS {unS :: s} deriving (Show,  Eq)
+-- | 'NS' is used
+newtype NS s = NS {unNS :: Precedence -> s}
 
-instance (Eq s, Show s, IsString s, Joinable s) => Num (NS s) where
-    fromInteger = NS . fromString . show
+type Precedence = Int
 
-    (+) = bin "+"
-    (-) = bin "-"
-    (*) = bin "*"
+-- The following bogus Show and Eq instances are needed for Num :-(
+
+instance Show (NS s) where
+    show _ = "NS <function>"
+
+instance Eq (NS s) where
+    _ == _ = False
+
+instance (IsString s, Joinable s) => Num (NS s) where
+    fromInteger = NS . const . fromString . show
+
+    (+) = bin "+" 6
+    (-) = bin "-" 6
+    (*) = bin "*" 7
 
     negate = un "negate"
     abs    = un "abs"
     signum = un "signum"
 
 un :: (IsString s, Joinable s) => s -> (NS s -> NS s)
-un fun x = NS (fun <+> unS x)
+un sFun x = NS $ \p -> paren (p > precApp)
+                             (sFun <+> unNS x (precApp+1))
+    where
+      precApp  = 10
 
-bin :: (IsString s, Joinable s) => s -> (NS s -> NS s -> NS s)
-bin op x y = NS (p (unS x <> op <> unS y))
+bin :: (IsString s, Joinable s) => s -> Precedence -> (NS s -> NS s -> NS s)
+bin sOp d x y = NS $ \p -> paren (p > d) $
+                let p' = d+1
+                in unNS x p' <+> sOp <+> unNS y p'
 
-p :: (IsString s, Joinable s) => s -> s
-p s = "(" <> s <> ")"
+paren :: (IsString s, Joinable s) => Bool -> s -> s
+paren True  s = "(" <> s <> ")"
+paren False s = s
 
 instance Stringable s => Stringable (NS s) where
-    toString = toString . unS
+    toString (NS f) = toString $ f 0
 
 testNSS :: Test (NS String)
 testNSS = test

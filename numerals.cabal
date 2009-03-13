@@ -14,7 +14,7 @@ description:
   TODO
 
 library
-  build-depends:   base, dstring, pretty, text, bytestring
+  build-depends:   base, mtl ==1.1.*, dstring, pretty, text, bytestring
   exposed-modules: Text.Numeral
                    , Text.Numeral.Language
                      , Text.Numeral.Language.NL
@@ -30,6 +30,7 @@ library
                      , Text.Numeral.Language.JA
                      , Text.Numeral.Language.EO
                    , Text.Numeral.Pelletier
+                   , Text.Numeral.Roman
                    , Text.Numeral.Joinable
                    , Text.Numeral.Misc
                    , Text.Numeral.Debug

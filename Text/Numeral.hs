@@ -1,6 +1,5 @@
-{-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE OverloadedStrings         #-}
-{-# LANGUAGE RecordWildCards           #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Text.Numeral
     ( -- *Types
@@ -123,7 +122,6 @@ mul val fs = mulG val $ const fs
 -- Differentiate between masculine and feminine genders. Other genders
 -- default to masculine.
 gender :: s -> s -> (Gender -> s)
-gender m _ Masculine = m
 gender _ f Feminine  = f
 gender m _ _         = m
 
@@ -142,16 +140,12 @@ genderN _ _ f Feminine  = f
 --    a) additive:       10 + x
 --    m) multiplicative: x * 10
 tenForms :: s -> s -> s -> (SymbolContext -> s)
-tenForms d a m ctx = case ctx of
-                       RA 10 _ -> a
-                       LM 10 _ -> m
-                       _       -> d
+tenForms _ a _ (RA 10 _) = a
+tenForms _ _ m (LM 10 _) = m
+tenForms d _ _ _         = d
 
 tenFormsG :: (Gender -> s) -> (Gender -> s) -> (Gender -> s) -> (Gender -> SymbolContext -> s)
-tenFormsG d a m g ctx = case ctx of
-                          RA 10 _ -> a g
-                          LM 10 _ -> m g
-                          _       -> d g
+tenFormsG d a m g ctx = tenForms (d g) (a g) (m g) ctx
 
 -- |Constructs a symbol representation based on the relation of the
 --  symbol with the number 10.
@@ -162,11 +156,10 @@ tenFormsG d a m g ctx = case ctx of
 --    mt) multiplicative: x * 10
 --    mh) multiplicative: x * 100
 tenForms' :: s -> s -> s -> s -> (SymbolContext -> s)
-tenForms' d a mt mh ctx = case ctx of
-                            RA 10  _ -> a
-                            LM 10  _ -> mt
-                            LM 100 _ -> mh
-                            _        -> d
+tenForms' _ a _  _  (RA 10  _) = a
+tenForms' _ _ mt _  (LM 10  _) = mt
+tenForms' _ _ _  mh (LM 100 _) = mh
+tenForms' d _ _  _  _          = d
 
 mulForms :: s -> s -> (SymbolContext -> s)
 mulForms _ p (RM {}) = p

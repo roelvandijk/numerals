@@ -75,13 +75,14 @@ testDocWithStyle s nc g = mapM_ (putStrLn . pretty)
 -- when you use a suitable numeric type such as 'NS' which renders a
 -- numeric expression to a string representing the same expression.
 nummify :: Num n => NumConfig s -> NumConfig n
-nummify nc@(NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym . ncCardinal
-                                        , ncNeg      = negate
-                                        , ncOne      = snd
-                                        , ncAdd      = withSnd (+)
-                                        , ncMul      = withSnd (*)
-                                        }
+nummify (NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym . ncCardinal
+                                     , ncNeg      = negate
+                                     , ncOne      = snd
+                                     , ncAdd      = withSnd (+)
+                                     , ncMul      = withSnd (*)
+                                     }
     where
+      -- Create a new symbol who's representation is its value.
       transformSym :: (Num n) => NumSymbol s -> NumSymbol n
       transformSym sym = sym { symRepr = const2 . fromInteger . symVal $ sym}
 
@@ -123,7 +124,7 @@ un sFun x = NS $ \p -> paren (p > precApp)
 
 bin :: (IsString s, Joinable s) => s -> Precedence -> (NS s -> NS s -> NS s)
 bin sOp d x y = NS $ \p -> paren (p > d) $
-                let p' = d+1
+                let p' = d + 1
                 in unNS x p' <+> sOp <+> unNS y p'
 
 paren :: (IsString s, Joinable s) => Bool -> s -> s

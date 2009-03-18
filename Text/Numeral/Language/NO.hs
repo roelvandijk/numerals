@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 
 module Text.Numeral.Language.NO (no) where
 
@@ -9,6 +9,14 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
+#ifdef DO_SPECIALISE
+import qualified Data.ByteString as B
+import qualified Data.DString    as DS
+
+{-# SPECIALISE no :: NumConfig String #-}
+{-# SPECIALISE no :: NumConfig B.ByteString #-}
+{-# SPECIALISE no :: NumConfig DS.DString #-}
+#endif
 
 -- Sources:
 --   http://en.wikibooks.org/wiki/Norwegian_Numbers

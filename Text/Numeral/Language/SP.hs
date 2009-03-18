@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 
 module Text.Numeral.Language.SP (sp) where
 
@@ -9,6 +9,14 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d)
 
+#ifdef DO_SPECIALISE
+import qualified Data.ByteString as B
+import qualified Data.DString    as DS
+
+{-# SPECIALISE sp :: NumConfig String #-}
+{-# SPECIALISE sp :: NumConfig B.ByteString #-}
+{-# SPECIALISE sp :: NumConfig DS.DString #-}
+#endif
 
 -- Sources:
 --   http://spanish.about.com/cs/forbeginners/a/cardinalnum_beg.htm

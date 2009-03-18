@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 
 module Text.Numeral.Language.SV (sv) where
 
@@ -8,6 +8,15 @@ import Data.String
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
+
+#ifdef DO_SPECIALISE
+import qualified Data.ByteString as B
+import qualified Data.DString    as DS
+
+{-# SPECIALISE sv :: NumConfig String #-}
+{-# SPECIALISE sv :: NumConfig B.ByteString #-}
+{-# SPECIALISE sv :: NumConfig DS.DString #-}
+#endif
 
 -- Sources:
 --   http://www.lysator.liu.se/language/Languages/Swedish/Grammar.html

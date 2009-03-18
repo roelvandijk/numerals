@@ -10,12 +10,26 @@ license:       BSD3
 license-file:  LICENSE
 category:      Numerical
 synopsis:      TODO
-description:
-  TODO
+description:   TODO
+
+extra-source-files: ./TODO, ./README, ./LICENSE
+
+flag specialise
+  description: Specialise the polymorphic language definitions to some
+               often used types (String, ByteString, DString). Note
+               that this increases compilation time and the size of
+               the object file significantly.
+               Also see README
+  default: False
 
 library
+  if flag(specialise)
+    CPP-Options: -DDO_SPECIALISE
+
   GHC-Options: -O2
+
   build-depends:   base, mtl ==1.1.*, dstring, pretty, text, bytestring
+
   exposed-modules: Text.Numeral
                    , Text.Numeral.Language
                      , Text.Numeral.Language.NL

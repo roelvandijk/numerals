@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 
 module Text.Numeral.Language.DE (de) where
 
@@ -9,6 +9,14 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
+#ifdef DO_SPECIALISE
+import qualified Data.ByteString as B
+import qualified Data.DString    as DS
+
+{-# SPECIALISE de :: NumConfig String #-}
+{-# SPECIALISE de :: NumConfig B.ByteString #-}
+{-# SPECIALISE de :: NumConfig DS.DString #-}
+#endif
 
 de :: (IsString s, Joinable s) => NumConfig s
 de = NumConfig { ncNeg      = ("minus" <+>)

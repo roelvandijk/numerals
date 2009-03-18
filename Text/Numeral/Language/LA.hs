@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 
 module Text.Numeral.Language.LA (la) where
 
@@ -7,6 +7,14 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d)
 
+#ifdef DO_SPECIALISE
+import qualified Data.ByteString as B
+import qualified Data.DString    as DS
+
+{-# SPECIALISE la :: NumConfig String #-}
+{-# SPECIALISE la :: NumConfig B.ByteString #-}
+{-# SPECIALISE la :: NumConfig DS.DString #-}
+#endif
 
 la :: (IsString s, Joinable s) => NumConfig s
 la = NumConfig { ncNeg      = error "laNeg: undefined"

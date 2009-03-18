@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 
 module Text.Numeral.Language.FR (fr) where
 
@@ -8,6 +8,15 @@ import Data.String
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Pelletier (longScalePlural)
+
+#ifdef DO_SPECIALISE
+import qualified Data.ByteString as B
+import qualified Data.DString    as DS
+
+{-# SPECIALISE fr :: NumConfig String #-}
+{-# SPECIALISE fr :: NumConfig B.ByteString #-}
+{-# SPECIALISE fr :: NumConfig DS.DString #-}
+#endif
 
 -- Sources:
 --  http://www.cliffsnotes.com/WileyCDA/CliffsReviewTopic/Numbers.topicArticleId-25559,articleId-25469.html

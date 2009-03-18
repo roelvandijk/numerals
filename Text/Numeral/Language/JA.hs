@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 
 module Text.Numeral.Language.JA (ja) where
 
@@ -9,6 +9,14 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
+#ifdef DO_SPECIALISE
+import qualified Data.ByteString as B
+import qualified Data.DString    as DS
+
+{-# SPECIALISE ja :: NumConfig String #-}
+{-# SPECIALISE ja :: NumConfig B.ByteString #-}
+{-# SPECIALISE ja :: NumConfig DS.DString #-}
+#endif
 
 ja :: (IsString s, Joinable s) => NumConfig s
 ja = NumConfig { ncNeg      = ("mainasu" <+>)

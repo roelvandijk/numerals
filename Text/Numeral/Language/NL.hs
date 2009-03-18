@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 
 module Text.Numeral.Language.NL (nl) where
 
@@ -8,6 +8,15 @@ import Data.String
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Pelletier (longScale)
+
+#ifdef DO_SPECIALISE
+import qualified Data.ByteString as B
+import qualified Data.DString    as DS
+
+{-# SPECIALISE nl :: NumConfig String #-}
+{-# SPECIALISE nl :: NumConfig B.ByteString #-}
+{-# SPECIALISE nl :: NumConfig DS.DString #-}
+#endif
 
 nl :: (IsString s, Joinable s) => NumConfig s
 nl = NumConfig { ncNeg      = ("min" <+>)

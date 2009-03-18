@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 
 module Text.Numeral.Language.PT (pt) where
 
@@ -8,6 +8,15 @@ import Data.String
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Pelletier (shortScalePlural)
+
+#ifdef DO_SPECIALISE
+import qualified Data.ByteString as B
+import qualified Data.DString    as DS
+
+{-# SPECIALISE pt :: NumConfig String #-}
+{-# SPECIALISE pt :: NumConfig B.ByteString #-}
+{-# SPECIALISE pt :: NumConfig DS.DString #-}
+#endif
 
 -- Sources:
 --   http://www.sonia-portuguese.com/text/numerals.htm

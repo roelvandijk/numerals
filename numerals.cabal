@@ -3,8 +3,8 @@ version:       0.1
 cabal-version: >= 1.6
 build-type:    Simple
 stability:     provisional
-author:        Roel van Dijk, Bas van Dijk
-maintainer:    vandijk.roel@gmail.com
+author:        Roel van Dijk <vandijk.roel@gmail.com>, Bas van Dijk <v.dijk.bas@gmail.com>
+maintainer:    Roel van Dijk <vandijk.roel@gmail.com>, Bas van Dijk <v.dijk.bas@gmail.com>
 copyright:     (c) 2009 Roel van Dijk, Bas van Dijk
 license:       BSD3
 license-file:  LICENSE

@@ -14,6 +14,7 @@ description:
   TODO
 
 library
+  GHC-Options: -O2
   build-depends:   base, mtl ==1.1.*, dstring, pretty, text, bytestring
   exposed-modules: Text.Numeral
                    , Text.Numeral.Language

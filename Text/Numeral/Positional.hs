@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE BangPatterns      #-}
 
 module Text.Numeral.Positional
     ( toPositional
@@ -20,36 +21,37 @@ import Data.String
 
 -------------------------------------------------------------------------------
 
-quotRem' :: Integral a => a -> a -> (a, a)
-quotRem' n d = let qr@(q, r) = n `quotRem` d
-               in if r < 0
-                  then (q + 1, r - d)
-                  else qr
 
--------------------------------------------------------------------------------
+toPolynomial :: Integer -> Integer -> [Integer]
+toPolynomial b n | n == 0    = [0]
+                 | b == 0    = error "toPolynomial: base 0"
+                 | b == (-1) = case n of
+                                 (-1) -> [0, 1]
+                                 1    -> [1]
+                                 _    -> error "toPolynomial: base (-1)"
+                 | b == 1    = L.genericReplicate (abs n) (signum n)
+                 | otherwise = toPolynomial_b $ n
+      where toPolynomial_b 0 = []
+            toPolynomial_b n = let (q, r) = n `qr` b
+                         in r : toPolynomial_b q
 
-toDigits :: Integer -> Integer -> [Integer]
-toDigits b n | n == 0    = [0]
-             | b == 0    = error "digits: base 0"
-             | b == (-1) = case n of
-                             (-1) -> [1, 0]
-                             1    -> [1]
-                             _    -> error "digits: base (-1)"
-             | b == 1    = L.genericReplicate (abs n) (signum n)
-             | otherwise = reverse . digits_b $ n
-      where digits_b 0 = []
-            digits_b n = let (q, r) = n `quotRem'` b
-                         in r : digits_b q
+            qr | b > 0     = quotRem
+               | otherwise = quotRem'
 
-fromDigits :: Integer -> [Integer] -> Integer
-fromDigits b = go 1 . reverse
-    where go _ []     = 0
-          go n (x:xs) = x * n + go (n * b) xs
+            quotRem' :: Integral a => a -> a -> (a, a)
+            quotRem' n d = let qr@(q, r) = n `quotRem` d
+                           in if r < 0
+                              then (q + 1, r - d)
+                              else qr
 
-prop_digits :: Integer -> Integer -> Bool
-prop_digits b n | b == 0    && n /= 0    = True
-                | b == (-1) && abs n > 1 = True
-                | otherwise              = n == (fromDigits b $ toDigits b n)
+fromPolynomial :: Integer -> [Integer] -> Integer
+fromPolynomial b = sum' . zipWith (*) (iterate (* b) 1)
+    where sum' = L.foldl' (+) 0
+
+prop_polynomial :: Integer -> Integer -> Bool
+prop_polynomial b n | b == 0    && n /= 0    = True
+                    | b == (-1) && abs n > 1 = True
+                    | otherwise              = n == (fromPolynomial b $ toPolynomial b n)
 
 -------------------------------------------------------------------------------
 
@@ -57,7 +59,7 @@ toPositional :: (IsString s, Monoid s) => (Integer -> s) -> Integer -> Integer -
 toPositional f b n | b == 0         = Nothing
                    | n < 0 && b > 0 = fmap (mappend "-") $ repr (abs n)
                    | otherwise      = repr n
-    where repr x = fmap mconcat . mapM f' . toDigits b $ x
+    where repr x = fmap mconcat . mapM f' . reverse . toPolynomial b $ x
           f' n | n >= abs b = Nothing
                | otherwise  = Just $ f n
 

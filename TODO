@@ -56,3 +56,8 @@ Positional systems:
 
 Concatenative systems:
   Roman numerals
+
+
+*** TODOS ***
+
+Use a package which defines polynomials for the positional numeral systems stuff.

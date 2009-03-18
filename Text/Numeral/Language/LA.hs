@@ -8,6 +8,14 @@ import Text.Numeral.Joinable
 import Text.Numeral.Misc (d)
 
 
+la :: (IsString s, Joinable s) => NumConfig s
+la = NumConfig { ncNeg      = error "laNeg: undefined"
+               , ncOne      = snd
+               , ncAdd      = laAdd
+               , ncMul      = laMul
+               , ncCardinal = findSym laTable
+               }
+
 laAdd :: (IsString s, Joinable s) => (Integer, s) -> (Integer, s) -> s
 laAdd (x, x') (_, y') | x == 10   = y' <> x'
                       | otherwise = x' <+> y'
@@ -57,11 +65,3 @@ laTable = [ term 0     $ const "nulla"
           , mul  1000  $ mulForms "mille" "millia"
           , term (d 6) $ const "decies centena milia"
           ]
-
-la :: (IsString s, Joinable s) => NumConfig s
-la = NumConfig { ncNeg      = error "laNeg: undefined"
-               , ncOne      = snd
-               , ncAdd      = laAdd
-               , ncMul      = laMul
-               , ncCardinal = findSym laTable
-               }

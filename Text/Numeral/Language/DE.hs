@@ -9,6 +9,15 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
+
+de :: (IsString s, Joinable s) => NumConfig s
+de = NumConfig { ncNeg      = ("minus" <+>)
+               , ncOne      = deOne
+               , ncAdd      = deAdd
+               , ncMul      = withSnd (<>)
+               , ncCardinal = findSym deTable
+               }
+
 deOne :: (IsString s, Joinable s) => (Integer, s) -> s
 deOne (v, vs) | v >= (d 6) = "eine" <+> vs
               | v >= 100   = "ein"  <>  vs
@@ -41,11 +50,3 @@ deTable = [ term 0        $ const "null"
           , mul  (d 6)    $ const "million"
           , mul  (d 9)    $ const "milliarde"
           ]
-
-de :: (IsString s, Joinable s) => NumConfig s
-de = NumConfig { ncNeg      = ("minus" <+>)
-               , ncOne      = deOne
-               , ncAdd      = deAdd
-               , ncMul      = withSnd (<>)
-               , ncCardinal = findSym deTable
-               }

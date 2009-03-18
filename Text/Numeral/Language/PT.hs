@@ -13,6 +13,14 @@ import Text.Numeral.Pelletier (shortScalePlural)
 --   http://www.sonia-portuguese.com/text/numerals.htm
 --   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
 
+pt :: (IsString s, Joinable s) => NumConfig s
+pt = NumConfig { ncNeg      = error "ptNeg: undefined"
+               , ncOne      = ptOne
+               , ncAdd      = ptAdd
+               , ncMul      = ptMul
+               , ncCardinal = findSym ptTable
+               }
+
 ptOne :: (IsString s, Joinable s) => (Integer, s) -> s
 ptOne (x, x') | x <= 1000 = x'
               | otherwise = "um" <+> x'
@@ -56,11 +64,3 @@ ptTable = [ term 0         $ const "zero"
           , add  500   100 $ const "quinhentos"
           , mul  1000      $ const "mil"
           ] ++ shortScalePlural "ilhão" "ilhões"
-
-pt :: (IsString s, Joinable s) => NumConfig s
-pt = NumConfig { ncNeg      = error "ptNeg: undefined"
-               , ncOne      = ptOne
-               , ncAdd      = ptAdd
-               , ncMul      = ptMul
-               , ncCardinal = findSym ptTable
-               }

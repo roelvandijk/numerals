@@ -13,9 +13,6 @@ import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, untilNothing, weave, withSnd)
 
 
-bigCardinal :: (IsString s, Joinable s) => Integer -> Maybe s
-bigCardinal = cardinal bigNum Masculine
-
 longScale :: (IsString s, Joinable s) => s -> s -> [NumSymbol s]
 longScale a b = longScalePlural a a b b
 
@@ -31,9 +28,21 @@ shortScalePlural :: (IsString s, Joinable s) => s -> s -> [NumSymbol s]
 shortScalePlural a as = untilNothing $ map illion [1..]
     where illion n = fmap (\s -> mul (d 3 * (d 3 ^ n)) $ mulForms (s <> a) (s <> as)) $ bigCardinal n
 
+bigCardinal :: (IsString s, Joinable s) => Integer -> Maybe s
+bigCardinal = cardinal bigNum Masculine
+
+
 -------------------------------------------------------------------------------
 -- Big Num 'language'
 -------------------------------------------------------------------------------
+
+bigNum :: (IsString s, Joinable s) => NumConfig s
+bigNum = NumConfig { ncNeg      = error "bigNumNeg: undefined"
+                   , ncOne      = snd
+                   , ncAdd      = withSnd . flip $ (<>)
+                   , ncMul      = withSnd (<>)
+                   , ncCardinal = findSym bigNumTable
+                   }
 
 bigNumTable :: (IsString s, Joinable s) => [NumSymbol s]
 bigNumTable = [ term 0     $ const "nulla"
@@ -62,12 +71,4 @@ bigNumTable = [ term 0     $ const "nulla"
                                       LM 100 _ -> m2
                                       LM _   _ -> m1
                                       _        -> d
-
-bigNum :: (IsString s, Joinable s) => NumConfig s
-bigNum = NumConfig { ncNeg      = error "bigNumNeg: undefined"
-                   , ncOne      = snd
-                   , ncAdd      = withSnd . flip $ (<>)
-                   , ncMul      = withSnd (<>)
-                   , ncCardinal = findSym bigNumTable
-                   }
 

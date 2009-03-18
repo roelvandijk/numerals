@@ -13,6 +13,14 @@ import Text.Numeral.Misc (d, withSnd)
 -- Sources:
 --   http://en.wikibooks.org/wiki/Norwegian_Numbers
 
+no :: (IsString s, Joinable s) => NumConfig s
+no = NumConfig { ncNeg      = error "noNeg: undefined"
+               , ncOne      = noOne
+               , ncAdd      = noAdd
+               , ncMul      = withSnd (<>)
+               , ncCardinal = findSym noTable
+               }
+
 noOne :: (IsString s, Joinable s) => (Integer, s) -> s
 noOne (v, vs) | v >= (d 6) = "én" <+> vs
               | otherwise  = vs
@@ -45,11 +53,3 @@ noTable = [ term 0        $ const "null"
           , mul  (d 6)    $ mulForms "million"  "millioner"
           , mul  (d 9)    $ mulForms "milliard" "milliarder"
           ]
-
-no :: (IsString s, Joinable s) => NumConfig s
-no = NumConfig { ncNeg      = error "noNeg: undefined"
-               , ncOne      = noOne
-               , ncAdd      = noAdd
-               , ncMul      = withSnd (<>)
-               , ncCardinal = findSym noTable
-               }

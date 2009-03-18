@@ -13,6 +13,14 @@ import Text.Numeral.Pelletier (longScalePlural)
 -- Sources:
 --   http://italian.about.com/library/weekly/aa042600a.htm
 
+it :: (IsString s, Joinable s) => NumConfig s
+it = NumConfig { ncNeg      = error "itNeg: undefined"
+               , ncOne      = snd
+               , ncAdd      = itAdd
+               , ncMul      = itMul
+               , ncCardinal = findSym itTable
+               }
+
 itAdd :: (IsString s, Joinable s) => (Integer, s) -> (Integer, s) -> s
 itAdd (x, x') (y, y') | x == 10 && y < 7 = y' <> x'
                       | y == 3    = x' <> "tré"
@@ -58,11 +66,3 @@ itTable = [ term  0       $ const "zero"
           , mul   100     $ const "cento"
           , mul   1000    $ mulForms "mille" "mila"
           ] ++ longScalePlural "ilione" "ilioni" "iliardo" "iliardi"
-
-it :: (IsString s, Joinable s) => NumConfig s
-it = NumConfig { ncNeg      = error "itNeg: undefined"
-               , ncOne      = snd
-               , ncAdd      = itAdd
-               , ncMul      = itMul
-               , ncCardinal = findSym itTable
-               }

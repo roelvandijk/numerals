@@ -12,6 +12,14 @@ import Text.Numeral.Pelletier (longScalePlural)
 -- Sources:
 --  http://www.cliffsnotes.com/WileyCDA/CliffsReviewTopic/Numbers.topicArticleId-25559,articleId-25469.html
 
+fr :: (IsString s, Joinable s) => NumConfig s
+fr = NumConfig { ncNeg      = ("moins" <+>)
+               , ncOne      = snd
+               , ncAdd      = frAdd
+               , ncMul      = frMul
+               , ncCardinal = findSym frTable
+               }
+
 frAdd :: (IsString s, Joinable s) => (Integer, s) -> (Integer, s) -> s
 frAdd (x, x') (y, y') | x == 10 && y < 7 = y' <> x'
                       | x < 80 && y == 1 = x' <+> "et" <+> y'
@@ -52,11 +60,3 @@ frTable = [ term  0        $ const "zéro"
                                           _             -> c
           , mul   1000     $ const "mille"
           ] ++ longScalePlural "illion" "illions" "illiard" "illiards"
-
-fr :: (IsString s, Joinable s) => NumConfig s
-fr = NumConfig { ncNeg      = ("moins" <+>)
-               , ncOne      = snd
-               , ncAdd      = frAdd
-               , ncMul      = frMul
-               , ncCardinal = findSym frTable
-               }

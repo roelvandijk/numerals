@@ -9,6 +9,14 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Pelletier (longScale)
 
+nl :: (IsString s, Joinable s) => NumConfig s
+nl = NumConfig { ncNeg      = ("min" <+>)
+               , ncOne      = snd
+               , ncAdd      = nlAdd
+               , ncMul      = nlMul
+               , ncCardinal = findSym nlTable
+               }
+
 nlAdd :: (IsString s, Joinable s) => (Integer, s) -> (Integer, s) -> s
 nlAdd (x, x') (y, y') | x < 20    = y' <> x'
                       | x < 100   = y' <> (if y == 2 || y == 3
@@ -40,11 +48,3 @@ nlTable = [ term 0    $ const "nul"
           , mul  100  $ const "honderd"
           , mul  1000 $ const "duizend"
           ] ++ (longScale "iljoen" "iljard")
-
-nl :: (IsString s, Joinable s) => NumConfig s
-nl = NumConfig { ncNeg      = ("min" <+>)
-               , ncOne      = snd
-               , ncAdd      = nlAdd
-               , ncMul      = nlMul
-               , ncCardinal = findSym nlTable
-               }

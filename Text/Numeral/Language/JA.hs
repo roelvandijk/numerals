@@ -10,6 +10,14 @@ import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
 
+ja :: (IsString s, Joinable s) => NumConfig s
+ja = NumConfig { ncNeg      = ("mainasu" <+>)
+               , ncOne      = jaOne
+               , ncAdd      = withSnd (<+>)
+               , ncMul      = withSnd (<->)
+               , ncCardinal = findSym jaTable
+               }
+
 jaOne :: (IsString s, Joinable s) => (Integer, s) -> s
 jaOne (v, vs) | v < 100 || (300 >= v && v < 400) = vs
               | otherwise = "ichi" <-> vs
@@ -47,12 +55,3 @@ jaTable = [ term 0         $ const "rei"
           , mul (d 64)     $ const "fukashigi"
           , mul (d 68)     $ const "muryōtaisū"
           ]
-
-ja :: (IsString s, Joinable s) => NumConfig s
-ja = NumConfig { ncNeg      = ("mainasu" <+>)
-               , ncOne      = jaOne
-               , ncAdd      = withSnd (<+>)
-               , ncMul      = withSnd (<->)
-               , ncCardinal = findSym jaTable
-               }
-

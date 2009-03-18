@@ -17,6 +17,14 @@ import Text.Numeral.Misc (d, withSnd)
 --   http://www.cs.chalmers.se/~aarne/GF/
 --   http://www.cs.chalmers.se/~aarne/GF/lib/resource/norwegian/NumeralNor.gf
 
+sv :: (IsString s, Joinable s) => NumConfig s
+sv = NumConfig { ncNeg      = ("minus" <+>)
+               , ncOne      = svOne
+               , ncAdd      = svAdd
+               , ncMul      = withSnd (<>)
+               , ncCardinal = findSym svTable
+               }
+
 svOne :: (IsString s, Joinable s) => (Integer, s) -> s
 svOne (v, vs) | v >= 100   = "ett" <> vs
               | otherwise  = vs
@@ -55,11 +63,3 @@ svTable = [ term 0        $ const "noll"
           , mul  (d 30)   $ mulForms "kvintriljon"  "kvintriljoner"
           , mul  (d 33)   $ mulForms "kvintriljard" "kvintriljarder"
           ]
-
-sv :: (IsString s, Joinable s) => NumConfig s
-sv = NumConfig { ncNeg      = ("minus" <+>)
-               , ncOne      = svOne
-               , ncAdd      = svAdd
-               , ncMul      = withSnd (<>)
-               , ncCardinal = findSym svTable
-               }

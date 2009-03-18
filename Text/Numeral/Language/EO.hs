@@ -10,6 +10,14 @@ import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
 
+eo :: (IsString s, Joinable s) => NumConfig s
+eo = NumConfig { ncNeg      = error "eoNeg: undefined"
+               , ncOne      = snd
+               , ncAdd      = withSnd (<+>)
+               , ncMul      = withSnd (<>)
+               , ncCardinal = findSym eoTable
+               }
+
 eoTable :: (IsString s, Joinable s) => [NumSymbol s]
 eoTable = [ term 0    $ const "nulo"
           , term 1    $ const "unu"
@@ -26,11 +34,3 @@ eoTable = [ term 0    $ const "nulo"
           , mul 1000  $ const "mil"
           , mul (d 6) $ const "miliono"
           ]
-
-eo :: (IsString s, Joinable s) => NumConfig s
-eo = NumConfig { ncNeg      = error "eoNeg: undefined"
-               , ncOne      = snd
-               , ncAdd      = withSnd (<+>)
-               , ncMul      = withSnd (<>)
-               , ncCardinal = findSym eoTable
-               }

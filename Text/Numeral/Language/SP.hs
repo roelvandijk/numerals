@@ -15,6 +15,14 @@ import Text.Numeral.Misc (d)
 --   http://www.learn-spanish-help.com/count-in-spanish.html
 --   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
 
+sp :: (IsString s, Joinable s) => NumConfig s
+sp = NumConfig { ncNeg      = error "spNeg: undefined"
+               , ncOne      = snd
+               , ncAdd      = spAdd
+               , ncMul      = spMul
+               , ncCardinal = findSym spTable
+               }
+
 spAdd :: (IsString s, Joinable s) => (Integer, s) -> (Integer, s) -> s
 spAdd (x, x') (y, y') | x == 10 && y < 6 = y' <> x'
                       | x == 10    = x' <> y'
@@ -62,11 +70,3 @@ spTable = [ term  0         $ const "cero"
           , mul   (d 6)     $ mulForms "millón" "millones"
           , mul   (d 12)    $ mulForms "billón" "billones"
           ]
-
-sp :: (IsString s, Joinable s) => NumConfig s
-sp = NumConfig { ncNeg      = error "spNeg: undefined"
-               , ncOne      = snd
-               , ncAdd      = spAdd
-               , ncMul      = spMul
-               , ncCardinal = findSym spTable
-               }

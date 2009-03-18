@@ -8,6 +8,17 @@ import Text.Numeral.Joinable
 import Text.Numeral.Pelletier (shortScale, longScale)
 
 
+enShort :: (IsString s, Joinable s) => NumConfig s
+enShort = NumConfig { ncNeg      = enNeg
+                    , ncOne      = enOne
+                    , ncAdd      = enAdd
+                    , ncMul      = enMul
+                    , ncCardinal = findSym $ enTable ++ shortScale "illion"
+                    }
+
+enLong :: (IsString s, Joinable s) => NumConfig s
+enLong = enShort { ncCardinal = findSym $ enTable ++ longScale "illion" "illiard"}
+
 enNeg :: (IsString s, Joinable s) => s -> s
 enNeg = ("minus" <+>)
 
@@ -44,19 +55,3 @@ enTable = [ term 0    $ const "zero"
           , mul  100  $ const "hundred"
           , mul  1000 $ const "thousand"
           ]
-
-enShort :: (IsString s, Joinable s) => NumConfig s
-enShort = NumConfig { ncNeg      = enNeg
-                    , ncOne      = enOne
-                    , ncAdd      = enAdd
-                    , ncMul      = enMul
-                    , ncCardinal = findSym $ enTable ++ shortScale "illion"
-                    }
-
-enLong :: (IsString s, Joinable s) => NumConfig s
-enLong = NumConfig { ncNeg      = enNeg
-                   , ncOne      = enOne
-                   , ncAdd      = enAdd
-                   , ncMul      = enMul
-                   , ncCardinal = findSym $ enTable ++ longScale "illion" "illiard"
-                   }

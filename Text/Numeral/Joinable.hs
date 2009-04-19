@@ -12,6 +12,7 @@ import qualified Data.Text             as T
 import qualified Text.PrettyPrint      as PP
 
 
+-- | Class of string-like types which can be joined.
 class Joinable s where
     (<>)  :: s -> s -> s
     (<+>) :: s -> s -> s

@@ -60,6 +60,6 @@ Conclusion
 
 If we specialise then:
 * compilation will take almost 3 times longer
-* the object file will be at least 3 times bigger
+* the library will be at least 3 times bigger
 
 TODO: Check for peformance gains!

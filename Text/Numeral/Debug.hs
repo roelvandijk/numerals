@@ -8,6 +8,7 @@ import Data.String
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (const2, withSnd)
+import Text.Numeral.Language
 
 import qualified Data.DString          as DS
 import qualified Data.ByteString.Char8 as B

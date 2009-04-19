@@ -2,23 +2,26 @@ name:          numerals
 version:       0.1
 cabal-version: >= 1.6
 build-type:    Simple
-stability:     provisional
+stability:     experimental
 author:        Roel van Dijk <vandijk.roel@gmail.com>, Bas van Dijk <v.dijk.bas@gmail.com>
 maintainer:    Roel van Dijk <vandijk.roel@gmail.com>, Bas van Dijk <v.dijk.bas@gmail.com>
 copyright:     (c) 2009 Roel van Dijk, Bas van Dijk
 license:       BSD3
 license-file:  LICENSE
-category:      Numerical
-synopsis:      TODO
-description:   TODO
+category:      Natural Language Processing, Numerical, Text
+synopsis:      Utilities for working with numerals
+description:
 
-extra-source-files: ./TODO, ./README, ./LICENSE
+extra-source-files: ./TODO
+                  , ./README
+                  , ./LICENSE
+                  , ./Text/Numeral/Debug.hs
 
 flag specialise
   description: Specialise the polymorphic language definitions to some
                often used types (String, ByteString, DString). Note
                that this increases compilation time and the size of
-               the object file significantly.
+               the object files significantly.
                Also see README
   default: False
 
@@ -28,7 +31,12 @@ library
 
   GHC-Options: -O2
 
-  build-depends:   base, mtl ==1.1.*, dstring, pretty, text, bytestring
+  build-depends: base >=2
+               , mtl ==1.1.*
+               , dstring <0.3
+               , pretty >=1 && <1.1
+               , text >=0.1 && <0.2
+               , bytestring >=0.9 && <1
 
   exposed-modules: Text.Numeral
                    , Text.Numeral.Language
@@ -49,4 +57,4 @@ library
                    , Text.Numeral.Roman
                    , Text.Numeral.Joinable
                    , Text.Numeral.Misc
-                   , Text.Numeral.Debug
+                   -- , Text.Numeral.Debug

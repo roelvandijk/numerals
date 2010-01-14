@@ -1,54 +1,80 @@
-{-# LANGUAGE OverloadedStrings         #-}
-{-# LANGUAGE TypeSynonymInstances      #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE NoImplicitPrelude    #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE UnicodeSyntax        #-}
 
 module Text.Numeral.Joinable where
 
-import Data.Monoid
-import Data.String
 
-import qualified Data.DString          as DS
+-------------------------------------------------------------------------------
+-- Imports
+-------------------------------------------------------------------------------
+
+-- base
+import Data.Char   ( String )
+import Data.String ( IsString, fromString )
+import Text.Show   ( ShowS, showString )
+-- base-unicode-symbols
+import Data.Monoid.Unicode ( (⊕) )
+-- bytestring
 import qualified Data.ByteString.Char8 as B
-import qualified Data.Text             as T
-import qualified Text.PrettyPrint      as PP
+-- dstring
+import qualified Data.DString as DS
+-- pretty
+import qualified Text.PrettyPrint as PP
+-- text
+import qualified Data.Text as T
 
+
+-------------------------------------------------------------------------------
+-- Joinable class
+-------------------------------------------------------------------------------
 
 -- | Class of string-like types which can be joined.
 class Joinable s where
-    (<>)  :: s -> s -> s
-    (<+>) :: s -> s -> s
+    (<>)  ∷ s → s → s
+    (<+>) ∷ s → s → s
 
 infixr 5 <>, <+>, <->
 
-(<->) :: (Joinable s, IsString s) => s -> s -> s
+(<->) ∷ (Joinable s, IsString s) ⇒ s → s → s
 x <-> y = x <> "-" <> y
 
-space :: (Joinable s, IsString s) => s -> s -> s
+space ∷ (Joinable s, IsString s) ⇒ s → s → s
 space x y = x <> " " <> y
 
+
+-------------------------------------------------------------------------------
+-- Joinable instances
+-------------------------------------------------------------------------------
+
 instance Joinable String where
-    (<>)  = mappend
+    (<>)  = (⊕)
     (<+>) = space
 
 instance Joinable B.ByteString where
-    (<>)  = mappend
+    (<>)  = (⊕)
     (<+>) = space
 
 instance Joinable T.Text where
-    (<>)  = mappend
+    (<>)  = (⊕)
     (<+>) = space
 
 instance Joinable ShowS where
-    (<>)  = mappend
+    (<>)  = (⊕)
     (<+>) = space
 
 instance Joinable DS.DString where
-    (<>)  = mappend
+    (<>)  = (⊕)
     (<+>) = space
 
 instance Joinable PP.Doc where
     (<>)  = (PP.<>)
     (<+>) = (PP.<+>)
 
+
+-------------------------------------------------------------------------------
+-- Miscellaneous IsString instances
 -------------------------------------------------------------------------------
 
 instance IsString ShowS where

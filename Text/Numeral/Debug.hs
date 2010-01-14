@@ -15,6 +15,8 @@ import qualified Data.ByteString.Char8 as B
 import qualified Data.Text             as T
 import qualified Text.PrettyPrint      as PP
 
+import Text.Numeral.Language
+
 -------------------------------------------------------------------------------
 
 class Stringable s where

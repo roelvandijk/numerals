@@ -1,5 +1,5 @@
 name:          numerals
-version:       0.1
+version:       0.2
 cabal-version: >= 1.6
 build-type:    Simple
 stability:     experimental
@@ -29,14 +29,15 @@ library
   if flag(specialise)
     CPP-Options: -DDO_SPECIALISE
 
-  GHC-Options: -O2
+  GHC-Options: -Wall
 
-  build-depends: base >=2
-               , mtl ==1.1.*
-               , dstring <0.3
-               , pretty >=1 && <1.1
-               , text >=0.1 && <0.2
-               , bytestring >=0.9 && <1
+  build-depends: base                 >= 3.0.3.1 && < 4.3
+               , base-unicode-symbols >= 0.1.1   && < 0.2
+               , mtl                  == 1.1.*
+               , dstring              == 0.3.*
+               , pretty               >= 1       && < 1.0.2
+               , text                 == 0.7.*
+               , bytestring           >= 0.9.1.5 && < 0.10
 
   exposed-modules: Text.Numeral
                    , Text.Numeral.Language

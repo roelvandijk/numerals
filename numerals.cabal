@@ -55,7 +55,6 @@ library
                      , Text.Numeral.Language.EO
                    , Text.Numeral.Pelletier
                    , Text.Numeral.Positional
-                   , Text.Numeral.Roman
                    , Text.Numeral.Joinable
                    , Text.Numeral.Misc
                    -- , Text.Numeral.Debug

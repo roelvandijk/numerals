@@ -1,6 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE UnicodeSyntax     #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Pelletier
     ( longScale
@@ -15,15 +13,14 @@ module Text.Numeral.Pelletier
 -------------------------------------------------------------------------------
 
 -- base
-import Control.Monad         ( (>>), fmap )
+import Control.Monad         ( fmap )
 import Data.Bool             ( otherwise )
-import Data.Eq               ( (==) )
 import Data.Function         ( ($), const, flip )
 import Data.List             ( map )
 import Data.Maybe            ( Maybe )
 import Data.String
 import Data.Tuple            ( snd )
-import Prelude               ( (^), Integer, fromInteger, error )
+import Prelude               ( (^), Integer, error )
 
 -- base-unicode-symbols
 import Data.Function.Unicode ( (∘) )
@@ -100,10 +97,10 @@ bigNumTable =
     , mul  1000  $ const "mill"
     , mul  10000 $ const "myr"
     ]
-    where forms d a1 a2 m1 m2 ctx = case ctx of
+    where forms t a1 a2 m1 m2 ctx = case ctx of
                                       RA 10  _ → a1
                                       RA _   _ → a2
                                       LM 100 _ → m2
                                       LM _   _ → m1
-                                      _        → d
+                                      _        → t
 

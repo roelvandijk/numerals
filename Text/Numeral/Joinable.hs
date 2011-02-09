@@ -1,34 +1,40 @@
-{-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE NoImplicitPrelude    #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE UnicodeSyntax        #-}
+{-# LANGUAGE OverloadedStrings
+           , NoImplicitPrelude
+           , TypeSynonymInstances
+           , UnicodeSyntax
+  #-}
 
 module Text.Numeral.Joinable where
 
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Imports
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
--- base
+-- from base:
 import Data.Char   ( String )
 import Data.String ( IsString, fromString )
 import Text.Show   ( ShowS, showString )
--- base-unicode-symbols
+
+-- from base-unicode-symbols:
 import Data.Monoid.Unicode ( (⊕) )
--- bytestring
+
+-- from bytestring:
 import qualified Data.ByteString.Char8 as B
--- dstring
+
+-- from dstring:
 import qualified Data.DString as DS
--- pretty
+
+-- from pretty:
 import qualified Text.PrettyPrint as PP
--- text
+
+-- from text:
 import qualified Data.Text as T
 
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Joinable class
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- | Class of string-like types which can be joined.
 class Joinable s where

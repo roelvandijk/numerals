@@ -1,6 +1,8 @@
-{-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE RecordWildCards      #-}
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE OverloadedStrings
+           , RecordWildCards
+           , TypeSynonymInstances
+           , UnicodeSyntax
+  #-}
 
 module Text.Numeral.Debug where
 
@@ -17,10 +19,13 @@ import qualified Text.PrettyPrint      as PP
 
 import Text.Numeral.Language
 
+import Data.Function.Unicode ( (∘) )
+import Data.Eq.Unicode       ( (≡) )
+
 -------------------------------------------------------------------------------
 
 class Stringable s where
-    toString :: s -> String
+    toString ∷ s → String
 
 instance Stringable String where
     toString = id
@@ -42,32 +47,32 @@ instance Stringable PP.Doc where
 
 -------------------------------------------------------------------------------
 
-type Test s = NumConfig s -> Gender -> [Integer] -> IO ()
+type Test s = NumConfig s → Gender → [Integer] → IO ()
 
-test :: Stringable s => Test s
-test nc g = mapM_ (putStrLn . pretty)
-    where pretty n = show n ++ " == " ++ (maybe "-" id $ fmap toString $ cardinal nc g n)
+test ∷ Stringable s ⇒ Test s
+test nc g = mapM_ (putStrLn ∘ pretty)
+    where pretty n = show n ++ " ≡ " ++ (maybe "-" id $ fmap toString $ cardinal nc g n)
 
-testS :: Test String
+testS ∷ Test String
 testS = test
 
-testBS :: Test B.ByteString
+testBS ∷ Test B.ByteString
 testBS = test
 
-testT :: Test T.Text
+testT ∷ Test T.Text
 testT = test
 
-testSS :: Test ShowS
+testSS ∷ Test ShowS
 testSS = test
 
-testDS :: Test DS.DString
+testDS ∷ Test DS.DString
 testDS = test
 
-testDoc :: Test PP.Doc
+testDoc ∷ Test PP.Doc
 testDoc = test
 
-testDocWithStyle :: PP.Style -> NumConfig PP.Doc -> Gender -> [Integer] -> IO ()
-testDocWithStyle s nc g = mapM_ (putStrLn . pretty)
+testDocWithStyle ∷ PP.Style → NumConfig PP.Doc → Gender → [Integer] → IO ()
+testDocWithStyle s nc g = mapM_ (putStrLn ∘ pretty)
     where pretty n = show n ++ " == " ++ (maybe "-" id $ fmap (PP.renderStyle s) $ cardinal nc g n)
 
 -------------------------------------------------------------------------------
@@ -77,8 +82,8 @@ testDocWithStyle s nc g = mapM_ (putStrLn . pretty)
 -- as a testing aid.  @nummify@ is also usefull as a debugging aid
 -- when you use a suitable numeric type such as 'NS' which renders a
 -- numeric expression to a string representing the same expression.
-nummify :: Num n => NumConfig s -> NumConfig n
-nummify (NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym . ncCardinal
+nummify ∷ Num n ⇒ NumConfig s → NumConfig n
+nummify (NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym ∘ ncCardinal
                                      , ncNeg      = negate
                                      , ncOne      = snd
                                      , ncAdd      = withSnd (+)
@@ -86,17 +91,17 @@ nummify (NumConfig {..}) = NumConfig { ncCardinal = fmap transformSym . ncCardin
                                      }
     where
       -- Create a new symbol who's representation is its value.
-      transformSym :: (Num n) => NumSymbol s -> NumSymbol n
-      transformSym sym = sym { symRepr = const2 . fromInteger . symVal $ sym}
+      transformSym ∷ (Num n) ⇒ NumSymbol s → NumSymbol n
+      transformSym sym = sym { symRepr = const2 ∘ fromInteger ∘ symVal $ sym}
 
 -- | 'prop_cardinal_nummify' specifies the correctness of 'cardinal'.
-prop_cardinal_nummify :: NumConfig String -> Gender -> Integer -> Bool
-prop_cardinal_nummify nc g n = maybe True (== n) $ cardinal (nummify nc) g n
+prop_cardinal_nummify ∷ NumConfig String → Gender → Integer → Bool
+prop_cardinal_nummify nc g n = maybe True (≡ n) $ cardinal (nummify nc) g n
 
 -------------------------------------------------------------------------------
 
 -- | 'NS' is used
-newtype NS s = NS {unNS :: Precedence -> s}
+newtype NS s = NS {unNS ∷ Precedence → s}
 
 type Precedence = Int
 
@@ -108,8 +113,8 @@ instance Show (NS s) where
 instance Eq (NS s) where
     _ == _ = False
 
-instance (IsString s, Joinable s) => Num (NS s) where
-    fromInteger = NS . const . fromString . show
+instance (IsString s, Joinable s) ⇒ Num (NS s) where
+    fromInteger = NS ∘ const ∘ fromString ∘ show
 
     (+) = bin "+" 6
     (-) = bin "-" 6
@@ -119,50 +124,50 @@ instance (IsString s, Joinable s) => Num (NS s) where
     abs    = un "abs"
     signum = un "signum"
 
-un :: (IsString s, Joinable s) => s -> (NS s -> NS s)
-un sFun x = NS $ \p -> paren (p > precApp)
+un ∷ (IsString s, Joinable s) ⇒ s → (NS s → NS s)
+un sFun x = NS $ \p → paren (p > precApp)
                              (sFun <+> unNS x (precApp+1))
     where
       precApp  = 10
 
-bin :: (IsString s, Joinable s) => s -> Precedence -> (NS s -> NS s -> NS s)
-bin sOp d x y = NS $ \p -> paren (p > d) $
+bin ∷ (IsString s, Joinable s) ⇒ s → Precedence → (NS s → NS s → NS s)
+bin sOp d x y = NS $ \p → paren (p > d) $
                 let p' = d + 1
                 in unNS x p' <+> sOp <+> unNS y p'
 
-paren :: (IsString s, Joinable s) => Bool -> s -> s
+paren ∷ (IsString s, Joinable s) ⇒ Bool → s → s
 paren True  s = "(" <> s <> ")"
 paren False s = s
 
-instance Stringable s => Stringable (NS s) where
+instance Stringable s ⇒ Stringable (NS s) where
     toString (NS f) = toString $ f 0
 
-testNSS :: Test (NS String)
+testNSS ∷ Test (NS String)
 testNSS = test
 
-testNumS :: Test String
-testNumS = testNSS . nummify
+testNumS ∷ Test String
+testNumS = testNSS ∘ nummify
 
 -------------------------------------------------------------------------------
 
-newtype Lst s = Lst {unLst :: [s]}
+newtype Lst s = Lst {unLst ∷ [s]}
 
-instance Joinable s => Joinable (Lst s) where
+instance Joinable s ⇒ Joinable (Lst s) where
     x <>  y = Lst $ appendUnionWith (<>) (unLst x) (unLst y)
     x <+> y = Lst $ unLst x ++ unLst y
 
--- | appendUnionWith f [a, b, c] [d, e, f] => [a, b, c `f` d, e, f]
-appendUnionWith :: (a -> a -> a) -> [a] -> [a] -> [a]
+-- | appendUnionWith f [a, b, c] [d, e, f] ⇒ [a, b, c `f` d, e, f]
+appendUnionWith ∷ (a → a → a) → [a] → [a] → [a]
 appendUnionWith _ []     ys     = ys
 appendUnionWith _ xs     []     = xs
 appendUnionWith f [x]    (y:ys) = x `f` y : ys
 appendUnionWith f (x:xs) ys     = x : appendUnionWith f xs ys
 
-instance IsString s => IsString (Lst s) where
+instance IsString s ⇒ IsString (Lst s) where
     fromString s = Lst [fromString s]
 
-instance Stringable s => Stringable (Lst s) where
-    toString = show . map toString . unLst
+instance Stringable s ⇒ Stringable (Lst s) where
+    toString = show ∘ map toString ∘ unLst
 
-testLst :: Test (Lst String)
+testLst ∷ Test (Lst String)
 testLst = test

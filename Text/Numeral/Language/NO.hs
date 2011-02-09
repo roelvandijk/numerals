@@ -1,19 +1,35 @@
--- -*- coding: utf-8 -*-
-
-{-# LANGUAGE CPP, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Language.NO (no) where
 
-import Data.String
+-------------------------------------------------------------------------------
+-- Imports
+-------------------------------------------------------------------------------
+
+-- from base:
+import Data.Bool     ( otherwise )
+import Data.Function ( const, ($) )
+import Data.Ord      ( (<) )
+import Data.String   ( IsString )
+import Prelude       ( Integer, error )
+
+-- from base-unicode-symbols:
+import Data.Ord.Unicode ( (≥) )
+
+-- from numerals:
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
 
+-------------------------------------------------------------------------------
+-- NO
+-------------------------------------------------------------------------------
+
 -- Sources:
 --   http://en.wikibooks.org/wiki/Norwegian_Numbers
 
-no :: (IsString s, Joinable s) => NumConfig s
+no ∷ (IsString s, Joinable s) ⇒ NumConfig s
 no = NumConfig { ncNeg      = error "noNeg: undefined"
                , ncOne      = noOne
                , ncAdd      = noAdd
@@ -21,17 +37,17 @@ no = NumConfig { ncNeg      = error "noNeg: undefined"
                , ncCardinal = findSym noTable
                }
 
-noOne :: (IsString s, Joinable s) => (Integer, s) -> s
-noOne (v, vs) | v >= (d 6) = "én" <+> vs
-              | otherwise  = vs
+noOne ∷ (IsString s, Joinable s) ⇒ (Integer, s) → s
+noOne (v, vs) | v ≥ (d 6) = "én" <+> vs
+              | otherwise = vs
 
 -- TODO: What are the rules for conjunction in Norse? When do you put
 -- "og" between numbers?
-noAdd :: (IsString s, Joinable s) => (Integer, s) -> (Integer, s) -> s
+noAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
 noAdd (x, x') (_, y') | x < 20    = y' <> x'
                       | otherwise = x' <> y'
 
-noTable :: (IsString s, Joinable s) => [NumSymbol s]
+noTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
 noTable = [ term 0        $ const "null"
           , term 1        $ const "én"
           , term 2        $ const "to"
@@ -42,9 +58,9 @@ noTable = [ term 0        $ const "null"
           , term 7        $ tenForms "sju"  "syt" "syt"
           , term 8        $ tenForms "åtte" "at"  "åt"
           , term 9        $ tenForms "ni"   "nit" "nit"
-          , mul  10       $ \ctx -> case ctx of
-                                       LA {} -> "ten"
-                                       _     -> "ti"
+          , mul  10       $ \ctx → case ctx of
+                                     LA {} → "ten"
+                                     _     → "ti"
           , term 11       $ const "elleve"
           , term 12       $ const "tolv"
           , add  20    10 $ const "tjue"

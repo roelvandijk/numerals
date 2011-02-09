@@ -1,8 +1,4 @@
--- -*- coding: utf-8 -*-
-
-{-# LANGUAGE CPP               #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE UnicodeSyntax     #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Language.NL (nl) where
 
@@ -10,25 +6,31 @@ module Text.Numeral.Language.NL (nl) where
 -- Imports
 -------------------------------------------------------------------------------
 
--- base
-import Data.String
+-- from base:
+import Data.Bool     ( otherwise )
+import Data.Function ( const, ($) )
+import Data.Ord      ( (<) )
+import Data.String   ( IsString )
+import Data.Tuple    ( snd )
+import Prelude       ( Integer )
 
--- base-unicode-symbols
+-- from base-unicode-symbols:
 import Data.Monoid.Unicode ( (⊕) )
 import Data.Bool.Unicode   ( (∨) )
 import Data.Eq.Unicode     ( (≡) )
 import Data.Ord.Unicode    ( (≤) )
 
--- numerals
+-- from numerals:
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Pelletier ( longScale )
 
 
 -------------------------------------------------------------------------------
+-- NL
 -------------------------------------------------------------------------------
 
-nl ∷ (IsString s, Joinable s) => NumConfig s
+nl ∷ (IsString s, Joinable s) ⇒ NumConfig s
 nl = NumConfig { ncNeg      = ("min" <+>)
                , ncOne      = snd
                , ncAdd      = nlAdd

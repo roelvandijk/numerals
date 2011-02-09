@@ -1,31 +1,30 @@
 name:          numerals
-version:       0.2
+version:       0.3
 cabal-version: >= 1.6
 build-type:    Simple
 stability:     experimental
 author:        Roel van Dijk <vandijk.roel@gmail.com>, Bas van Dijk <v.dijk.bas@gmail.com>
 maintainer:    Roel van Dijk <vandijk.roel@gmail.com>, Bas van Dijk <v.dijk.bas@gmail.com>
-copyright:     (c) 2009 Roel van Dijk, Bas van Dijk
+copyright:     © 2009—2011 Roel van Dijk, Bas van Dijk
 license:       BSD3
 license-file:  LICENSE
 category:      Natural Language Processing, Numerical, Text
-synopsis:      Utilities for working with numerals
+synopsis:      Convert numbers to their written forms
 description:
 
 extra-source-files: ./TODO
-                  , ./README
                   , ./LICENSE
                   , ./Text/Numeral/Debug.hs
 
 library
   GHC-Options: -Wall
 
-  build-depends: base                 >= 3.0.3.1 && < 4.3
-               , base-unicode-symbols >= 0.1.1   && < 0.2
-               , mtl                  == 1.1.*
-               , dstring              == 0.3.*
+  build-depends: base                 >= 3.0.3.1 && < 4.4
+               , base-unicode-symbols >= 0.1.1   && < 0.3
+               , mtl                  >= 2.0     && < 2.1
+               , dstring              >= 0.3     && < 0.5
                , pretty               >= 1       && < 1.0.2
-               , text                 == 0.7.*
+               , text                 >= 0.7     && < 0.12
                , bytestring           >= 0.9.1.5 && < 0.10
 
   exposed-modules: Text.Numeral
@@ -43,7 +42,5 @@ library
                      , Text.Numeral.Language.JA
                      , Text.Numeral.Language.EO
                    , Text.Numeral.Pelletier
-                   , Text.Numeral.Positional
                    , Text.Numeral.Joinable
                    , Text.Numeral.Misc
-                   -- , Text.Numeral.Debug

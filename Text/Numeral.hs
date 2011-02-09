@@ -1,7 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE UnicodeSyntax     #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , RecordWildCards
+           , UnicodeSyntax
+  #-}
 
 module Text.Numeral
     ( -- *Types
@@ -31,14 +32,12 @@ module Text.Numeral
 -------------------------------------------------------------------------------
 
 -- base
-import Control.Monad    ( (>>=), (>>), return, fail, fmap )
+import Control.Monad    ( return, fmap )
 import Data.Bool        ( otherwise )
-import Data.Eq          ( (==) )
 import Data.Function    ( ($), const )
 import Data.Maybe       ( Maybe(Nothing, Just) )
 import Data.Ord         ( (>), (<) )
-import Data.String      ( fromString )
-import Prelude          ( Integer, (+), fromInteger, abs, divMod )
+import Prelude          ( Integer, (+), abs, divMod )
 import Text.Show        ( Show )
 
 -- base-unicode-symbols

@@ -1,15 +1,30 @@
--- -*- coding: utf-8 -*-
-
-{-# LANGUAGE CPP, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Language.SV (sv) where
 
-import Data.String
+-------------------------------------------------------------------------------
+-- Imports
+-------------------------------------------------------------------------------
+
+-- from base:
+import Data.Bool     ( otherwise )
+import Data.Function ( const, ($) )
+import Data.Ord      ( (<) )
+import Data.String   ( IsString )
+import Prelude       ( Integer )
+
+-- from base-unicode-symbols:
+import Data.Ord.Unicode ( (≥) )
+
+-- from numerals:
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
 
+-------------------------------------------------------------------------------
+-- SV
+-------------------------------------------------------------------------------
 
 -- Sources:
 --   http://www.lysator.liu.se/language/Languages/Swedish/Grammar.html
@@ -19,7 +34,7 @@ import Text.Numeral.Misc (d, withSnd)
 --   http://www.cs.chalmers.se/~aarne/GF/
 --   http://www.cs.chalmers.se/~aarne/GF/lib/resource/norwegian/NumeralNor.gf
 
-sv :: (IsString s, Joinable s) => NumConfig s
+sv ∷ (IsString s, Joinable s) ⇒ NumConfig s
 sv = NumConfig { ncNeg      = ("minus" <+>)
                , ncOne      = svOne
                , ncAdd      = svAdd
@@ -27,15 +42,15 @@ sv = NumConfig { ncNeg      = ("minus" <+>)
                , ncCardinal = findSym svTable
                }
 
-svOne :: (IsString s, Joinable s) => (Integer, s) -> s
-svOne (v, vs) | v >= 100   = "ett" <> vs
+svOne ∷ (IsString s, Joinable s) ⇒ (Integer, s) → s
+svOne (v, vs) | v ≥ 100   = "ett" <> vs
               | otherwise  = vs
 
-svAdd :: (IsString s, Joinable s) => (Integer, s) -> (Integer, s) -> s
+svAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
 svAdd (x, x') (_, y') | x < 20    = y' <> x'
                       | otherwise = x' <> y'
 
-svTable :: (IsString s, Joinable s) => [NumSymbol s]
+svTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
 svTable = [ term 0        $ const "noll"
           , term 1        $ const "ett"
           , term 2        $ const "två"
@@ -46,9 +61,9 @@ svTable = [ term 0        $ const "noll"
           , term 7        $ tenForms "sju"  "sjut" "sjut"
           , term 8        $ tenForms "åtta" "ar"   "åt"
           , term 9        $ tenForms "nio"  "nit"  "nit"
-          , mul  10       $ \ctx -> case ctx of
-                                       LA {} -> "ton"
-                                       _     -> "tio"
+          , mul  10       $ \ctx → case ctx of
+                                     LA {} → "ton"
+                                     _     → "tio"
           , term 11       $ const "elva"
           , term 12       $ const "tolv"
           , add  20    10 $ const "tjugo"

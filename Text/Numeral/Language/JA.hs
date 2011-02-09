@@ -1,16 +1,34 @@
--- -*- coding: utf-8 -*-
-
-{-# LANGUAGE CPP, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Language.JA (ja) where
 
-import Data.String
+
+--------------------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------------------
+
+-- from base:
+import Data.Bool     ( otherwise )
+import Data.Function ( const, ($) )
+import Data.Ord      ( (<) )
+import Data.String   ( IsString )
+import Prelude       ( Integer )
+
+-- from base-unicode-symbols:
+import Data.Ord.Unicode  ( (≥) )
+import Data.Bool.Unicode ( (∧), (∨) )
+
+-- from numerals:
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
 
-ja :: (IsString s, Joinable s) => NumConfig s
+--------------------------------------------------------------------------------
+-- JA
+--------------------------------------------------------------------------------
+
+ja ∷ (IsString s, Joinable s) ⇒ NumConfig s
 ja = NumConfig { ncNeg      = ("mainasu" <+>)
                , ncOne      = jaOne
                , ncAdd      = withSnd (<+>)
@@ -18,11 +36,11 @@ ja = NumConfig { ncNeg      = ("mainasu" <+>)
                , ncCardinal = findSym jaTable
                }
 
-jaOne :: (IsString s, Joinable s) => (Integer, s) -> s
-jaOne (v, vs) | v < 100 || (300 >= v && v < 400) = vs
+jaOne ∷ (IsString s, Joinable s) ⇒ (Integer, s) → s
+jaOne (v, vs) | v < 100 ∨ (300 ≥ v ∧ v < 400) = vs
               | otherwise = "ichi" <-> vs
 
-jaTable :: (IsString s, Joinable s) => [NumSymbol s]
+jaTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
 jaTable = [ term 0         $ const "rei"
           , term 1         $ const "ichi"
           , term 2         $ const "ni"

@@ -1,16 +1,29 @@
--- -*- coding: utf-8 -*-
-
-{-# LANGUAGE CPP, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Language.EO (eo) where
 
-import Data.String
+
+--------------------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------------------
+
+-- from base:
+import Data.Function ( const, ($) )
+import Data.String   ( IsString )
+import Data.Tuple    ( snd )
+import Prelude       ( error )
+
+-- from numerals:
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
 
-eo :: (IsString s, Joinable s) => NumConfig s
+--------------------------------------------------------------------------------
+-- EO
+--------------------------------------------------------------------------------
+
+eo ∷ (IsString s, Joinable s) ⇒ NumConfig s
 eo = NumConfig { ncNeg      = error "eoNeg: undefined"
                , ncOne      = snd
                , ncAdd      = withSnd (<+>)
@@ -18,7 +31,7 @@ eo = NumConfig { ncNeg      = error "eoNeg: undefined"
                , ncCardinal = findSym eoTable
                }
 
-eoTable :: (IsString s, Joinable s) => [NumSymbol s]
+eoTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
 eoTable = [ term 0    $ const "nulo"
           , term 1    $ const "unu"
           , term 2    $ const "du"

@@ -1,28 +1,31 @@
--- -*- coding: utf-8 -*-
-
-{-# LANGUAGE CPP               #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE UnicodeSyntax     #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Language.DE (de) where
+
 
 -------------------------------------------------------------------------------
 -- Imports
 -------------------------------------------------------------------------------
 
--- base
-import Data.String
+-- from base:
+import Data.Bool     ( otherwise )
+import Data.Function ( const, ($) )
+import Data.Ord      ( (<) )
+import Data.String   ( IsString )
+import Prelude       ( Integer )
 
--- base-unicode-symbols
+-- from base-unicode-symbols:
 import Data.Eq.Unicode  ( (≡) )
 import Data.Ord.Unicode ( (≥) )
 
--- numerals
+-- from numerals:
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc ( d, withSnd )
 
+
 -------------------------------------------------------------------------------
+-- DE
 -------------------------------------------------------------------------------
 
 de ∷ (IsString s, Joinable s) ⇒ NumConfig s

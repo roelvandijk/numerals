@@ -1,17 +1,23 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE UnicodeSyntax     #-}
+{-# LANGUAGE NoImplicitPrelude, UnicodeSyntax #-}
 
 module Text.Numeral.Misc where
+
+--------------------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------------------
 
 -- base
 import Data.Function         ( const )
 import Data.Maybe            ( Maybe(Nothing, Just) )
-import Prelude               ( (^), Integer, fromInteger )
+import Prelude               ( (^), Integer )
 
 -- base-unicode-symbols
 import Data.Function.Unicode ( (∘) )
 
--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Misc
+--------------------------------------------------------------------------------
 
 withSnd ∷ (a → b → c) → (d, a) → (e, b) → c
 withSnd f (_, x) (_, y) = f x y

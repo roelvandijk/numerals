@@ -1,20 +1,41 @@
--- -*- coding: utf-8 -*-
-
-{-# LANGUAGE CPP, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Language.IT (it) where
 
-import Data.String
+
+--------------------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------------------
+
+-- from base:
+import Data.Bool     ( otherwise )
+import Data.Function ( const, ($) )
+import Data.List     ( (++) )
+import Data.Ord      ( (<) )
+import Data.String   ( IsString )
+import Data.Tuple    ( snd )
+import Prelude       ( Integer, error )
+
+-- from base-unicode-symbols:
+import Data.Eq.Unicode   ( (≡) )
+import Data.Bool.Unicode ( (∧) )
+
+-- from numerals:
 import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d)
 import Text.Numeral.Pelletier (longScalePlural)
 
 
+--------------------------------------------------------------------------------
+-- IT
+--------------------------------------------------------------------------------
+
 -- Sources:
 --   http://italian.about.com/library/weekly/aa042600a.htm
 
-it :: (IsString s, Joinable s) => NumConfig s
+
+it ∷ (IsString s, Joinable s) ⇒ NumConfig s
 it = NumConfig { ncNeg      = error "itNeg: undefined"
                , ncOne      = snd
                , ncAdd      = itAdd
@@ -22,16 +43,16 @@ it = NumConfig { ncNeg      = error "itNeg: undefined"
                , ncCardinal = findSym itTable
                }
 
-itAdd :: (IsString s, Joinable s) => (Integer, s) -> (Integer, s) -> s
-itAdd (x, x') (y, y') | x == 10 && y < 7 = y' <> x'
-                      | y == 3    = x' <> "tré"
+itAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+itAdd (x, x') (y, y') | x ≡ 10 ∧ y < 7 = y' <> x'
+                      | y ≡ 3    = x' <> "tré"
                       | otherwise = x' <> y'
 
-itMul :: (IsString s, Joinable s) => (Integer, s) -> (Integer, s) -> s
+itMul ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
 itMul (_, x') (y, y') | y < d 6   = x' <> y'
                       | otherwise = x' <+> y'
 
-itTable :: (IsString s, Joinable s) => [NumSymbol s]
+itTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
 itTable = [ term  0       $ const "zero"
           , termG 1       $ tenFormsG (gender "uno" "una") (const "un") (const "uno")
           , term  2       $ tenForms "due"     "do"      "due"
@@ -42,11 +63,11 @@ itTable = [ term  0       $ const "zero"
           , term  7       $ tenForms "sette"   "assette" "sett"
           , term  8       $ tenForms "otto"    "otto"    "ott"
           , term  9       $ tenForms "nove"    "annove"  "nove"
-          , mul   10      $ \ctx -> case ctx of
-                                       LA _ _ -> "dici"
-                                       RM 3 _ -> "ta"
-                                       RM _ _ -> "anta"
-                                       _      -> "dieci"
+          , mul   10      $ \ctx → case ctx of
+                                       LA _ _ → "dici"
+                                       RM 3 _ → "ta"
+                                       RM _ _ → "anta"
+                                       _      → "dieci"
           , add   20   10 $ const "venti"
           , term  21      $ const "ventuno"
           , term  28      $ const "ventotto"

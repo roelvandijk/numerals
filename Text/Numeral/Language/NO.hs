@@ -9,6 +9,7 @@ module Text.Numeral.Language.NO (no) where
 -- from base:
 import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Prelude       ( Integer, error )
@@ -18,8 +19,10 @@ import Data.Ord.Unicode ( (≥) )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
 
 
 -------------------------------------------------------------------------------
@@ -29,7 +32,7 @@ import Text.Numeral.Misc (d, withSnd)
 -- Sources:
 --   http://en.wikibooks.org/wiki/Norwegian_Numbers
 
-no ∷ (IsString s, Joinable s) ⇒ NumConfig s
+no ∷ (Monoid s, IsString s) ⇒ NumConfig s
 no = NumConfig { ncNeg      = error "noNeg: undefined"
                , ncOne      = noOne
                , ncAdd      = noAdd
@@ -37,17 +40,17 @@ no = NumConfig { ncNeg      = error "noNeg: undefined"
                , ncCardinal = findSym noTable
                }
 
-noOne ∷ (IsString s, Joinable s) ⇒ (Integer, s) → s
+noOne ∷ (Monoid s, IsString s) ⇒ (Integer, s) → s
 noOne (v, vs) | v ≥ (d 6) = "én" <+> vs
               | otherwise = vs
 
 -- TODO: What are the rules for conjunction in Norse? When do you put
 -- "og" between numbers?
-noAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+noAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 noAdd (x, x') (_, y') | x < 20    = y' <> x'
                       | otherwise = x' <> y'
 
-noTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
+noTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
 noTable = [ term 0        $ const "null"
           , term 1        $ const "én"
           , term 2        $ const "to"

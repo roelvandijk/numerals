@@ -10,6 +10,7 @@ module Text.Numeral.Language.PT (pt) where
 import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
 import Data.List     ( (++) )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Prelude       ( Integer, error )
@@ -20,8 +21,10 @@ import Data.Ord.Unicode ( (≤) )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Joinable
 import Text.Numeral.Pelletier (shortScalePlural)
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
 
 
 -------------------------------------------------------------------------------
@@ -32,7 +35,7 @@ import Text.Numeral.Pelletier (shortScalePlural)
 --   http://www.sonia-portuguese.com/text/numerals.htm
 --   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
 
-pt ∷ (IsString s, Joinable s) ⇒ NumConfig s
+pt ∷ (Monoid s, IsString s) ⇒ NumConfig s
 pt = NumConfig { ncNeg      = error "ptNeg: undefined"
                , ncOne      = ptOne
                , ncAdd      = ptAdd
@@ -40,20 +43,20 @@ pt = NumConfig { ncNeg      = error "ptNeg: undefined"
                , ncCardinal = findSym ptTable
                }
 
-ptOne ∷ (IsString s, Joinable s) ⇒ (Integer, s) → s
+ptOne ∷ (Monoid s, IsString s) ⇒ (Integer, s) → s
 ptOne (x, x') | x ≤ 1000  = x'
               | otherwise = "um" <+> x'
 
 -- TODO: When to use "e" is still unclear.
-ptAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+ptAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 ptAdd (x, x') (_, y') | x ≡ 10    = y' <> x'
                       | otherwise = x' <+> "e" <+> y'
 
-ptMul ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+ptMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 ptMul (_, x') (y, y') | y < 1000  = x' <> y'
                       | otherwise = x' <+> y'
 
-ptTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
+ptTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
 ptTable = [ term 0         $ const "zero"
           , term 1         $ tenForms "um"     "on"    "um"
           , term 2         $ tenForms "dois"   "do"    "dois"

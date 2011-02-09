@@ -13,14 +13,15 @@ module Text.Numeral.Pelletier
 -------------------------------------------------------------------------------
 
 -- base
-import Control.Monad         ( fmap )
-import Data.Bool             ( otherwise )
-import Data.Function         ( ($), const, flip )
-import Data.List             ( map )
-import Data.Maybe            ( Maybe )
+import Control.Monad ( fmap )
+import Data.Bool     ( otherwise )
+import Data.Function ( ($), const, flip )
+import Data.List     ( map )
+import Data.Maybe    ( Maybe )
+import Data.Monoid   ( Monoid )
 import Data.String
-import Data.Tuple            ( snd )
-import Prelude               ( (^), Integer, error )
+import Data.Tuple    ( snd )
+import Prelude       ( (^), Integer, error )
 
 -- base-unicode-symbols
 import Data.Function.Unicode ( (∘) )
@@ -29,37 +30,39 @@ import Prelude.Unicode       ( (⋅) )
 
 -- numerals
 import Text.Numeral
-import Text.Numeral.Joinable
-import Text.Numeral.Misc     ( d, untilNothing, weave, withSnd )
+import Text.Numeral.Misc ( d, untilNothing, weave, withSnd )
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>) )
 
 
 -------------------------------------------------------------------------------
 -- Short and long scale
 -------------------------------------------------------------------------------
 
-longScale ∷ (IsString s, Joinable s) ⇒ s → s → [NumSymbol s]
+longScale ∷ (Monoid s, IsString s) ⇒ s → s → [NumSymbol s]
 longScale a b = longScalePlural a a b b
 
-longScalePlural ∷ (IsString s, Joinable s) ⇒ s → s → s → s → [NumSymbol s]
-longScalePlural a as b bs = untilNothing $ weave (map illion  [1..]) 
+longScalePlural ∷ (Monoid s, IsString s) ⇒ s → s → s → s → [NumSymbol s]
+longScalePlural a as b bs = untilNothing $ weave (map illion  [1..])
                                                  (map illiard [1..])
     where illion  n = genScale (d 6 ^ n)       a as n
           illiard n = genScale (d 6 ^ n ⋅ d 3) b bs n
 
-          genScale p x y n = fmap (\s → mul p $ mulForms (s <> x) (s <> y)) 
+          genScale p x y n = fmap (\s → mul p $ mulForms (s <> x) (s <> y))
                                   $ bigCardinal n
 
-shortScale ∷ (IsString s, Joinable s) ⇒ s → [NumSymbol s]
+shortScale ∷ (Monoid s, IsString s) ⇒ s → [NumSymbol s]
 shortScale a = shortScalePlural a a
 
-shortScalePlural ∷ (IsString s, Joinable s) ⇒ s → s → [NumSymbol s]
+shortScalePlural ∷ (Monoid s, IsString s) ⇒ s → s → [NumSymbol s]
 shortScalePlural a as = untilNothing $ map illion [1..]
-    where illion n = fmap ( \s → mul (d 3 ⋅ (d 3 ^ n)) 
+    where illion n = fmap ( \s → mul (d 3 ⋅ (d 3 ^ n))
                                  $ mulForms (s <> a) (s <> as)
-                          ) 
+                          )
                           $ bigCardinal n
 
-bigCardinal ∷ (IsString s, Joinable s) ⇒ Integer → Maybe s
+bigCardinal ∷ (Monoid s, IsString s) ⇒ Integer → Maybe s
 bigCardinal = cardinal bigNum Masculine
 
 
@@ -67,7 +70,7 @@ bigCardinal = cardinal bigNum Masculine
 -- Big Num 'language'
 -------------------------------------------------------------------------------
 
-bigNum ∷ (IsString s, Joinable s) ⇒ NumConfig s
+bigNum ∷ (Monoid s, IsString s) ⇒ NumConfig s
 bigNum = NumConfig { ncNeg      = error "bigNumNeg: undefined"
                    , ncOne      = snd
                    , ncAdd      = withSnd ∘ flip $ (<>)
@@ -75,8 +78,8 @@ bigNum = NumConfig { ncNeg      = error "bigNumNeg: undefined"
                    , ncCardinal = findSym bigNumTable
                    }
 
-bigNumTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
-bigNumTable = 
+bigNumTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
+bigNumTable =
     [ term 0     $ const "nulla"
     , term 1     $ forms "m"     "un"       "un"       "mi"      "mi"
     , term 2     $ forms "b"     "duo"      "duo"      "vi"      "du"

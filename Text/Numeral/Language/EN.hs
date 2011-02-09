@@ -11,6 +11,7 @@ module Text.Numeral.Language.EN (enShort, enLong) where
 import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
 import Data.List     ( (++) )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Prelude       ( Integer )
@@ -21,15 +22,18 @@ import Data.Ord.Unicode ( (≥) )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Joinable
-import Text.Numeral.Pelletier (shortScale, longScale)
+import Text.Numeral.Misc      ( (<->) )
+import Text.Numeral.Pelletier ( shortScale, longScale )
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
 
 
 --------------------------------------------------------------------------------
 -- EN
 --------------------------------------------------------------------------------
 
-enShort ∷ (IsString s, Joinable s) ⇒ NumConfig s
+enShort ∷ (Monoid s, IsString s) ⇒ NumConfig s
 enShort = NumConfig { ncNeg      = enNeg
                     , ncOne      = enOne
                     , ncAdd      = enAdd
@@ -37,26 +41,26 @@ enShort = NumConfig { ncNeg      = enNeg
                     , ncCardinal = findSym $ enTable ++ shortScale "illion"
                     }
 
-enLong ∷ (IsString s, Joinable s) ⇒ NumConfig s
+enLong ∷ (Monoid s, IsString s) ⇒ NumConfig s
 enLong = enShort { ncCardinal = findSym $ enTable ++ longScale "illion" "illiard"}
 
-enNeg ∷ (IsString s, Joinable s) ⇒ s → s
+enNeg ∷ (Monoid s, IsString s) ⇒ s → s
 enNeg = ("minus" <+>)
 
-enOne ∷ (IsString s, Joinable s) ⇒ (Integer, s) → s
+enOne ∷ (Monoid s, IsString s) ⇒ (Integer, s) → s
 enOne (v,  vs) | v ≥ 100  = "one" <+> vs
                | otherwise = vs
 
-enAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+enAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 enAdd (x, x') (_, y') | x < 20    = y' <> x'
                       | x < 100   = x' <-> y'
                       | otherwise = x' <+> y'
 
-enMul ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+enMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 enMul (_, x') (y, y') | y ≡ 10   = x' <> y'
                       | otherwise = x' <+> y'
 
-enTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
+enTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
 enTable = [ term 0    $ const "zero"
           , term 1    $ const "one"
           , term 2    $ tenForms "two"   "twen" "twen"

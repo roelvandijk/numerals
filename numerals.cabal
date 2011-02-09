@@ -22,10 +22,7 @@ library
   build-depends: base                 >= 3.0.3.1 && < 4.4
                , base-unicode-symbols >= 0.1.1   && < 0.3
                , mtl                  >= 2.0     && < 2.1
-               , dstring              >= 0.3     && < 0.5
-               , pretty               >= 1       && < 1.0.2
-               , text                 >= 0.7     && < 0.12
-               , bytestring           >= 0.9.1.5 && < 0.10
+               , string-combinators   >= 0.6     && < 0.7
 
   exposed-modules: Text.Numeral
                    , Text.Numeral.Language
@@ -42,5 +39,4 @@ library
                      , Text.Numeral.Language.JA
                      , Text.Numeral.Language.EO
                    , Text.Numeral.Pelletier
-                   , Text.Numeral.Joinable
                    , Text.Numeral.Misc

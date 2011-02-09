@@ -9,6 +9,7 @@ module Text.Numeral.Language.NL (nl) where
 -- from base:
 import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Data.Tuple    ( snd )
@@ -22,15 +23,17 @@ import Data.Ord.Unicode    ( (≤) )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Joinable
 import Text.Numeral.Pelletier ( longScale )
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
 
 
 -------------------------------------------------------------------------------
 -- NL
 -------------------------------------------------------------------------------
 
-nl ∷ (IsString s, Joinable s) ⇒ NumConfig s
+nl ∷ (Monoid s, IsString s) ⇒ NumConfig s
 nl = NumConfig { ncNeg      = ("min" <+>)
                , ncOne      = snd
                , ncAdd      = nlAdd
@@ -38,7 +41,7 @@ nl = NumConfig { ncNeg      = ("min" <+>)
                , ncCardinal = findSym nlTable
                }
 
-nlAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+nlAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 nlAdd (x, x') (y, y') | x < 20    = y' <> x'
                       | x < 100   = y' <> (if y ≡ 2 ∨ y ≡ 3
                                            then "ën"
@@ -46,11 +49,11 @@ nlAdd (x, x') (y, y') | x < 20    = y' <> x'
                                        <> x'
                       | otherwise = x' <+> y'
 
-nlMul ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+nlMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 nlMul (_, x') (y, y') | y ≤ 10    = x' <> y'
                       | otherwise = x' <+> y'
 
-nlTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
+nlTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
 nlTable = [ term 0    $ const "nul"
           , term 1    $ const "één"
           , term 2    $ tenForms "twee" "twin" "twin"

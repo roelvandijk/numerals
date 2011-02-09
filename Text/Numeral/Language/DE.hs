@@ -10,6 +10,7 @@ module Text.Numeral.Language.DE (de) where
 -- from base:
 import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Prelude       ( Integer )
@@ -20,15 +21,17 @@ import Data.Ord.Unicode ( (≥) )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Joinable
 import Text.Numeral.Misc ( d, withSnd )
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
 
 
 -------------------------------------------------------------------------------
 -- DE
 -------------------------------------------------------------------------------
 
-de ∷ (IsString s, Joinable s) ⇒ NumConfig s
+de ∷ (Monoid s, IsString s) ⇒ NumConfig s
 de = NumConfig { ncNeg      = ("minus" <+>)
                , ncOne      = deOne
                , ncAdd      = deAdd
@@ -36,19 +39,19 @@ de = NumConfig { ncNeg      = ("minus" <+>)
                , ncCardinal = findSym deTable
                }
 
-deOne ∷ (IsString s, Joinable s) ⇒ (Integer, s) → s
+deOne ∷ (Monoid s, IsString s) ⇒ (Integer, s) → s
 deOne (v, vs) | v ≥ (d 6) = "eine" <+> vs
               | v ≥ 100   = "ein"  <>  vs
               | otherwise = vs
 
-deAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+deAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 deAdd (x, x') (y, y') | x < 20    = y' <> x'
                       | x < 100   = (if y ≡ 1
                                      then "ein"
                                      else y') <> "und" <> x'
                       | otherwise = x' <> y'
 
-deTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
+deTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
 deTable = [ term 0        $ const "null"
           , term 1        $ const "eins"
           , term 2        $ tenForms "zwei" "zwei" "zwan"

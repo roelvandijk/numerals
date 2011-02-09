@@ -9,6 +9,7 @@ module Text.Numeral.Language.SP (sp) where
 -- import base:
 import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Data.Tuple    ( snd )
@@ -21,8 +22,10 @@ import Data.Ord.Unicode  ( (≤) )
 
 -- import numerals:
 import Text.Numeral
-import Text.Numeral.Joinable
 import Text.Numeral.Misc (d)
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
 
 
 -------------------------------------------------------------------------------
@@ -34,7 +37,7 @@ import Text.Numeral.Misc (d)
 --   http://www.learn-spanish-help.com/count-in-spanish.html
 --   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
 
-sp ∷ (IsString s, Joinable s) ⇒ NumConfig s
+sp ∷ (Monoid s, IsString s) ⇒ NumConfig s
 sp = NumConfig { ncNeg      = error "spNeg: undefined"
                , ncOne      = snd
                , ncAdd      = spAdd
@@ -42,18 +45,18 @@ sp = NumConfig { ncNeg      = error "spNeg: undefined"
                , ncCardinal = findSym spTable
                }
 
-spAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+spAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 spAdd (x, x') (y, y') | x ≡ 10 ∧ y < 6 = y' <> x'
                       | x ≡ 10     = x' <> y'
                       | x < 30     = x' <>  "i" <>  y'
                       | x < 100    = x' <+> "y" <+> y'
                       | otherwise  = x' <+> y'
 
-spMul ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+spMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 spMul (_, x') (y, y') | y < 1000  = x' <> y'
                       | otherwise = x' <+> y'
 
-spTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
+spTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
 spTable = [ term  0         $ const "cero"
           , termG 1         $ tenFormsG (genderN "uno" "un" "una") (const "on") (const "uno")
           , term  2         $ \ctx → case ctx of

@@ -12,6 +12,7 @@ import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
 import Data.Ord      ( (<) )
 import Data.List     ( (++)  )
+import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
 import Data.Tuple    ( snd )
 import Prelude       ( Integer )
@@ -22,8 +23,11 @@ import Data.Bool.Unicode ( (∧) )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Joinable
-import Text.Numeral.Pelletier (longScalePlural)
+import Text.Numeral.Misc      ( (<->) )
+import Text.Numeral.Pelletier ( longScalePlural )
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
 
 
 --------------------------------------------------------------------------------
@@ -33,7 +37,7 @@ import Text.Numeral.Pelletier (longScalePlural)
 -- Sources:
 --  http://www.cliffsnotes.com/WileyCDA/CliffsReviewTopic/Numbers.topicArticleId-25559,articleId-25469.html
 
-fr ∷ (IsString s, Joinable s) ⇒ NumConfig s
+fr ∷ (Monoid s, IsString s) ⇒ NumConfig s
 fr = NumConfig { ncNeg      = ("moins" <+>)
                , ncOne      = snd
                , ncAdd      = frAdd
@@ -41,17 +45,17 @@ fr = NumConfig { ncNeg      = ("moins" <+>)
                , ncCardinal = findSym frTable
                }
 
-frAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+frAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 frAdd (x, x') (y, y') | x ≡ 10 ∧ y < 7 = y' <> x'
                       | x < 80 ∧ y ≡ 1 = x' <+> "et" <+> y'
                       | x < 100        = x' <-> y'
                       | otherwise      = x' <+> y'
 
-frMul ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+frMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 frMul (_, x') (y, y') | y ≡ 10   = x' <> y'
                       | otherwise = x' <+> y'
 
-frTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
+frTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
 frTable = [ term  0        $ const "zéro"
           , termG 1        $ tenFormsG (gender "un" "une") (const "on") (const "un")
           , term  2        $ tenForms "deux"   "deux"   "dou"

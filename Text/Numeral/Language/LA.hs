@@ -10,6 +10,7 @@ module Text.Numeral.Language.LA (la) where
 -- from base:
 import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Data.Tuple    ( snd )
@@ -21,15 +22,17 @@ import Data.List.Unicode ( (∈) )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Joinable
 import Text.Numeral.Misc (d)
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
 
 
 --------------------------------------------------------------------------------
 -- LA
 --------------------------------------------------------------------------------
 
-la ∷ (IsString s, Joinable s) ⇒ NumConfig s
+la ∷ (Monoid s, IsString s) ⇒ NumConfig s
 la = NumConfig { ncNeg      = error "laNeg: undefined"
                , ncOne      = snd
                , ncAdd      = laAdd
@@ -37,15 +40,15 @@ la = NumConfig { ncNeg      = error "laNeg: undefined"
                , ncCardinal = findSym laTable
                }
 
-laAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+laAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 laAdd (x, x') (_, y') | x ≡ 10   = y' <> x'
                       | otherwise = x' <+> y'
 
-laMul ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+laMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 laMul (_, x') (y, y') | y < 1000  = x' <> y'
                       | otherwise = x' <+> y'
 
-laTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
+laTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
 laTable = [ term 0     $ const "nulla"
           , term 1     $ tenForms  "unus"     "un"       "unus"
           , term 2     $ tenForms' "duo"      "duo"      "vi"      "du"

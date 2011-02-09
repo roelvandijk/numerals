@@ -11,6 +11,7 @@ module Text.Numeral.Language.IT (it) where
 import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
 import Data.List     ( (++) )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Data.Tuple    ( snd )
@@ -22,9 +23,11 @@ import Data.Bool.Unicode ( (∧) )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Joinable
-import Text.Numeral.Misc (d)
-import Text.Numeral.Pelletier (longScalePlural)
+import Text.Numeral.Misc      ( d )
+import Text.Numeral.Pelletier ( longScalePlural )
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
 
 
 --------------------------------------------------------------------------------
@@ -35,7 +38,7 @@ import Text.Numeral.Pelletier (longScalePlural)
 --   http://italian.about.com/library/weekly/aa042600a.htm
 
 
-it ∷ (IsString s, Joinable s) ⇒ NumConfig s
+it ∷ (Monoid s, IsString s) ⇒ NumConfig s
 it = NumConfig { ncNeg      = error "itNeg: undefined"
                , ncOne      = snd
                , ncAdd      = itAdd
@@ -43,16 +46,16 @@ it = NumConfig { ncNeg      = error "itNeg: undefined"
                , ncCardinal = findSym itTable
                }
 
-itAdd ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+itAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 itAdd (x, x') (y, y') | x ≡ 10 ∧ y < 7 = y' <> x'
                       | y ≡ 3    = x' <> "tré"
                       | otherwise = x' <> y'
 
-itMul ∷ (IsString s, Joinable s) ⇒ (Integer, s) → (Integer, s) → s
+itMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
 itMul (_, x') (y, y') | y < d 6   = x' <> y'
                       | otherwise = x' <+> y'
 
-itTable ∷ (IsString s, Joinable s) ⇒ [NumSymbol s]
+itTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
 itTable = [ term  0       $ const "zero"
           , termG 1       $ tenFormsG (gender "uno" "una") (const "un") (const "uno")
           , term  2       $ tenForms "due"     "do"      "due"

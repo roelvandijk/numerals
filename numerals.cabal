@@ -17,18 +17,7 @@ extra-source-files: ./TODO
                   , ./LICENSE
                   , ./Text/Numeral/Debug.hs
 
-flag specialise
-  description: Specialise the polymorphic language definitions to some
-               often used types (String, ByteString, DString). Note
-               that this increases compilation time and the size of
-               the object files significantly.
-               Also see README
-  default: False
-
 library
-  if flag(specialise)
-    CPP-Options: -DDO_SPECIALISE
-
   GHC-Options: -Wall
 
   build-depends: base                 >= 3.0.3.1 && < 4.3

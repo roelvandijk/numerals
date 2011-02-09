@@ -24,14 +24,6 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Pelletier ( longScale )
 
-#ifdef DO_SPECIALISE
-import qualified Data.ByteString as B  ( ByteString )
-import qualified Data.DString    as DS ( DString )
-
-{-# SPECIALISE nl ∷ NumConfig String       #-}
-{-# SPECIALISE nl ∷ NumConfig B.ByteString #-}
-{-# SPECIALISE nl ∷ NumConfig DS.DString   #-}
-#endif
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------

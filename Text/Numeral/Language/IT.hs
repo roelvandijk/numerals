@@ -10,14 +10,6 @@ import Text.Numeral.Joinable
 import Text.Numeral.Misc (d)
 import Text.Numeral.Pelletier (longScalePlural)
 
-#ifdef DO_SPECIALISE
-import qualified Data.ByteString as B
-import qualified Data.DString    as DS
-
-{-# SPECIALISE it :: NumConfig String #-}
-{-# SPECIALISE it :: NumConfig B.ByteString #-}
-{-# SPECIALISE it :: NumConfig DS.DString #-}
-#endif
 
 -- Sources:
 --   http://italian.about.com/library/weekly/aa042600a.htm

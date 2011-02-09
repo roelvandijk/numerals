@@ -7,18 +7,6 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Pelletier (shortScale, longScale)
 
-#ifdef DO_SPECIALISE
-import qualified Data.ByteString as B
-import qualified Data.DString    as DS
-
-{-# SPECIALISE enShort :: NumConfig String #-}
-{-# SPECIALISE enShort :: NumConfig B.ByteString #-}
-{-# SPECIALISE enShort :: NumConfig DS.DString #-}
-
-{-# SPECIALISE enLong :: NumConfig String #-}
-{-# SPECIALISE enLong :: NumConfig B.ByteString #-}
-{-# SPECIALISE enLong :: NumConfig DS.DString #-}
-#endif
 
 enShort :: (IsString s, Joinable s) => NumConfig s
 enShort = NumConfig { ncNeg      = enNeg

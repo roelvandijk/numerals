@@ -9,14 +9,6 @@ import Text.Numeral
 import Text.Numeral.Joinable
 import Text.Numeral.Misc (d, withSnd)
 
-#ifdef DO_SPECIALISE
-import qualified Data.ByteString as B
-import qualified Data.DString    as DS
-
-{-# SPECIALISE eo :: NumConfig String #-}
-{-# SPECIALISE eo :: NumConfig B.ByteString #-}
-{-# SPECIALISE eo :: NumConfig DS.DString #-}
-#endif
 
 eo :: (IsString s, Joinable s) => NumConfig s
 eo = NumConfig { ncNeg      = error "eoNeg: undefined"

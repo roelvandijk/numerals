@@ -6,23 +6,36 @@
 
 module Text.Numeral.Debug where
 
-import Data.String
-import Text.Numeral
-import Text.Numeral.Joinable
-import Text.Numeral.Misc (const2, withSnd)
-import Text.Numeral.Language
 
-import qualified Data.DString          as DS
-import qualified Data.ByteString.Char8 as B
-import qualified Data.Text             as T
-import qualified Text.PrettyPrint      as PP
+--------------------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------------------
 
-import Text.Numeral.Language
+-- from base:
+import Data.String ( IsString, fromString )
+import Data.Monoid ( Monoid )
 
+-- from base-unicode-symbols:
 import Data.Function.Unicode ( (∘) )
 import Data.Eq.Unicode       ( (≡) )
 
--------------------------------------------------------------------------------
+-- from numerals:
+import Text.Numeral
+import Text.Numeral.Misc (const2, withSnd)
+import Text.Numeral.Language
+
+-- from string-combinators:
+import Data.String.Combinators ( (<>), (<+>) )
+
+-- from various other packages:
+import qualified Data.ByteString.Char8 as B
+import qualified Data.Text             as T
+
+
+--------------------------------------------------------------------------------
+-- Debug
+--------------------------------------------------------------------------------
+
 
 class Stringable s where
     toString ∷ s → String
@@ -36,22 +49,13 @@ instance Stringable B.ByteString where
 instance Stringable T.Text where
     toString = T.unpack
 
-instance Stringable ShowS where
-    toString s = s []
-
-instance Stringable DS.DString where
-    toString = DS.toString
-
-instance Stringable PP.Doc where
-    toString = PP.render
-
 -------------------------------------------------------------------------------
 
 type Test s = NumConfig s → Gender → [Integer] → IO ()
 
 test ∷ Stringable s ⇒ Test s
 test nc g = mapM_ (putStrLn ∘ pretty)
-    where pretty n = show n ++ " ≡ " ++ (maybe "-" id $ fmap toString $ cardinal nc g n)
+    where pretty n = show n ++ " = " ++ (maybe "-" id $ fmap toString $ cardinal nc g n)
 
 testS ∷ Test String
 testS = test
@@ -62,18 +66,6 @@ testBS = test
 testT ∷ Test T.Text
 testT = test
 
-testSS ∷ Test ShowS
-testSS = test
-
-testDS ∷ Test DS.DString
-testDS = test
-
-testDoc ∷ Test PP.Doc
-testDoc = test
-
-testDocWithStyle ∷ PP.Style → NumConfig PP.Doc → Gender → [Integer] → IO ()
-testDocWithStyle s nc g = mapM_ (putStrLn ∘ pretty)
-    where pretty n = show n ++ " == " ++ (maybe "-" id $ fmap (PP.renderStyle s) $ cardinal nc g n)
 
 -------------------------------------------------------------------------------
 
@@ -113,7 +105,7 @@ instance Show (NS s) where
 instance Eq (NS s) where
     _ == _ = False
 
-instance (IsString s, Joinable s) ⇒ Num (NS s) where
+instance (Monoid s, IsString s) ⇒ Num (NS s) where
     fromInteger = NS ∘ const ∘ fromString ∘ show
 
     (+) = bin "+" 6
@@ -124,18 +116,18 @@ instance (IsString s, Joinable s) ⇒ Num (NS s) where
     abs    = un "abs"
     signum = un "signum"
 
-un ∷ (IsString s, Joinable s) ⇒ s → (NS s → NS s)
+un ∷ (Monoid s, IsString s) ⇒ s → (NS s → NS s)
 un sFun x = NS $ \p → paren (p > precApp)
                              (sFun <+> unNS x (precApp+1))
     where
       precApp  = 10
 
-bin ∷ (IsString s, Joinable s) ⇒ s → Precedence → (NS s → NS s → NS s)
+bin ∷ (Monoid s, IsString s) ⇒ s → Precedence → (NS s → NS s → NS s)
 bin sOp d x y = NS $ \p → paren (p > d) $
                 let p' = d + 1
                 in unNS x p' <+> sOp <+> unNS y p'
 
-paren ∷ (IsString s, Joinable s) ⇒ Bool → s → s
+paren ∷ (Monoid s, IsString s) ⇒ Bool → s → s
 paren True  s = "(" <> s <> ")"
 paren False s = s
 
@@ -150,6 +142,7 @@ testNumS = testNSS ∘ nummify
 
 -------------------------------------------------------------------------------
 
+{-
 newtype Lst s = Lst {unLst ∷ [s]}
 
 instance Joinable s ⇒ Joinable (Lst s) where
@@ -171,3 +164,4 @@ instance Stringable s ⇒ Stringable (Lst s) where
 
 testLst ∷ Test (Lst String)
 testLst = test
+-}

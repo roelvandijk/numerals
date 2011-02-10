@@ -2,13 +2,14 @@
 
 module Text.Numeral.Language.NL (nl) where
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Imports
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- from base:
 import Data.Bool     ( otherwise )
 import Data.Function ( const, ($) )
+import Data.List     ( (++) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
@@ -16,7 +17,6 @@ import Data.Tuple    ( snd )
 import Prelude       ( Integer )
 
 -- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
 import Data.Bool.Unicode   ( (∨) )
 import Data.Eq.Unicode     ( (≡) )
 import Data.Ord.Unicode    ( (≤) )
@@ -29,9 +29,9 @@ import Text.Numeral.Pelletier ( longScale )
 import Data.String.Combinators ( (<>), (<+>) )
 
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- NL
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 nl ∷ (Monoid s, IsString s) ⇒ NumConfig s
 nl = NumConfig { ncNeg      = ("min" <+>)
@@ -62,7 +62,7 @@ nlTable = [ term 0    $ const "nul"
           , term 5    $ const "vijf"
           , term 6    $ const "zes"
           , term 7    $ const "zeven"
-          , term 8    $ tenForms "acht" "tach" "acht"
+          , term 8    $ tenForms "acht" "acht" "tach"
           , term 9    $ const "negen"
           , mul  10   $ \ctx → case ctx of
                                  RM {} → "tig"
@@ -71,4 +71,4 @@ nlTable = [ term 0    $ const "nul"
           , term 12   $ const "twaalf"
           , mul  100  $ const "honderd"
           , mul  1000 $ const "duizend"
-          ] ⊕ (longScale "iljoen" "iljard")
+          ] ++ (longScale "iljoen" "iljard")

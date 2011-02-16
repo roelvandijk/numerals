@@ -1,74 +1,91 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.NL (nl) where
+module Text.Numeral.Language.NL (nl, rules, nl_repr) where
 
 --------------------------------------------------------------------------------
 -- Imports
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( otherwise )
-import Data.Function ( const, ($) )
-import Data.List     ( (++) )
-import Data.Monoid   ( Monoid )
+import Data.Bool     ( Bool(False), otherwise )
+import Data.Function ( const )
+import Data.List     ( map )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Data.Tuple    ( snd )
-import Prelude       ( Integer )
+import Prelude       ( Num, fromInteger )
 
 -- from base-unicode-symbols:
 import Data.Bool.Unicode   ( (∨) )
 import Data.Eq.Unicode     ( (≡) )
-import Data.Ord.Unicode    ( (≤) )
+import Data.Monoid.Unicode ( (⊕) )
+
+-- from containers:
+import qualified Data.IntMap as IM ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Pelletier ( longScale )
-
--- from string-combinators:
-import Data.String.Combinators ( (<>), (<+>) )
+import Text.Numeral.Pelletier ( scale )
 
 
 --------------------------------------------------------------------------------
 -- NL
 --------------------------------------------------------------------------------
 
-nl ∷ (Monoid s, IsString s) ⇒ NumConfig s
-nl = NumConfig { ncNeg      = ("min" <+>)
-               , ncOne      = snd
-               , ncAdd      = nlAdd
-               , ncMul      = nlMul
-               , ncCardinal = findSym nlTable
-               }
+nl ∷ (IsString s) ⇒ (Rules, Repr s)
+nl = (rules, nl_repr)
 
-nlAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-nlAdd (x, x') (y, y') | x < 20    = y' <> x'
-                      | x < 100   = y' <> (if y ≡ 2 ∨ y ≡ 3
-                                           then "ën"
-                                           else "en")
-                                       <> x'
-                      | otherwise = x' <+> y'
+rules ∷ Rules
+rules = Rules { rsFindRule = findRule rs
+              , rsMulOne   = const False
+              }
+    where
+      rs = map atom [1..9]
+         ⊕ [mul 10  10  10 LeftAdd]
+         ⊕ map atom [11..12]
+         ⊕ [mul 100 100 10 RightAdd]
+         ⊕ scale RightAdd 3
 
-nlMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-nlMul (_, x') (y, y') | y ≤ 10    = x' <> y'
-                      | otherwise = x' <+> y'
+nl_repr ∷ (IsString s) ⇒ Repr s
+nl_repr =
+    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+         , reprAdd   = (⊞)
+         , reprMul   = \_ _ → ""
+         , reprZero  = "nul"
+         , reprNeg   = "min"
+         }
+    where
+      _   ⊞ C 10 = ""
+      C n ⊞ _ | n ≡ 2 ∨ n ≡ 3 = "ën"
+              | n < 10        = "en"
+              | otherwise     = ""
+      _   ⊞ _ = " "
 
-nlTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
-nlTable = [ term 0    $ const "nul"
-          , term 1    $ const "één"
-          , term 2    $ tenForms "twee" "twin" "twin"
-          , term 3    $ tenForms "drie" "der"  "der"
-          , term 4    $ tenForms "vier" "veer" "veer"
-          , term 5    $ const "vijf"
-          , term 6    $ const "zes"
-          , term 7    $ const "zeven"
-          , term 8    $ tenForms "acht" "acht" "tach"
-          , term 9    $ const "negen"
-          , mul  10   $ \ctx → case ctx of
-                                 RM {} → "tig"
-                                 _     → "tien"
-          , term 11   $ const "elf"
-          , term 12   $ const "twaalf"
-          , mul  100  $ const "honderd"
-          , mul  1000 $ const "duizend"
-          ] ++ (longScale "iljoen" "iljard")
+      symMap = IM.fromList
+               [ (1, const "een")
+               , (2, ten   "twee" "twin")
+               , (3, ten   "drie" "der")
+               , (4, ten   "vier" "veer")
+               , (5, const "vijf")
+               , (6, const "zes")
+               , (7, const "zeven")
+               , (8, \c → case c of
+                            LM (C 10) _ → "tach"
+                            LA (C 10) _ → "ach"
+                            _           → "acht"
+                 )
+               , (9, const "negen")
+               , (10, \c → case c of
+                             RM {} → "tig"
+                             _     → "tien"
+                 )
+               , (11, const "elf")
+               , (12, const "twaalf")
+               , (100, const "honderd")
+               , (1000, const "duizend")
+               ]
+
+      ten ∷ s → s → SymbolContext → s
+      ten n t ctx = case ctx of
+                      LM (C 10) _ → t
+                      LA (C 10) _ → t
+                      _           → n

@@ -1,87 +1,97 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.FR (fr) where
-
+module Text.Numeral.Language.FR (rules, repr) where
 
 --------------------------------------------------------------------------------
 -- Imports
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( otherwise )
-import Data.Function ( const, ($) )
+import Data.Bool     ( Bool(True, False), otherwise )
+import Data.Function ( const )
+import Data.List     ( map )
 import Data.Ord      ( (<) )
-import Data.List     ( (++)  )
-import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Data.Tuple    ( snd )
-import Prelude       ( Integer )
+import Prelude       ( Num, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Eq.Unicode   ( (≡) )
-import Data.Bool.Unicode ( (∧) )
+import Data.Monoid.Unicode ( (⊕) )
+
+-- from containers:
+import qualified Data.IntMap as IM ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc      ( (<->) )
-import Text.Numeral.Pelletier ( longScalePlural )
-
--- from string-combinators:
-import Data.String.Combinators ( (<>), (<+>) )
+import Text.Numeral.Pelletier ( scale )
 
 
 --------------------------------------------------------------------------------
 -- FR
 --------------------------------------------------------------------------------
 
--- Sources:
---  http://www.cliffsnotes.com/WileyCDA/CliffsReviewTopic/Numbers.topicArticleId-25559,articleId-25469.html
+rules ∷ Rules
+rules = Rules { rsFindRule = findRule rs
+              , rsMulOne   = const False
+              }
+    where
+      rs = map atom [1..9]
+           ⊕ [ mul  10  10 10 LeftAdd
+             , mul  10  17 10 RightAdd
+             , add  20  20 10 RightAdd True
+             , add  60  60 20 RightAdd False
+             , mul  20  80  1 RightAdd
+             , mul 100 100 10 RightAdd
+             ]
+           ⊕ scale RightAdd 3
 
-fr ∷ (Monoid s, IsString s) ⇒ NumConfig s
-fr = NumConfig { ncNeg      = ("moins" <+>)
-               , ncOne      = snd
-               , ncAdd      = frAdd
-               , ncMul      = frMul
-               , ncCardinal = findSym frTable
-               }
+repr ∷ (IsString s) ⇒ Repr s
+repr = Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+            , reprAdd   = (⊞)
+            , reprMul   = (⊡)
+            , reprZero  = "zeró"
+            , reprNeg   = "moins"
+            }
+    where
+      C _  ⊞ C 10           = ""
+      _    ⊞ C 10           = "-"
+      (C 4 :⋅: C 20) ⊞ _    = "-"
+      _    ⊞ C 1            = " et "
+      _    ⊞ (C 1 :+: C 10) = " et "
+      C 10 ⊞ _              = "-"
+      _    ⊞ _              = "-"
 
-frAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-frAdd (x, x') (y, y') | x ≡ 10 ∧ y < 7 = y' <> x'
-                      | x < 80 ∧ y ≡ 1 = x' <+> "et" <+> y'
-                      | x < 100        = x' <-> y'
-                      | otherwise      = x' <+> y'
+      _ ⊡ 20 = "-"
+      _ ⊡ _  = ""
 
-frMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-frMul (_, x') (y, y') | y ≡ 10   = x' <> y'
-                      | otherwise = x' <+> y'
 
-frTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
-frTable = [ term  0        $ const "zéro"
-          , termG 1        $ tenFormsG (gender "un" "une") (const "on") (const "un")
-          , term  2        $ tenForms "deux"   "deux"   "dou"
-          , term  3        $ tenForms "trois"  "trei"   "tren"
-          , term  4        $ tenForms "quatre" "quator" "quar"
-          , term  5        $ tenForms "cinq"   "quin"   "cinqu"
-          , term  6        $ tenForms "six"    "sei"    "soix"
-          , term  7        $ const "sept"
-          , term  8        $ const "huit"
-          , term  9        $ const "neuf"
-          , mul   10       $ \ctx → case ctx of
-                                        LA n _ | n < 7     → "ze"
-                                               | otherwise → "dix"
-                                        RM 3 _ → "te"
-                                        RM _ _ → "ante"
-                                        _      → "dix"
-          , add   20    10 $ const "vingt"
-          , add   60    20 $ const "soixante"
-          , term  71       $ const "soixante et onze"
-          , term  80       $ const "quatre-vingts"
-          , add   80    20 $ const "quatre-vingt"
-          , mul   100      $ let c = "cent"
-                             in \ctx → case ctx of
-                                          RM _ (LA _ _) → c
-                                          RM _ (LM _ _) → c
-                                          RM _ _        → c <> "s"
-                                          _             → c
-          , mul   1000     $ const "mille"
-          ] ++ longScalePlural "illion" "illions" "illiard" "illiards"
+      symMap = IM.fromList
+               [ (0, const "zéro")
+               , (1, ten   "un"     "on"     "un")
+               , (2, ten   "deux"   "dou"    "deux")
+               , (3, ten   "trois"  "trei"   "tren")
+               , (4, ten   "quatre" "quator" "quar")
+               , (5, ten   "cinq"   "quin"   "cinqu")
+               , (6, ten   "six"    "sei"    "soix")
+               , (7, const "sept")
+               , (8, const "huit")
+               , (9, const "neuf")
+               , (10, \c → case c of
+                             RA (C n) _ | n < 7     → "ze"
+                                        | otherwise → "dix"
+                             RM (C 3) _ → "te"
+                             RM {}      → "ante"
+                             _          → "dix"
+                 )
+               , (20,   \c → case c of
+                               RM _ Empty → "vingts"
+                               _          → "vingt"
+                 )
+               , (100,  const "cent")
+               , (1000, const "mille")
+               ]
+
+      ten ∷ s → s → s → SymbolContext → s
+      ten n a m ctx = case ctx of
+                        LA (C 10) _ → a
+                        LM (C 10) _ → m
+                        _           → n

@@ -1,28 +1,28 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.SV (sv) where
+module Text.Numeral.Language.SV (sv, rules, sv_repr) where
 
 -------------------------------------------------------------------------------
 -- Imports
 -------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( otherwise )
-import Data.Function ( const, ($) )
-import Data.Monoid   ( Monoid )
+import Data.Bool     ( Bool(True, False), otherwise )
+import Data.Function ( const )
+import Data.List     ( map )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integer )
+import Prelude       ( Num, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Ord.Unicode ( (≥) )
+import Data.Monoid.Unicode ( (⊕) )
+
+-- from containers:
+import qualified Data.IntMap as IM ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc (d, withSnd)
-
--- from string-combinators:
-import Data.String.Combinators ( (<>), (<+>) )
+import Text.Numeral.Pelletier ( scale )
 
 
 -------------------------------------------------------------------------------
@@ -36,6 +36,18 @@ import Data.String.Combinators ( (<>), (<+>) )
 
 --   http://www.cs.chalmers.se/~aarne/GF/
 --   http://www.cs.chalmers.se/~aarne/GF/lib/resource/norwegian/NumeralNor.gf
+
+
+rules ∷ Rules
+rules = Rules { rsFindRule = findRule rs
+              , rsMulOne   = const False
+              }
+    where
+      rs = map atom [1..9]
+           ⊕ [ mul  10  10 10 LeftAdd
+             , mul 100 100 10 RightAdd
+             ]
+           ⊕ scale RightAdd 3
 
 sv ∷ (Monoid s, IsString s) ⇒ NumConfig s
 sv = NumConfig { ncNeg      = ("minus" <+>)

@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.DE (de) where
+module Text.Numeral.Language.DE (de, rules, de_repr) where
 
 
 -------------------------------------------------------------------------------
@@ -8,66 +8,89 @@ module Text.Numeral.Language.DE (de) where
 -------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( otherwise )
-import Data.Function ( const, ($) )
-import Data.Monoid   ( Monoid )
+import Data.Bool     ( Bool(False), otherwise )
+import Data.Function ( const )
+import Data.List     ( map )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integer )
+import Prelude       ( Num, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Eq.Unicode  ( (≡) )
-import Data.Ord.Unicode ( (≥) )
+import Data.Bool.Unicode   ( (∨) )
+import Data.Eq.Unicode     ( (≡) )
+import Data.Monoid.Unicode ( (⊕) )
+import Data.Ord.Unicode    ( (≥) )
+
+-- from containers:
+import qualified Data.IntMap as IM ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc ( d, withSnd )
-
--- from string-combinators:
-import Data.String.Combinators ( (<>), (<+>) )
+import Text.Numeral.Misc      ( dec )
+import Text.Numeral.Pelletier ( scale )
 
 
 -------------------------------------------------------------------------------
 -- DE
 -------------------------------------------------------------------------------
 
-de ∷ (Monoid s, IsString s) ⇒ NumConfig s
-de = NumConfig { ncNeg      = ("minus" <+>)
-               , ncOne      = deOne
-               , ncAdd      = deAdd
-               , ncMul      = withSnd (<>)
-               , ncCardinal = findSym deTable
-               }
+de ∷ (IsString s) ⇒ (Rules, Repr s)
+de = (rules, de_repr)
 
-deOne ∷ (Monoid s, IsString s) ⇒ (Integer, s) → s
-deOne (v, vs) | v ≥ (d 6) = "eine" <+> vs
-              | v ≥ 100   = "ein"  <>  vs
-              | otherwise = vs
+rules ∷ Rules
+rules = Rules { rsFindRule = findRule rs
+              , rsMulOne   = (≥ 100)
+              }
+    where
+      rs = map atom [1..9]
+         ⊕ [mul 10 10 10 LeftAdd]
+         ⊕ map atom [11..12]
+         ⊕ [mul 100 100 10 RightAdd]
+         ⊕ scale RightAdd 3
 
-deAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-deAdd (x, x') (y, y') | x < 20    = y' <> x'
-                      | x < 100   = (if y ≡ 1
-                                     then "ein"
-                                     else y') <> "und" <> x'
-                      | otherwise = x' <> y'
+de_repr ∷ (IsString s) ⇒ Repr s
+de_repr =
+    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+         , reprAdd   = (⊞)
+         , reprMul   = \_ _ → ""
+         , reprZero  = "null"
+         , reprNeg   = "minus"
+         }
+    where
+      _   ⊞ C 10 = ""
+      C n ⊞ _ | n < 10        = "und"
+              | otherwise     = ""
+      _   ⊞ _ = " "
 
-deTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
-deTable = [ term 0        $ const "null"
-          , term 1        $ const "eins"
-          , term 2        $ tenForms "zwei" "zwei" "zwan"
-          , term 3        $ const "drei"
-          , term 4        $ const "vier"
-          , term 5        $ const "fünf"
-          , term 6        $ const "sechs"
-          , term 7        $ tenForms "sieben" "sieb" "sieb"
-          , term 8        $ const "acht"
-          , term 9        $ const "neun"
-          , mul  10       $ mulForms "zehn" "zig"
-          , term 11       $ const "elf"
-          , term 12       $ const "zwölf"
-          , add  30    10 $ const "dreißig"
-          , mul  100      $ const "hundert"
-          , mul  1000     $ const "tausend"
-          , mul  (d 6)    $ const "million"
-          , mul  (d 9)    $ const "milliarde"
-          ]
+      symMap = IM.fromList
+               [ (1, \c → case c of
+                            LA {} → "ein"
+                            LM (C n) _ | n ≥ dec 6 → "eine"
+                                       | n ≥ 100   → "ein"
+                            _ → "eins"
+                 )
+               , (2, \c → case c of
+                            LM (C 10) _ → "zwan"
+                            _           → "zwei"
+                 )
+               , (3, const "drei")
+               , (4, const "vier")
+               , (5, const "fünf")
+               , (6, const "sechs")
+               , (7, \c → case c of
+                            LA (C 10) _ → "sieb"
+                            LM (C 10) _ → "sieb"
+                            _           → "sieben"
+                 )
+               , (8, const "acht")
+               , (9, const "neun")
+               , (10, \c → case c of
+                             RM (C 3) _ → "ßig"
+                             RM (C _) _ → "zig"
+                             _          → "zehn"
+                 )
+               , (11, const "elf")
+               , (12, const "zwölf")
+               , (100, const "hundert")
+               , (1000, const "tausend")
+               ]

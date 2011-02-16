@@ -21,22 +21,21 @@ library
 
   build-depends: base                 >= 3.0.3.1 && < 4.4
                , base-unicode-symbols >= 0.1.1   && < 0.3
-               , mtl                  >= 2.0     && < 2.1
+               , containers           >= 0.4     && < 0.5
                , string-combinators   >= 0.6     && < 0.7
 
   exposed-modules: Text.Numeral
-                   , Text.Numeral.Language
-                     , Text.Numeral.Language.NL
-                     , Text.Numeral.Language.DE
-                     , Text.Numeral.Language.EN
-                     , Text.Numeral.Language.SV
-                     , Text.Numeral.Language.NO
-                     , Text.Numeral.Language.FR
-                     , Text.Numeral.Language.IT
-                     , Text.Numeral.Language.LA
-                     , Text.Numeral.Language.PT
-                     , Text.Numeral.Language.SP
-                     , Text.Numeral.Language.JA
-                     , Text.Numeral.Language.EO
-                   , Text.Numeral.Pelletier
-                   , Text.Numeral.Misc
+                 , Text.Numeral.Language.NL
+                 , Text.Numeral.Language.DE
+                 , Text.Numeral.Language.EN
+               --, Text.Numeral.Language.SV
+               --, Text.Numeral.Language.NO
+                 , Text.Numeral.Language.FR
+               --, Text.Numeral.Language.IT
+               --, Text.Numeral.Language.LA
+               --, Text.Numeral.Language.PT
+               --, Text.Numeral.Language.SP
+                 , Text.Numeral.Language.JA
+                 , Text.Numeral.Language.EO
+                 , Text.Numeral.Pelletier
+                 , Text.Numeral.Misc

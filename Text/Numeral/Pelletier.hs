@@ -1,6 +1,35 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Pelletier
+    ( scale
+    ) where
+
+
+--------------------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------------------
+
+-- from base:
+import Data.Bool ( Bool(True) )
+import Prelude   ( Integer )
+
+-- from base-unicode-symbols:
+import Prelude.Unicode ( (⋅) )
+
+-- from numerals:
+import Text.Numeral ( AddType, Rule(Rule), RuleType(Mul) )
+import Text.Numeral.Misc ( dec )
+
+
+--------------------------------------------------------------------------------
+-- Pelletier
+--------------------------------------------------------------------------------
+
+scale ∷ AddType → Integer → [Rule]
+scale a g = [Rule Mul (dec n) (dec n) (dec g) a True | n ← [g, 2⋅g ..]]
+
+
+{-
     ( longScale
     , longScalePlural
     , shortScale
@@ -107,3 +136,4 @@ bigNumTable =
                                       LM _   _ → m1
                                       _        → t
 
+-}

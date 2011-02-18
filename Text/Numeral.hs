@@ -20,7 +20,7 @@ module Text.Numeral
     , SymbolRepr
     , SymbolContext(..)
     , Repr(..)
-    , cardinal
+    , textify
 
     , atom
     , add
@@ -43,20 +43,18 @@ import Data.Maybe    ( Maybe(Nothing, Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<), (>) )
 import Data.String   ( IsString )
-import Prelude       ( Num, (+), (*), (-), negate, abs, signum, fromInteger
-                     , Integer, divMod, error, abs
+import Prelude       ( Num, (+), (*), (-), negate, abs, signum
+                     , Integral, fromIntegral
+                     , Integer, fromInteger, divMod, error, abs
                      )
 import Text.Show     ( Show )
 
 -- from base-unicode-symbols:
-import Data.Bool.Unicode   ( (∧) )
-import Data.Eq.Unicode     ( (≡) )
-import Data.Monoid.Unicode ( (⊕) )
-import Data.Ord.Unicode    ( (≥) )
-import Prelude.Unicode     ( (⋅) )
-
--- from string-combinators:
-import Data.String.Combinators ( (<+>) )
+import Data.Bool.Unicode     ( (∧) )
+import Data.Eq.Unicode       ( (≡) )
+import Data.Monoid.Unicode   ( (⊕) )
+import Data.Ord.Unicode      ( (≥) )
+import Prelude.Unicode       ( (⋅) )
 
 
 -------------------------------------------------------------------------------
@@ -90,13 +88,13 @@ infixl 7 :⋅:
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-data Rule = Rule { rType    ∷ RuleType
-                 , rVal     ∷ Integer
-                 , rPos     ∷ Integer
-                 , rScope   ∷ Integer
-                 , rAddType ∷ AddType
-                 , rTerm    ∷ Bool
-                 } deriving Show
+data Rule i = Rule { rType    ∷ RuleType
+                   , rVal     ∷ i
+                   , rPos     ∷ i
+                   , rScope   ∷ i
+                   , rAddType ∷ AddType
+                   , rTerm    ∷ Bool
+                   } deriving Show
 
 data RuleType = Atom | Add | Mul deriving Show
 
@@ -104,27 +102,27 @@ data AddType = LeftAdd
              | RightAdd
                deriving Show
 
-data Rules = Rules { rsFindRule ∷ Maybe Integer → Integer → Rule
-                   , rsMulOne   ∷ Integer → Bool
-                   }
+data Rules i = Rules { rsFindRule ∷ Maybe i → i → Rule i
+                     , rsMulOne   ∷ i → Bool
+                     }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-deconstruct ∷ ∀ α. (Num α) ⇒ Rules → Integer → Val α
+deconstruct ∷ ∀ α i. (Num α, Integral i) ⇒ Rules i → i → Val α
 deconstruct (Rules {..}) i
     | i < 0 = Neg $ go Nothing True (abs i)
     | i > 0 = Pos $ go Nothing True i
     | otherwise = Zero
     where
-      go ∷ Maybe Integer → Bool → Integer → α
+      go ∷ Maybe i → Bool → i → α
       go m o n = let (Rule {rVal, rTerm, rAddType}) = rsFindRule m n
                      x `plus` y = case rAddType of
                                     RightAdd → x + y
                                     LeftAdd  → y + x
                      infixl 6 `plus`
                  in case n `divMod` rVal of
-                      (1, r) → let one | rTerm     = fromInteger rVal
+                      (1, r) → let one | rTerm     = fromIntegral rVal
                                        | otherwise = go (Just rVal) True rVal
                                    one' | o ∧ rsMulOne rVal = 1 ⋅ one
                                         | otherwise         = one
@@ -132,13 +130,16 @@ deconstruct (Rules {..}) i
                                   then one'
                                   else one' `plus` go Nothing True r
 
-                      (q, 0) → go Nothing True q ⋅ go Nothing False rVal
-                      (q, r) → go Nothing True q ⋅ go Nothing False rVal `plus` go Nothing True r
+                      (q, r) → let mr = go Nothing True q
+                                      ⋅ go Nothing False rVal
+                               in if r ≡ 0
+                                  then mr
+                                  else mr `plus` go Nothing True r
 
-findRule ∷ [Rule] → Maybe Integer → Integer → Rule
+findRule ∷ ∀ i. (Integral i) ⇒ [Rule i] → Maybe i → i → Rule i
 findRule []     _   _ = error "empty rule table"
 findRule (e:es) mmp n = go e e es
-    where go ∷ Rule → Rule → [Rule] → Rule
+    where go ∷ Rule i → Rule i → [Rule i] → Rule i
           go a m [] = stop a m
           go a m (x@(Rule {..}) : xs)
               | Just mp ← mmp, rPos ≥ mp = stop a m
@@ -150,7 +151,7 @@ findRule (e:es) mmp n = go e e es
                               Mul | rPos > n  → stop a m
                                   | otherwise → go a x xs
 
-          stop ∷ Rule → Rule → Rule
+          stop ∷ Rule i → Rule i → Rule i
           stop a@(Rule {..}) m | n < rPos + rScope = a
                                | otherwise         = m
 
@@ -158,13 +159,13 @@ findRule (e:es) mmp n = go e e es
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-atom ∷ Integer → Rule
+atom ∷ (Integral i) ⇒ i → Rule i
 atom n = Rule Atom n n 1 RightAdd True
 
-add ∷ Integer → Integer → Integer → AddType → Bool → Rule
+add ∷ (Integral i) ⇒ i → i → i → AddType → Bool → Rule i
 add v p s a t = Rule Add v p s a t
 
-mul ∷ Integer → Integer → Integer → AddType → Rule
+mul ∷ (Integral i) ⇒ i → i → i → AddType → Rule i
 mul v p s a = Rule Mul v p s a True
 
 
@@ -193,10 +194,10 @@ data Repr s = Repr { reprValue ∷ Integer → Maybe (SymbolContext → s)
 --------------------------------------------------------------------------------
 
 
-cardinal ∷ ∀ s. (Monoid s, IsString s) ⇒ Repr s → Val Exp → Maybe s
-cardinal (Repr {reprZero}) Zero = Just reprZero
-cardinal repr (Neg x) = (reprNeg repr <+>) <$> cardinal repr (Pos x)
-cardinal (Repr {..}) (Pos e) = go Empty e
+textify ∷ ∀ s. (Monoid s, IsString s) ⇒ Repr s → Val Exp → Maybe s
+textify (Repr {reprZero}) Zero = Just reprZero
+textify repr (Neg x) = (reprNeg repr ⊕) <$> textify repr (Pos x)
+textify (Repr {..}) (Pos e) = go Empty e
     where
       go ∷ SymbolContext → Exp → Maybe s
       go ctx (C n) = ($ ctx) <$> reprValue n

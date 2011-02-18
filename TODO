@@ -1,13 +1,6 @@
+
+INCREDIBLY USEFUL!: http://www.sf.airnet.ne.jp/~ts/language/number.html
 Also see: http://conway.rutgers.edu/~ccshan/wiki/blog/posts/WordNumbers1/
-
-*** Features ***
-
-Conversions between:
-  - Numbers and linguistic numerals
-  - Numbers and representations in numeral systems
-
-
-*** Linguistic numerals ***
 
 Cardinal numerals:
   How many items - one, two, three
@@ -46,18 +39,3 @@ Distributive numerals:
   Expresses a group of the number specified: In pairs, by the
   dozen. English does not have distributive numerals for these but
   other languages such as Georgian do.
-
-
-*** Numeral systems ***
-
-Positional systems:
-  Binary, octal, decimal, hexadecimal, vigesimal etc.
-  Also support floating point numbers.
-
-Concatenative systems:
-  Roman numerals
-
-
-*** TODOS ***
-
-Use a package which defines polynomials for the positional numeral systems stuff.

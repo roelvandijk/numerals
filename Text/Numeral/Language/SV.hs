@@ -1,22 +1,28 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.SV (sv, rules, sv_repr) where
+module Text.Numeral.Language.SV
+    ( cardinal
+    , rules
+    , cardinalRepr
+    ) where
 
 -------------------------------------------------------------------------------
 -- Imports
 -------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( Bool(True, False), otherwise )
+import Data.Bool     ( Bool(True) )
 import Data.Function ( const )
 import Data.List     ( map )
-import Data.Ord      ( (<) )
+import Data.Maybe    ( Maybe )
+import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Num, fromInteger )
+import Prelude       ( Integral, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
-import Data.Ord.Unicode    ( (≥) )
+import Data.Function.Unicode ( (∘) )
+import Data.Monoid.Unicode   ( (⊕) )
+import Data.Ord.Unicode      ( (≥) )
 
 -- from containers:
 import qualified Data.IntMap as IM ( fromList, lookup )
@@ -30,7 +36,11 @@ import Text.Numeral.Pelletier ( scale )
 -- SV
 -------------------------------------------------------------------------------
 
-rules ∷ Rules
+
+cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+cardinal = textify cardinalRepr ∘ deconstruct rules
+
+rules ∷ (Integral i) ⇒ Rules i
 rules = Rules { rsFindRule = findRule rs
               , rsMulOne   = (≥ 100)
               }
@@ -44,16 +54,14 @@ rules = Rules { rsFindRule = findRule rs
          ⊕ [mul 100 100 10 RightAdd]
          ⊕ scale RightAdd 3
 
-sv ∷ (IsString s) ⇒ (Rules, Repr s)
-sv = (rules, sv_repr)
-
-sv_repr ∷ (IsString s) ⇒ Repr s
-sv_repr = Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
-               , reprAdd = (⊞)
-               , reprMul = \_ _ → ""
-               , reprZero = "noll"
-               , reprNeg  = "minus"
-               }
+cardinalRepr ∷ (IsString s) ⇒ Repr s
+cardinalRepr =
+    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+         , reprAdd = (⊞)
+         , reprMul = \_ _ → ""
+         , reprZero = "noll"
+         , reprNeg  = "minus "
+         }
     where
       _ ⊞ _ = ""
 

@@ -25,23 +25,15 @@ import qualified Text.Numeral.Language.EN as EN
 import qualified Text.Numeral.Language.EO as EO
 import qualified Text.Numeral.Language.JA as JA
 import qualified Text.Numeral.Language.SV as SV
+import qualified Text.Numeral.Language.NO as NO
 
 
 --------------------------------------------------------------------------------
 -- Debug and test stuff
 --------------------------------------------------------------------------------
 
-test ∷ (Rules, Repr String) → [Integer] → IO ()
-test (rules, repr) xs = forM_ xs $ f ∘ ( test' rules
-                                                repr
-                                          ∷ Integer → (Integer, Val Exp, Maybe String)
-                                        )
-    where
-      f (n, e, ms) = putStrLn $ show n ⊕ " - " ⊕ show e ⊕ " - " ⊕ maybe "error" id ms
-
-test' ∷ (Num α, Monoid s, IsString s)
-     ⇒ Rules → Repr s → Integer → (Integer, Val α, Maybe s)
-test' rules repr n = ( n
-                     , deconstruct rules n
-                     , cardinal repr $ deconstruct rules n
-                     )
+test ∷ (Integer → Maybe String) → [Integer] → IO ()
+test cardinal xs = forM_ xs $ \x → do putStr $ (show x) ⊕ " - "
+                                      maybe (putStrLn "error")
+                                            putStrLn
+                                            $ cardinal x

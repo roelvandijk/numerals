@@ -1,6 +1,10 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.EO (rules, repr) where
+module Text.Numeral.Language.EO
+    ( cardinal
+    , rules
+    , cardinalRepr
+    ) where
 
 
 --------------------------------------------------------------------------------
@@ -11,11 +15,14 @@ module Text.Numeral.Language.EO (rules, repr) where
 import Data.Bool     ( Bool(False) )
 import Data.Function ( const )
 import Data.List     ( map )
+import Data.Maybe    ( Maybe )
+import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Num, fromInteger )
+import Prelude       ( Integral, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
+import Data.Function.Unicode ( (∘) )
+import Data.Monoid.Unicode   ( (⊕) )
 
 -- from containers:
 import qualified Data.IntMap as IM ( fromList, lookup )
@@ -29,7 +36,10 @@ import Text.Numeral.Pelletier ( scale )
 -- EO
 --------------------------------------------------------------------------------
 
-rules ∷ Rules
+cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+cardinal = textify cardinalRepr ∘ deconstruct rules
+
+rules ∷ (Integral i) ⇒ Rules i
 rules = Rules { rsFindRule = findRule rs
               , rsMulOne   = const False
               }
@@ -40,13 +50,14 @@ rules = Rules { rsFindRule = findRule rs
            ]
          ⊕ scale RightAdd 3
 
-repr ∷ (IsString s) ⇒ Repr s
-repr = Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
-            , reprAdd  = (⊞)
-            , reprMul  = (⊡)
-            , reprZero = "nul"
-            , reprNeg  = "ne" -- ???
-            }
+cardinalRepr ∷ (IsString s) ⇒ Repr s
+cardinalRepr =
+    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+         , reprAdd  = (⊞)
+         , reprMul  = (⊡)
+         , reprZero = "nul"
+         , reprNeg  = "ne " -- ???
+         }
     where
       _ ⊞ _ = " "
       _ ⊡ _ = ""

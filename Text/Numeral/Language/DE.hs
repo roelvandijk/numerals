@@ -1,6 +1,10 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.DE (de, rules, de_repr) where
+module Text.Numeral.Language.DE
+    ( cardinal
+    , rules
+    , cardinalRepr
+    ) where
 
 
 -------------------------------------------------------------------------------
@@ -8,18 +12,20 @@ module Text.Numeral.Language.DE (de, rules, de_repr) where
 -------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( Bool(False), otherwise )
+import Data.Bool     ( otherwise )
 import Data.Function ( const )
 import Data.List     ( map )
+import Data.Maybe    ( Maybe )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Num, fromInteger )
+import Prelude       ( Integral, Num, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Bool.Unicode   ( (∨) )
-import Data.Eq.Unicode     ( (≡) )
-import Data.Monoid.Unicode ( (⊕) )
-import Data.Ord.Unicode    ( (≥) )
+import Data.Eq.Unicode       ( (≡) )
+import Data.Function.Unicode ( (∘) )
+import Data.Monoid.Unicode   ( (⊕) )
+import Data.Ord.Unicode      ( (≥) )
 
 -- from containers:
 import qualified Data.IntMap as IM ( fromList, lookup )
@@ -34,12 +40,12 @@ import Text.Numeral.Pelletier ( scale )
 -- DE
 -------------------------------------------------------------------------------
 
-de ∷ (IsString s) ⇒ (Rules, Repr s)
-de = (rules, de_repr)
+cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+cardinal = textify cardinalRepr ∘ deconstruct rules
 
-rules ∷ Rules
+rules ∷ (Integral i) ⇒ Rules i
 rules = Rules { rsFindRule = findRule rs
-              , rsMulOne   = (≥ 100)
+              , rsMulOne   = (≡ 100)
               }
     where
       rs = map atom [1..9]
@@ -48,19 +54,18 @@ rules = Rules { rsFindRule = findRule rs
          ⊕ [mul 100 100 10 RightAdd]
          ⊕ scale RightAdd 3
 
-de_repr ∷ (IsString s) ⇒ Repr s
-de_repr =
+cardinalRepr ∷ (IsString s) ⇒ Repr s
+cardinalRepr =
     Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
          , reprAdd   = (⊞)
          , reprMul   = \_ _ → ""
          , reprZero  = "null"
-         , reprNeg   = "minus"
+         , reprNeg   = "minus "
          }
     where
-      _   ⊞ C 10 = ""
       C n ⊞ _ | n < 10        = "und"
               | otherwise     = ""
-      _   ⊞ _ = " "
+      _   ⊞ _ = ""
 
       symMap = IM.fromList
                [ (1, \c → case c of

@@ -1,28 +1,36 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.NO (no) where
+module Text.Numeral.Language.NO
+    ( cardinal
+    , rules
+    , cardinalRepr
+    ) where
 
 -------------------------------------------------------------------------------
 -- Imports
 -------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( otherwise )
-import Data.Function ( const, ($) )
+import Data.Bool     ( Bool(True) )
+import Data.Function ( const )
+import Data.List     ( map )
+import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
-import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integer, error )
+import Prelude       ( Integral, Num, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Ord.Unicode ( (≥) )
+import Data.Function.Unicode ( (∘) )
+import Data.Monoid.Unicode   ( (⊕) )
+import Data.Ord.Unicode      ( (≥) )
+
+-- from containers:
+import qualified Data.IntMap as IM ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc (d, withSnd)
-
--- from string-combinators:
-import Data.String.Combinators ( (<>), (<+>) )
+import Text.Numeral.Misc      ( dec )
+import Text.Numeral.Pelletier ( scale )
 
 
 -------------------------------------------------------------------------------
@@ -31,44 +39,58 @@ import Data.String.Combinators ( (<>), (<+>) )
 
 -- Sources:
 --   http://en.wikibooks.org/wiki/Norwegian_Numbers
+--   http://www.sf.airnet.ne.jp/~ts/language/number/norwegian.html
 
-no ∷ (Monoid s, IsString s) ⇒ NumConfig s
-no = NumConfig { ncNeg      = error "noNeg: undefined"
-               , ncOne      = noOne
-               , ncAdd      = noAdd
-               , ncMul      = withSnd (<>)
-               , ncCardinal = findSym noTable
-               }
+cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+cardinal = textify cardinalRepr ∘ deconstruct rules
 
-noOne ∷ (Monoid s, IsString s) ⇒ (Integer, s) → s
-noOne (v, vs) | v ≥ (d 6) = "én" <+> vs
-              | otherwise = vs
+rules ∷ (Integral i) ⇒ Rules i
+rules = Rules { rsFindRule = findRule rs
+              , rsMulOne   = (≥ dec 6)
+              }
+    where
+      rs = map atom [1..9]
+         ⊕ map atom [11..12]
+         ⊕ [ add 10 10 10 LeftAdd  True
+           , add 20 20 10 RightAdd True
+           , mul 10 30 10 RightAdd
+           , mul 100 100 10 RightAdd
+           ]
+         ⊕ scale RightAdd 3
 
--- TODO: What are the rules for conjunction in Norse? When do you put
--- "og" between numbers?
-noAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-noAdd (x, x') (_, y') | x < 20    = y' <> x'
-                      | otherwise = x' <> y'
+cardinalRepr ∷ (IsString s) ⇒ Repr s
+cardinalRepr =
+    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+         , reprAdd = (⊞)
+         , reprMul = \_ _ → ""
+         , reprZero = "null"
+         , reprNeg  = " " -- TODO
+         }
+    where
+      _ ⊞ _ = ""
 
-noTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
-noTable = [ term 0        $ const "null"
-          , term 1        $ const "én"
-          , term 2        $ const "to"
-          , term 3        $ tenForms "tre"  "tret" "tret"
-          , term 4        $ tenForms "fire" "fjor" "før"
-          , term 5        $ const "fem"
-          , term 6        $ const "seks"
-          , term 7        $ tenForms "sju"  "syt" "syt"
-          , term 8        $ tenForms "åtte" "at"  "åt"
-          , term 9        $ tenForms "ni"   "nit" "nit"
-          , mul  10       $ \ctx → case ctx of
-                                     LA {} → "ten"
-                                     _     → "ti"
-          , term 11       $ const "elleve"
-          , term 12       $ const "tolv"
-          , add  20    10 $ const "tjue"
-          , mul  100      $ const "hundre"
-          , mul  (d 3)    $ const "tusen"
-          , mul  (d 6)    $ mulForms "million"  "millioner"
-          , mul  (d 9)    $ mulForms "milliard" "milliarder"
-          ]
+      symMap = IM.fromList
+               [ (1,  const "én")
+               , (2,  const "to")
+               , (3,  ten   "tre"  "tret" "tret")
+               , (4,  ten   "fire" "fjor" "før")
+               , (5,  const "fem")
+               , (6,  const "seks")
+               , (7,  ten   "syv"  "syt"  "syt")
+               , (8,  ten   "åtte" "at"   "åt")
+               , (9,  ten   "ni"   "nit"  "nit")
+               , (10, \c → case c of
+                             RA {} → "ten"
+                             _     → "ti"
+                 )
+               , (11, const "elleve")
+               , (12, const "tolv")
+               , (20, const "tjue")
+               , (100, const "hundre")
+               , (1000, const "tusen")
+               ]
+
+      ten n a m = \c → case c of
+                         LA (C 10) _ → a
+                         LM (C 10) _ → m
+                         _           → n

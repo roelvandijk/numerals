@@ -11,7 +11,7 @@ module Text.Numeral.Pelletier
 
 -- from base:
 import Data.Bool ( Bool(True) )
-import Prelude   ( Integer )
+import Prelude   ( Integral )
 
 -- from base-unicode-symbols:
 import Prelude.Unicode ( (⋅) )
@@ -25,7 +25,7 @@ import Text.Numeral.Misc ( dec )
 -- Pelletier
 --------------------------------------------------------------------------------
 
-scale ∷ AddType → Integer → [Rule]
+scale ∷ (Integral i) ⇒ AddType → i → [Rule i]
 scale a g = [Rule Mul (dec n) (dec n) (dec g) a True | n ← [g, 2⋅g ..]]
 
 

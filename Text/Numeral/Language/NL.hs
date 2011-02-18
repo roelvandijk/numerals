@@ -1,6 +1,10 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.NL (nl, rules, nl_repr) where
+module Text.Numeral.Language.NL
+    ( cardinal
+    , rules
+    , cardinalRepr
+    ) where
 
 --------------------------------------------------------------------------------
 -- Imports
@@ -10,14 +14,17 @@ module Text.Numeral.Language.NL (nl, rules, nl_repr) where
 import Data.Bool     ( Bool(False), otherwise )
 import Data.Function ( const )
 import Data.List     ( map )
+import Data.Maybe    ( Maybe )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Num, fromInteger )
+import Prelude       ( Integral, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Bool.Unicode   ( (∨) )
-import Data.Eq.Unicode     ( (≡) )
-import Data.Monoid.Unicode ( (⊕) )
+import Data.Bool.Unicode     ( (∨) )
+import Data.Eq.Unicode       ( (≡) )
+import Data.Function.Unicode ( (∘) )
+import Data.Monoid.Unicode   ( (⊕) )
 
 -- from containers:
 import qualified Data.IntMap as IM ( fromList, lookup )
@@ -31,10 +38,10 @@ import Text.Numeral.Pelletier ( scale )
 -- NL
 --------------------------------------------------------------------------------
 
-nl ∷ (IsString s) ⇒ (Rules, Repr s)
-nl = (rules, nl_repr)
+cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+cardinal = textify cardinalRepr ∘ deconstruct rules
 
-rules ∷ Rules
+rules ∷ (Integral i) ⇒ Rules i
 rules = Rules { rsFindRule = findRule rs
               , rsMulOne   = const False
               }
@@ -45,13 +52,13 @@ rules = Rules { rsFindRule = findRule rs
          ⊕ [mul 100 100 10 RightAdd]
          ⊕ scale RightAdd 3
 
-nl_repr ∷ (IsString s) ⇒ Repr s
-nl_repr =
+cardinalRepr ∷ (IsString s) ⇒ Repr s
+cardinalRepr =
     Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
          , reprAdd   = (⊞)
          , reprMul   = \_ _ → ""
          , reprZero  = "nul"
-         , reprNeg   = "min"
+         , reprNeg   = "min "
          }
     where
       _   ⊞ C 10 = ""

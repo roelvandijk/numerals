@@ -8,21 +8,13 @@ module Text.Numeral.Misc where
 
 -- base
 import Data.Maybe    ( Maybe(Nothing, Just) )
-import Data.Monoid   ( Monoid )
-import Data.String   ( IsString )
 import Prelude       ( (^), Integral )
-
--- from string-combinators:
-import Data.String.Combinators ( mid )
 
 
 
 --------------------------------------------------------------------------------
 -- Misc
 --------------------------------------------------------------------------------
-
-(<->) ∷ (Monoid s, IsString s) ⇒ s → s → s
-(<->) = mid "-"
 
 withSnd ∷ (a → b → c) → (d, a) → (e, b) → c
 withSnd f (_, x) (_, y) = f x y

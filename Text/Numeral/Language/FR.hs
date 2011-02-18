@@ -1,6 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.FR (rules, repr) where
+module Text.Numeral.Language.FR
+    ( cardinal
+    , rules
+    , cardinalRepr
+    ) where
+
 
 --------------------------------------------------------------------------------
 -- Imports
@@ -10,12 +15,15 @@ module Text.Numeral.Language.FR (rules, repr) where
 import Data.Bool     ( Bool(True, False), otherwise )
 import Data.Function ( const )
 import Data.List     ( map )
+import Data.Maybe    ( Maybe )
+import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Num, fromInteger )
+import Prelude       ( Integral, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
+import Data.Function.Unicode ( (∘) )
+import Data.Monoid.Unicode   ( (⊕) )
 
 -- from containers:
 import qualified Data.IntMap as IM ( fromList, lookup )
@@ -29,7 +37,10 @@ import Text.Numeral.Pelletier ( scale )
 -- FR
 --------------------------------------------------------------------------------
 
-rules ∷ Rules
+cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+cardinal = textify cardinalRepr ∘ deconstruct rules
+
+rules ∷ (Integral i) ⇒ Rules i
 rules = Rules { rsFindRule = findRule rs
               , rsMulOne   = const False
               }
@@ -44,13 +55,14 @@ rules = Rules { rsFindRule = findRule rs
              ]
            ⊕ scale RightAdd 3
 
-repr ∷ (IsString s) ⇒ Repr s
-repr = Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
-            , reprAdd   = (⊞)
-            , reprMul   = (⊡)
-            , reprZero  = "zeró"
-            , reprNeg   = "moins"
-            }
+cardinalRepr ∷ (IsString s) ⇒ Repr s
+cardinalRepr =
+    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+         , reprAdd   = (⊞)
+         , reprMul   = (⊡)
+         , reprZero  = "zeró"
+         , reprNeg   = "moins "
+         }
     where
       C _  ⊞ C 10           = ""
       _    ⊞ C 10           = "-"
@@ -63,10 +75,8 @@ repr = Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
       _ ⊡ 20 = "-"
       _ ⊡ _  = ""
 
-
       symMap = IM.fromList
-               [ (0, const "zéro")
-               , (1, ten   "un"     "on"     "un")
+               [ (1, ten   "un"     "on"     "un")
                , (2, ten   "deux"   "dou"    "deux")
                , (3, ten   "trois"  "trei"   "tren")
                , (4, ten   "quatre" "quator" "quar")

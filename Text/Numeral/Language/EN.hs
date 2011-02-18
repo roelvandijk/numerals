@@ -1,6 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.EN (rules, uk_repr, us_repr) where
+module Text.Numeral.Language.EN
+    ( ukCardinal
+    , usCardinal
+    , rules
+    , ukCardinalRepr
+    , usCardinalRepr
+    ) where
 
 --------------------------------------------------------------------------------
 -- Imports
@@ -10,12 +16,15 @@ module Text.Numeral.Language.EN (rules, uk_repr, us_repr) where
 import Data.Bool     ( Bool(True) )
 import Data.Function ( const )
 import Data.List     ( map )
+import Data.Maybe    ( Maybe )
+import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Num, fromInteger )
+import Prelude       ( Integral, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Ord.Unicode    ( (≥) )
-import Data.Monoid.Unicode ( (⊕) )
+import Data.Function.Unicode ( (∘) )
+import Data.Ord.Unicode      ( (≥) )
+import Data.Monoid.Unicode   ( (⊕) )
 
 -- from containers:
 import qualified Data.IntMap as IM ( fromList, lookup )
@@ -29,7 +38,13 @@ import Text.Numeral.Pelletier ( scale )
 -- EN
 --------------------------------------------------------------------------------
 
-rules ∷ Rules
+ukCardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+ukCardinal = textify ukCardinalRepr ∘ deconstruct rules
+
+usCardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+usCardinal = textify usCardinalRepr ∘ deconstruct rules
+
+rules ∷ (Integral i) ⇒ Rules i
 rules = Rules { rsFindRule = findRule rs
               , rsMulOne   = (≥ 100)
               }
@@ -41,34 +56,34 @@ rules = Rules { rsFindRule = findRule rs
          ⊕ [mul 100 100 10 RightAdd]
          ⊕ scale RightAdd 3
 
-us_repr ∷ (IsString s) ⇒ Repr s
-us_repr = repr (⊞)
+usCardinalRepr ∷ (IsString s) ⇒ Repr s
+usCardinalRepr = cardinalRepr (⊞)
   where
     (_ :⋅: C 10) ⊞ _ = "-"
     (_ :⋅: _   ) ⊞ _ = " "
     _            ⊞ _ = ""
 
-uk_repr ∷ (IsString s) ⇒ Repr s
-uk_repr = repr (⊞)
+ukCardinalRepr ∷ (IsString s) ⇒ Repr s
+ukCardinalRepr = cardinalRepr (⊞)
   where
     (_ :⋅: C 10) ⊞ _ = "-"
     (_ :⋅: _   ) ⊞ _ = " and "
     _            ⊞ _ = ""
 
-repr ∷ (IsString s) ⇒ (Exp → Exp → s) → Repr s
-repr f = Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
-              , reprAdd   = f
-              , reprMul   = (⊡)
-              , reprZero  = "zero"
-              , reprNeg   = "minus"
-              }
+cardinalRepr ∷ (IsString s) ⇒ (Exp → Exp → s) → Repr s
+cardinalRepr f =
+    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+         , reprAdd   = f
+         , reprMul   = (⊡)
+         , reprZero  = "zero"
+         , reprNeg   = "minus "
+         }
     where
       _ ⊡ C 10 = ""
       _ ⊡ _    = " "
 
       symMap = IM.fromList
-               [ (0, const "zero")
-               , (1, const "one")
+               [ (1, const "one")
                , (2, ten   "two"   "two"  "twen")
                , (3, ten   "three" "thir" "thir")
                , (4, ten   "four"  "four" "for")
@@ -89,7 +104,7 @@ repr f = Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
                ]
 
       ten ∷ s → s → s → SymbolContext → s
-      ten n a m ctx = case ctx of
-                        LA (C 10) _ → a
-                        LM (C 10) _ → m
-                        _           → n
+      ten n a m = \c → case c of
+                         LA (C 10) _ → a
+                         LM (C 10) _ → m
+                         _           → n

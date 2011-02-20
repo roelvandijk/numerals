@@ -1,6 +1,10 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.LA (la) where
+module Text.Numeral.Language.LA
+    ( cardinal
+    , rules
+    , cardinalRepr
+    ) where
 
 
 --------------------------------------------------------------------------------
@@ -8,84 +12,160 @@ module Text.Numeral.Language.LA (la) where
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( otherwise )
+import Data.Bool     ( Bool(False), otherwise )
 import Data.Function ( const, ($) )
+import Data.List     ( map, concatMap )
+import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
-import Data.Ord      ( (<) )
+import Data.Ord      ( (<), (>) )
 import Data.String   ( IsString )
-import Data.Tuple    ( snd )
-import Prelude       ( Integer, error )
+import Prelude       ( (+), Integral, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Eq.Unicode   ( (≡) )
-import Data.List.Unicode ( (∈) )
+import Data.Bool.Unicode     ( (∨) )
+import Data.Eq.Unicode       ( (≡) )
+import Data.Function.Unicode ( (∘) )
+import Data.List.Unicode     ( (∈) )
+import Data.Monoid.Unicode   ( (⊕) )
+import Data.Ord.Unicode      ( (≤) )
+
+-- from containers:
+import qualified Data.IntMap as IM ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc (d)
-
--- from string-combinators:
-import Data.String.Combinators ( (<>), (<+>) )
+import Text.Numeral.Misc      ( dec )
+import Text.Numeral.Pelletier ( scale )
 
 
 --------------------------------------------------------------------------------
 -- LA
 --------------------------------------------------------------------------------
 
-la ∷ (Monoid s, IsString s) ⇒ NumConfig s
-la = NumConfig { ncNeg      = error "laNeg: undefined"
-               , ncOne      = snd
-               , ncAdd      = laAdd
-               , ncMul      = laMul
-               , ncCardinal = findSym laTable
-               }
+{-
+Sources:
+  http://www.informalmusic.com/latinsoc/latnum.html
+  http://www.sf.airnet.ne.jp/~ts/language/number/latin.html
 
-laAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-laAdd (x, x') (_, y') | x ≡ 10   = y' <> x'
-                      | otherwise = x' <+> y'
+TODO: need undercounting to represent [18, 19, 28, 29, ..., 98, 99].
 
-laMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-laMul (_, x') (y, y') | y < 1000  = x' <> y'
-                      | otherwise = x' <+> y'
+18 = 2 from (2 ⋅ 10)
+19 = 1 from (2 ⋅ 10)
+28 = 2 from (3 ⋅ 10)
+29 = 1 from (3 ⋅ 10)
+-}
 
-laTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
-laTable = [ term 0     $ const "nulla"
-          , term 1     $ tenForms  "unus"     "un"       "unus"
-          , term 2     $ tenForms' "duo"      "duo"      "vi"      "du"
-          , term 3     $ tenForms' "tres"     "tre"      "tri"     "tre"
-          , term 4     $ tenForms' "quattuor" "quattuor" "quadra"  "quadri"
-          , term 5     $ tenForms' "quinque"  "quin"     "quinqua" "quin"
-          , term 6     $ tenForms' "sex"      "se"       "sexa"    "ses"
-          , term 7     $ tenForms' "septem"   "septen"   "septua"  "septin"
-          , term 8     $ const "octo"
-          , term 9     $ tenForms' "novem"    "novem"    "nona"    "non"
-          , mul  10    $ \ctx → case ctx of
-                                    LA _ _ → "decim"
-                                    RM 2 _ → "ginti"
-                                    RM _ _ → "ginta"
-                                    _      → "decem"
-          , term 18    $ const "duodeviginti"
-          , term 19    $ const "undeviginti"
-          , term 28    $ const "duodetriginta"
-          , term 29    $ const "undetriginta"
-          , term 38    $ const "duodequadraginta"
-          , term 39    $ const "undequadraginta"
-          , term 48    $ const "duodequinquaginta"
-          , term 49    $ const "undequinquaginta"
-          , term 58    $ const "duodesexaginta"
-          , term 59    $ const "undesexaginta"
-          , term 68    $ const "duodeseptuaginta"
-          , term 69    $ const "undeseptuaginta"
-          , term 78    $ const "duodeoctoginta"
-          , term 79    $ const "undeoctoginta"
-          , term 88    $ const "duodenonaginta"
-          , term 89    $ const "undenonaginta"
-          , term 98    $ const "duodecentum"
-          , term 99    $ const "undecentum"
-          , mul  100   $ \ctx → case ctx of
-                                    RM n _ | n ∈ [2, 3, 6] → "centi"
-                                           | otherwise     → "genti"
-                                    _                      → "centum"
-          , mul  1000  $ mulForms "mille" "millia"
-          , term (d 6) $ const "decies centena milia"
-          ]
+cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+cardinal = textify cardinalRepr ∘ deconstruct rules
+
+rules ∷ (Integral i) ⇒ Rules i
+rules = Rules { rsFindRule = findRule rs
+              , rsMulOne   = const False
+              }
+    where
+      rs = map atom [1..9]
+         ⊕ [mul 10 10 10 LeftAdd]
+         ⊕ concatMap (\n → [atom $ n + 8, atom $ n + 9]) [10,20..90]
+         ⊕ [ mul (dec 2) (dec 2) (dec 1) RightAdd
+           , mul (dec 3) (dec 3) (dec 3) RightAdd
+           , mul (dec 6) (dec 6) (dec 6) RightAdd
+           ]
+
+cardinalRepr ∷ (IsString s) ⇒ Repr s
+cardinalRepr =
+    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+         , reprAdd   = (⊞)
+         , reprMul   = (⊡)
+         , reprZero  = "nihil"
+         -- TODO: negative numbers probably can't be represented in latin
+         , reprNeg   = "- "
+         }
+    where
+      (_ :⋅: C n) ⊞ _ | n > 100 = " "
+      _           ⊞ _           = ""
+
+      _ ⊡ (C n) | n ≤ 100 = ""
+      _ ⊡ _               = " "
+
+      symMap = IM.fromList
+               [ (1, \c → case c of
+                            LA (C 10)  _ → "ūn"
+                            _            → "ūnus"
+                 )
+               , (2, \c → case c of
+                            LM (C 10)  _ → "vi"
+                            LM (C 100) _ → "du"
+                            _            → "duo"
+                 )
+               , (3, \c → case c of
+                            LA (C 10)  _ → "trē"
+                            LM (C 10)  _ → "trī"
+                            LM (C 100) _ → "tre"
+                            _            → "trēs"
+                 )
+               , (4, \c → case c of
+                            LM (C 10)  _ → "quadrā"
+                            LM (C 100) _ → "quadrin"
+                            _            → "quattuor"
+                 )
+               , (5, \c → case c of
+                            LA (C 10)  _ → "quīn"
+                            LM (C 10)  _ → "quīnquā"
+                            LM (C 100) _ → "quīn"
+                            _            → "quīnque"
+                 )
+               , (6, \c → case c of
+                            LA (C 10)  _ → "sē"
+                            LM (C 10)  _ → "sexā"
+                            LM (C 100) _ → "ses"
+                            _            → "sex"
+                 )
+               , (7, \c → case c of
+                            LA (C 10)  _ → "septen"
+                            LM (C 10)  _ → "septuā"
+                            LM (C 100) _ → "septin"
+                            _            → "septem"
+                 )
+               , (8, \c → case c of
+                            LM (C 100) _ → "octin"
+                            _            → "octō"
+                 )
+               , (9, \c → case c of
+                            LM (C 10)  _ → "nōnā"
+                            LM (C 100) _ → "nōn"
+                            _            → "novem"
+                 )
+               , (10, \c → case c of
+                             RA {}       → "decim"
+                             RM (C 2)  _ → "gintī"
+                             RM {}       → "gintā"
+                             _           → "decem"
+                 )
+               , (18, const "duodēvīgintī")
+               , (19, const "ūndēvīgintī")
+               , (28, const "duodētrīgintā")
+               , (29, const "ūndētrīgintā")
+               , (38, const "duodēquadrāgintā")
+               , (39, const "ūndēquadrāgintā")
+               , (48, const "duodēquīnquāgintā")
+               , (49, const "ūndēquīnquāgintā")
+               , (58, const "duodēsexāgintā")
+               , (59, const "ūndēsexāgintā")
+               , (68, const "duodēseptuāgintā")
+               , (69, const "ūndēseptuāgintā")
+               , (78, const "duodēoctōgintā")
+               , (79, const "ūndēoctōgintā")
+               , (88, const "duodēnōnāgintā")
+               , (89, const "ūndēnōnāgintā")
+               , (98, const "duodēcentum")
+               , (99, const "ūndēcentum")
+               , (100, \c → case c of
+                              RM (C n) _ | n ∈ [2, 3, 6] → "centī"
+                                         | otherwise     → "gentī"
+                              _                          → "centum"
+                 )
+               , (1000, \c → case c of
+                               RM {} → "milia"
+                               _     → "mīlle"
+                 )
+               ]

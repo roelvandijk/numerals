@@ -27,11 +27,11 @@ library
                  , Text.Numeral.Language.NL
                  , Text.Numeral.Language.DE
                  , Text.Numeral.Language.EN
-               --, Text.Numeral.Language.SV
-               --, Text.Numeral.Language.NO
+                 , Text.Numeral.Language.SV
+                 , Text.Numeral.Language.NO
                  , Text.Numeral.Language.FR
                --, Text.Numeral.Language.IT
-               --, Text.Numeral.Language.LA
+                 , Text.Numeral.Language.LA
                --, Text.Numeral.Language.PT
                --, Text.Numeral.Language.SP
                  , Text.Numeral.Language.JA

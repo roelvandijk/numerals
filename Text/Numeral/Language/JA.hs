@@ -155,7 +155,7 @@ generic_repr ∷ (IsString s) ⇒ s → s → Repr s
 generic_repr four seven =
     Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
          , reprAdd  = \_ _ → " "
-         , reprMul  = \_ _ → "-"
+         , reprMul  = \_ _ → ""
          , reprZero = "rei"
          , reprNeg  = "mainasu "
          }

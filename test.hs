@@ -31,20 +31,22 @@ import Test.Framework ( Test, defaultMain, testGroup )
 import Test.Framework.Providers.HUnit ( testCase )
 
 -- from numerals:
-import qualified Text.Numeral.Language.NL          as NL ( cardinal  )
-import qualified Text.Numeral.Language.NL.TestData as NL ( cardinals )
 import qualified Text.Numeral.Language.DE          as DE ( cardinal  )
 import qualified Text.Numeral.Language.DE.TestData as DE ( cardinals )
-import qualified Text.Numeral.Language.SV          as SV ( cardinal  )
-import qualified Text.Numeral.Language.SV.TestData as SV ( cardinals )
-import qualified Text.Numeral.Language.NO          as NO ( cardinal  )
-import qualified Text.Numeral.Language.NO.TestData as NO ( cardinals )
-import qualified Text.Numeral.Language.FR          as FR ( cardinal  )
-import qualified Text.Numeral.Language.FR.TestData as FR ( cardinals )
-import qualified Text.Numeral.Language.LA          as LA ( cardinal  )
-import qualified Text.Numeral.Language.LA.TestData as LA ( cardinals )
 import qualified Text.Numeral.Language.EO          as EO ( cardinal  )
 import qualified Text.Numeral.Language.EO.TestData as EO ( cardinals )
+import qualified Text.Numeral.Language.FR          as FR ( cardinal  )
+import qualified Text.Numeral.Language.FR.TestData as FR ( cardinals )
+import qualified Text.Numeral.Language.JA          as JA ( preferred_cardinal  )
+import qualified Text.Numeral.Language.JA.TestData as JA ( preferred_cardinals )
+import qualified Text.Numeral.Language.LA          as LA ( cardinal  )
+import qualified Text.Numeral.Language.LA.TestData as LA ( cardinals )
+import qualified Text.Numeral.Language.NL          as NL ( cardinal  )
+import qualified Text.Numeral.Language.NL.TestData as NL ( cardinals )
+import qualified Text.Numeral.Language.NO          as NO ( cardinal  )
+import qualified Text.Numeral.Language.NO.TestData as NO ( cardinals )
+import qualified Text.Numeral.Language.SV          as SV ( cardinal  )
+import qualified Text.Numeral.Language.SV.TestData as SV ( cardinals )
 
 
 --------------------------------------------------------------------------------
@@ -77,11 +79,15 @@ mkTests n f xs = testCase n $ testAsGroup f xs
 --mkTests n f xs = testGroup n $ testIndividually f xs
 
 tests ∷ [Test]
-tests = [ testGroup "NL" [mkTests "cardinal" NL.cardinal NL.cardinals]
-        , testGroup "DE" [mkTests "cardinal" DE.cardinal DE.cardinals]
-        , testGroup "SV" [mkTests "cardinal" SV.cardinal SV.cardinals]
-        , testGroup "NO" [mkTests "cardinal" NO.cardinal NO.cardinals]
-        , testGroup "FR" [mkTests "cardinal" FR.cardinal FR.cardinals]
-        , testGroup "LA" [mkTests "cardinal" LA.cardinal LA.cardinals]
+tests = [ testGroup "DE" [mkTests "cardinal" DE.cardinal DE.cardinals]
         , testGroup "EO" [mkTests "cardinal" EO.cardinal EO.cardinals]
+        , testGroup "FR" [mkTests "cardinal" FR.cardinal FR.cardinals]
+        , testGroup "JA"
+          [ testGroup "preferred"
+            [mkTests "cardinal" JA.preferred_cardinal JA.preferred_cardinals]
+          ]
+        , testGroup "LA" [mkTests "cardinal" LA.cardinal LA.cardinals]
+        , testGroup "NL" [mkTests "cardinal" NL.cardinal NL.cardinals]
+        , testGroup "NO" [mkTests "cardinal" NO.cardinal NO.cardinals]
+        , testGroup "SV" [mkTests "cardinal" SV.cardinal SV.cardinals]
         ]

@@ -12,18 +12,15 @@ module Text.Numeral.Language.LA
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( Bool(False), otherwise )
+import Data.Bool     ( Bool(False, True), otherwise )
 import Data.Function ( const, ($) )
 import Data.List     ( map, concatMap )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
-import Data.Ord      ( (<), (>) )
 import Data.String   ( IsString )
 import Prelude       ( (+), Integral, fromInteger )
 
 -- from base-unicode-symbols:
-import Data.Bool.Unicode     ( (∨) )
-import Data.Eq.Unicode       ( (≡) )
 import Data.Function.Unicode ( (∘) )
 import Data.List.Unicode     ( (∈) )
 import Data.Monoid.Unicode   ( (⊕) )
@@ -35,7 +32,6 @@ import qualified Data.IntMap as IM ( fromList, lookup )
 -- from numerals:
 import Text.Numeral
 import Text.Numeral.Misc      ( dec )
-import Text.Numeral.Pelletier ( scale )
 
 
 --------------------------------------------------------------------------------
@@ -47,7 +43,7 @@ Sources:
   http://www.informalmusic.com/latinsoc/latnum.html
   http://www.sf.airnet.ne.jp/~ts/language/number/latin.html
 
-TODO: need undercounting to represent [18, 19, 28, 29, ..., 98, 99].
+TODO: need overcounting to represent [18, 19, 28, 29, ..., 98, 99].
 
 18 = 2 from (2 ⋅ 10)
 19 = 1 from (2 ⋅ 10)
@@ -64,7 +60,9 @@ rules = Rules { rsFindRule = findRule rs
               }
     where
       rs = map atom [1..9]
-         ⊕ [mul 10 10 10 LeftAdd]
+         ⊕ [ add 10 10 10 LeftAdd True
+           , mul 10 10 10 RightAdd
+           ]
          ⊕ concatMap (\n → [atom $ n + 8, atom $ n + 9]) [10,20..90]
          ⊕ [ mul (dec 2) (dec 2) (dec 1) RightAdd
            , mul (dec 3) (dec 3) (dec 3) RightAdd
@@ -81,8 +79,8 @@ cardinalRepr =
          , reprNeg   = "- "
          }
     where
-      (_ :⋅: C n) ⊞ _ | n > 100 = " "
-      _           ⊞ _           = ""
+      (_ :⋅: C _) ⊞ _ = " "
+      _           ⊞ _ = ""
 
       _ ⊡ (C n) | n ≤ 100 = ""
       _ ⊡ _               = " "
@@ -93,7 +91,7 @@ cardinalRepr =
                             _            → "ūnus"
                  )
                , (2, \c → case c of
-                            LM (C 10)  _ → "vi"
+                            LM (C 10)  _ → "vī"
                             LM (C 100) _ → "du"
                             _            → "duo"
                  )

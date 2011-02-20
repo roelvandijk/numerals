@@ -45,13 +45,12 @@ rules = Rules { rsFindRule = findRule rs
               , rsMulOne   = (≥ 100)
               }
     where
-      rs = map atom [1..9]
-         ⊕ [ add 10 10 10 LeftAdd  True
+      rs = map atom [1..12]
+         ⊕ [ add 10 13  7 LeftAdd  True
            , add 20 20 10 RightAdd True
            , mul 10 30 10 RightAdd
+           , mul 100 100 10 RightAdd
            ]
-         ⊕ map atom [11..12]
-         ⊕ [mul 100 100 10 RightAdd]
          ⊕ scale RightAdd 3
 
 cardinalRepr ∷ (IsString s) ⇒ Repr s

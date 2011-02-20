@@ -70,7 +70,7 @@ cardinalRepr =
       _ ⊞ _ = ""
 
       symMap = IM.fromList
-               [ (1,  const "én")
+               [ (1,  const "en")
                , (2,  const "to")
                , (3,  ten   "tre"  "tret" "tret")
                , (4,  ten   "fire" "fjor" "før")

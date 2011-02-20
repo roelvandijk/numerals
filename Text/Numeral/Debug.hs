@@ -9,11 +9,8 @@ module Text.Numeral.Debug where
 
 -- from base:
 import Control.Monad ( forM_ )
-import Data.Monoid   ( Monoid )
-import Data.String   ( IsString )
 
 -- from base-unicode-symbols:
-import Data.Function.Unicode ( (∘) )
 import Data.Monoid.Unicode   ( (⊕) )
 
 -- from numerals:

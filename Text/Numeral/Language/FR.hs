@@ -37,6 +37,12 @@ import Text.Numeral.Pelletier ( scale )
 -- FR
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.sf.airnet.ne.jp/~ts/language/number/french.html
+  http://www.french-linguistics.co.uk/tutorials/numbers/
+-}
+
 cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
 cardinal = textify cardinalRepr ∘ deconstruct rules
 
@@ -60,7 +66,7 @@ cardinalRepr =
     Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
          , reprAdd   = (⊞)
          , reprMul   = (⊡)
-         , reprZero  = "zeró"
+         , reprZero  = "zéro"
          , reprNeg   = "moins "
          }
     where

@@ -12,12 +12,10 @@ module Text.Numeral.Language.DE
 -------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( otherwise )
 import Data.Function ( const )
 import Data.List     ( map )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
-import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Prelude       ( Integral, Num, fromInteger )
 
@@ -63,9 +61,8 @@ cardinalRepr =
          , reprNeg   = "minus "
          }
     where
-      C n ⊞ _ | n < 10        = "und"
-              | otherwise     = ""
-      _   ⊞ _ = ""
+      _ ⊞ (_ :⋅: C 10) = "und"
+      _ ⊞ _            = ""
 
       symMap = IM.fromList
                [ (1, \c → case c of
@@ -81,7 +78,11 @@ cardinalRepr =
                , (3, const "drei")
                , (4, const "vier")
                , (5, const "fünf")
-               , (6, const "sechs")
+               , (6, \c → case c of
+                            LA (C 10) _ → "sech"
+                            LM (C 10) _ → "sech"
+                            _           → "sechs"
+                 )
                , (7, \c → case c of
                             LA (C 10) _ → "sieb"
                             LM (C 10) _ → "sieb"

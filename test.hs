@@ -12,7 +12,7 @@ import Control.Monad ( forM_, when )
 import Data.Char     ( String )
 import Data.Function ( ($) )
 import Data.List     ( map )
-import Data.Maybe    ( Maybe(Just), maybe )
+import Data.Maybe    ( Maybe(Just), fromMaybe )
 import Prelude       ( Integer )
 import System.IO     ( IO )
 import Text.Printf   ( printf )
@@ -22,7 +22,7 @@ import Text.Show     ( show )
 import Data.Eq.Unicode ( (≢) )
 
 -- from HUnit:
-import Test.HUnit ( Assertion, assertFailure, (@?=) )
+import Test.HUnit ( Assertion, assertFailure )
 
 -- from test-framework:
 import Test.Framework ( Test, defaultMain, testGroup )
@@ -63,22 +63,23 @@ import qualified Text.Numeral.Language.SV.TestData as SV ( cardinals )
 main ∷ IO ()
 main = defaultMain tests
 
+testConversion ∷ (Integer → Maybe String) → Integer → String → Assertion
+testConversion f n s =
+  let r = f n
+  in when (r ≢ Just s)
+        $ assertFailure
+        $ printf "Expected %i = \"%s\" but got \"%s\""
+                 n
+                 s
+                 (fromMaybe "no result" r)
+
 testAsGroup ∷ (Integer → Maybe String) → [(Integer, String)] → Assertion
-testAsGroup f xs = do
-  forM_ xs $ \(n, s) →
-    let r = f n
-    in when (r ≢ Just s)
-          $ assertFailure
-          $ printf "Expected %i = %s but got %s"
-                   n
-                   (show s)
-                   (maybe "no result" show r)
+testAsGroup f xs = forM_ xs $ \(n, s) → testConversion f n s
 
 testIndividually ∷ (Integer → Maybe String) → [(Integer, String)] → [Test]
-testIndividually f xs = map test xs
-    where
-      test (n, s) = testCase (show n) $ f n @?= Just s
-
+testIndividually f xs = let mkTest (n, s) = testCase (show n)
+                                          $ testConversion f n s
+                        in map mkTest xs
 
 mkTests ∷ String → (Integer → Maybe String) → [(Integer, String)] → Test
 mkTests n f xs = testCase n $ testAsGroup f xs

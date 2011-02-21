@@ -62,6 +62,7 @@ library
 executable test-numerals
   main-is: test.hs
   other-modules: Text.Numeral.Language.DE.TestData
+               , Text.Numeral.Language.EN.TestData
                , Text.Numeral.Language.EO.TestData
                , Text.Numeral.Language.FR.TestData
                , Text.Numeral.Language.LA.TestData

@@ -33,6 +33,12 @@ import Test.Framework.Providers.HUnit ( testCase )
 -- from numerals:
 import qualified Text.Numeral.Language.DE          as DE ( cardinal  )
 import qualified Text.Numeral.Language.DE.TestData as DE ( cardinals )
+import qualified Text.Numeral.Language.EN          as EN ( uk_cardinal
+                                                         , us_cardinal
+                                                         )
+import qualified Text.Numeral.Language.EN.TestData as EN ( uk_cardinals
+                                                         , us_cardinals
+                                                         )
 import qualified Text.Numeral.Language.EO          as EO ( cardinal  )
 import qualified Text.Numeral.Language.EO.TestData as EO ( cardinals )
 import qualified Text.Numeral.Language.FR          as FR ( cardinal  )
@@ -81,6 +87,12 @@ mkTests n f xs = testCase n $ testAsGroup f xs
 tests ∷ [Test]
 tests = [ testGroup "DE" [mkTests "cardinal" DE.cardinal DE.cardinals]
         , testGroup "EO" [mkTests "cardinal" EO.cardinal EO.cardinals]
+        , testGroup "EN"
+          [ testGroup "UK"
+            [mkTests "cardinal" EN.uk_cardinal EN.uk_cardinals]
+          , testGroup "US"
+            [mkTests "cardinal" EN.us_cardinal EN.us_cardinals]
+          ]
         , testGroup "FR" [mkTests "cardinal" FR.cardinal FR.cardinals]
         , testGroup "JA"
           [ testGroup "preferred"

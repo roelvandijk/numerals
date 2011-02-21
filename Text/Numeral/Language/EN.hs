@@ -1,11 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Language.EN
-    ( ukCardinal
-    , usCardinal
+    ( uk_cardinal
+    , us_cardinal
     , rules
-    , ukCardinalRepr
-    , usCardinalRepr
+    , uk_cardinalRepr
+    , us_cardinalRepr
     ) where
 
 --------------------------------------------------------------------------------
@@ -38,11 +38,39 @@ import Text.Numeral.Pelletier ( scale )
 -- EN
 --------------------------------------------------------------------------------
 
-ukCardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-ukCardinal = textify ukCardinalRepr ∘ deconstruct rules
+{-
+TODO? Other interesting number names in English:
 
-usCardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-usCardinal = textify usCardinalRepr ∘ deconstruct rules
+Base 20:
+20      score           20
+40      twoscore        2 × 20
+60      threescore      3 × 20
+80      fourscore       4 × 20
+100     fivescore       5 × 20
+120     sixscore        6 × 20
+140     sevenscore      7 × 20
+160     eightscore      8 × 20
+180     ninescore       9 × 20
+200     tenscore        10 × 20
+
+Base 12:
+6       half dozen      ½ × 12
+12      dozen           12
+13      baker's dozen   baker's 12
+13      long dozen      long 12
+72      half gross      ½ × 144
+120     long hundred    long 100 (12 × 10)
+144     gross           144 (12²)
+156     long gross      long 144 (12 × 13)
+1200    long thousand   long 1000 (12 × 10²)
+1728    great gross     1728 (12³)
+-}
+
+uk_cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+uk_cardinal = textify uk_cardinalRepr ∘ deconstruct rules
+
+us_cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
+us_cardinal = textify us_cardinalRepr ∘ deconstruct rules
 
 rules ∷ (Integral i) ⇒ Rules i
 rules = Rules { rsFindRule = findRule rs
@@ -56,15 +84,15 @@ rules = Rules { rsFindRule = findRule rs
          ⊕ [mul 100 100 10 RightAdd]
          ⊕ scale RightAdd 3
 
-usCardinalRepr ∷ (IsString s) ⇒ Repr s
-usCardinalRepr = cardinalRepr (⊞)
+us_cardinalRepr ∷ (IsString s) ⇒ Repr s
+us_cardinalRepr = cardinalRepr (⊞)
   where
     (_ :⋅: C 10) ⊞ _ = "-"
     (_ :⋅: _   ) ⊞ _ = " "
     _            ⊞ _ = ""
 
-ukCardinalRepr ∷ (IsString s) ⇒ Repr s
-ukCardinalRepr = cardinalRepr (⊞)
+uk_cardinalRepr ∷ (IsString s) ⇒ Repr s
+uk_cardinalRepr = cardinalRepr (⊞)
   where
     (_ :⋅: C 10) ⊞ _ = "-"
     (_ :⋅: _   ) ⊞ _ = " and "

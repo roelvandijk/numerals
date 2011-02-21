@@ -65,6 +65,7 @@ executable test-numerals
                , Text.Numeral.Language.EN.TestData
                , Text.Numeral.Language.EO.TestData
                , Text.Numeral.Language.FR.TestData
+               , Text.Numeral.Language.JA.TestData
                , Text.Numeral.Language.LA.TestData
                , Text.Numeral.Language.NL.TestData
                , Text.Numeral.Language.NO.TestData

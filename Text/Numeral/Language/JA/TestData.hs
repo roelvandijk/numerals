@@ -1,6 +1,10 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.JA.TestData (preferred_cardinals) where
+module Text.Numeral.Language.JA.TestData
+    ( preferred_cardinals
+    , kanji_cardinals
+    , daiji_cardinals
+    ) where
 
 
 --------------------------------------------------------------------------------
@@ -9,7 +13,10 @@ module Text.Numeral.Language.JA.TestData (preferred_cardinals) where
 
 -- from base:
 import Data.String ( IsString )
-import Prelude     ( Num )
+import Prelude     ( Num, Integral )
+
+-- from numerals:
+import Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
@@ -119,4 +126,45 @@ preferred_cardinals =
   , (98, "kyūjū hachi")
   , (99, "kyūjū kyū")
   , (100, "hyaku")
+  ]
+
+kanji_cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
+kanji_cardinals =
+  [ (0, "零")
+  , (1, "一")
+  , (2, "二")
+  , (3, "三")
+  , (4, "四")
+  , (5, "五")
+  , (6, "六")
+  , (7, "七")
+  , (8, "八")
+  , (9, "九")
+  , (10, "十")
+  , (21, "二十一")
+  , (100, "百")
+  , (321, "三百二十一")
+  , (1000, "千")
+  , (4321, "四千三百二十一")
+  , (10000, "一万")
+  , (654321, "六十五万四千三百二十一")
+  , (87654321, "八千七百六十五万四千三百二十一")
+  , (100000000, "一億")
+  , (987654321, "九億八千七百六十五万四千三百二十一")
+  , (dec 12, "一兆")
+  ]
+
+daiji_cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
+daiji_cardinals =
+  [ (0, "零")
+  , (1, "壱")
+  , (2, "弐")
+  , (3, "参")
+  , (4, "四")
+  , (5, "五")
+  , (6, "六")
+  , (7, "七")
+  , (8, "八")
+  , (9, "九")
+  , (10, "拾")
   ]

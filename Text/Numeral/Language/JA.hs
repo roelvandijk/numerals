@@ -123,12 +123,7 @@ daiji_cardinal = textify daiji_cardinal_repr ∘ deconstruct rules
 
 daiji_cardinal_repr ∷ (IsString s) ⇒ Repr s
 daiji_cardinal_repr =
-    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
-         , reprAdd  = \_ _ → ""
-         , reprMul  = \_ _ → ""
-         , reprZero = "零"
-         , reprNeg  = ""
-         }
+    kanji_cardinal_repr {reprValue = \n → IM.lookup (fromInteger n) symMap}
     where
       symMap = IM.fromList
                [ (1, const "壱")

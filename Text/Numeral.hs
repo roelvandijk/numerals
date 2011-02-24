@@ -180,14 +180,14 @@ infixl 6 :+:
 infixl 7 :*:
 
 instance Num Exp where
-    x + y       = x :+: y
-    x * y       = x :*: y
+    (+)         = (:+:)
+    (*)         = (:*:)
     negate      = Neg
     fromInteger = C
 
-    _ - _    = error "not implemented"
-    abs    _ = error "not implemented"
-    signum _ = error "not implemented"
+    (-)    = error "not implemented"
+    abs    = error "not implemented"
+    signum = error "not implemented"
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

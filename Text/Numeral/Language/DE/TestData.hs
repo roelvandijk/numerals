@@ -119,4 +119,6 @@ cardinals =
   , (98, "achtundneunzig")
   , (99, "neunundneunzig")
   , (100, "einhundert")
+  , (200, "zweihundert")
+  , (1000, "tausend")
   ]

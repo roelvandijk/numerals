@@ -2,7 +2,7 @@
 
 module Text.Numeral.Language.DE
     ( cardinal
-    , rules
+    , findRule
     , cardinalRepr
     ) where
 
@@ -12,21 +12,18 @@ module Text.Numeral.Language.DE
 -------------------------------------------------------------------------------
 
 -- from base:
+import Control.Monad ( (>>=) )
 import Data.Function ( const )
-import Data.List     ( map )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Integral, Num, fromInteger )
+import Prelude       ( Integral, Num )
 
 -- from base-unicode-symbols:
-import Data.Eq.Unicode       ( (≡) )
-import Data.Function.Unicode ( (∘) )
-import Data.Monoid.Unicode   ( (⊕) )
-import Data.Ord.Unicode      ( (≥) )
+import Data.Ord.Unicode ( (≥) )
 
 -- from containers:
-import qualified Data.IntMap as IM ( fromList, lookup )
+import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
@@ -38,34 +35,35 @@ import Text.Numeral.Pelletier ( scale )
 -- DE
 -------------------------------------------------------------------------------
 
-cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-cardinal = textify cardinalRepr ∘ deconstruct rules
+cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+cardinal n = deconstruct findRule n >>= textify cardinalRepr
 
-rules ∷ (Integral i) ⇒ Rules i
-rules = Rules { rsFindRule = findRule rs
-              , rsMulOne   = (≡ 100)
-              }
-    where
-      rs = map atom [1..9]
-         ⊕ [mul 10 10 10 LeftAdd]
-         ⊕ map atom [11..12]
-         ⊕ [mul 100 100 10 RightAdd]
-         ⊕ scale RightAdd 3
+findRule ∷ (Integral α, Num β) ⇒ FindRule α β
+findRule = mkFindRule rules (scale 3 R L)
+
+rules ∷ (Integral α, Num β) ⇒ Rules α β
+rules = [ ((  0,  12), atom)
+        , (( 13,  19), add 10 L)
+        , (( 20,  99), mul 10 L L)
+        , ((100, 100), atom1)
+        , ((101, 199), add 100 R)
+        , ((200, 999), mul1 100 R L)
+        ]
 
 cardinalRepr ∷ (IsString s) ⇒ Repr s
 cardinalRepr =
-    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+    Repr { reprValue = \n → M.lookup n symMap
          , reprAdd   = (⊞)
          , reprMul   = \_ _ → ""
-         , reprZero  = "null"
          , reprNeg   = "minus "
          }
     where
-      _ ⊞ (_ :⋅: C 10) = "und"
+      _ ⊞ (_ :*: C 10) = "und"
       _ ⊞ _            = ""
 
-      symMap = IM.fromList
-               [ (1, \c → case c of
+      symMap = M.fromList
+               [ (0, const "null")
+               , (1, \c → case c of
                             LA {} → "ein"
                             LM (C n) _ | n ≥ dec 6 → "eine"
                                        | n ≥ 100   → "ein"

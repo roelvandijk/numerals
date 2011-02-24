@@ -6,7 +6,7 @@ http://www.guidetojapanese.org/numbers.html
 -}
 
 module Text.Numeral.Language.JA
-    ( rules
+    ( findRule
 
     , kanji_cardinal
     , kanji_cardinal_repr
@@ -27,62 +27,60 @@ module Text.Numeral.Language.JA
 --------------------------------------------------------------------------------
 
 -- from base:
+import Control.Monad ( (>>=) )
 import Data.Function ( const )
-import Data.List     ( map )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Integral, fromInteger )
-
--- from base-unicode-symbols:
-import Data.Function.Unicode ( (∘) )
-import Data.Monoid.Unicode ( (⊕) )
-import Data.Ord.Unicode    ( (≥) )
+import Prelude       ( Num, Integral )
 
 -- from containers:
-import qualified Data.IntMap as IM ( fromList, lookup )
+import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
 import Text.Numeral.Misc      ( dec )
-import Text.Numeral.Pelletier ( scale )
+import Text.Numeral.Pelletier ( scale1 )
 
 
 --------------------------------------------------------------------------------
 -- JA
 --------------------------------------------------------------------------------
 
-rules ∷ (Integral i) ⇒ Rules i
-rules = Rules { rsFindRule = findRule rs
-              , rsMulOne   = (≥ 10000)
-              }
-    where
-      rs = map atom [1..9]
-         ⊕ [ mul 10   10   10 RightAdd
-           , mul 100  100  10 RightAdd
-           , mul 1000 1000 10 RightAdd
-           ]
-         ⊕ scale RightAdd 4
+findRule ∷ (Integral α, Num β) ⇒ FindRule α β
+findRule = mkFindRule rules (scale1 4 R L)
+
+rules ∷ (Integral α, Num β) ⇒ Rules α β
+rules = [ ((   0,   10), atom)
+        , ((  11,   19), add 10 R)
+        , ((  20,   99), mul 10 R L)
+        , (( 100,  100), atom)
+        , (( 101,  199), add 100 R)
+        , (( 200,  999), mul 100 R L)
+        , ((1000, 1000), atom)
+        , ((1001, 1999), add 1000 R)
+        , ((2000, 9999), mul 1000 R L)
+        ]
 
 
 --------------------------------------------------------------------------------
 -- Kanji
 --------------------------------------------------------------------------------
 
-kanji_cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-kanji_cardinal = textify kanji_cardinal_repr ∘ deconstruct rules
+kanji_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+kanji_cardinal n = deconstruct findRule n >>= textify kanji_cardinal_repr
 
 kanji_cardinal_repr ∷ (IsString s) ⇒ Repr s
 kanji_cardinal_repr =
-    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+    Repr { reprValue = \n → M.lookup n symMap
          , reprAdd  = \_ _ → ""
          , reprMul  = \_ _ → ""
-         , reprZero = "零" -- alternatives:"ゼロ" or "マル"
          , reprNeg  = "マイナス"
          }
     where
-      symMap = IM.fromList
-               [ (1, const "一")
+      symMap = M.fromList
+               [ (0, const "零") -- alternatives:"ゼロ" or "マル"
+               , (1, const "一")
                , (2, const "二")
                , (3, const "三")
                , (4, const "四")
@@ -118,15 +116,16 @@ kanji_cardinal_repr =
 -- Daiji
 --------------------------------------------------------------------------------
 
-daiji_cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-daiji_cardinal = textify daiji_cardinal_repr ∘ deconstruct rules
+daiji_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+daiji_cardinal n = deconstruct findRule n >>= textify daiji_cardinal_repr
 
 daiji_cardinal_repr ∷ (IsString s) ⇒ Repr s
 daiji_cardinal_repr =
-    kanji_cardinal_repr {reprValue = \n → IM.lookup (fromInteger n) symMap}
+    kanji_cardinal_repr {reprValue = \n → M.lookup n symMap}
     where
-      symMap = IM.fromList
-               [ (1, const "壱")
+      symMap = M.fromList
+               [ (0, const "零") -- alternatives:"ゼロ" or "マル"
+               , (1, const "壱")
                , (2, const "弐")
                , (3, const "参")
                , (4, const "四")
@@ -148,15 +147,15 @@ daiji_cardinal_repr =
 
 generic_repr ∷ (IsString s) ⇒ s → s → Repr s
 generic_repr four seven =
-    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+    Repr { reprValue = \n → M.lookup n symMap
          , reprAdd  = \_ _ → " "
          , reprMul  = \_ _ → ""
-         , reprZero = "rei"
          , reprNeg  = "mainasu "
          }
     where
-      symMap = IM.fromList
-               [ (1, const "ichi")
+      symMap = M.fromList
+               [ (0, const "rei")
+               , (1, const "ichi")
                , (2, const "ni")
                , (3, const "san")
                , (4, const four)
@@ -195,8 +194,8 @@ generic_repr four seven =
 -- On'yomi
 --------------------------------------------------------------------------------
 
-on'yomi_cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-on'yomi_cardinal = textify on'yomi_cardinal_repr ∘ deconstruct rules
+on'yomi_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+on'yomi_cardinal n = deconstruct findRule n >>= textify on'yomi_cardinal_repr
 
 on'yomi_cardinal_repr ∷ (IsString s) ⇒ Repr s
 on'yomi_cardinal_repr = generic_repr "shi" "shichi"
@@ -206,8 +205,8 @@ on'yomi_cardinal_repr = generic_repr "shi" "shichi"
 -- Preferred reading
 --------------------------------------------------------------------------------
 
-preferred_cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-preferred_cardinal = textify preferred_cardinal_repr ∘ deconstruct rules
+preferred_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+preferred_cardinal n = deconstruct findRule n >>= textify preferred_cardinal_repr
 
 preferred_cardinal_repr ∷ (IsString s) ⇒ Repr s
 preferred_cardinal_repr = generic_repr "yon" "nana"

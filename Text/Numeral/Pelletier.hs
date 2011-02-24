@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Pelletier
-    ( scale
+    ( scale, scale1
     ) where
 
 
@@ -10,14 +10,14 @@ module Text.Numeral.Pelletier
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool ( Bool(True) )
-import Prelude   ( Integral )
+import Data.List ( concatMap )
+import Prelude   ( Integral, Num, (+), (-) )
 
 -- from base-unicode-symbols:
 import Prelude.Unicode ( (⋅) )
 
 -- from numerals:
-import Text.Numeral ( AddType, Rule(Rule), RuleType(Mul) )
+import Text.Numeral
 import Text.Numeral.Misc ( dec )
 
 
@@ -25,9 +25,25 @@ import Text.Numeral.Misc ( dec )
 -- Pelletier
 --------------------------------------------------------------------------------
 
-scale ∷ (Integral i) ⇒ AddType → i → [Rule i]
-scale a g = [Rule Mul (dec n) (dec n) (dec g) a True | n ← [g, 2⋅g ..]]
+scale ∷ (Integral α, Num β) ⇒ α → Side → Side → [((α, α), Rule α β)]
+scale g aSide mSide = concatMap step [g, 2⋅g ..]
+    where
+      step n = [ ((s, s), atom)
+               , ((s+1, 2⋅s - 1), add s aSide)
+               , ((2⋅s, s ⋅ dec g - 1), mul s aSide mSide)
+               ]
+          where
+            s = dec n
 
+scale1 ∷ (Integral α, Num β) ⇒ α → Side → Side → [((α, α), Rule α β)]
+scale1 g aSide mSide = concatMap step [g, 2⋅g ..]
+    where
+      step n = [ ((s, s), atom1)
+               , ((s+1, 2⋅s - 1), add s aSide)
+               , ((2⋅s, s ⋅ dec g - 1), mul1 s aSide mSide)
+               ]
+          where
+            s = dec n
 
 {-
     ( longScale

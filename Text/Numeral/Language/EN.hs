@@ -3,7 +3,7 @@
 module Text.Numeral.Language.EN
     ( uk_cardinal
     , us_cardinal
-    , rules
+    , findRule
     , uk_cardinalRepr
     , us_cardinalRepr
     ) where
@@ -13,21 +13,15 @@ module Text.Numeral.Language.EN
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( Bool(True) )
+import Control.Monad ( (>>=) )
 import Data.Function ( const )
-import Data.List     ( map )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Integral, fromInteger )
-
--- from base-unicode-symbols:
-import Data.Function.Unicode ( (∘) )
-import Data.Ord.Unicode      ( (≥) )
-import Data.Monoid.Unicode   ( (⊕) )
+import Prelude       ( Num, Integral )
 
 -- from containers:
-import qualified Data.IntMap as IM ( fromList, lookup )
+import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
@@ -66,52 +60,52 @@ Base 12:
 1728    great gross     1728 (12³)
 -}
 
-uk_cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-uk_cardinal = textify uk_cardinalRepr ∘ deconstruct rules
+uk_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+uk_cardinal n = deconstruct findRule n >>= textify uk_cardinalRepr
 
-us_cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-us_cardinal = textify us_cardinalRepr ∘ deconstruct rules
+us_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+us_cardinal n = deconstruct findRule n >>= textify us_cardinalRepr
 
-rules ∷ (Integral i) ⇒ Rules i
-rules = Rules { rsFindRule = findRule rs
-              , rsMulOne   = (≥ 100)
-              }
-    where
-      rs = map atom [1..12]
-         ⊕ [ add 10 10 10 LeftAdd True
-           , mul 10 20 10 RightAdd
-           ]
-         ⊕ [mul 100 100 10 RightAdd]
-         ⊕ scale RightAdd 3
+findRule ∷ (Integral α, Num β) ⇒ FindRule α β
+findRule = mkFindRule rules (scale 3 R L)
+
+rules ∷ (Integral α, Num β) ⇒ Rules α β
+rules = [ ((  0,  12), atom)
+        , (( 13,  19), add 10 L)
+        , (( 20,  99), mul 10 R L)
+        , ((100, 100), atom1)
+        , ((101, 199), add 100 R)
+        , ((200, 999), mul1 100 R L)
+        ]
 
 us_cardinalRepr ∷ (IsString s) ⇒ Repr s
 us_cardinalRepr = cardinalRepr (⊞)
   where
-    (_ :⋅: C 10) ⊞ _ = "-"
-    (_ :⋅: _   ) ⊞ _ = " "
+    (_ :*: C 10) ⊞ _ = "-"
+    (_ :*: _   ) ⊞ _ = " "
     _            ⊞ _ = ""
 
 uk_cardinalRepr ∷ (IsString s) ⇒ Repr s
 uk_cardinalRepr = cardinalRepr (⊞)
   where
-    (_ :⋅: C 10) ⊞ _ = "-"
-    (_ :⋅: _   ) ⊞ _ = " and "
+    (_ :*: C 10) ⊞ _ = "-"
+    (_ :*: _   ) ⊞ _ = " and "
     _            ⊞ _ = ""
 
 cardinalRepr ∷ (IsString s) ⇒ (Exp → Exp → s) → Repr s
 cardinalRepr f =
-    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+    Repr { reprValue = \n → M.lookup n symMap
          , reprAdd   = f
          , reprMul   = (⊡)
-         , reprZero  = "zero"
          , reprNeg   = "minus "
          }
     where
       _ ⊡ C 10 = ""
       _ ⊡ _    = " "
 
-      symMap = IM.fromList
-               [ (1, const "one")
+      symMap = M.fromList
+               [ (0, const "zero")
+               , (1, const "one")
                , (2, ten   "two"   "two"  "twen")
                , (3, ten   "three" "thir" "thir")
                , (4, ten   "four"  "four" "for")

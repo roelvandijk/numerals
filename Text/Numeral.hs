@@ -8,23 +8,29 @@
   #-}
 
 module Text.Numeral
-    ( Val(..)
-    , Exp(..)
-    , Rule(..)
-    , RuleType(..)
-    , AddType(..)
-    , Rules(..)
-    , deconstruct
-    , findRule
+    ( -- * Intervals
+    --   Interval
+    -- , IntervalMap
+    -- , lookupInterval
 
-    , SymbolRepr
+      -- * Rules
+      Rule
+    , Rules
+    , FindRule
+    , mkFindRule
+    , Side(..)
+    , atom, atom1
+    , add
+    , mul, mul1
+
+      -- * Structure of numerals
+    , deconstruct
+
+      -- * Representation of numerals
+    , Exp(..)
     , SymbolContext(..)
     , Repr(..)
     , textify
-
-    , atom
-    , add
-    , mul
     )
     where
 
@@ -34,146 +40,157 @@ module Text.Numeral
 -------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad ( return )
-import Data.Bool     ( Bool(False, True), otherwise )
-import Data.Eq       ( Eq )
-import Data.Function ( ($)  )
-import Data.Functor  ( (<$>) )
-import Data.Maybe    ( Maybe(Nothing, Just) )
-import Data.Monoid   ( Monoid )
-import Data.Ord      ( (<), (>) )
-import Data.String   ( IsString )
-import Prelude       ( Num, (+), (*), (-), negate, abs, signum
-                     , Integral, fromIntegral
-                     , Integer, fromInteger, divMod, error, abs
-                     )
-import Text.Show     ( Show )
+import Control.Applicative ( liftA2 )
+import Control.Monad       ( return )
+import Data.Bool           ( Bool, otherwise )
+import Data.Eq             ( Eq )
+import Data.Function       ( ($), id, const, flip )
+import Data.Functor        ( (<$>), fmap )
+import Data.List           ( foldr, find )
+import Data.Maybe          ( Maybe(Just) )
+import Data.Monoid         ( Monoid )
+import Data.Ord            ( Ord, (<), (>) )
+import Data.String         ( IsString )
+import Data.Tuple          ( fst, snd )
+import Prelude             ( Num, (+), (*), (-), negate, abs, signum
+                           , Integral, fromIntegral
+                           , Integer, fromInteger, divMod, error, abs
+                           )
+import Text.Show           ( Show )
 
 -- from base-unicode-symbols:
 import Data.Bool.Unicode     ( (∧) )
 import Data.Eq.Unicode       ( (≡) )
+import Data.Function.Unicode ( (∘) )
 import Data.Monoid.Unicode   ( (⊕) )
-import Data.Ord.Unicode      ( (≥) )
+import Data.Ord.Unicode      ( (≤) )
 import Prelude.Unicode       ( (⋅) )
 
-
--------------------------------------------------------------------------------
--- Structure of numerals
--------------------------------------------------------------------------------
-
-data Val α = Pos α
-           | Neg α
-           | Zero
-             deriving Show
-
-data Exp = Exp :+: Exp
-         | Exp :⋅: Exp
-         | C Integer -- must be > 0
-           deriving (Eq, Show)
-
-instance Num Exp where
-    x + y = x :+: y
-    x * y = x :⋅: y
-    fromInteger = C
-
-    _ - _    = error "not implemented"
-    negate _ = error "not implemented"
-    abs    _ = error "not implemented"
-    signum _ = error "not implemented"
-
-infixl 6 :+:
-infixl 7 :⋅:
+-- from fingertree:
+import qualified Data.IntervalMap.FingerTree as FT
+    ( Interval(Interval)
+    , IntervalMap, empty, insert
+    , search
+    )
 
 
 --------------------------------------------------------------------------------
+-- Intervals
 --------------------------------------------------------------------------------
 
-data Rule i = Rule { rType    ∷ RuleType
-                   , rVal     ∷ i
-                   , rPos     ∷ i
-                   , rScope   ∷ i
-                   , rAddType ∷ AddType
-                   , rTerm    ∷ Bool
-                   } deriving Show
+type Interval i = (i, i)
+type IntervalMap i α = [(Interval i, α)]
 
-data RuleType = Atom | Add | Mul deriving Show
+lookupInterval ∷ (Ord i) ⇒ i → IntervalMap i α → Maybe α
+lookupInterval x = fmap snd ∘ find (inInterval x ∘ fst)
 
-data AddType = LeftAdd
-             | RightAdd
-               deriving Show
+inInterval ∷ (Ord i) ⇒ i → Interval i → Bool
+inInterval x (lo, hi) = lo ≤ x ∧ x ≤ hi
 
-data Rules i = Rules { rsFindRule ∷ Maybe i → i → Rule i
-                     , rsMulOne   ∷ i → Bool
-                     }
 
 --------------------------------------------------------------------------------
+-- Rules
 --------------------------------------------------------------------------------
 
-deconstruct ∷ ∀ α i. (Num α, Integral i) ⇒ Rules i → i → Val α
-deconstruct (Rules {..}) i
-    | i < 0 = Neg $ go Nothing True (abs i)
-    | i > 0 = Pos $ go Nothing True i
-    | otherwise = Zero
+type Rule     α β = (α → Maybe β) → (α → Maybe β)
+type Rules    α β =  [((α, α), Rule α β)]
+type FindRule α β = α → Maybe (Rule α β)
+
+
+-- Precondition: xs is finite
+mkFindRule ∷ (Integral α, Num β) ⇒ Rules α β → Rules α β → FindRule α β
+mkFindRule xs ys = \n → case FT.search n xm of
+                          []  → lookupInterval n ys
+                          x:_ → Just $ snd x
     where
-      go ∷ Maybe i → Bool → i → α
-      go m o n = let (Rule {rVal, rTerm, rAddType}) = rsFindRule m n
-                     x `plus` y = case rAddType of
-                                    RightAdd → x + y
-                                    LeftAdd  → y + x
-                     infixl 6 `plus`
-                 in case n `divMod` rVal of
-                      (1, r) → let one | rTerm     = fromIntegral rVal
-                                       | otherwise = go (Just rVal) True rVal
-                                   one' | o ∧ rsMulOne rVal = 1 ⋅ one
-                                        | otherwise         = one
-                               in if r ≡ 0
-                                  then one'
-                                  else one' `plus` go Nothing True r
+      xm = mkIntervalMap xs
 
-                      (q, r) → let mr = go Nothing True q
-                                      ⋅ go Nothing False rVal
-                               in if r ≡ 0
-                                  then mr
-                                  else mr `plus` go Nothing True r
-
-findRule ∷ ∀ i. (Integral i) ⇒ [Rule i] → Maybe i → i → Rule i
-findRule []     _   _ = error "empty rule table"
-findRule (e:es) mmp n = go e e es
-    where go ∷ Rule i → Rule i → [Rule i] → Rule i
-          go a m [] = stop a m
-          go a m (x@(Rule {..}) : xs)
-              | Just mp ← mmp, rPos ≥ mp = stop a m
-              | rPos ≡ n = x
-              | otherwise = case rType of
-                              Atom            → go a m xs
-                              Add | rPos > n  → stop a m
-                                  | otherwise → go x m xs
-                              Mul | rPos > n  → stop a m
-                                  | otherwise → go a x xs
-
-          stop ∷ Rule i → Rule i → Rule i
-          stop a@(Rule {..}) m | n < rPos + rScope = a
-                               | otherwise         = m
-
+mkIntervalMap ∷ (Ord v) ⇒ [((v, v), α)] → FT.IntervalMap v α
+mkIntervalMap = foldr ins FT.empty
+  where ins ((lo, hi), n) = FT.insert (FT.Interval lo hi) n
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-atom ∷ (Integral i) ⇒ i → Rule i
-atom n = Rule Atom n n 1 RightAdd True
+data Side = L | R deriving Show
 
-add ∷ (Integral i) ⇒ i → i → i → AddType → Bool → Rule i
-add v p s a t = Rule Add v p s a t
+flipIfR ∷ Side → (α → α → α) → (α → α → α)
+flipIfR L = id
+flipIfR R = flip
 
-mul ∷ (Integral i) ⇒ i → i → i → AddType → Rule i
-mul v p s a = Rule Mul v p s a True
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+atom ∷ (Integral α, Num β) ⇒ Rule α β
+atom = const $ Just ∘ fromIntegral
+
+atom1 ∷ (Integral α, Num β) ⇒ Rule α β
+atom1 = const $ \n → Just $ 1 ⋅ fromIntegral n
+
+add ∷ (Num α, Num β) ⇒ α → Side → Rule α β
+add val s = \f n → liftA2 (flipIfR s (+)) (f $ n - val) (f val)
+
+mul ∷ (Integral α, Num β) ⇒ α → Side → Side → Rule α β
+mul val aSide mSide =
+    \f n → let (q, r) = n `divMod` val
+               qval = liftA2 (flipIfR mSide (⋅)) (f q) (f val)
+           in if r ≡ 0
+              then qval
+              else liftA2 (flipIfR aSide (+)) (f r) qval
+
+mul1 ∷ (Integral α, Num β) ⇒ α → Side → Side → Rule α β
+mul1 val aSide mSide =
+    \f n → let (q, r) = n `divMod` val
+               qval = if q ≡ 1
+                      then Just $ 1 ⊡ fromIntegral val
+                      else (⊡ fromIntegral val) <$> f q
+           in if r ≡ 0
+              then qval
+              else liftA2 (flipIfR aSide (+)) (f r) qval
+  where
+     (⊡) = flipIfR mSide (⋅)
+
+
+--------------------------------------------------------------------------------
+-- Structure of numerals
+--------------------------------------------------------------------------------
+
+deconstruct ∷ ∀ α β. (Integral α, Num β) ⇒ FindRule α β → α → Maybe β
+deconstruct findRule n
+    | n < 0 = negate <$> toExp (abs n)
+    | n > 0 = toExp n
+    | otherwise = Just 0
+    where
+      toExp ∷ α → Maybe β
+      toExp x = do r ← findRule x
+                   r toExp x
 
 
 --------------------------------------------------------------------------------
 -- Representation of numerals
 --------------------------------------------------------------------------------
 
-type SymbolRepr s = SymbolContext → s
+data Exp = Exp :+: Exp
+         | Exp :*: Exp
+         | Neg Exp
+         | C Integer
+           deriving (Eq, Show)
+
+infixl 6 :+:
+infixl 7 :*:
+
+instance Num Exp where
+    x + y       = x :+: y
+    x * y       = x :*: y
+    negate      = Neg
+    fromInteger = C
+
+    _ - _    = error "not implemented"
+    abs    _ = error "not implemented"
+    signum _ = error "not implemented"
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 data SymbolContext = Empty
                    | LA Exp SymbolContext
@@ -185,7 +202,6 @@ data SymbolContext = Empty
 data Repr s = Repr { reprValue ∷ Integer → Maybe (SymbolContext → s)
                    , reprAdd   ∷ Exp → Exp → s
                    , reprMul   ∷ Exp → Exp → s
-                   , reprZero  ∷ s
                    , reprNeg   ∷ s
                    }
 
@@ -194,16 +210,14 @@ data Repr s = Repr { reprValue ∷ Integer → Maybe (SymbolContext → s)
 --------------------------------------------------------------------------------
 
 
-textify ∷ ∀ s. (Monoid s, IsString s) ⇒ Repr s → Val Exp → Maybe s
-textify (Repr {reprZero}) Zero = Just reprZero
-textify repr (Neg x) = (reprNeg repr ⊕) <$> textify repr (Pos x)
-textify (Repr {..}) (Pos e) = go Empty e
+textify ∷ (Monoid s, IsString s) ⇒ Repr s → Exp → Maybe s
+textify (Repr {..}) e = go Empty e
     where
-      go ∷ SymbolContext → Exp → Maybe s
       go ctx (C n) = ($ ctx) <$> reprValue n
+      go ctx (Neg x) = (reprNeg ⊕) <$> go ctx x
       go ctx (x :+: y) = do x' ← go (LA y ctx) x
                             y' ← go (RA x ctx) y
                             return $ x' ⊕ reprAdd x y ⊕ y'
-      go ctx (x :⋅: y) = do x' ← go (LM y ctx) x
+      go ctx (x :*: y) = do x' ← go (LM y ctx) x
                             y' ← go (RM x ctx) y
                             return $ x' ⊕ reprMul x y ⊕ y'

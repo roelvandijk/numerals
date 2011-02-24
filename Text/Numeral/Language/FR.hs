@@ -66,6 +66,7 @@ cardinalRepr =
     Repr { reprValue = \n → M.lookup n symMap
          , reprAdd   = (⊞)
          , reprMul   = (⊡)
+         , reprSub   = \_ _ → ""
          , reprNeg   = "moins "
          }
     where
@@ -92,14 +93,14 @@ cardinalRepr =
                , (8, const "huit")
                , (9, const "neuf")
                , (10, \c → case c of
-                             RA (C n) _ | n < 7     → "ze"
+                             AddR (C n) _ | n < 7     → "ze"
                                         | otherwise → "dix"
-                             RM (C 3) _ → "te"
-                             RM {}      → "ante"
+                             MulR (C 3) _ → "te"
+                             MulR {}      → "ante"
                              _          → "dix"
                  )
                , (20,   \c → case c of
-                               RM _ Empty → "vingts"
+                               MulR _ Empty → "vingts"
                                _          → "vingt"
                  )
                , (100,  const "cent")
@@ -107,6 +108,6 @@ cardinalRepr =
                ]
 
       ten n a m ctx = case ctx of
-                        LA (C 10) _ → a
-                        LM (C 10) _ → m
+                        AddL (C 10) _ → a
+                        MulL (C 10) _ → m
                         _           → n

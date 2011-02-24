@@ -52,6 +52,7 @@ cardinalRepr =
     Repr { reprValue = \n → M.lookup n symMap
          , reprAdd  = \_ _ → " "
          , reprMul  = \_ _ → ""
+         , reprSub   = \_ _ → ""
          , reprNeg  = "ne " -- ???
          }
     where

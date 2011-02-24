@@ -24,6 +24,8 @@ module Text.Numeral
 
       -- * Representation of numerals
     , Exp(..)
+    , Subtract, subtract
+
     , SymbolContext(..)
     , Repr(..)
     , textify
@@ -36,22 +38,22 @@ module Text.Numeral
 -------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad       ( return )
-import Data.Bool           ( Bool, otherwise )
+import Control.Monad ( return )
+import Data.Bool     ( Bool, otherwise )
 import Data.Eq             ( Eq )
-import Data.Function       ( ($) )
-import Data.Functor        ( (<$>), fmap )
-import Data.List           ( foldr, find )
-import Data.Maybe          ( Maybe(Just) )
-import Data.Monoid         ( Monoid )
-import Data.Ord            ( Ord, (<), (>) )
-import Data.String         ( IsString )
-import Data.Tuple          ( fst, snd )
-import Prelude             ( Num, Integral, Integer, fromInteger
-                           , (+), (*), (-), negate, abs, signum
-                           , error
-                           )
-import Text.Show           ( Show )
+import Data.Function ( ($) )
+import Data.Functor  ( (<$>), fmap )
+import Data.List     ( foldr, find )
+import Data.Maybe    ( Maybe(Just) )
+import Data.Monoid   ( Monoid )
+import Data.Ord      ( Ord, (<), (>) )
+import Data.String   ( IsString )
+import Data.Tuple    ( fst, snd )
+import Prelude       ( Num, Integral, Integer, fromInteger
+                     , (+), (*), (-), signum, abs, negate, error
+                     )
+import Text.Show     ( Show )
+import qualified Prelude as P ( subtract )
 
 -- from base-unicode-symbols:
 import Data.Bool.Unicode     ( (∧) )
@@ -65,7 +67,6 @@ import qualified Data.IntervalMap.FingerTree as FT
     , IntervalMap, empty, insert
     , search
     )
-
 
 --------------------------------------------------------------------------------
 -- Intervals
@@ -107,23 +108,10 @@ mkIntervalMap = foldr ins FT.empty
 -- Structure of numerals
 --------------------------------------------------------------------------------
 
-deconstruct ∷ ∀ α β. (Integral α, Num β) ⇒ FindRule α β → α → Maybe β
-deconstruct findRule n
-    | n < 0 = negate <$> toExp (abs n)
-    | n > 0 = toExp n
-    | otherwise = Just 0
-    where
-      toExp ∷ α → Maybe β
-      toExp x = do r ← findRule x
-                   r toExp x
-
-
---------------------------------------------------------------------------------
--- Representation of numerals
---------------------------------------------------------------------------------
 
 data Exp = Exp :+: Exp
          | Exp :*: Exp
+         | Sub Exp Exp
          | Neg Exp
          | C Integer
            deriving (Eq, Show)
@@ -141,20 +129,46 @@ instance Num Exp where
     abs    = error "not implemented"
     signum = error "not implemented"
 
+class (Num α) ⇒ Subtract α where
+    subtract ∷ α → α → α
+    subtract = P.subtract
+
+instance Subtract Integer
+
+instance Subtract Exp where
+    subtract = Sub
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+deconstruct ∷ ∀ α β. (Integral α, Num β) ⇒ FindRule α β → α → Maybe β
+deconstruct findRule n
+    | n < 0 = negate <$> toExp (abs n)
+    | n > 0 = toExp n
+    | otherwise = Just 0
+    where
+      toExp ∷ α → Maybe β
+      toExp x = do r ← findRule x
+                   r toExp x
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 data SymbolContext = Empty
-                   | LA Exp SymbolContext
-                   | RA Exp SymbolContext
-                   | LM Exp SymbolContext
-                   | RM Exp SymbolContext
+                   | AddL Exp SymbolContext
+                   | AddR Exp SymbolContext
+                   | MulL Exp SymbolContext
+                   | MulR Exp SymbolContext
+                   | SubL Exp SymbolContext
+                   | SubR Exp SymbolContext
                      deriving Show
 
 data Repr s = Repr { reprValue ∷ Integer → Maybe (SymbolContext → s)
                    , reprAdd   ∷ Exp → Exp → s
                    , reprMul   ∷ Exp → Exp → s
+                   , reprSub   ∷ Exp → Exp → s
                    , reprNeg   ∷ s
                    }
 
@@ -167,9 +181,12 @@ textify (Repr {..}) e = go Empty e
     where
       go ctx (C n) = ($ ctx) <$> reprValue n
       go ctx (Neg x) = (reprNeg ⊕) <$> go ctx x
-      go ctx (x :+: y) = do x' ← go (LA y ctx) x
-                            y' ← go (RA x ctx) y
+      go ctx (x :+: y) = do x' ← go (AddL y ctx) x
+                            y' ← go (AddR x ctx) y
                             return $ x' ⊕ reprAdd x y ⊕ y'
-      go ctx (x :*: y) = do x' ← go (LM y ctx) x
-                            y' ← go (RM x ctx) y
+      go ctx (x :*: y) = do x' ← go (MulL y ctx) x
+                            y' ← go (MulR x ctx) y
                             return $ x' ⊕ reprMul x y ⊕ y'
+      go ctx (Sub x y) = do x' ← go (SubL y ctx) x
+                            y' ← go (SubR x ctx) y
+                            return $ x' ⊕ reprSub x y ⊕ y'

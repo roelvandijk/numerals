@@ -98,6 +98,7 @@ cardinalRepr f =
     Repr { reprValue = \n → M.lookup n symMap
          , reprAdd   = f
          , reprMul   = (⊡)
+         , reprSub   = \_ _ → ""
          , reprNeg   = "minus "
          }
     where
@@ -116,8 +117,8 @@ cardinalRepr f =
                , (8, ten   "eight" "eigh" "eigh")
                , (9, const "nine")
                , (10, \c → case c of
-                             RA (C _) _ → "teen"
-                             RM {} → "ty"
+                             AddR (C _) _ → "teen"
+                             MulR {} → "ty"
                              _     → "ten"
                  )
                , (11,   const "eleven")
@@ -128,6 +129,6 @@ cardinalRepr f =
 
       ten ∷ s → s → s → SymbolContext → s
       ten n a m = \c → case c of
-                         LA (C 10) _ → a
-                         LM (C 10) _ → m
+                         AddL (C 10) _ → a
+                         MulL (C 10) _ → m
                          _           → n

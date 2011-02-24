@@ -51,9 +51,10 @@ rules = [ ((  0,  12), atom)
 cardinalRepr ∷ (IsString s) ⇒ Repr s
 cardinalRepr =
     Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd = (⊞)
-         , reprMul = \_ _ → ""
-         , reprNeg  = "minus "
+         , reprAdd   = (⊞)
+         , reprMul   = \_ _ → ""
+         , reprSub   = \_ _ → ""
+         , reprNeg   = "minus "
          }
     where
       _ ⊞ _ = ""
@@ -70,7 +71,7 @@ cardinalRepr =
                , (8,  ten   "åtta" "ar"   "åt")
                , (9,  ten   "nio"  "nit"  "nit")
                , (10, \c → case c of
-                             RA {} → "ton"
+                             AddR {} → "ton"
                              _     → "tio"
                  )
                , (11, const "elva")
@@ -81,6 +82,6 @@ cardinalRepr =
                ]
 
       ten n a m = \c → case c of
-                         LA (C 10) _ → a
-                         LM (C 10) _ → m
+                         AddL (C 10) _ → a
+                         MulL (C 10) _ → m
                          _           → n

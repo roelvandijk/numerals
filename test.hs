@@ -51,8 +51,8 @@ import qualified Text.Numeral.Language.JA.TestData as JA ( preferred_cardinals
                                                          , kanji_cardinals
                                                          , daiji_cardinals
                                                          )
--- import qualified Text.Numeral.Language.LA          as LA ( cardinal  )
--- import qualified Text.Numeral.Language.LA.TestData as LA ( cardinals )
+import qualified Text.Numeral.Language.LA          as LA ( cardinal  )
+import qualified Text.Numeral.Language.LA.TestData as LA ( cardinals )
 import qualified Text.Numeral.Language.NL          as NL ( cardinal  )
 import qualified Text.Numeral.Language.NL.TestData as NL ( cardinals )
 import qualified Text.Numeral.Language.NO          as NO ( cardinal  )
@@ -108,7 +108,7 @@ tests = [ testGroup "DE" [mkTests "cardinal" DE.cardinal DE.cardinals]
           , testGroup "daiji"
             [mkTests "cardinal" JA.daiji_cardinal JA.daiji_cardinals]
           ]
-        -- , testGroup "LA" [mkTests "cardinal" LA.cardinal LA.cardinals]
+        , testGroup "LA" [mkTests "cardinal" LA.cardinal LA.cardinals]
         , testGroup "NL" [mkTests "cardinal" NL.cardinal NL.cardinals]
         , testGroup "NO" [mkTests "cardinal" NO.cardinal NO.cardinals]
         , testGroup "SV" [mkTests "cardinal" SV.cardinal SV.cardinals]

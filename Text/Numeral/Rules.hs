@@ -7,7 +7,9 @@ module Text.Numeral.Rules
   , atom, atom1
   , add
   , mul, mul1
+  , sub
   ) where
+
 
 -------------------------------------------------------------------------------
 -- Imports
@@ -27,7 +29,7 @@ import Data.Function.Unicode ( (∘) )
 import Prelude.Unicode       ( (⋅) )
 
 -- from numerals:
-import Text.Numeral ( Rule )
+import Text.Numeral     ( Rule, Subtract, subtract )
 
 
 --------------------------------------------------------------------------------
@@ -73,3 +75,6 @@ mul1 val aSide mSide =
               else liftA2 (flipIfR aSide (+)) (f r) qval
   where
      (⊡) = flipIfR mSide (⋅)
+
+sub ∷ (Integral α, Subtract β) ⇒ α → Rule α β
+sub val = \f n → liftA2 subtract (f $ val - n) (f val)

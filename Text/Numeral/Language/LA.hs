@@ -2,7 +2,7 @@
 
 module Text.Numeral.Language.LA
     ( cardinal
-    , rules
+    , findRule
     , cardinalRepr
     ) where
 
@@ -12,18 +12,16 @@ module Text.Numeral.Language.LA
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( Bool(False, True), otherwise )
-import Data.Function ( const, ($) )
-import Data.List     ( map, concatMap )
+import Control.Monad ( (>>=) )
+import Data.Bool     ( otherwise )
+import Data.Function ( const )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( (+), Integral )
+import Prelude       ( Integral )
 
 -- from base-unicode-symbols:
-import Data.Function.Unicode ( (∘) )
 import Data.List.Unicode     ( (∈) )
-import Data.Monoid.Unicode   ( (⊕) )
 import Data.Ord.Unicode      ( (≤) )
 
 -- from containers:
@@ -31,8 +29,7 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc      ( dec )
-import Text.Numeral.Rules     ( Side(L, R), atom, atom1, add, mul, mul1 )
+import Text.Numeral.Rules ( Side(L, R), atom, add, mul, sub )
 
 
 --------------------------------------------------------------------------------
@@ -43,50 +40,48 @@ import Text.Numeral.Rules     ( Side(L, R), atom, atom1, add, mul, mul1 )
 Sources:
   http://www.informalmusic.com/latinsoc/latnum.html
   http://www.sf.airnet.ne.jp/~ts/language/number/latin.html
-
-TODO: need overcounting to represent [18, 19, 28, 29, ..., 98, 99].
-
-18 = 2 from (2 ⋅ 10)
-19 = 1 from (2 ⋅ 10)
-28 = 2 from (3 ⋅ 10)
-29 = 1 from (3 ⋅ 10)
 -}
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal n = deconstruct findRule n >>= textify cardinalRepr
 
-findRule ∷ (Integral α, Num β) ⇒ FindRule α β
-findRule = mkFindRule rules (scale1 3 R L)
+findRule ∷ (Integral α, Subtract β) ⇒ FindRule α β
+findRule = mkFindRule rules []
 
 -- TODO: doen
 
-rules ∷ (Integral α, Num β) ⇒ Rules α β
-rules = [ ((  0,  10), atom)
-        , (( 13,  17), add 10 L)
-        , (( 18,  18), atom)
-        , (( 19,  19), atom)
+rules ∷ (Integral α, Subtract β) ⇒ Rules α β
+rules = [ ((   0,   10), atom)
+        , ((  11,   17), add 10 L)
+        , ((  18,   19), sub 20)
+        , ((  20,   27), mul 10 R L)
+        , ((  28,   29), sub 30)
+        , ((  30,   37), mul 10 R L)
+        , ((  38,   39), sub 40)
+        , ((  40,   47), mul 10 R L)
+        , ((  48,   49), sub 50)
+        , ((  50,   57), mul 10 R L)
+        , ((  58,   59), sub 60)
+        , ((  60,   67), mul 10 R L)
+        , ((  68,   69), sub 70)
+        , ((  70,   77), mul 10 R L)
+        , ((  78,   79), sub 80)
+        , ((  80,   87), mul 10 R L)
+        , ((  88,   89), sub 90)
+        , ((  90,   97), mul 10 R L)
+        , ((  98,   99), sub 100)
+        , (( 100,  100), atom)
+        , (( 101,  199), add 100 L)
+        , (( 200,  999), mul 100 R L)
+        , ((1000, 1000), atom)
         ]
-
-rules ∷ (Integral i) ⇒ Rules i
-rules = Rules { rsFindRule = findRule rs
-              , rsMulOne   = const False
-              }
-    where
-      rs = map atom [1..9]
-         ⊕ [ add 10 10 10 LeftAdd True
-           , mul 10 10 10 RightAdd
-           ]
-         ⊕ concatMap (\n → [atom $ n + 8, atom $ n + 9]) [10,20..90]
-         ⊕ [ mul (dec 2) (dec 2) (dec 1) RightAdd
-           , mul (dec 3) (dec 3) (dec 3) RightAdd
-           , mul (dec 6) (dec 6) (dec 6) RightAdd
-           ]
 
 cardinalRepr ∷ (IsString s) ⇒ Repr s
 cardinalRepr =
     Repr { reprValue = \n → M.lookup n symMap
          , reprAdd   = (⊞)
          , reprMul   = (⊡)
+         , reprSub   = \_ _ → "dē"
          -- TODO: negative numbers probably can't be represented in latin
          , reprNeg   = "- "
          }
@@ -100,83 +95,66 @@ cardinalRepr =
       symMap = M.fromList
                [ (0, const "nihil")
                , (1, \c → case c of
-                            LA (C 10)  _ → "ūn"
-                            _            → "ūnus"
+                            AddL (C 10)  _ → "ūn"
+                            SubL {}        → "ūn"
+                            _              → "ūnus"
                  )
                , (2, \c → case c of
-                            LM (C 10)  _ → "vī"
-                            LM (C 100) _ → "du"
-                            _            → "duo"
+                            MulL (C 10)  _ → "vī"
+                            MulL (C 100) _ → "du"
+                            _              → "duo"
                  )
                , (3, \c → case c of
-                            LA (C 10)  _ → "trē"
-                            LM (C 10)  _ → "trī"
-                            LM (C 100) _ → "tre"
-                            _            → "trēs"
+                            AddL (C 10)  _ → "trē"
+                            MulL (C 10)  _ → "trī"
+                            MulL (C 100) _ → "tre"
+                            _              → "trēs"
                  )
                , (4, \c → case c of
-                            LM (C 10)  _ → "quadrā"
-                            LM (C 100) _ → "quadrin"
-                            _            → "quattuor"
+                            MulL (C 10)  _ → "quadrā"
+                            MulL (C 100) _ → "quadrin"
+                            _              → "quattuor"
                  )
                , (5, \c → case c of
-                            LA (C 10)  _ → "quīn"
-                            LM (C 10)  _ → "quīnquā"
-                            LM (C 100) _ → "quīn"
-                            _            → "quīnque"
+                            AddL (C 10)  _ → "quīn"
+                            MulL (C 10)  _ → "quīnquā"
+                            MulL (C 100) _ → "quīn"
+                            _              → "quīnque"
                  )
                , (6, \c → case c of
-                            LA (C 10)  _ → "sē"
-                            LM (C 10)  _ → "sexā"
-                            LM (C 100) _ → "ses"
-                            _            → "sex"
+                            AddL (C 10)  _ → "sē"
+                            MulL (C 10)  _ → "sexā"
+                            MulL (C 100) _ → "ses"
+                            _              → "sex"
                  )
                , (7, \c → case c of
-                            LA (C 10)  _ → "septen"
-                            LM (C 10)  _ → "septuā"
-                            LM (C 100) _ → "septin"
-                            _            → "septem"
+                            AddL (C 10)  _ → "septen"
+                            MulL (C 10)  _ → "septuā"
+                            MulL (C 100) _ → "septin"
+                            _              → "septem"
                  )
                , (8, \c → case c of
-                            LM (C 100) _ → "octin"
-                            _            → "octō"
+                            MulL (C 100) _ → "octin"
+                            _              → "octō"
                  )
                , (9, \c → case c of
-                            LM (C 10)  _ → "nōnā"
-                            LM (C 100) _ → "nōn"
-                            _            → "novem"
+                            MulL (C 10)  _ → "nōnā"
+                            MulL (C 100) _ → "nōn"
+                            _              → "novem"
                  )
                , (10, \c → case c of
-                             RA {}       → "decim"
-                             RM (C 2)  _ → "gintī"
-                             RM {}       → "gintā"
-                             _           → "decem"
+                             AddR {}       → "decim"
+                             MulR (C 2)  _ → "gintī"
+                             MulR {}       → "gintā"
+                             _             → "decem"
                  )
-               , (18, const "duodēvīgintī")
-               , (19, const "ūndēvīgintī")
-               , (28, const "duodētrīgintā")
-               , (29, const "ūndētrīgintā")
-               , (38, const "duodēquadrāgintā")
-               , (39, const "ūndēquadrāgintā")
-               , (48, const "duodēquīnquāgintā")
-               , (49, const "ūndēquīnquāgintā")
-               , (58, const "duodēsexāgintā")
-               , (59, const "ūndēsexāgintā")
-               , (68, const "duodēseptuāgintā")
-               , (69, const "ūndēseptuāgintā")
-               , (78, const "duodēoctōgintā")
-               , (79, const "ūndēoctōgintā")
-               , (88, const "duodēnōnāgintā")
-               , (89, const "ūndēnōnāgintā")
-               , (98, const "duodēcentum")
-               , (99, const "ūndēcentum")
                , (100, \c → case c of
-                              RM (C n) _ | n ∈ [2, 3, 6] → "centī"
-                                         | otherwise     → "gentī"
-                              _                          → "centum"
+                              MulR (C n) _ | n ∈ [2, 3, 6] → "centī"
+                                           | otherwise     → "gentī"
+                              _                            → "centum"
                  )
                , (1000, \c → case c of
-                               RM {} → "milia"
-                               _     → "mīlle"
+                               MulR {} → "milia"
+                               _       → "mīlle"
                  )
                ]

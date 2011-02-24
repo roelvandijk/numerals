@@ -74,9 +74,10 @@ kanji_cardinal n = deconstruct findRule n >>= textify kanji_cardinal_repr
 kanji_cardinal_repr ∷ (IsString s) ⇒ Repr s
 kanji_cardinal_repr =
     Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd  = \_ _ → ""
-         , reprMul  = \_ _ → ""
-         , reprNeg  = "マイナス"
+         , reprAdd   = \_ _ → ""
+         , reprMul   = \_ _ → ""
+         , reprSub   = \_ _ → ""
+         , reprNeg   = "マイナス"
          }
     where
       symMap = M.fromList
@@ -149,9 +150,10 @@ daiji_cardinal_repr =
 generic_repr ∷ (IsString s) ⇒ s → s → Repr s
 generic_repr four seven =
     Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd  = \_ _ → " "
-         , reprMul  = \_ _ → ""
-         , reprNeg  = "mainasu "
+         , reprAdd   = \_ _ → " "
+         , reprMul   = \_ _ → ""
+         , reprSub   = \_ _ → ""
+         , reprNeg   = "mainasu "
          }
     where
       symMap = M.fromList
@@ -167,7 +169,7 @@ generic_repr four seven =
                , (9, const "kyū")
                , (10, const "jū")
                , (100, \c → case c of
-                              (RM 3 _) → "byaku" -- rendaku
+                              (MulR 3 _) → "byaku" -- rendaku
                               _        → "hyaku"
                  )
                , (dec 3, const "sen")

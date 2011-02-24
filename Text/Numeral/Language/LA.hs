@@ -18,7 +18,7 @@ import Data.List     ( map, concatMap )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( (+), Integral, fromInteger )
+import Prelude       ( (+), Integral )
 
 -- from base-unicode-symbols:
 import Data.Function.Unicode ( (∘) )
@@ -27,11 +27,12 @@ import Data.Monoid.Unicode   ( (⊕) )
 import Data.Ord.Unicode      ( (≤) )
 
 -- from containers:
-import qualified Data.IntMap as IM ( fromList, lookup )
+import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
 import Text.Numeral.Misc      ( dec )
+import Text.Numeral.Rules     ( Side(L, R), atom, atom1, add, mul, mul1 )
 
 
 --------------------------------------------------------------------------------
@@ -51,8 +52,20 @@ TODO: need overcounting to represent [18, 19, 28, 29, ..., 98, 99].
 29 = 1 from (3 ⋅ 10)
 -}
 
-cardinal ∷ (Monoid s, IsString s, Integral i) ⇒ i → Maybe s
-cardinal = textify cardinalRepr ∘ deconstruct rules
+cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+cardinal n = deconstruct findRule n >>= textify cardinalRepr
+
+findRule ∷ (Integral α, Num β) ⇒ FindRule α β
+findRule = mkFindRule rules (scale1 3 R L)
+
+-- TODO: doen
+
+rules ∷ (Integral α, Num β) ⇒ Rules α β
+rules = [ ((  0,  10), atom)
+        , (( 13,  17), add 10 L)
+        , (( 18,  18), atom)
+        , (( 19,  19), atom)
+        ]
 
 rules ∷ (Integral i) ⇒ Rules i
 rules = Rules { rsFindRule = findRule rs
@@ -71,22 +84,22 @@ rules = Rules { rsFindRule = findRule rs
 
 cardinalRepr ∷ (IsString s) ⇒ Repr s
 cardinalRepr =
-    Repr { reprValue = \n → IM.lookup (fromInteger n) symMap
+    Repr { reprValue = \n → M.lookup n symMap
          , reprAdd   = (⊞)
          , reprMul   = (⊡)
-         , reprZero  = "nihil"
          -- TODO: negative numbers probably can't be represented in latin
          , reprNeg   = "- "
          }
     where
-      (_ :⋅: C _) ⊞ _ = " "
+      (_ :*: C _) ⊞ _ = " "
       _           ⊞ _ = ""
 
       _ ⊡ (C n) | n ≤ 100 = ""
       _ ⊡ _               = " "
 
-      symMap = IM.fromList
-               [ (1, \c → case c of
+      symMap = M.fromList
+               [ (0, const "nihil")
+               , (1, \c → case c of
                             LA (C 10)  _ → "ūn"
                             _            → "ūnus"
                  )

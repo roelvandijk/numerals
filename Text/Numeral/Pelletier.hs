@@ -18,7 +18,8 @@ import Prelude.Unicode ( (⋅) )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc ( dec )
+import Text.Numeral.Misc  ( dec )
+import Text.Numeral.Rules ( Side, atom, atom1, add, mul, mul1 )
 
 
 --------------------------------------------------------------------------------

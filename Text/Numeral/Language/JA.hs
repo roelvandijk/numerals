@@ -41,6 +41,7 @@ import qualified Data.Map as M ( fromList, lookup )
 import Text.Numeral
 import Text.Numeral.Misc      ( dec )
 import Text.Numeral.Pelletier ( scale1 )
+import Text.Numeral.Rules     ( Side(L, R), atom, add, mul )
 
 
 --------------------------------------------------------------------------------

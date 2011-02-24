@@ -27,6 +27,7 @@ import qualified Data.Map as M ( fromList, lookup )
 -- from numerals:
 import Text.Numeral
 import Text.Numeral.Pelletier ( scale )
+import Text.Numeral.Rules     ( Side(L, R), atom, add, mul )
 
 
 --------------------------------------------------------------------------------

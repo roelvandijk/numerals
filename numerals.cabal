@@ -47,6 +47,7 @@ library
                , fingertree           >= 0.0.1   && < 0.1
 
   exposed-modules: Text.Numeral
+                 , Text.Numeral.Rules
                  , Text.Numeral.Language.DE
                  , Text.Numeral.Language.EN
                  , Text.Numeral.Language.EO

@@ -18,10 +18,6 @@ module Text.Numeral
     , Rules
     , FindRule
     , mkFindRule
-    , Side(..)
-    , atom, atom1
-    , add
-    , mul, mul1
 
       -- * Structure of numerals
     , deconstruct
@@ -40,11 +36,10 @@ module Text.Numeral
 -------------------------------------------------------------------------------
 
 -- from base:
-import Control.Applicative ( liftA2 )
 import Control.Monad       ( return )
 import Data.Bool           ( Bool, otherwise )
 import Data.Eq             ( Eq )
-import Data.Function       ( ($), id, const, flip )
+import Data.Function       ( ($) )
 import Data.Functor        ( (<$>), fmap )
 import Data.List           ( foldr, find )
 import Data.Maybe          ( Maybe(Just) )
@@ -52,19 +47,17 @@ import Data.Monoid         ( Monoid )
 import Data.Ord            ( Ord, (<), (>) )
 import Data.String         ( IsString )
 import Data.Tuple          ( fst, snd )
-import Prelude             ( Num, (+), (*), (-), negate, abs, signum
-                           , Integral, fromIntegral
-                           , Integer, fromInteger, divMod, error, abs
+import Prelude             ( Num, Integral, Integer, fromInteger
+                           , (+), (*), (-), negate, abs, signum
+                           , error
                            )
 import Text.Show           ( Show )
 
 -- from base-unicode-symbols:
 import Data.Bool.Unicode     ( (∧) )
-import Data.Eq.Unicode       ( (≡) )
 import Data.Function.Unicode ( (∘) )
 import Data.Monoid.Unicode   ( (⊕) )
 import Data.Ord.Unicode      ( (≤) )
-import Prelude.Unicode       ( (⋅) )
 
 -- from fingertree:
 import qualified Data.IntervalMap.FingerTree as FT
@@ -109,47 +102,6 @@ mkIntervalMap ∷ (Ord v) ⇒ [((v, v), α)] → FT.IntervalMap v α
 mkIntervalMap = foldr ins FT.empty
   where ins ((lo, hi), n) = FT.insert (FT.Interval lo hi) n
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-data Side = L | R deriving Show
-
-flipIfR ∷ Side → (α → α → α) → (α → α → α)
-flipIfR L = id
-flipIfR R = flip
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-atom ∷ (Integral α, Num β) ⇒ Rule α β
-atom = const $ Just ∘ fromIntegral
-
-atom1 ∷ (Integral α, Num β) ⇒ Rule α β
-atom1 = const $ \n → Just $ 1 ⋅ fromIntegral n
-
-add ∷ (Num α, Num β) ⇒ α → Side → Rule α β
-add val s = \f n → liftA2 (flipIfR s (+)) (f $ n - val) (f val)
-
-mul ∷ (Integral α, Num β) ⇒ α → Side → Side → Rule α β
-mul val aSide mSide =
-    \f n → let (q, r) = n `divMod` val
-               qval = liftA2 (flipIfR mSide (⋅)) (f q) (f val)
-           in if r ≡ 0
-              then qval
-              else liftA2 (flipIfR aSide (+)) (f r) qval
-
-mul1 ∷ (Integral α, Num β) ⇒ α → Side → Side → Rule α β
-mul1 val aSide mSide =
-    \f n → let (q, r) = n `divMod` val
-               qval = if q ≡ 1
-                      then Just $ 1 ⊡ fromIntegral val
-                      else (⊡ fromIntegral val) <$> f q
-           in if r ≡ 0
-              then qval
-              else liftA2 (flipIfR aSide (+)) (f r) qval
-  where
-     (⊡) = flipIfR mSide (⋅)
-
 
 --------------------------------------------------------------------------------
 -- Structure of numerals
@@ -189,6 +141,7 @@ instance Num Exp where
     abs    = error "not implemented"
     signum = error "not implemented"
 
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -208,7 +161,6 @@ data Repr s = Repr { reprValue ∷ Integer → Maybe (SymbolContext → s)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 
 textify ∷ (Monoid s, IsString s) ⇒ Repr s → Exp → Maybe s
 textify (Repr {..}) e = go Empty e

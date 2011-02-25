@@ -1,5 +1,37 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
+{-|
+[@ISO639-1@]        sv
+
+[@ISO639-2B@]       swe
+
+[@ISO639-3@]        swe
+
+[@Native name@]     svenska
+
+[@English name@]    Swedish
+
+[@French name@]     suédois
+
+[@Spanish name@]    sueco
+
+[@Chinese name@]    瑞典语
+
+[@Russian name@]    шведский
+
+[@German name@]     Schwedisch
+
+[@Language family@] Indo-European,
+                    Germanic,
+                    North Germanic,
+                    East Scandinavian,
+                    Swedish
+
+[@Scope@]           Individual language
+
+[@Type@]            Living
+-}
+
 module Text.Numeral.Language.SV
     ( cardinal
     , findRule

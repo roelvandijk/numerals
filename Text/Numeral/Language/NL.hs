@@ -1,5 +1,37 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
+{-|
+[@ISO639-1@]        nl
+
+[@ISO639-2B@]       dut
+
+[@ISO639-3@]        nld
+
+[@Native name@]     Nederlands
+
+[@English name@]    Dutch
+
+[@French name@]     Néerlandais
+
+[@Spanish name@]    Neerlandés
+
+[@Chinese name@]    荷兰语
+
+[@Russian name@]    нидерландский
+
+[@German name@]     Niederländisch
+
+[@Language family@] Indo-European,
+                    Germanic,
+                    West Germanic,
+                    Low Franconian,
+                    Dutch
+
+[@Scope@]           Individual language
+
+[@Type@]            Living
+-}
+
 module Text.Numeral.Language.NL
     ( cardinal
     , findRule

@@ -1,8 +1,32 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-{-
-http://en.wikipedia.org/wiki/Japanese_numerals
-http://www.guidetojapanese.org/numbers.html
+{-|
+[@ISO639-1@]        ja
+
+[@ISO639-2B@]       jpn
+
+[@ISO639-3@]        jpn
+
+[@Native name@]     日本語
+
+[@English name@]    Japanese
+
+[@French name@]     Japonais
+
+[@Spanish name@]    Japonés
+
+[@Chinese name@]    日语
+
+[@Russian name@]    японский
+
+[@German name@]     Japanisch
+
+[@Language family@] Japonic,
+                    Japanese
+
+[@Scope@]           Individual language
+
+[@Type@]            Living
 -}
 
 module Text.Numeral.Language.JA
@@ -47,6 +71,12 @@ import Text.Numeral.Rules     ( Side(L, R), atom, add, mul )
 --------------------------------------------------------------------------------
 -- JA
 --------------------------------------------------------------------------------
+
+{-
+Sources:
+  http://en.wikipedia.org/wiki/Japanese_numerals
+  http://www.guidetojapanese.org/numbers.html
+-}
 
 findRule ∷ (Integral α, Num β) ⇒ FindRule α β
 findRule = mkFindRule rules (scale1 4 R L)

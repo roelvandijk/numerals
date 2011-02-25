@@ -1,5 +1,38 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
+{-|
+[@ISO639-1@]        en
+
+[@ISO639-2B@]       eng
+
+[@ISO639-3@]        eng
+
+[@Native name@]     English
+
+[@English name@]    English
+
+[@French name@]     anglais
+
+[@Spanish name@]    inglés
+
+[@Chinese name@]    英语
+
+[@Russian name@]    английский
+
+[@German name@]     Englisch
+
+[@Language family@] Indo-European,
+                    Germanic,
+                    West Germanic,
+                    Anglo-Frisian,
+                    Anglic,
+                    English
+
+[@Scope@]           Individual language
+
+[@Type@]            Living
+-}
+
 module Text.Numeral.Language.EN
     ( uk_cardinal
     , us_cardinal

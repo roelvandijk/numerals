@@ -1,5 +1,33 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
+{-|
+[@ISO639-1@]        eo
+
+[@ISO639-2B@]       epo
+
+[@ISO639-3@]        epo
+
+[@Native name@]     Esperanto
+
+[@English name@]    Esperanto
+
+[@French name@]     espéranto
+
+[@Spanish name@]    esperanto
+
+[@Chinese name@]    世界语
+
+[@Russian name@]    эсперанто
+
+[@German name@]     Esperanto
+
+[@Language family@] Constructed
+
+[@Scope@]           Individual language
+
+[@Type@]            Living
+-}
+
 module Text.Numeral.Language.EO
     ( cardinal
     , findRule

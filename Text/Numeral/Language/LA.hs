@@ -1,5 +1,36 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
+{-|
+[@ISO639-1@]        la
+
+[@ISO639-2B@]       lat
+
+[@ISO639-3@]        lat
+
+[@Native name@]     Latine
+
+[@English name@]    Latin
+
+[@French name@]     Latin
+
+[@Spanish name@]    Latin
+
+[@Chinese name@]    拉丁语
+
+[@Russian name@]    латинский
+
+[@German name@]     Latein
+
+[@Language family@] Indo-European,
+                    Italic,
+                    Latino-Faliscan,
+                    Latin
+
+[@Scope@]           Individual language
+
+[@Type@]            Ancient
+-}
+
 module Text.Numeral.Language.LA
     ( cardinal
     , findRule

@@ -1,5 +1,42 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
+{-|
+[@ISO639-1@]        fr
+
+[@ISO639-2B@]       fre
+
+[@ISO639-3@]        fra
+
+[@Native name@]     Français
+
+[@English name@]    French
+
+[@French name@]     Français
+
+[@Spanish name@]    Francés
+
+[@Chinese name@]    法语
+
+[@Russian name@]    французский
+
+[@German name@]     Französisch
+
+[@Language family@] Indo-European,
+                    Italic,
+                    Romance,
+                    Italo-Western,
+                    Western Romance,
+                    Gallo-Iberian,
+                    Gallo-Romance,
+                    Gallo-Rhaetian,
+                    Oïl,
+                    French
+
+[@Scope@]           Individual language
+
+[@Type@]            Living
+-}
+
 module Text.Numeral.Language.FR
     ( cardinal
     , findRule

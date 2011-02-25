@@ -1,5 +1,37 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
+{-|
+[@ISO639-1@]        nb
+
+[@ISO639-2B@]       nob
+
+[@ISO639-3@]        nob
+
+[@Native name@]     Bokmål
+
+[@English name@]    Norwegian Bokmål
+
+[@French name@]     Norvégien bokmål
+
+[@Spanish name@]    Noruego bokmål
+
+[@Chinese name@]    挪威布克莫尔语; 书面挪威语; 波克莫尔语
+
+[@Russian name@]    букмол
+
+[@German name@]     Norwegische Bokmål
+
+[@Language family@] Indo-European,
+                    Germanic,
+                    North Germanic,
+                    Mainland or East Scandinavian,
+                    Norwegian
+
+[@Scope@]           Individual language
+
+[@Type@]            Living
+-}
+
 module Text.Numeral.Language.NO
     ( cardinal
     , findRule

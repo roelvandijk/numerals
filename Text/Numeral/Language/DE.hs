@@ -1,5 +1,37 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
+{-|
+[@ISO639-1@]        de
+
+[@ISO639-2B@]       ger
+
+[@ISO639-3@]        deu
+
+[@Native name@]     Deutsch
+
+[@English name@]    German
+
+[@French name@]     allemand
+
+[@Spanish name@]    alemán
+
+[@Chinese name@]    德语
+
+[@Russian name@]    немецкий
+
+[@German name@]     Deutsch
+
+[@Language family@] Indo-European,
+                    Germanic,
+                    West Germanic,
+                    High German,
+                    German
+
+[@Scope@]           Individual language
+
+[@Type@]            Living
+-}
+
 module Text.Numeral.Language.DE
     ( cardinal
     , findRule

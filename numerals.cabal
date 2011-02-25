@@ -48,6 +48,7 @@ library
 
   exposed-modules: Text.Numeral
                  , Text.Numeral.Rules
+                 , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.DE
                  , Text.Numeral.Language.EN
                  , Text.Numeral.Language.EO
@@ -67,7 +68,8 @@ library
 
 executable test-numerals
   main-is: test.hs
-  other-modules: Text.Numeral.Language.DE.TestData
+  other-modules: Text.Numeral.Language.CHN.TestData
+               , Text.Numeral.Language.DE.TestData
                , Text.Numeral.Language.EN.TestData
                , Text.Numeral.Language.EO.TestData
                , Text.Numeral.Language.FR.TestData

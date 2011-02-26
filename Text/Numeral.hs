@@ -24,7 +24,7 @@ module Text.Numeral
 
       -- * Representation of numerals
     , Exp(..)
-    , Subtract, subtract
+    , Subtract(subtract)
 
     , SymbolContext(..)
     , Repr(..)

@@ -58,6 +58,7 @@ library
                  , Text.Numeral.Language.LA
                  , Text.Numeral.Language.NL
                  , Text.Numeral.Language.NO
+                 , Text.Numeral.Language.NQM
                --, Text.Numeral.Language.PT
                --, Text.Numeral.Language.SP
                  , Text.Numeral.Language.SV
@@ -77,6 +78,7 @@ executable test-numerals
                , Text.Numeral.Language.LA.TestData
                , Text.Numeral.Language.NL.TestData
                , Text.Numeral.Language.NO.TestData
+               , Text.Numeral.Language.NQM.TestData
                , Text.Numeral.Language.SV.TestData
   ghc-options: -Wall
 

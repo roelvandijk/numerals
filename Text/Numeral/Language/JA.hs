@@ -56,7 +56,7 @@ import Data.List     ( take )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Num, Integral )
+import Prelude       ( Num, Integral, (-) )
 
 -- from base-unicode-symbols:
 import Data.Monoid.Unicode ( (⊕) )
@@ -81,20 +81,19 @@ Sources:
 -}
 
 rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule rules
-
-rules ∷ (Integral α, Num β) ⇒ Rules α β
-rules = [ ((   0,   10), atom)
-        , ((  11,   19), add 10 R)
-        , ((  20,   99), mul 10 R L)
-        , (( 100,  100), atom)
-        , (( 101,  199), add 100 R)
-        , (( 200,  999), mul 100 R L)
-        , ((1000, 1000), atom)
-        , ((1001, 1999), add 1000 R)
-        , ((2000, 9999), mul 1000 R L)
-        ]
-        ⊕ take (3 ⋅ 17) (scale1Rules 4 R L)
+rule = findRule (   0, atom        )
+            ( [ (  11, add   10 R  )
+              , (  20, mul   10 R L)
+              , ( 100, atom        )
+              , ( 101, add  100 R  )
+              , ( 200, mul  100 R L)
+              , (1000, atom        )
+              , (1001, add 1000 R  )
+              , (2000, mul 1000 R L)
+              ]
+            ⊕ take (3 ⋅ 17) (scale1Rules 4 R L)
+            )
+           (dec 72 - 1)
 
 
 --------------------------------------------------------------------------------

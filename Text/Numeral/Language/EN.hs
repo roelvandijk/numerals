@@ -118,19 +118,17 @@ pelletierScaleRule ∷ (Integral α, Scale α, Num β, Scale β) ⇒ Rule α β
 pelletierScaleRule = rule `combine` pelletierScale  R L BN.rule
 
 rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule rules
-
-rules ∷ (Integral α, Num β) ⇒ Rules α β
-rules = [ ((   0,     12), atom)
-        , ((  13,     19), add    10 L)
-        , ((  20,     99), mul    10 R L)
-        , (( 100,    100), atom1)
-        , (( 101,    199), add   100 R)
-        , (( 200,    999), mul1  100 R L)
-        , ((1000,   1000), atom1)
-        , ((1001,   1999), add  1000 R)
-        , ((2000, 999999), mul1 1000 R L)
-        ]
+rule = findRule (   0, atom         )
+              [ (  13, add    10 L  )
+              , (  20, mul    10 R L)
+              , ( 100, atom1        )
+              , ( 101, add   100 R  )
+              , ( 200, mul1  100 R L)
+              , (1000, atom1        )
+              , (1001, add  1000 R  )
+              , (2000, mul1 1000 R L)
+              ]
+               999999
 
 us_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 us_cardinalRepr = cardinalRepr (⊞)

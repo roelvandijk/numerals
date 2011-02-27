@@ -91,12 +91,12 @@ conditional pred r = \f n → if pred n
 
 type Rules α β = [((α, α), Rule α β)]
 
-findRule ∷ (Ord α) ⇒ Rules α β → Rule α β
-findRule xs = \f n → case FT.search n xm of
-                       [] → Nothing
-                       (_,r):_ → r f n
+findRule ∷ (Ord α, Num α) ⇒ (α, Rule α β) → [(α, Rule α β)] → α → Rule α β
+findRule x xs end = \f n → case FT.search n xm of
+                             [] → Nothing
+                             (_,r):_ → r f n
     where
-      xm = mkIntervalMap xs
+      xm = mkIntervalMap $ mkIntervalList x xs end
 
 
 --------------------------------------------------------------------------------
@@ -183,26 +183,32 @@ flipIfR ∷ Side → (α → α → α) → (α → α → α)
 flipIfR L = id
 flipIfR R = flip
 
+mkIntervalList ∷ (Num a) ⇒ (a, b) → [(a, b)] → a → [((a, a), b)]
+mkIntervalList (k, r) krs end = go k r krs
+    where
+      go k1 r1 []            = [((k1, end), r1)]
+      go k1 r1 ((k2, r2):xs) = ((k1, k2-1), r1) : go k2 r2 xs
+
 mkIntervalMap ∷ (Ord v) ⇒ [((v, v), α)] → FT.IntervalMap v α
 mkIntervalMap = foldr ins FT.empty
   where ins ((lo, hi), n) = FT.insert (FT.Interval lo hi) n
 
-scaleRules ∷ (Integral α, Num β) ⇒ α → Side → Side → Rules α β
+scaleRules ∷ (Integral α, Num β) ⇒ α → Side → Side → [(α, Rule α β)]
 scaleRules g aSide mSide = concatMap step [g, 2⋅g ..]
     where
-      step n = [ ((s, s), atom)
-               , ((s+1, 2⋅s - 1), add s aSide)
-               , ((2⋅s, s ⋅ dec g - 1), mul s aSide mSide)
+      step n = [ (s,   atom)
+               , (s+1, add s aSide)
+               , (2⋅s, mul s aSide mSide)
                ]
           where
             s = dec n
 
-scale1Rules ∷ (Integral α, Num β) ⇒ α → Side → Side → Rules α β
+scale1Rules ∷ (Integral α, Num β) ⇒ α → Side → Side → [(α, Rule α β)]
 scale1Rules g aSide mSide = concatMap step [g, 2⋅g ..]
     where
-      step n = [ ((s, s), atom1)
-               , ((s+1, 2⋅s - 1), add s aSide)
-               , ((2⋅s, s ⋅ dec g - 1), mul1 s aSide mSide)
+      step n = [ (s,   atom1)
+               , (s+1, add s aSide)
+               , (2⋅s, mul1 s aSide mSide)
                ]
           where
             s = dec n

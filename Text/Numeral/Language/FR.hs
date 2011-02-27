@@ -78,22 +78,20 @@ cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = mkCardinal rule cardinalRepr
 
 rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule rules
-
-rules ∷ (Integral α, Num β) ⇒ Rules α β
-rules = [ ((  0,  10), atom)
-        , (( 11,  16), add 10 L)
-        , (( 17,  19), add 10 R)
-        , (( 20,  20), atom)
-        , (( 21,  29), add 20 R)
-        , (( 30,  69), mul 10 R L)
-        , (( 70,  79), add 60 R)
-        , (( 80,  89), mul 20 R L)
-        , (( 89,  99), add 80 R)
-        , ((100, 100), atom)
-        , ((101, 199), add 100 R)
-        , ((200, 999), mul 100 R L)
-        ]
+rule = findRule (0, atom)
+              [ ( 11, add  10 L  )
+              , ( 17, add  10 R  )
+              , ( 20, atom       )
+              , ( 21, add  20 R  )
+              , ( 30, mul  10 R L)
+              , ( 70, add  60 R  )
+              , ( 80, mul  20 R L)
+              , ( 89, add  80 R  )
+              , (100, atom       )
+              , (101, add 100 R  )
+              , (200, mul 100 R L)
+              ]
+                 1000
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 cardinalRepr = defaultRepr

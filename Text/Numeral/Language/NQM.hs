@@ -61,18 +61,17 @@ cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = mkCardinal rule cardinalRepr
 
 rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule rules
-
-rules ∷ (Integral α, Num β) ⇒ Rules α β
-rules = [ ((  1,   6), atom)
-        , ((  7,  11), add 6 R)
-        , (( 12,  17), mul 6 R R)
-        , (( 18,  18), atom)
-        , (( 19,  35), add 18 R)
-        , (( 36,  36), atom)
-        , (( 37,  71), add 36 R)
-        , (( 72, 107), mul 36 R R)
-        ]
+rule = findRule (1, atom        )
+              [ (  1, atom      )
+              , (  7, add  6 R  )
+              , ( 12, mul  6 R R)
+              , ( 18, atom      )
+              , ( 19, add 18 R  )
+              , ( 36, atom      )
+              , ( 37, add 36 R  )
+              , ( 72, mul 36 R R)
+              ]
+                 107
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 cardinalRepr = defaultRepr

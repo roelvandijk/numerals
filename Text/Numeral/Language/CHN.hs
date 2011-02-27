@@ -41,7 +41,7 @@ module Text.Numeral.Language.CHN
 
 -- from base:
 import Data.Function ( const )
-import Data.Maybe    ( Maybe )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
 import Prelude       ( Num, Integral )
@@ -70,14 +70,12 @@ rules = [ ((  1,  10), atom)
         , ((100, 100), atom)
         ]
 
-cardinalRepr ∷ (IsString s) ⇒ Repr s
-cardinalRepr =
-    Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd   = \_ _ → " pe "
-         , reprMul   = \_ _ → " "
-         , reprSub   = \_ _ → ""
-         , reprNeg   = "" -- TODO: probably not supported
-         }
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+cardinalRepr = defaultRepr
+               { reprValue = \n → M.lookup n symMap
+               , reprAdd   = \_ _ → Just " pe "
+               , reprMul   = \_ _ → Just " "
+               }
     where
       symMap = M.fromList
                [ (1, const "ikt")

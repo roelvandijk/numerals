@@ -51,7 +51,7 @@ module Text.Numeral.Language.FR
 -- from base:
 import Data.Bool     ( otherwise )
 import Data.Function ( const )
-import Data.Maybe    ( Maybe )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
@@ -95,25 +95,24 @@ rules = [ ((  0,  10), atom)
         , ((200, 999), mul 100 R L)
         ]
 
-cardinalRepr ∷ IsString s ⇒ Repr s
-cardinalRepr =
-    Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd   = (⊞)
-         , reprMul   = (⊡)
-         , reprSub   = \_ _ → ""
-         , reprNeg   = "moins "
-         }
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+cardinalRepr = defaultRepr
+               { reprValue = \n → M.lookup n symMap
+               , reprAdd   = (⊞)
+               , reprMul   = (⊡)
+               , reprNeg   = \_ → Just "moins "
+               }
     where
-      C _  ⊞ C 10           = ""
-      _    ⊞ C 10           = "-"
-      (C 4 :*: C 20) ⊞ _    = "-"
-      _    ⊞ C 1            = " et "
-      _    ⊞ (C 1 :+: C 10) = " et "
-      C 10 ⊞ _              = "-"
-      _    ⊞ _              = "-"
+      C _  ⊞ C 10           = Just ""
+      _    ⊞ C 10           = Just "-"
+      (C 4 :*: C 20) ⊞ _    = Just "-"
+      _    ⊞ C 1            = Just " et "
+      _    ⊞ (C 1 :+: C 10) = Just " et "
+      C 10 ⊞ _              = Just "-"
+      _    ⊞ _              = Just "-"
 
-      _ ⊡ 20 = "-"
-      _ ⊡ _  = ""
+      _ ⊡ 20 = Just "-"
+      _ ⊡ _  = Just ""
 
       symMap = M.fromList
                [ (0, const "zéro")

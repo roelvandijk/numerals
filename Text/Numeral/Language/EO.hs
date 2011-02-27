@@ -41,7 +41,7 @@ module Text.Numeral.Language.EO
 
 -- from base:
 import Data.Function ( const )
-import Data.Maybe    ( Maybe )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
 import Prelude       ( Num, Integral )
@@ -72,14 +72,12 @@ rules = [ ((  0,  10), atom)
         , ((200, 999), mul 100 R L)
         ]
 
-cardinalRepr ∷ (IsString s) ⇒ Repr s
-cardinalRepr =
-    Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd   = \_ _ → " "
-         , reprMul   = \_ _ → ""
-         , reprSub   = \_ _ → ""
-         , reprNeg   = "ne " -- ???
-         }
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+cardinalRepr = defaultRepr
+               { reprValue = \n → M.lookup n symMap
+               , reprAdd   = \_ _ → Just " "
+               , reprMul   = \_ _ → Just ""
+               }
     where
       symMap = M.fromList
                [ (0, const "nul")

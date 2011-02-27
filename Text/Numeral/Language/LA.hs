@@ -46,7 +46,7 @@ module Text.Numeral.Language.LA
 import Data.Bool     ( otherwise )
 import Data.Function ( ($), const )
 import Data.List     ( concat )
-import Data.Maybe    ( Maybe )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
 import Prelude       ( Integral, Num, (+) )
@@ -95,21 +95,20 @@ rules = [ (( 0, 10), atom)
         , ((1000, 1000), atom)
         ]
 
-cardinalRepr ∷ (IsString s) ⇒ Repr s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 cardinalRepr =
-    Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd   = (⊞)
-         , reprMul   = (⊡)
-         , reprSub   = \_ _ → "dē"
-         -- TODO: negative numbers probably can't be represented in latin.
-         , reprNeg   = "- "
-         }
+    defaultRepr
+    { reprValue = \n → M.lookup n symMap
+    , reprAdd   = (⊞)
+    , reprMul   = (⊡)
+    , reprSub   = \_ _ → Just "dē"
+    }
     where
-      (_ :*: C _) ⊞ _ = " "
-      _           ⊞ _ = ""
+      (_ :*: C _) ⊞ _ = Just " "
+      _           ⊞ _ = Just ""
 
-      _ ⊡ (C n) | n ≤ 100 = ""
-      _ ⊡ _               = " "
+      _ ⊡ (C n) | n ≤ 100 = Just ""
+      _ ⊡ _               = Just " "
 
       symMap = M.fromList
                [ (0, const "nihil")
@@ -168,9 +167,9 @@ cardinalRepr =
                              _             → "decem"
                  )
                , (100, \c → case c of
-                              MulR (C n) _ | n ∈ [2, 3, 6] → "centī"
-                                           | otherwise     → "gentī"
-                              _                            → "centum"
+                              MulR (C n) _ | n ∈ [2,3,6] → "centī"
+                                           | otherwise   → "gentī"
+                              _                          → "centum"
                  )
                , (1000, \c → case c of
                                MulR {} → "milia"

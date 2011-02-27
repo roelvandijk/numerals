@@ -45,7 +45,7 @@ module Text.Numeral.Language.DE
 
 -- from base:
 import Data.Function ( const )
-import Data.Maybe    ( Maybe )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
 import Prelude       ( Integral, Num )
@@ -84,17 +84,17 @@ rules = [ ((  0,  12), atom)
         , ((2000, 999999), mul 1000 R L)
         ]
 
-cardinalRepr ∷ (IsString s) ⇒ Repr s
-cardinalRepr =
-    Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd   = (⊞)
-         , reprMul   = \_ _ → ""
-         , reprSub   = \_ _ → ""
-         , reprNeg   = "minus "
-         }
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+cardinalRepr = defaultRepr
+               { reprValue = \n → M.lookup n symMap
+               , reprAdd   = (⊞)
+               , reprMul   = \_ _ → Just ""
+               , reprSub   = \_ _ → Just ""
+               , reprNeg   = \_   → Just "minus "
+               }
     where
-      _ ⊞ (_ :*: C 10) = "und"
-      _ ⊞ _            = ""
+      _ ⊞ (_ :*: C 10) = Just "und"
+      _ ⊞ _            = Just ""
 
       symMap = M.fromList
                [ (0, const "null")

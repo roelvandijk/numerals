@@ -41,7 +41,7 @@ module Text.Numeral.Language.NQM
 
 -- from base:
 import Data.Function ( const )
-import Data.Maybe    ( Maybe )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
 import Prelude       ( Num, Integral )
@@ -74,17 +74,15 @@ rules = [ ((  1,   6), atom)
         , (( 72, 107), mul 36 R R)
         ]
 
-cardinalRepr ∷ (IsString s) ⇒ Repr s
-cardinalRepr =
-    Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd   = \_ _ → " abo "
-         , reprMul   = (⊡)
-         , reprSub   = \_ _ → ""
-         , reprNeg   = ""
-         }
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+cardinalRepr = defaultRepr
+               { reprValue = \n → M.lookup n symMap
+               , reprAdd   = \_ _ → Just " abo "
+               , reprMul   = (⊡)
+               }
     where
-      C 36 ⊡ _ = " "
-      _    ⊡ _ = " an "
+      C 36 ⊡ _ = Just " "
+      _    ⊡ _ = Just " an "
 
       symMap = M.fromList
                [ (1, const "sas")

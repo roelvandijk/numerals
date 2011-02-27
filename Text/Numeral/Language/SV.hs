@@ -44,7 +44,7 @@ module Text.Numeral.Language.SV
 
 -- from base:
 import Data.Function ( const )
-import Data.Maybe    ( Maybe )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
 import Prelude       ( Integral, Num )
@@ -77,17 +77,14 @@ rules = [ ((  0,  12), atom)
         , ((200, 999), mul1 100 R L)
         ]
 
-cardinalRepr ∷ (IsString s) ⇒ Repr s
-cardinalRepr =
-    Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd   = (⊞)
-         , reprMul   = \_ _ → ""
-         , reprSub   = \_ _ → ""
-         , reprNeg   = "minus "
-         }
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+cardinalRepr = defaultRepr
+               { reprValue = \n → M.lookup n symMap
+               , reprAdd   = \_ _ → Just ""
+               , reprMul   = \_ _ → Just ""
+               , reprNeg   = \_   → Just "minus "
+               }
     where
-      _ ⊞ _ = ""
-
       symMap = M.fromList
                [ (0,  const "noll")
                , (1,  const "ett")

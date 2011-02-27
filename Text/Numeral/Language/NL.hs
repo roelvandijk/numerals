@@ -45,7 +45,7 @@ module Text.Numeral.Language.NL
 -- from base:
 import Data.Bool     ( otherwise )
 import Data.Function ( const )
-import Data.Maybe    ( Maybe )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
@@ -85,20 +85,19 @@ rules = [ ((  0,  12), atom)
         , ((2000, 999999), mul 1000 R L)
         ]
 
-cardinalRepr ∷ (IsString s) ⇒ Repr s
-cardinalRepr =
-    Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd   = (⊞)
-         , reprMul   = \_ _ → ""
-         , reprSub   = \_ _ → ""
-         , reprNeg   = "min "
-         }
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+cardinalRepr = defaultRepr
+               { reprValue = \n → M.lookup n symMap
+               , reprAdd   = (⊞)
+               , reprMul   = \_ _ → Just ""
+               , reprNeg   = \_   → Just "min "
+               }
     where
-      _   ⊞ C 10 = ""
-      C n ⊞ _ | n ≡ 2 ∨ n ≡ 3 = "ën"
-              | n < 10        = "en"
-              | otherwise     = ""
-      _   ⊞ _ = " "
+      _   ⊞ C 10 = Just ""
+      C n ⊞ _ | n ≡ 2 ∨ n ≡ 3 = Just "ën"
+              | n < 10        = Just "en"
+              | otherwise     = Just ""
+      _   ⊞ _ = Just " "
 
       symMap = M.fromList
                [ (0, const "nul")

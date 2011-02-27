@@ -5,7 +5,8 @@
 
 module Text.Numeral.Rules
   ( Rule
-  , emptyRule, combineRules
+  , empty, combine
+  , conditional
 
   , Rules
   , findRule
@@ -18,7 +19,7 @@ module Text.Numeral.Rules
   , sub
 
   , mulScale
-  , shortScale
+  , shortScale, longScale, pelletierScale
 
   , scaleRules, scale1Rules
   ) where
@@ -30,15 +31,15 @@ module Text.Numeral.Rules
 
 -- from base:
 import Control.Applicative ( liftA2 )
-import Data.Bool           ( otherwise )
-import Data.Function       ( ($), id, const, flip )
+import Control.Monad       ( (>>=) )
+import Data.Bool           ( Bool, otherwise )
+import Data.Function       ( ($), id, const, flip, fix )
 import Data.Functor        ( (<$>) )
 import Data.List           ( foldr, concatMap )
 import Data.Maybe          ( Maybe(Nothing, Just) )
-import Data.Monoid         ( Monoid, mempty, mappend )
 import Data.Ord            ( Ord, (<), (>) )
-import Prelude             ( Integral, fromIntegral, fromInteger
-                           , Num, (+), (-), abs, negate, divMod, div
+import Prelude             ( Integral, fromIntegral
+                           , Num, (+), (-), abs, negate, divMod, div, even
                            )
 import Text.Show           ( Show )
 
@@ -65,25 +66,28 @@ import qualified Data.IntervalMap.FingerTree as FT
 
 type Rule α β = (α → Maybe β) → (α → Maybe β)
 
-instance Monoid (Rule α β) where
-  mempty  = emptyRule
-  mappend = combineRules
-
 
 --------------------------------------------------------------------------------
 -- Rule combinators
 --------------------------------------------------------------------------------
 
-emptyRule ∷ Rule α β
-emptyRule _ _ = Nothing
-
-combineRules ∷ Rule α β → Rule α β → Rule α β
-combineRules r1 r2 = \f n → case r1 f n of
-                              Nothing → r2 f n
-                              x       → x
+-- Law: r `combine` empty ≡ r
 
 -- idRule ∷ Rule α β
 -- idRule f n = f n
+
+empty ∷ Rule α β
+empty _ _ = Nothing
+
+combine ∷ Rule α β → Rule α β → Rule α β
+combine r1 r2 = \f n → case r1 f n of
+                         Nothing → r2 f n
+                         x       → x
+
+conditional ∷ (α → Bool) → Rule α β → Rule α β
+conditional pred r = \f n → if pred n
+                            then r f n
+                            else Nothing
 
 type Rules α β = [((α, α), Rule α β)]
 
@@ -137,27 +141,37 @@ sub ∷ (Integral α, Subtract β) ⇒ α → Rule α β
 sub val = \f n → liftA2 subtract (f $ val - n) (f val)
 
 -- See: http://en.wikipedia.org/wiki/Names_of_large_numbers
-mulScale ∷ (Integral α, Num β, Scale β) ⇒ α → α → Side → Side → Rule α β
-mulScale base offset aSide mSide =
-    \f n → let rank = (intLog n - offset) `div` base
-               big ∷ Scale γ ⇒ γ
-               big = scale (fromIntegral base)
-                           (fromIntegral offset)
-                           (fromIntegral rank)
-               (m, a) = n `divMod` fromInteger big
-               mval = liftA2 (flipIfR mSide (⋅)) (f m) (Just big)
-           in if a ≡ 0
-              then mval
-              else liftA2 (flipIfR aSide (+)) (f a) mval
+mulScale ∷ (Integral α, Scale α, Num β, Scale β)
+         ⇒ α → α → Side → Side → Rule α β → Rule α β
+mulScale base offset aSide mSide bigNumRule =
+    \f n → let rank    = (intLog n - offset) `div` base
+               base'   = fromIntegral base
+               offset' = fromIntegral offset
+               rank'   = fromIntegral rank
+           in (fix bigNumRule) rank >>= \rankExp →
+              let (m, a) = n `divMod` scale base' offset' rank'
+                  mval = liftA2 (flipIfR mSide (⋅))
+                                (f m)
+                                (Just $ scale base' offset' rankExp)
+              in if a ≡ 0
+                 then mval
+                 else liftA2 (flipIfR aSide (+)) (f a) mval
 
-shortScale ∷ (Integral α, Num β, Scale β) ⇒ Side → Side → Rule α β
+shortScale ∷ (Integral α, Scale α, Num β, Scale β)
+           ⇒ Side → Side → Rule α β → Rule α β
 shortScale = mulScale 3 3
 
--- longScale1 ∷ (Scale α) ⇒ Integer → α
--- longScale1 = scale 6 0
+longScale ∷ (Integral α, Scale α, Num β, Scale β)
+          ⇒ Side → Side → Rule α β → Rule α β
+longScale = mulScale 6 0
 
--- longScale2 ∷ (Scale α) ⇒ Integer → α
--- longScale2 = scale 6 3
+pelletierScale ∷ (Integral α, Scale α, Num β, Scale β)
+          ⇒ Side → Side → Rule α β → Rule α β
+pelletierScale aSide mSide bigNumRule =
+    conditional (\n → even $ intLog n `div` 3)
+                (mulScale 6 0 aSide mSide bigNumRule)
+    `combine`   (mulScale 6 3 aSide mSide bigNumRule)
+
 
 --------------------------------------------------------------------------------
 -- Miscellaneous

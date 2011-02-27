@@ -35,9 +35,6 @@ flag hpc
 -------------------------------------------------------------------------------
 
 library
-  if flag(test)
-    buildable: False
-
   ghc-options: -Wall
 
 
@@ -47,6 +44,8 @@ library
                , fingertree           >= 0.0.1   && < 0.1
 
   exposed-modules: Text.Numeral
+                 , Text.Numeral.Exp
+                 , Text.Numeral.Repr
                  , Text.Numeral.Rules
                  , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.DE
@@ -62,7 +61,6 @@ library
                --, Text.Numeral.Language.PT
                --, Text.Numeral.Language.SP
                  , Text.Numeral.Language.SV
-                 , Text.Numeral.Pelletier
   other-modules: Text.Numeral.Misc
 
 -------------------------------------------------------------------------------

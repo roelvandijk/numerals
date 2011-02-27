@@ -30,7 +30,7 @@
 
 module Text.Numeral.Language.EO
     ( cardinal
-    , findRule
+    , rule
     , cardinalRepr
     ) where
 
@@ -40,7 +40,6 @@ module Text.Numeral.Language.EO
 --------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad ( (>>=) )
 import Data.Function ( const )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
@@ -52,8 +51,6 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Pelletier ( scale )
-import Text.Numeral.Rules     ( Side(L, R), atom, add, mul )
 
 
 --------------------------------------------------------------------------------
@@ -61,10 +58,10 @@ import Text.Numeral.Rules     ( Side(L, R), atom, add, mul )
 --------------------------------------------------------------------------------
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal n = deconstruct findRule n >>= textify cardinalRepr
+cardinal = mkCardinal rule cardinalRepr
 
-findRule ∷ (Integral α, Num β) ⇒ FindRule α β
-findRule = mkFindRule rules (scale 3 R L)
+rule ∷ (Integral α, Num β) ⇒ Rule α β
+rule = findRule rules
 
 rules ∷ (Integral α, Num β) ⇒ Rules α β
 rules = [ ((  0,  10), atom)
@@ -78,10 +75,10 @@ rules = [ ((  0,  10), atom)
 cardinalRepr ∷ (IsString s) ⇒ Repr s
 cardinalRepr =
     Repr { reprValue = \n → M.lookup n symMap
-         , reprAdd  = \_ _ → " "
-         , reprMul  = \_ _ → ""
+         , reprAdd   = \_ _ → " "
+         , reprMul   = \_ _ → ""
          , reprSub   = \_ _ → ""
-         , reprNeg  = "ne " -- ???
+         , reprNeg   = "ne " -- ???
          }
     where
       symMap = M.fromList

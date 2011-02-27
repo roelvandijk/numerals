@@ -34,7 +34,7 @@
 
 module Text.Numeral.Language.DE
     ( cardinal
-    , findRule
+    , rule
     , cardinalRepr
     ) where
 
@@ -44,7 +44,6 @@ module Text.Numeral.Language.DE
 -------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad ( (>>=) )
 import Data.Function ( const )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
@@ -59,20 +58,19 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc      ( dec )
-import Text.Numeral.Pelletier ( scale )
-import Text.Numeral.Rules     ( Side(L, R), atom, atom1, add, mul, mul1 )
+import Text.Numeral.Misc ( dec )
 
 
 -------------------------------------------------------------------------------
 -- DE
 -------------------------------------------------------------------------------
+-- scale 3 R L
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal n = deconstruct findRule n >>= textify cardinalRepr
+cardinal = mkCardinal rule cardinalRepr
 
-findRule ∷ (Integral α, Num β) ⇒ FindRule α β
-findRule = mkFindRule rules (scale 3 R L)
+rule ∷ (Integral α, Num β) ⇒ Rule α β
+rule = findRule rules
 
 rules ∷ (Integral α, Num β) ⇒ Rules α β
 rules = [ ((  0,  12), atom)
@@ -81,6 +79,9 @@ rules = [ ((  0,  12), atom)
         , ((100, 100), atom1)
         , ((101, 199), add 100 R)
         , ((200, 999), mul1 100 R L)
+        , ((1000, 1000), atom)
+        , ((1001, 1999), add 1000 R)
+        , ((2000, 999999), mul 1000 R L)
         ]
 
 cardinalRepr ∷ (IsString s) ⇒ Repr s
@@ -100,12 +101,12 @@ cardinalRepr =
                , (1, \c → case c of
                             AddL {} → "ein"
                             MulL (C n) _ | n ≥ dec 6 → "eine"
-                                       | n ≥ 100   → "ein"
+                                         | n ≥ 100   → "ein"
                             _ → "eins"
                  )
                , (2, \c → case c of
                             MulL (C 10) _ → "zwan"
-                            _           → "zwei"
+                            _             → "zwei"
                  )
                , (3, const "drei")
                , (4, const "vier")
@@ -113,19 +114,19 @@ cardinalRepr =
                , (6, \c → case c of
                             AddL (C 10) _ → "sech"
                             MulL (C 10) _ → "sech"
-                            _           → "sechs"
+                            _             → "sechs"
                  )
                , (7, \c → case c of
                             AddL (C 10) _ → "sieb"
                             MulL (C 10) _ → "sieb"
-                            _           → "sieben"
+                            _             → "sieben"
                  )
                , (8, const "acht")
                , (9, const "neun")
                , (10, \c → case c of
                              MulR (C 3) _ → "ßig"
                              MulR (C _) _ → "zig"
-                             _          → "zehn"
+                             _            → "zehn"
                  )
                , (11, const "elf")
                , (12, const "zwölf")

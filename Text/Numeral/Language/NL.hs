@@ -34,7 +34,7 @@
 
 module Text.Numeral.Language.NL
     ( cardinal
-    , findRule
+    , rule
     , cardinalRepr
     ) where
 
@@ -43,7 +43,6 @@ module Text.Numeral.Language.NL
 --------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad ( (>>=) )
 import Data.Bool     ( otherwise )
 import Data.Function ( const )
 import Data.Maybe    ( Maybe )
@@ -53,27 +52,26 @@ import Data.String   ( IsString )
 import Prelude       ( Integral, Num )
 
 -- from base-unicode-symbols:
-import Data.Bool.Unicode   ( (∨) )
-import Data.Eq.Unicode     ( (≡) )
+import Data.Bool.Unicode     ( (∨) )
+import Data.Eq.Unicode       ( (≡) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Pelletier ( scale )
-import Text.Numeral.Rules     ( Side(L, R), atom, add, mul )
 
 
 --------------------------------------------------------------------------------
 -- NL
 --------------------------------------------------------------------------------
+-- scale 3 R L
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal n = deconstruct findRule n >>= textify cardinalRepr
+cardinal = mkCardinal rule cardinalRepr
 
-findRule ∷ (Integral α, Num β) ⇒ FindRule α β
-findRule = mkFindRule rules (scale 3 R L)
+rule ∷ (Integral α, Num β) ⇒ Rule α β
+rule = findRule rules
 
 rules ∷ (Integral α, Num β) ⇒ Rules α β
 rules = [ ((  0,  12), atom)
@@ -82,6 +80,9 @@ rules = [ ((  0,  12), atom)
         , ((100, 100), atom)
         , ((101, 199), add 100 R)
         , ((200, 999), mul 100 R L)
+        , ((1000, 1000), atom)
+        , ((1001, 1999), add 1000 R)
+        , ((2000, 999999), mul 1000 R L)
         ]
 
 cardinalRepr ∷ (IsString s) ⇒ Repr s
@@ -111,12 +112,12 @@ cardinalRepr =
                , (8, \c → case c of
                             MulL (C 10) _ → "tach"
                             AddL (C 10) _ → "ach"
-                            _           → "acht"
+                            _             → "acht"
                  )
                , (9, const "negen")
                , (10, \c → case c of
                              MulR {} → "tig"
-                             _     → "tien"
+                             _       → "tien"
                  )
                , (11, const "elf")
                , (12, const "twaalf")
@@ -127,4 +128,4 @@ cardinalRepr =
       ten n t ctx = case ctx of
                       MulL (C 10) _ → t
                       AddL (C 10) _ → t
-                      _           → n
+                      _             → n

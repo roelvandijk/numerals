@@ -39,7 +39,7 @@
 
 module Text.Numeral.Language.FR
     ( cardinal
-    , findRule
+    , rule
     , cardinalRepr
     ) where
 
@@ -49,7 +49,6 @@ module Text.Numeral.Language.FR
 --------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad ( (>>=) )
 import Data.Bool     ( otherwise )
 import Data.Function ( const )
 import Data.Maybe    ( Maybe )
@@ -63,8 +62,6 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Pelletier ( scale )
-import Text.Numeral.Rules     ( Side(L, R), atom, add, mul )
 
 
 --------------------------------------------------------------------------------
@@ -78,10 +75,10 @@ Sources:
 -}
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal n = deconstruct findRule n >>= textify cardinalRepr
+cardinal = mkCardinal rule cardinalRepr
 
-findRule ∷ (Integral α, Num β) ⇒ FindRule α β
-findRule = mkFindRule rules (scale 3 R L)
+rule ∷ (Integral α, Num β) ⇒ Rule α β
+rule = findRule rules
 
 rules ∷ (Integral α, Num β) ⇒ Rules α β
 rules = [ ((  0,  10), atom)
@@ -131,14 +128,14 @@ cardinalRepr =
                , (9, const "neuf")
                , (10, \c → case c of
                              AddR (C n) _ | n < 7     → "ze"
-                                        | otherwise → "dix"
+                                          | otherwise → "dix"
                              MulR (C 3) _ → "te"
                              MulR {}      → "ante"
-                             _          → "dix"
+                             _            → "dix"
                  )
                , (20,   \c → case c of
                                MulR _ Empty → "vingts"
-                               _          → "vingt"
+                               _            → "vingt"
                  )
                , (100,  const "cent")
                , (1000, const "mille")
@@ -147,4 +144,4 @@ cardinalRepr =
       ten n a m ctx = case ctx of
                         AddL (C 10) _ → a
                         MulL (C 10) _ → m
-                        _           → n
+                        _             → n

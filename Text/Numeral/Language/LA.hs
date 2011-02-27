@@ -33,7 +33,7 @@
 
 module Text.Numeral.Language.LA
     ( cardinal
-    , findRule
+    , rule
     , cardinalRepr
     ) where
 
@@ -43,14 +43,13 @@ module Text.Numeral.Language.LA
 --------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad ( (>>=) )
 import Data.Bool     ( otherwise )
 import Data.Function ( ($), const )
 import Data.List     ( concat )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Integral, (+) )
+import Prelude       ( Integral, Num, (+) )
 
 -- from base-unicode-symbols:
 import Data.List.Unicode     ( (∈) )
@@ -62,7 +61,6 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Rules ( Side(L, R), atom, add, mul, sub )
 
 
 --------------------------------------------------------------------------------
@@ -76,12 +74,12 @@ Sources:
 -}
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal n = deconstruct findRule n >>= textify cardinalRepr
+cardinal = mkCardinal rule cardinalRepr
 
-findRule ∷ (Integral α, Subtract β) ⇒ FindRule α β
-findRule = mkFindRule rules []
+rule ∷ (Integral α, Num β, Subtract β) ⇒ Rule α β
+rule = findRule rules
 
-rules ∷ (Integral α, Subtract β) ⇒ Rules α β
+rules ∷ (Integral α, Num β, Subtract β) ⇒ Rules α β
 rules = [ (( 0, 10), atom)
         , ((11, 17), add 10 L)
         , ((18, 19), sub 20)

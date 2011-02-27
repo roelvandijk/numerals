@@ -34,7 +34,7 @@
 
 module Text.Numeral.Language.NO
     ( cardinal
-    , findRule
+    , rule
     , cardinalRepr
     ) where
 
@@ -43,7 +43,6 @@ module Text.Numeral.Language.NO
 -------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad ( (>>=) )
 import Data.Function ( const )
 import Data.Maybe    ( Maybe )
 import Data.Monoid   ( Monoid )
@@ -55,8 +54,6 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Pelletier ( scale )
-import Text.Numeral.Rules     ( Side(L, R), atom, add, mul )
 
 
 -------------------------------------------------------------------------------
@@ -68,10 +65,10 @@ import Text.Numeral.Rules     ( Side(L, R), atom, add, mul )
 --   http://www.sf.airnet.ne.jp/~ts/language/number/norwegian.html
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal n = deconstruct findRule n >>= textify cardinalRepr
+cardinal = mkCardinal rule cardinalRepr
 
-findRule ∷ (Integral α, Num β) ⇒ FindRule α β
-findRule = mkFindRule rules (scale 3 R L)
+rule ∷ (Integral α, Num β) ⇒ Rule α β
+rule = findRule rules
 
 rules ∷ (Integral α, Num β) ⇒ Rules α β
 rules = [ ((  0,  12), atom)
@@ -106,7 +103,7 @@ cardinalRepr =
                , (9,  ten   "ni"   "nit"  "nit")
                , (10, \c → case c of
                              AddR {} → "ten"
-                             _     → "ti"
+                             _       → "ti"
                  )
                , (11, const "elleve")
                , (12, const "tolv")
@@ -118,4 +115,4 @@ cardinalRepr =
       ten n a m = \c → case c of
                          AddL (C 10) _ → a
                          MulL (C 10) _ → m
-                         _           → n
+                         _             → n

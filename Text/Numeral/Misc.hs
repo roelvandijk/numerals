@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE OverloadedStrings, UnicodeSyntax #-}
 
 module Text.Numeral.Misc where
 
@@ -6,26 +6,22 @@ module Text.Numeral.Misc where
 -- Imports
 --------------------------------------------------------------------------------
 
--- base
--- import Data.Maybe    ( Maybe(Nothing, Just) )
-import Prelude       ( (^), Integral )
-
 
 --------------------------------------------------------------------------------
 -- Misc
 --------------------------------------------------------------------------------
 
--- withSnd ∷ (a → b → c) → (d, a) → (e, b) → c
--- withSnd f (_, x) (_, y) = f x y
-
 dec ∷ (Integral α) ⇒ α → α
 dec = (10 ^)
 
--- weave ∷ [a] → [a] → [a]
--- weave []     ys = ys
--- weave (x:xs) ys = x : weave ys xs
+intLog ∷ (Integral α) ⇒ α → α
+intLog x | x < 0 = error "undefined for negative numbers"
+         | otherwise = go x 0
+    where
+      go n acc = case n `div` 10 of
+                   0 → acc
+                   1 → acc + 1
+                   q → go q $! acc + 1
 
--- untilNothing ∷ [Maybe a] → [a]
--- untilNothing []             = []
--- untilNothing (Just x  : xs) = x : untilNothing xs
--- untilNothing (Nothing : _)  = []
+-- prop_intLog e = intLog (10^e) ≡ e
+

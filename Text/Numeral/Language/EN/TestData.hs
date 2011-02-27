@@ -11,10 +11,15 @@ module Text.Numeral.Language.EN.TestData (uk_cardinals, us_cardinals) where
 import Data.String ( IsString )
 import Prelude     ( Num )
 
+-- from base-unicode-symbols:
+import Data.Monoid.Unicode ( (⊕) )
+
 
 --------------------------------------------------------------------------------
 -- EN
 --------------------------------------------------------------------------------
+
+-- Sources: http://en.wikipedia.org/wiki/List_of_numbers
 
 en_cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
 en_cardinals =
@@ -123,7 +128,57 @@ en_cardinals =
 
 
 uk_cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
-uk_cardinals = en_cardinals
+uk_cardinals =
+    en_cardinals
+  ⊕ [ (101, "one hundred and one")
+    , (110, "one hundred and ten")
+    , (111, "one hundred and eleven")
+    , (120, "one hundred and twenty")
+    , (121, "one hundred and twenty-one")
+    , (144, "one hundred and forty-four")
+    , (200, "two hundred")
+    , (300, "three hundred")
+    , (666, "six hundred and sixty-six")
+    , (1000, "one thousand")
+    , (1001, "one thousand and one")
+    , (1010, "one thousand and ten")
+    , (1011, "one thousand and eleven")
+    , (1024, "one thousand and twenty-four")
+    , (1100, "one thousand one hundred")
+    , (1728, "one thousand seven hundred and twenty-eight")
+    , (2000, "two thousand")
+    , (10000, "ten thousand")
+    , (100000, "one hundred thousand")
+    , (500000, "five hundred thousand")
+    , (1000000, "one million")
+    , (1048576, "one million forty-eight thousand five hundred and seventy-six")
+    , (10000000, "ten million")
+    ]
 
 us_cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
-us_cardinals = en_cardinals
+us_cardinals =
+    en_cardinals
+  ⊕ [ (101, "one hundred one")
+    , (110, "one hundred ten")
+    , (111, "one hundred eleven")
+    , (120, "one hundred twenty")
+    , (121, "one hundred twenty-one")
+    , (144, "one hundred forty-four")
+    , (200, "two hundred")
+    , (300, "three hundred")
+    , (666, "six hundred sixty-six")
+    , (1000, "one thousand")
+    , (1001, "one thousand one")
+    , (1010, "one thousand ten")
+    , (1011, "one thousand eleven")
+    , (1024, "one thousand twenty-four")
+    , (1100, "one thousand one hundred")
+    , (1728, "one thousand seven hundred twenty-eight")
+    , (2000, "two thousand")
+    , (10000, "ten thousand")
+    , (100000, "one hundred thousand")
+    , (500000, "five hundred thousand")
+    , (1000000, "one million")
+    , (1048576, "one million forty-eight thousand five hundred seventy-six")
+    , (10000000, "ten million")
+    ]

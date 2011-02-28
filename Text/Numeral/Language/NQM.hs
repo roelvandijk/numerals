@@ -30,7 +30,7 @@
 
 module Text.Numeral.Language.NQM
     ( cardinal
-    , rule
+    , struct
     , cardinalRepr
     ) where
 
@@ -40,7 +40,8 @@ module Text.Numeral.Language.NQM
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Function ( const )
+import Control.Monad ( (>=>) )
+import Data.Function ( const, fix )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
@@ -58,7 +59,10 @@ import Text.Numeral
 --------------------------------------------------------------------------------
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal = mkCardinal rule cardinalRepr
+cardinal = struct >=> cardinalRepr
+
+struct ∷ (Integral α, Num β) ⇒ α → Maybe β
+struct = positive (fix rule)
 
 rule ∷ (Integral α, Num β) ⇒ Rule α β
 rule = findRule (1, atom        )
@@ -73,8 +77,8 @@ rule = findRule (1, atom        )
               ]
                  107
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
-cardinalRepr = defaultRepr
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n symMap
                , reprAdd   = \_ _ → Just " abo "
                , reprMul   = (⊡)

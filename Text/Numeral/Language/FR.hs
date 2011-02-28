@@ -39,7 +39,7 @@
 
 module Text.Numeral.Language.FR
     ( cardinal
-    , rule
+    , struct
     , cardinalRepr
     ) where
 
@@ -49,8 +49,9 @@ module Text.Numeral.Language.FR
 --------------------------------------------------------------------------------
 
 -- from base:
+import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
-import Data.Function ( const )
+import Data.Function ( const, fix )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
@@ -75,7 +76,10 @@ Sources:
 -}
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal = mkCardinal rule cardinalRepr
+cardinal = struct >=> cardinalRepr
+
+struct ∷ (Integral α, Num β) ⇒ α → Maybe β
+struct = positive (fix rule)
 
 rule ∷ (Integral α, Num β) ⇒ Rule α β
 rule = findRule (0, atom)
@@ -93,8 +97,8 @@ rule = findRule (0, atom)
               ]
                  1000
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
-cardinalRepr = defaultRepr
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n symMap
                , reprAdd   = (⊞)
                , reprMul   = (⊡)

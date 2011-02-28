@@ -36,9 +36,9 @@
 module Text.Numeral.Language.EN
     ( uk_cardinal
     , us_cardinal
-    , shortScaleRule
-    , longScaleRule
-    , pelletierScaleRule
+    , shortScaleStruct
+    , longScaleStruct
+    , pelletierScaleStruct
     , uk_cardinalRepr
     , ukPelletier_cardinalRepr
     , us_cardinalRepr
@@ -49,8 +49,9 @@ module Text.Numeral.Language.EN
 --------------------------------------------------------------------------------
 
 -- from base:
+import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
-import Data.Function ( const )
+import Data.Function ( ($), const, fix )
 import Data.Functor  ( (<$>) )
 import Data.Maybe    ( Maybe(Nothing, Just) )
 import Data.Monoid   ( Monoid )
@@ -67,6 +68,7 @@ import qualified Data.Map as M ( fromList, lookup )
 -- from numerals:
 import Text.Numeral
 import qualified Text.Numeral.Language.BigNum as BN ( rule, cardinalRepr )
+
 
 --------------------------------------------------------------------------------
 -- EN
@@ -100,22 +102,23 @@ Base 12:
 1728    great gross     1728 (12³)
 -}
 
-uk_cardinal ∷ (Monoid s, IsString s, Integral α, Scale α)
-            ⇒ α → Maybe s
-uk_cardinal = mkCardinal shortScaleRule uk_cardinalRepr
+uk_cardinal ∷ (Monoid s, IsString s, Integral α, Scale α) ⇒ α → Maybe s
+uk_cardinal = shortScaleStruct >=> uk_cardinalRepr
 
-us_cardinal ∷ (Monoid s, IsString s, Integral α, Scale α)
-            ⇒ α → Maybe s
-us_cardinal = mkCardinal shortScaleRule us_cardinalRepr
+us_cardinal ∷ (Monoid s, IsString s, Integral α, Scale α) ⇒ α → Maybe s
+us_cardinal = shortScaleStruct >=> us_cardinalRepr
 
-shortScaleRule ∷ (Integral α, Scale α, Num β, Scale β) ⇒ Rule α β
-shortScaleRule = rule `combine` shortScale R L BN.rule
+shortScaleStruct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
+shortScaleStruct = positive
+                 $ fix $ rule `combine` shortScale R L BN.rule
 
-longScaleRule ∷ (Integral α, Scale α, Num β, Scale β) ⇒ Rule α β
-longScaleRule = rule `combine` longScale  R L BN.rule
+longScaleStruct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
+longScaleStruct = positive
+                $ fix $ rule `combine` longScale  R L BN.rule
 
-pelletierScaleRule ∷ (Integral α, Scale α, Num β, Scale β) ⇒ Rule α β
-pelletierScaleRule = rule `combine` pelletierScale  R L BN.rule
+pelletierScaleStruct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
+pelletierScaleStruct = positive
+                     $ fix $ rule `combine` pelletierScale  R L BN.rule
 
 rule ∷ (Integral α, Num β) ⇒ Rule α β
 rule = findRule (   0, atom         )
@@ -130,23 +133,26 @@ rule = findRule (   0, atom         )
               ]
                999999
 
-us_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
-us_cardinalRepr = cardinalRepr (⊞)
+us_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+us_cardinalRepr = textify $ cardinalRepr (⊞)
   where
     (_ :*: C 10) ⊞ _ = Just "-"
     (_ :*: _   ) ⊞ _ = Just " "
     _            ⊞ _ = Just ""
 
-uk_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
-uk_cardinalRepr = cardinalRepr (⊞)
+uk_cardinalRepr' ∷ (Monoid s, IsString s) ⇒ Repr s
+uk_cardinalRepr' = cardinalRepr (⊞)
   where
     (_ :*: C 10) ⊞ _ = Just "-"
     (_ :*: _   ) ⊞ x | eval x < (100 ∷ Integer) = Just " and "
                      | otherwise    = Just " "
     _            ⊞ _ = Just ""
 
-ukPelletier_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
-ukPelletier_cardinalRepr = uk_cardinalRepr { reprScale = pelletier }
+uk_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+uk_cardinalRepr = textify $ uk_cardinalRepr'
+
+ukPelletier_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+ukPelletier_cardinalRepr = textify uk_cardinalRepr' { reprScale = pelletier }
     where
       pelletier _ 0 e = big "illion"  e
       pelletier _ 3 e = big "illiard" e

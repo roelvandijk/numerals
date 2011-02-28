@@ -33,7 +33,7 @@
 
 module Text.Numeral.Language.LA
     ( cardinal
-    , rule
+    , struct
     , cardinalRepr
     ) where
 
@@ -43,8 +43,9 @@ module Text.Numeral.Language.LA
 --------------------------------------------------------------------------------
 
 -- from base:
+import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
-import Data.Function ( ($), const )
+import Data.Function ( ($), const, fix )
 import Data.List     ( concat )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
@@ -74,7 +75,10 @@ Sources:
 -}
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal = mkCardinal rule cardinalRepr
+cardinal = struct >=> cardinalRepr
+
+struct ∷ (Integral α, Num β, Subtract β) ⇒ α → Maybe β
+struct = positive (fix rule)
 
 rule ∷ (Integral α, Num β, Subtract β) ⇒ Rule α β
 rule = findRule ( 0, atom)
@@ -94,14 +98,13 @@ rule = findRule ( 0, atom)
             )
             1000
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
-cardinalRepr =
-    defaultRepr
-    { reprValue = \n → M.lookup n symMap
-    , reprAdd   = (⊞)
-    , reprMul   = (⊡)
-    , reprSub   = \_ _ → Just "dē"
-    }
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr = textify defaultRepr
+               { reprValue = \n → M.lookup n symMap
+               , reprAdd   = (⊞)
+               , reprMul   = (⊡)
+               , reprSub   = \_ _ → Just "dē"
+               }
     where
       (_ :*: C _) ⊞ _ = Just " "
       _           ⊞ _ = Just ""

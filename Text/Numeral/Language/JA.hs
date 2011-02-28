@@ -30,7 +30,7 @@
 -}
 
 module Text.Numeral.Language.JA
-    ( rule
+    ( struct
 
     , kanji_cardinal
     , kanji_cardinal_repr
@@ -51,7 +51,8 @@ module Text.Numeral.Language.JA
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Function ( const )
+import Control.Monad ( (>=>) )
+import Data.Function ( ($), const, fix )
 import Data.List     ( take )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
@@ -80,6 +81,9 @@ Sources:
   http://www.guidetojapanese.org/numbers.html
 -}
 
+struct ∷ (Integral α, Num β) ⇒ α → Maybe β
+struct = positive (fix rule)
+
 rule ∷ (Integral α, Num β) ⇒ Rule α β
 rule = findRule (   0, atom        )
             ( [ (  11, add   10 R  )
@@ -101,10 +105,10 @@ rule = findRule (   0, atom        )
 --------------------------------------------------------------------------------
 
 kanji_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-kanji_cardinal = mkCardinal rule kanji_cardinal_repr
+kanji_cardinal = struct >=> kanji_cardinal_repr
 
-kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Repr s
-kanji_cardinal_repr = defaultRepr
+kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+kanji_cardinal_repr = textify defaultRepr
                       { reprValue = \n → M.lookup n symMap
                       , reprAdd   = \_ _ → Just ""
                       , reprMul   = \_ _ → Just ""
@@ -150,11 +154,15 @@ kanji_cardinal_repr = defaultRepr
 --------------------------------------------------------------------------------
 
 daiji_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-daiji_cardinal = mkCardinal rule daiji_cardinal_repr
+daiji_cardinal = struct >=> daiji_cardinal_repr
 
-daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Repr s
-daiji_cardinal_repr = kanji_cardinal_repr
-                      { reprValue = \n → M.lookup n symMap }
+daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+daiji_cardinal_repr = textify defaultRepr
+                      { reprValue = \n → M.lookup n symMap
+                      , reprAdd   = \_ _ → Just ""
+                      , reprMul   = \_ _ → Just ""
+                      , reprNeg   = \_   → Just "マイナス"
+                      }
     where
       symMap = M.fromList
                [ (0, const "零") -- alternatives:"ゼロ" or "マル"
@@ -228,10 +236,10 @@ generic_repr four seven = defaultRepr
 --------------------------------------------------------------------------------
 
 on'yomi_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-on'yomi_cardinal = mkCardinal rule on'yomi_cardinal_repr
+on'yomi_cardinal = struct >=> on'yomi_cardinal_repr
 
-on'yomi_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Repr s
-on'yomi_cardinal_repr = generic_repr "shi" "shichi"
+on'yomi_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+on'yomi_cardinal_repr = textify $ generic_repr "shi" "shichi"
 
 
 --------------------------------------------------------------------------------
@@ -239,7 +247,7 @@ on'yomi_cardinal_repr = generic_repr "shi" "shichi"
 --------------------------------------------------------------------------------
 
 preferred_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-preferred_cardinal = mkCardinal rule preferred_cardinal_repr
+preferred_cardinal = struct >=> preferred_cardinal_repr
 
-preferred_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Repr s
-preferred_cardinal_repr = generic_repr "yon" "nana"
+preferred_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+preferred_cardinal_repr = textify $ generic_repr "yon" "nana"

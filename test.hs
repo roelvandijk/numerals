@@ -63,6 +63,8 @@ import qualified Text.Numeral.Language.NQM          as NQM ( cardinal  )
 import qualified Text.Numeral.Language.NQM.TestData as NQM ( cardinals )
 import qualified Text.Numeral.Language.SV           as SV  ( cardinal  )
 import qualified Text.Numeral.Language.SV.TestData  as SV  ( cardinals )
+import qualified Text.Numeral.Language.YOR          as YOR ( cardinal  )
+import qualified Text.Numeral.Language.YOR.TestData as YOR ( cardinals )
 
 
 
@@ -119,4 +121,5 @@ tests = [ testGroup "CHN" [mkTests "cardinal" CHN.cardinal CHN.cardinals]
         , testGroup "NO"  [mkTests "cardinal" NO.cardinal  NO.cardinals]
         , testGroup "NQM" [mkTests "cardinal" NQM.cardinal NQM.cardinals]
         , testGroup "SV"  [mkTests "cardinal" SV.cardinal  SV.cardinals]
+        , testGroup "YOR" [mkTests "cardinal" YOR.cardinal YOR.cardinals]
         ]

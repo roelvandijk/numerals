@@ -6,7 +6,7 @@
 module Text.Numeral.Rules
   ( Rule
   , empty, combine
-  , conditional
+  , when, conditional
 
   , Rules
   , findRule
@@ -84,10 +84,13 @@ combine r1 r2 = \f n → case r1 f n of
                          Nothing → r2 f n
                          x       → x
 
-conditional ∷ (α → Bool) → Rule α β → Rule α β
-conditional pred r = \f n → if pred n
-                            then r f n
-                            else Nothing
+when ∷ (α → Bool) → Rule α β → Rule α β
+when pred r = \f n → if pred n
+                     then r f n
+                     else Nothing
+
+conditional ∷ (α → Bool) → Rule α β → Rule α β → Rule α β
+conditional p t e = when p t `combine` e
 
 type Rules α β = [((α, α), Rule α β)]
 
@@ -170,7 +173,7 @@ pelletierScale ∷ (Integral α, Scale α, Num β, Scale β)
 pelletierScale aSide mSide bigNumRule =
     conditional (\n → even $ intLog n `div` 3)
                 (mulScale 6 0 aSide mSide bigNumRule)
-    `combine`   (mulScale 6 3 aSide mSide bigNumRule)
+                (mulScale 6 3 aSide mSide bigNumRule)
 
 
 --------------------------------------------------------------------------------

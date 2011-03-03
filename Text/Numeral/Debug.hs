@@ -28,6 +28,7 @@ import qualified Text.Numeral.Language.LA  as LA
 import qualified Text.Numeral.Language.NL  as NL
 import qualified Text.Numeral.Language.NO  as NO
 import qualified Text.Numeral.Language.NQM as NQM
+import qualified Text.Numeral.Language.PAA as PAA
 import qualified Text.Numeral.Language.SV  as SV
 import qualified Text.Numeral.Language.YOR as YOR
 
@@ -38,18 +39,20 @@ import qualified Text.Numeral.Language.BigNum as BN
 -- Debug and test stuff
 --------------------------------------------------------------------------------
 
+test ∷ (Integer → Maybe Exp) → (Exp → Maybe String) → [Integer] → IO ()
+test struct repr xs =
+    forM_ xs $ \x → do putStr $ (show x) ⊕ " - "
+                       case struct x of
+                         Nothing → putStrLn "error"
+                         Just e → do putStr $ show e
+                                     putStr " - "
+                                     putStrLn $ fromMaybe "error" (repr e)
 
-test ∷ Rule Integer Exp → Repr String → [Integer] → IO ()
-test rule repr xs = forM_ xs $ \x → do putStr $ (show x) ⊕ " - "
-                                       case (fix rule) x of
-                                         Nothing → putStrLn "error"
-                                         Just e → do putStr $ show e
-                                                     putStr " - "
-                                                     putStrLn $ fromMaybe "error" (textify repr e)
-
-test2 ∷ Rule Integer Exp → Repr String → [Integer] → IO ()
-test2 rule repr xs = forM_ xs $ \x → case (fix rule) x of
-                                       Nothing → putStrLn "error"
-                                       Just e → do putStr $ show e
-                                                   putStr " - "
-                                                   putStrLn $ fromMaybe "error" (textify repr e)
+-- | Like 'test' but doesn't print the numbers that are converted.
+test2 ∷ (Integer → Maybe Exp) → (Exp → Maybe String) → [Integer] → IO ()
+test2 struct repr xs =
+    forM_ xs $ \x → case struct x of
+                      Nothing → putStrLn "error"
+                      Just e → do putStr $ show e
+                                  putStr " - "
+                                  putStrLn $ fromMaybe "error" (repr e)

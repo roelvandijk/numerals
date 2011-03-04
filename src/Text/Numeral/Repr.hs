@@ -45,7 +45,7 @@ data SymbolContext = Empty
                      deriving Show
 
 data Repr s = Repr { reprValue ∷ Integer → Maybe (SymbolContext → s)
-                   , reprScale ∷ Integer → Integer → Exp → Maybe s
+                   , reprScale ∷ Integer → Integer → Exp → SymbolContext → Maybe s
                    , reprAdd ∷ Exp → Exp → Maybe s
                    , reprMul ∷ Exp → Exp → Maybe s
                    , reprSub ∷ Exp → Exp → Maybe s
@@ -58,12 +58,12 @@ data Repr s = Repr { reprValue ∷ Integer → Maybe (SymbolContext → s)
 
 defaultRepr ∷ (Monoid s) ⇒ Repr s
 defaultRepr =
-    Repr { reprValue = \_     → Nothing
-         , reprScale = \_ _ _ → Nothing
-         , reprAdd   = \_ _   → Nothing
-         , reprMul   = \_ _   → Nothing
-         , reprSub   = \_ _   → Nothing
-         , reprNeg   = \_     → Nothing
+    Repr { reprValue = \_       → Nothing
+         , reprScale = \_ _ _ _ → Nothing
+         , reprAdd   = \_ _     → Nothing
+         , reprMul   = \_ _     → Nothing
+         , reprSub   = \_ _     → Nothing
+         , reprNeg   = \_       → Nothing
          , reprAddCombine = \a x y → Just $ x ⊕ a ⊕ y
          , reprMulCombine = \m x y → Just $ x ⊕ m ⊕ y
          , reprSubCombine = \s x y → Just $ x ⊕ s ⊕ y
@@ -78,7 +78,7 @@ textify ∷ (Monoid s, IsString s) ⇒ Repr s → Exp → Maybe s
 textify (Repr {..}) e = go Empty e
     where
       go ctx (C n) = ($ ctx) <$> reprValue n
-      go _   (Scale b o r) = reprScale b o r
+      go ctx (Scale b o r) = reprScale b o r ctx
       go ctx (Neg x) = do x' ← go ctx x
                           n' ← reprNeg x
                           reprNegCombine n' x'

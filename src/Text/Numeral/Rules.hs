@@ -18,8 +18,9 @@ module Text.Numeral.Rules
   , mul, mul1
   , sub
 
-  , mulScale
-  , shortScale, longScale, pelletierScale
+  , mulScale, mulScale1
+  , shortScale,  longScale,  pelletierScale
+  , shortScale1, longScale1, pelletierScale1
 
   , scaleRules, scale1Rules
   ) where
@@ -153,6 +154,24 @@ mulScale base offset aSide mSide bigNumRule =
                rank'   = fromIntegral rank
            in (fix bigNumRule) rank >>= \rankExp →
               let (m, a) = n `divMod` scale base' offset' rank'
+                  scale' = Just $ scale base' offset' rankExp
+                  mval | m ≡ 1     = scale'
+                       | otherwise = liftA2 (flipIfR mSide (⋅))
+                                     (f m)
+                                     scale'
+              in if a ≡ 0
+                 then mval
+                 else liftA2 (flipIfR aSide (+)) (f a) mval
+
+mulScale1 ∷ (Integral α, Scale α, Num β, Scale β)
+          ⇒ α → α → Side → Side → Rule α β → Rule α β
+mulScale1 base offset aSide mSide bigNumRule =
+    \f n → let rank    = (intLog n - offset) `div` base
+               base'   = fromIntegral base
+               offset' = fromIntegral offset
+               rank'   = fromIntegral rank
+           in (fix bigNumRule) rank >>= \rankExp →
+              let (m, a) = n `divMod` scale base' offset' rank'
                   mval = liftA2 (flipIfR mSide (⋅))
                                 (f m)
                                 (Just $ scale base' offset' rankExp)
@@ -162,18 +181,33 @@ mulScale base offset aSide mSide bigNumRule =
 
 shortScale ∷ (Integral α, Scale α, Num β, Scale β)
            ⇒ Side → Side → Rule α β → Rule α β
-shortScale = mulScale 3 3
+shortScale  = mulScale 3 3
+
+shortScale1 ∷ (Integral α, Scale α, Num β, Scale β)
+            ⇒ Side → Side → Rule α β → Rule α β
+shortScale1 = mulScale1 3 3
 
 longScale ∷ (Integral α, Scale α, Num β, Scale β)
           ⇒ Side → Side → Rule α β → Rule α β
 longScale = mulScale 6 0
 
+longScale1 ∷ (Integral α, Scale α, Num β, Scale β)
+           ⇒ Side → Side → Rule α β → Rule α β
+longScale1 = mulScale1 6 0
+
 pelletierScale ∷ (Integral α, Scale α, Num β, Scale β)
-          ⇒ Side → Side → Rule α β → Rule α β
+                ⇒ Side → Side → Rule α β → Rule α β
 pelletierScale aSide mSide bigNumRule =
     conditional (\n → even $ intLog n `div` 3)
                 (mulScale 6 0 aSide mSide bigNumRule)
                 (mulScale 6 3 aSide mSide bigNumRule)
+
+pelletierScale1 ∷ (Integral α, Scale α, Num β, Scale β)
+                ⇒ Side → Side → Rule α β → Rule α β
+pelletierScale1 aSide mSide bigNumRule =
+    conditional (\n → even $ intLog n `div` 3)
+                (mulScale1 6 0 aSide mSide bigNumRule)
+                (mulScale1 6 3 aSide mSide bigNumRule)
 
 
 --------------------------------------------------------------------------------

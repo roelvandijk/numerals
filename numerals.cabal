@@ -52,6 +52,7 @@ library
                  , Text.Numeral.Language.DE
                  , Text.Numeral.Language.EN
                  , Text.Numeral.Language.EO
+                 , Text.Numeral.Language.ES
                  , Text.Numeral.Language.FR
                --, Text.Numeral.Language.IT
                  , Text.Numeral.Language.JA
@@ -61,7 +62,6 @@ library
                  , Text.Numeral.Language.NQM
                  , Text.Numeral.Language.PAA
                --, Text.Numeral.Language.PT
-               --, Text.Numeral.Language.SP
                  , Text.Numeral.Language.SV
                  , Text.Numeral.Language.YOR
   other-modules: Text.Numeral.Misc
@@ -76,6 +76,7 @@ executable test-numerals
                , Text.Numeral.Language.DE.TestData
                , Text.Numeral.Language.EN.TestData
                , Text.Numeral.Language.EO.TestData
+               , Text.Numeral.Language.ES.TestData
                , Text.Numeral.Language.FR.TestData
                , Text.Numeral.Language.JA.TestData
                , Text.Numeral.Language.LA.TestData

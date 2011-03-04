@@ -110,15 +110,15 @@ us_cardinal = shortScaleStruct >=> us_cardinalRepr
 
 shortScaleStruct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
 shortScaleStruct = positive
-                 $ fix $ rule `combine` shortScale R L BN.rule
+                 $ fix $ rule `combine` shortScale1 R L BN.rule
 
 longScaleStruct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
 longScaleStruct = positive
-                $ fix $ rule `combine` longScale  R L BN.rule
+                $ fix $ rule `combine` longScale1 R L BN.rule
 
 pelletierScaleStruct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
 pelletierScaleStruct = positive
-                     $ fix $ rule `combine` pelletierScale  R L BN.rule
+                     $ fix $ rule `combine` pelletierScale1 R L BN.rule
 
 rule ∷ (Integral α, Num β) ⇒ Rule α β
 rule = findRule (   0, atom         )
@@ -154,17 +154,17 @@ uk_cardinalRepr = textify $ uk_cardinalRepr'
 ukPelletier_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 ukPelletier_cardinalRepr = textify uk_cardinalRepr' { reprScale = pelletier }
     where
-      pelletier _ 0 e = big "illion"  e
-      pelletier _ 3 e = big "illiard" e
-      pelletier _ _ _ = Nothing
+      pelletier _ 0 e _ = big "illion"  e
+      pelletier _ 3 e _ = big "illiard" e
+      pelletier _ _ _ _ = Nothing
 
-      big s e = (⊕ s)  <$> textify BN.cardinalRepr e
+      big s e = (⊕ s) <$> textify BN.cardinalRepr e
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Maybe s) → Repr s
 cardinalRepr f =
     defaultRepr
     { reprValue = \n → M.lookup n symMap
-    , reprScale = \_ _ e → (⊕ "illion") <$> textify BN.cardinalRepr e
+    , reprScale = \_ _ e _ → (⊕ "illion") <$> textify BN.cardinalRepr e
     , reprAdd   = f
     , reprMul   = (⊞)
     , reprNeg   = \_ → Just "minus "

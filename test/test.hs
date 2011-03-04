@@ -43,6 +43,8 @@ import qualified Text.Numeral.Language.EN.TestData  as EN  ( uk_cardinals
                                                            )
 import qualified Text.Numeral.Language.EO           as EO  ( cardinal  )
 import qualified Text.Numeral.Language.EO.TestData  as EO  ( cardinals )
+import qualified Text.Numeral.Language.ES           as ES  ( cardinal  )
+import qualified Text.Numeral.Language.ES.TestData  as ES  ( cardinals )
 import qualified Text.Numeral.Language.FR           as FR  ( cardinal  )
 import qualified Text.Numeral.Language.FR.TestData  as FR  ( cardinals )
 import qualified Text.Numeral.Language.JA           as JA  ( preferred_cardinal
@@ -101,15 +103,16 @@ mkTests n f xs = testCase n $ testAsGroup f xs
 
 tests ∷ [Test]
 tests = [ testGroup "CHN" [mkTests "cardinal" CHN.cardinal CHN.cardinals]
-        , testGroup "DE" [mkTests "cardinal" DE.cardinal DE.cardinals]
+        , testGroup "DE"  [mkTests "cardinal" DE.cardinal DE.cardinals]
         , testGroup "EN"
           [ testGroup "UK"
             [mkTests "cardinal" EN.uk_cardinal EN.uk_cardinals]
           , testGroup "US"
             [mkTests "cardinal" EN.us_cardinal EN.us_cardinals]
           ]
-        , testGroup "EO" [mkTests "cardinal" EO.cardinal EO.cardinals]
-        , testGroup "FR" [mkTests "cardinal" FR.cardinal FR.cardinals]
+        , testGroup "EO"  [mkTests "cardinal" EO.cardinal EO.cardinals]
+        , testGroup "ES"  [mkTests "cardinal" ES.cardinal  ES.cardinals]
+        , testGroup "FR"  [mkTests "cardinal" FR.cardinal FR.cardinals]
         , testGroup "JA"
           [ testGroup "preferred"
             [mkTests "cardinal" JA.preferred_cardinal JA.preferred_cardinals]

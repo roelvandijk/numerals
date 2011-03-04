@@ -3,13 +3,13 @@
 {-|
 [@ISO639-1@]        -
 
-[@ISO639-2B@]       -
+[@ISO639-2B@]       paa
 
-[@ISO639-3@]        nqm
+[@ISO639-3@]        hui
 
 [@Native name@]     -
 
-[@English name@]    Ndom
+[@English name@]    Huli
 
 [@French name@]     -
 
@@ -21,14 +21,14 @@
 
 [@German name@]     -
 
-[@Language family@] Trans-New Guinea, Kolopom, Ndom
+[@Language family@] Trans-New Guinea, Engan, South, Huli
 
 [@Scope@]           Individual
 
 [@Type@]            Living
 -}
 
-module Text.Numeral.Language.NQM
+module Text.Numeral.Language.PAA
     ( cardinal
     , struct
     , cardinalRepr
@@ -55,8 +55,16 @@ import Text.Numeral
 
 
 --------------------------------------------------------------------------------
--- NQM
+-- PAA
 --------------------------------------------------------------------------------
+
+{-
+TODO:
+Need new Exp constructor to express
+42 = (15 × 2) + (12 obj. of the 3rd 15) = ngui ki, ngui tebone-gonaga hombearia
+
+Probably also need a constructor to express "4 obj" as opposed to just "4".
+-}
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
@@ -65,34 +73,45 @@ struct ∷ (Integral α, Num β) ⇒ α → Maybe β
 struct = positive (fix rule)
 
 rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (  1, atom      )
-              [ (  7, add  6 R  )
-              , ( 12, mul  6 R R)
-              , ( 18, atom      )
-              , ( 19, add 18 R  )
-              , ( 36, atom      )
-              , ( 37, add 36 R  )
-              , ( 72, mul 36 R R)
+rule = findRule ( 1, atom    )
+              [ (16, add 15 R)
+              , (30, mul 15 R R)
+              , (31, add 30 R)
               ]
-                 107
+                 100
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n symMap
-               , reprAdd   = \_ _ → Just " abo "
+               , reprAdd   = (⊞)
                , reprMul   = (⊡)
                }
     where
-      C 36 ⊡ _ = Just " "
-      _    ⊡ _ = Just " an "
+      -- _ ⊞ _ = Just ", ngui "
+      _ ⊞ _ = Just "-ni "
+
+      _ ⊡ _ = Just " "
 
       symMap = M.fromList
-               [ (1, const "sas")
-               , (2, const "thef")
-               , (3, const "ithin")
-               , (4, const "thonith")
-               , (5, const "meregh")
-               , (6, const "mer")
-               , (18, const "tondor")
-               , (36, const "nif")
+               [ ( 1, const "mbira")
+               , ( 2, \c → case c of
+                             MulR {} → "ki"
+                             _       → "kira"
+                 )
+               , ( 3, const "tebira")
+               , ( 4, const "maria")
+               , ( 5, const "duria")
+               , ( 6, const "waragaria")
+               , ( 7, const "karia")
+               , ( 8, const "halira")
+               , ( 9, const "dira")
+               , (10, const "pira")
+               , (11, const "bearia")
+               , (12, const "hombearia")
+               , (13, const "haleria")
+               , (14, const "deria")
+               , (15, \c → case c of
+                             MulL {} → "ngui"
+                             _       → "nguira"
+                 )
                ]

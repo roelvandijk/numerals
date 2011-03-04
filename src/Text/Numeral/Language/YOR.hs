@@ -69,6 +69,19 @@ import Text.Numeral
 -- YOR
 --------------------------------------------------------------------------------
 
+{-
+TODO: multiple sources make me suspect that this definition is not correct
+
+It may also be the case that numbers have multiple possible deriviations.
+
+ 45 = (20*3) - 10 - 5
+ 50 = (20*3) - 10
+108 = (20*6) - 10 - 2
+300 = 20 * (20 - 5)
+318 = 400 - (20*4) - 2
+525 = (200*3) - (20*4) + 5
+-}
+
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 

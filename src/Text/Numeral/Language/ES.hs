@@ -53,7 +53,7 @@ import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integral, Num, (-) )
+import Prelude       ( Integral, Num, (-), Integer )
 
 -- from base-unicode-symbols:
 import Data.Monoid.Unicode ( (⊕) )
@@ -61,10 +61,13 @@ import Data.Monoid.Unicode ( (⊕) )
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
+-- from containers-unicode-symbols:
+import Data.Map.Unicode ( (∪) )
+
 -- from numerals:
 import Text.Numeral
 import Text.Numeral.Misc ( dec )
-import qualified Text.Numeral.Language.BigNum as BN ( rule, cardinalRepr )
+import qualified Text.Numeral.BigNum as BN
 
 
 -------------------------------------------------------------------------------
@@ -100,19 +103,16 @@ rule = findRule (   0, atom        )
               ]
               (dec 6 - 1)
 
+
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n symMap
                , reprScale = longScaleRepr
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
+               , reprNeg   = \_ → Just "menos "
                }
     where
-      longScaleRepr _ _ e c = let s = case c of
-                                        MulR {} → "illones"
-                                        _       → "illón"
-                              in (⊕ s) <$> textify BN.cardinalRepr e
-
       _              ⊞ C 10 = Just ""
       C 10           ⊞ _    = Just ""
       C 20           ⊞ _    = Just ""
@@ -189,3 +189,17 @@ cardinalRepr = textify defaultRepr
                  )
                , (1000, const "mil")
                ]
+
+longScaleRepr ∷ (IsString s, Monoid s)
+              ⇒ Integer → Integer → Exp → SymbolContext → Maybe s
+longScaleRepr _ _ e c = let s = case c of
+                                  MulR {} → "illones"
+                                  _       → "illón"
+                        in (⊕ s) <$> textify repr e
+    where
+      repr = BN.cardinalRepr { reprValue = \n → M.lookup n $ diff ∪ BN.symMap }
+      diff = M.fromList
+             [ (4, BN.forms "cuatr" "cuator" "cuator" "cuatra" "cuatri")
+             , (9, BN.forms "non"   "noven"  "noven"  "nona"   "non")
+             ]
+

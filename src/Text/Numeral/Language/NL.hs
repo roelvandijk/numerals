@@ -63,7 +63,7 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import qualified Text.Numeral.Language.BigNum as BN ( rule, cardinalRepr )
+import qualified Text.Numeral.BigNum as BN ( rule, cardinalRepr )
 
 
 --------------------------------------------------------------------------------

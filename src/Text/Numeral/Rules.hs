@@ -10,10 +10,10 @@ module Text.Numeral.Rules
 
   , Rules
   , findRule
-  , positive
+  , pos, checkPos
 
   , Side(L, R)
-  , atom, atom1
+  , lit, lit1
   , add
   , mul, mul1
   , sub
@@ -40,7 +40,7 @@ import Data.List           ( foldr, concatMap )
 import Data.Maybe          ( Maybe(Nothing, Just) )
 import Data.Ord            ( Ord, (<), (>) )
 import Prelude             ( Integral, fromIntegral
-                           , Num, (+), (-), abs, negate, divMod, div, even
+                           , Num, (+), (-), abs, divMod, div, even
                            )
 import Text.Show           ( Show )
 
@@ -50,7 +50,7 @@ import Data.Function.Unicode ( (∘) )
 import Prelude.Unicode       ( (⋅) )
 
 -- from numerals:
-import Text.Numeral.Exp  ( Subtract, subtract, Scale, scale )
+import qualified Text.Numeral.Exp.Classes as C
 import Text.Numeral.Misc ( dec, intLog )
 
 -- from fingertree:
@@ -107,45 +107,51 @@ findRule x xs end = \f n → case FT.search n xm of
 -- Useful rules
 --------------------------------------------------------------------------------
 
-positive ∷ (Ord α, Num α, Num β) ⇒ Rule α β
-positive f n | n < 0 = negate <$> f (abs n)
-             | n > 0 = f n
-             | otherwise = Just 0
+pos ∷ (Ord α, Num α, C.Lit β, C.Neg β) ⇒ Rule α β
+pos f n | n < 0     = C.neg <$> f (abs n)
+        | n > 0     = f n
+        | otherwise = Just $ C.lit 0
 
-atom ∷ (Integral α, Num β) ⇒ Rule α β
-atom = const $ Just ∘ fromIntegral
+checkPos ∷ (Ord α, Num α, C.Lit β) ⇒ Rule α β
+checkPos f n | n < 0     = Nothing
+             | n > 0     = f n
+             | otherwise = Just $ C.lit 0
 
-atom1 ∷ (Integral α, Num β) ⇒ Rule α β
-atom1 = const $ \n → Just $ 1 ⋅ fromIntegral n
+lit ∷ (Integral α, C.Lit β) ⇒ Rule α β
+lit = const $ Just ∘ C.lit ∘ fromIntegral
 
-add ∷ (Num α, Num β) ⇒ α → Side → Rule α β
-add val s = \f n → liftA2 (flipIfR s (+)) (f $ n - val) (f val)
+lit1 ∷ (Integral α, C.Lit β, C.Mul β) ⇒ Rule α β
+lit1 = const $ \n → Just $ C.lit 1 `C.mul` C.lit (fromIntegral n)
 
-mul ∷ (Integral α, Num β) ⇒ α → Side → Side → Rule α β
+add ∷ (Num α, C.Add β) ⇒ α → Side → Rule α β
+add val s = \f n → liftA2 (flipIfR s C.add) (f $ n - val) (f val)
+
+mul ∷ (Integral α, C.Add β, C.Mul β) ⇒ α → Side → Side → Rule α β
 mul val aSide mSide =
     \f n → let (m, a) = n `divMod` val
-               mval = liftA2 (flipIfR mSide (⋅)) (f m) (f val)
+               mval = liftA2 (flipIfR mSide C.mul) (f m) (f val)
            in if a ≡ 0
               then mval
-              else liftA2 (flipIfR aSide (+)) (f a) mval
+              else liftA2 (flipIfR aSide C.add) (f a) mval
 
-mul1 ∷ (Integral α, Num β) ⇒ α → Side → Side → Rule α β
+mul1 ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
+     ⇒ α → Side → Side → Rule α β
 mul1 val aSide mSide =
     \f n → let (m, a) = n `divMod` val
                mval = if m ≡ 1
-                      then Just $ 1 ⊡ fromIntegral val
-                      else (⊡ fromIntegral val) <$> f m
+                      then Just $ C.lit 1 ⊡ C.lit (fromIntegral val)
+                      else (⊡ C.lit (fromIntegral val)) <$> f m
            in if a ≡ 0
               then mval
-              else liftA2 (flipIfR aSide (+)) (f a) mval
+              else liftA2 (flipIfR aSide C.add) (f a) mval
   where
-     (⊡) = flipIfR mSide (⋅)
+     (⊡) = flipIfR mSide C.mul
 
-sub ∷ (Integral α, Subtract β) ⇒ α → Rule α β
-sub val = \f n → liftA2 subtract (f $ val - n) (f val)
+sub ∷ (Integral α, C.Sub β) ⇒ α → Rule α β
+sub val = \f n → liftA2 C.sub (f $ val - n) (f val)
 
 -- See: http://en.wikipedia.org/wiki/Names_of_large_numbers
-mulScale ∷ (Integral α, Scale α, Num β, Scale β)
+mulScale ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)
          ⇒ α → α → Side → Side → Rule α β → Rule α β
 mulScale base offset aSide mSide bigNumRule =
     \f n → let rank    = (intLog n - offset) `div` base
@@ -153,17 +159,17 @@ mulScale base offset aSide mSide bigNumRule =
                offset' = fromIntegral offset
                rank'   = fromIntegral rank
            in (fix bigNumRule) rank >>= \rankExp →
-              let (m, a) = n `divMod` scale base' offset' rank'
-                  scale' = Just $ scale base' offset' rankExp
+              let (m, a) = n `divMod` C.scale base' offset' rank'
+                  scale' = Just $ C.scale base' offset' rankExp
                   mval | m ≡ 1     = scale'
-                       | otherwise = liftA2 (flipIfR mSide (⋅))
+                       | otherwise = liftA2 (flipIfR mSide C.mul)
                                      (f m)
                                      scale'
               in if a ≡ 0
                  then mval
-                 else liftA2 (flipIfR aSide (+)) (f a) mval
+                 else liftA2 (flipIfR aSide C.add) (f a) mval
 
-mulScale1 ∷ (Integral α, Scale α, Num β, Scale β)
+mulScale1 ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)
           ⇒ α → α → Side → Side → Rule α β → Rule α β
 mulScale1 base offset aSide mSide bigNumRule =
     \f n → let rank    = (intLog n - offset) `div` base
@@ -171,38 +177,38 @@ mulScale1 base offset aSide mSide bigNumRule =
                offset' = fromIntegral offset
                rank'   = fromIntegral rank
            in (fix bigNumRule) rank >>= \rankExp →
-              let (m, a) = n `divMod` scale base' offset' rank'
-                  mval = liftA2 (flipIfR mSide (⋅))
+              let (m, a) = n `divMod` C.scale base' offset' rank'
+                  mval = liftA2 (flipIfR mSide C.mul)
                                 (f m)
-                                (Just $ scale base' offset' rankExp)
+                                (Just $ C.scale base' offset' rankExp)
               in if a ≡ 0
                  then mval
-                 else liftA2 (flipIfR aSide (+)) (f a) mval
+                 else liftA2 (flipIfR aSide C.add) (f a) mval
 
-shortScale ∷ (Integral α, Scale α, Num β, Scale β)
+shortScale ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)
            ⇒ Side → Side → Rule α β → Rule α β
 shortScale  = mulScale 3 3
 
-shortScale1 ∷ (Integral α, Scale α, Num β, Scale β)
+shortScale1 ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)
             ⇒ Side → Side → Rule α β → Rule α β
 shortScale1 = mulScale1 3 3
 
-longScale ∷ (Integral α, Scale α, Num β, Scale β)
+longScale ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)
           ⇒ Side → Side → Rule α β → Rule α β
 longScale = mulScale 6 0
 
-longScale1 ∷ (Integral α, Scale α, Num β, Scale β)
+longScale1 ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)
            ⇒ Side → Side → Rule α β → Rule α β
 longScale1 = mulScale1 6 0
 
-pelletierScale ∷ (Integral α, Scale α, Num β, Scale β)
+pelletierScale ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)
                 ⇒ Side → Side → Rule α β → Rule α β
 pelletierScale aSide mSide bigNumRule =
     conditional (\n → even $ intLog n `div` 3)
                 (mulScale 6 0 aSide mSide bigNumRule)
                 (mulScale 6 3 aSide mSide bigNumRule)
 
-pelletierScale1 ∷ (Integral α, Scale α, Num β, Scale β)
+pelletierScale1 ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)
                 ⇒ Side → Side → Rule α β → Rule α β
 pelletierScale1 aSide mSide bigNumRule =
     conditional (\n → even $ intLog n `div` 3)
@@ -230,20 +236,22 @@ mkIntervalMap ∷ (Ord v) ⇒ [((v, v), α)] → FT.IntervalMap v α
 mkIntervalMap = foldr ins FT.empty
   where ins ((lo, hi), n) = FT.insert (FT.Interval lo hi) n
 
-scaleRules ∷ (Integral α, Num β) ⇒ α → Side → Side → [(α, Rule α β)]
+scaleRules ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
+           ⇒ α → Side → Side → [(α, Rule α β)]
 scaleRules g aSide mSide = concatMap step [g, 2⋅g ..]
     where
-      step n = [ (s,   atom)
+      step n = [ (s,   lit)
                , (s+1, add s aSide)
                , (2⋅s, mul s aSide mSide)
                ]
           where
             s = dec n
 
-scale1Rules ∷ (Integral α, Num β) ⇒ α → Side → Side → [(α, Rule α β)]
+scale1Rules ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
+            ⇒ α → Side → Side → [(α, Rule α β)]
 scale1Rules g aSide mSide = concatMap step [g, 2⋅g ..]
     where
-      step n = [ (s,   atom1)
+      step n = [ (s,   lit1)
                , (s+1, add s aSide)
                , (2⋅s, mul1 s aSide mSide)
                ]

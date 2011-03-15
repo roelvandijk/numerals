@@ -2,9 +2,8 @@
 
 module Text.Numeral.Exp
     ( Exp(..)
-    , Subtract(subtract)
-    , Scale(scale)
     , eval
+    , Ctx(..)
     ) where
 
 
@@ -15,58 +14,59 @@ module Text.Numeral.Exp
 -- from base:
 import Data.Eq   ( Eq )
 import Data.Ord  ( Ord )
-import Prelude   ( Num, Integer, fromInteger
-                 , (+), (*), (-), (^)
-                 , signum, abs, negate, error
-                 )
+import Prelude   ( Integer )
 import Text.Show ( Show )
-import qualified Prelude as P ( subtract )
 
--- from base-unicode-symbols:
-import Prelude.Unicode       ( (⋅) )
+-- from numerals:
+import qualified Text.Numeral.Exp.Classes as C
 
 
 -------------------------------------------------------------------------------
--- Exp
+-- Exp datatype
 -------------------------------------------------------------------------------
 
-data Exp = Exp :+: Exp
-         | Exp :*: Exp
-         | Sub Exp Exp
+data Exp = Lit Integer
          | Neg Exp
-         | C Integer
+         | Add Exp Exp
+         | Mul Exp Exp
+         | Sub Exp Exp
          | Scale Integer Integer Exp
            deriving (Eq, Ord, Show)
 
-infixl 6 :+:
-infixl 7 :*:
+infixl 6 `Add`
+infixl 6 `Sub`
+infixl 7 `Mul`
 
-instance Num Exp where
-    (+)         = (:+:)
-    (*)         = (:*:)
-    negate      = Neg
-    fromInteger = C
+instance C.Lit Exp where lit = Lit
+instance C.Neg Exp where neg = Neg
+instance C.Add Exp where add = Add
+instance C.Mul Exp where mul = Mul
+instance C.Sub Exp where sub = Sub
+instance C.Scale Exp where scale = Scale
 
-    (-)    = error "not implemented"
-    abs    = error "not implemented"
-    signum = error "not implemented"
-
-class    Subtract α       where subtract ∷ α → α → α
-instance Subtract Integer where subtract = P.subtract
-instance Subtract Exp     where subtract = Sub
-
-class    Scale α       where scale ∷ Integer → Integer → α → α
-instance Scale Exp     where scale = Scale
-instance Scale Integer where scale b o r = 10 ^ (r⋅b + o)
-
-
-eval ∷ (Num α, Subtract α, Scale α) ⇒ Exp → α
-eval (x :+: y)     = eval x + eval y
-eval (x :*: y)     = eval x ⋅ eval y
-eval (Sub x y)     = subtract (eval x) (eval y)
-eval (Neg x)       = negate (eval x)
-eval (C x)         = fromInteger x
-eval (Scale b o r) = scale b o (eval r)
+eval ∷ (C.Lit α, C.Neg α, C.Add α, C.Mul α, C.Sub α, C.Scale α) ⇒ Exp → α
+eval (Add x y)     = C.add (eval x) (eval y)
+eval (Mul x y)     = C.mul (eval x) (eval y)
+eval (Sub x y)     = C.sub (eval x) (eval y)
+eval (Neg x)       = C.neg (eval x)
+eval (Lit x)       = C.lit x
+eval (Scale b o r) = C.scale b o (eval r)
 
 -- prop_eval ∷ Exp → Bool
 -- prop_eval e = e ≡ eval e
+
+
+-------------------------------------------------------------------------------
+-- Context of expressions
+-------------------------------------------------------------------------------
+
+data Ctx α = CtxEmpty
+           | CtxNeg (Ctx α)
+           | CtxAddL α (Ctx α)
+           | CtxAddR α (Ctx α)
+           | CtxMulL α (Ctx α)
+           | CtxMulR α (Ctx α)
+           | CtxSubL α (Ctx α)
+           | CtxSubR α (Ctx α)
+           | CtxScale (Ctx α)
+             deriving Show

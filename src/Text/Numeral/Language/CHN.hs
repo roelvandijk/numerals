@@ -10,22 +10,6 @@
 [@Native name@]     -
 
 [@English name@]    Chinook Jargon
-
-[@French name@]     -
-
-[@Spanish name@]    -
-
-[@Chinese name@]    -
-
-[@Russian name@]    -
-
-[@German name@]     -
-
-[@Language family@] Various - Mainly Wakashan, Chinookan and Indo-European
-
-[@Scope@]           Individual
-
-[@Type@]            Living
 -}
 
 module Text.Numeral.Language.CHN
@@ -45,13 +29,14 @@ import Data.Function ( const, fix )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Num, Integral )
+import Prelude       ( Integral )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import qualified Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
@@ -61,15 +46,15 @@ import Text.Numeral
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, Num β) ⇒ α → Maybe β
-struct = positive (fix rule)
+struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ α → Maybe β
+struct = checkPos (fix rule)
 
-rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (  0, atom      )
-              [ (  1, atom      )
+rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
+rule = findRule (  0, lit      )
+              [ (  1, lit      )
               , ( 11, add 10 R  )
               , ( 20, mul 10 R L)
-              , (100, atom      )
+              , (100, lit      )
               ]
                  100
 

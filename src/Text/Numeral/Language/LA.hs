@@ -10,25 +10,6 @@
 [@Native name@]     Latine
 
 [@English name@]    Latin
-
-[@French name@]     Latin
-
-[@Spanish name@]    Latin
-
-[@Chinese name@]    拉丁语
-
-[@Russian name@]    латинский
-
-[@German name@]     Latein
-
-[@Language family@] Indo-European,
-                    Italic,
-                    Latino-Faliscan,
-                    Latin
-
-[@Scope@]           Individual language
-
-[@Type@]            Ancient
 -}
 
 module Text.Numeral.Language.LA
@@ -62,6 +43,7 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import qualified Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
@@ -77,26 +59,25 @@ Sources:
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, Num β, Subtract β) ⇒ α → Maybe β
-struct = positive (fix rule)
-
-rule ∷ (Integral α, Num β, Subtract β) ⇒ Rule α β
-rule = findRule ( 0, atom)
-            ( [ (11, add 10 L)
-              , (18, sub 20)
-              ]
-            ⊕ concat [ [ (n,   mul 10 R L)
-                       , (n+8, sub $ n+10)
-                       ]
-                     | n ← [20,30..90]
-                     ]
-            ⊕ [ ( 100, atom)
-              , ( 101, add 100 L)
-              , ( 200, mul 100 R L)
-              , (1000, atom)
-              ]
-            )
-            1000
+struct ∷ (Integral α, C.Lit β, C.Add β, C.Sub β, C.Mul β) ⇒ α → Maybe β
+struct = checkPos
+       $ fix
+       $ findRule ( 0, lit)
+                  ( [ (11, add 10 L)
+                    , (18, sub 20)
+                    ]
+                  ⊕ concat [ [ (n,   mul 10 R L)
+                             , (n+8, sub $ n+10)
+                             ]
+                           | n ← [20,30..90]
+                           ]
+                  ⊕ [ ( 100, lit)
+                    , ( 101, add 100 L)
+                    , ( 200, mul 100 R L)
+                    , (1000, lit)
+                    ]
+                  )
+                  1000
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
@@ -106,75 +87,75 @@ cardinalRepr = textify defaultRepr
                , reprSub   = \_ _ → Just "dē"
                }
     where
-      (_ :*: C _) ⊞ _ = Just " "
-      _           ⊞ _ = Just ""
+      (_ `Mul` Lit _) ⊞ _ = Just " "
+      _               ⊞ _ = Just ""
 
-      _ ⊡ (C n) | n ≤ 100 = Just ""
-      _ ⊡ _               = Just " "
+      _ ⊡ (Lit n) | n ≤ 100 = Just ""
+      _ ⊡ _                 = Just " "
 
       symMap = M.fromList
                [ (0, const "nihil")
                , (1, \c → case c of
-                            AddL (C 10)  _ → "ūn"
-                            SubL {}        → "ūn"
-                            _              → "ūnus"
+                            CtxAddL (Lit 10)  _ → "ūn"
+                            CtxSubL {}          → "ūn"
+                            _                   → "ūnus"
                  )
                , (2, \c → case c of
-                            MulL (C 10)  _ → "vī"
-                            MulL (C 100) _ → "du"
-                            _              → "duo"
+                            CtxMulL (Lit 10)  _ → "vī"
+                            CtxMulL (Lit 100) _ → "du"
+                            _                   → "duo"
                  )
                , (3, \c → case c of
-                            AddL (C 10)  _ → "trē"
-                            MulL (C 10)  _ → "trī"
-                            MulL (C 100) _ → "tre"
-                            _              → "trēs"
+                            CtxAddL (Lit 10)  _ → "trē"
+                            CtxMulL (Lit 10)  _ → "trī"
+                            CtxMulL (Lit 100) _ → "tre"
+                            _                   → "trēs"
                  )
                , (4, \c → case c of
-                            MulL (C 10)  _ → "quadrā"
-                            MulL (C 100) _ → "quadrin"
-                            _              → "quattuor"
+                            CtxMulL (Lit 10)  _ → "quadrā"
+                            CtxMulL (Lit 100) _ → "quadrin"
+                            _                   → "quattuor"
                  )
                , (5, \c → case c of
-                            AddL (C 10)  _ → "quīn"
-                            MulL (C 10)  _ → "quīnquā"
-                            MulL (C 100) _ → "quīn"
-                            _              → "quīnque"
+                            CtxAddL (Lit 10)  _ → "quīn"
+                            CtxMulL (Lit 10)  _ → "quīnquā"
+                            CtxMulL (Lit 100) _ → "quīn"
+                            _                   → "quīnque"
                  )
                , (6, \c → case c of
-                            AddL (C 10)  _ → "sē"
-                            MulL (C 10)  _ → "sexā"
-                            MulL (C 100) _ → "ses"
-                            _              → "sex"
+                            CtxAddL (Lit 10)  _ → "sē"
+                            CtxMulL (Lit 10)  _ → "sexā"
+                            CtxMulL (Lit 100) _ → "ses"
+                            _                   → "sex"
                  )
                , (7, \c → case c of
-                            AddL (C 10)  _ → "septen"
-                            MulL (C 10)  _ → "septuā"
-                            MulL (C 100) _ → "septin"
-                            _              → "septem"
+                            CtxAddL (Lit 10)  _ → "septen"
+                            CtxMulL (Lit 10)  _ → "septuā"
+                            CtxMulL (Lit 100) _ → "septin"
+                            _                   → "septem"
                  )
                , (8, \c → case c of
-                            MulL (C 100) _ → "octin"
-                            _              → "octō"
+                            CtxMulL (Lit 100) _ → "octin"
+                            _                   → "octō"
                  )
                , (9, \c → case c of
-                            MulL (C 10)  _ → "nōnā"
-                            MulL (C 100) _ → "nōn"
-                            _              → "novem"
+                            CtxMulL (Lit 10)  _ → "nōnā"
+                            CtxMulL (Lit 100) _ → "nōn"
+                            _                   → "novem"
                  )
                , (10, \c → case c of
-                             AddR {}       → "decim"
-                             MulR (C 2)  _ → "gintī"
-                             MulR {}       → "gintā"
-                             _             → "decem"
+                             CtxAddR {}         → "decim"
+                             CtxMulR (Lit 2)  _ → "gintī"
+                             CtxMulR {}         → "gintā"
+                             _                  → "decem"
                  )
                , (100, \c → case c of
-                              MulR (C n) _ | n ∈ [2,3,6] → "centī"
-                                           | otherwise   → "gentī"
-                              _                          → "centum"
+                              CtxMulR (Lit n) _ | n ∈ [2,3,6] → "centī"
+                                                | otherwise   → "gentī"
+                              _                               → "centum"
                  )
                , (1000, \c → case c of
-                               MulR {} → "milia"
-                               _       → "mīlle"
+                               CtxMulR {} → "milia"
+                               _          → "mīlle"
                  )
                ]

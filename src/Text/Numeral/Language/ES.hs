@@ -10,29 +10,6 @@
 [@Native name@]     Español
 
 [@English name@]    Spanish
-
-[@French name@]     Espagnole
-
-[@Spanish name@]    Español
-
-[@Chinese name@]    西班牙语
-
-[@Russian name@]    Испанский
-
-[@German name@]     Spanisch
-
-[@Language family@] Indo-European -
-                    Italic -
-                    Romance -
-                    Italo-Western -
-                    Gallo-Iberian -
-                    Ibero-Romance -
-                    West Iberian -
-                    Spanish, Castilian
-
-[@Scope@]           Individual
-
-[@Type@]            Living
 -}
 
 module Text.Numeral.Language.ES
@@ -53,7 +30,7 @@ import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integral, Num, (-), Integer )
+import Prelude       ( Integral, (-), Integer )
 
 -- from base-unicode-symbols:
 import Data.Monoid.Unicode ( (⊕) )
@@ -68,6 +45,7 @@ import Data.Map.Unicode ( (∪) )
 import Text.Numeral
 import Text.Numeral.Misc ( dec )
 import qualified Text.Numeral.BigNum as BN
+import qualified Text.Numeral.Exp.Classes as C
 
 
 -------------------------------------------------------------------------------
@@ -81,28 +59,29 @@ import qualified Text.Numeral.BigNum as BN
 --   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
 --   http://en.wiktionary.org/wiki/Appendix:Spanish_numerals
 
-cardinal ∷ (Monoid s, IsString s, Integral α, Scale α) ⇒ α → Maybe s
+cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
-struct = positive (fix $ rule `combine` longScale R L BN.rule)
-
-rule  ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (   0, atom        )
-              [ (  11, add   10 L  )
-              , (  16, add   10 R  )
-              , (  20, atom        )
-              , (  21, add   20 R  )
-              , (  30, mul   10 R L)
-              , ( 100, atom        )
-              , ( 101, add  100 R  )
-              , ( 200, mul  100 R L)
-              , (1000, atom        )
-              , (1001, add 1000 R  )
-              , (2000, mul 1000 R L)
-              ]
-              (dec 6 - 1)
-
+struct ∷ ( Integral α, C.Scale α
+         , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+         )
+       ⇒ α → Maybe β
+struct = pos (fix $ rule `combine` longScale R L BN.rule)
+    where
+      rule = findRule (   0, lit         )
+                    [ (  11, add   10 L  )
+                    , (  16, add   10 R  )
+                    , (  20, lit         )
+                    , (  21, add   20 R  )
+                    , (  30, mul   10 R L)
+                    , ( 100, lit         )
+                    , ( 101, add  100 R  )
+                    , ( 200, mul  100 R L)
+                    , (1000, lit         )
+                    , (1001, add 1000 R  )
+                    , (2000, mul 1000 R L)
+                    ]
+                    (dec 6 - 1)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
@@ -113,88 +92,88 @@ cardinalRepr = textify defaultRepr
                , reprNeg   = \_ → Just "menos "
                }
     where
-      _              ⊞ C 10 = Just ""
-      C 10           ⊞ _    = Just ""
-      C 20           ⊞ _    = Just ""
-      (C _ :*: C 10) ⊞ _    = Just " y "
-      _              ⊞ _    = Just " "
+      _                    ⊞ Lit 10 = Just ""
+      Lit 10               ⊞ _      = Just ""
+      Lit 20               ⊞ _      = Just ""
+      (Lit _ `Mul` Lit 10) ⊞ _      = Just " y "
+      _                    ⊞ _      = Just " "
 
-      _ ⊡ C n | n < 1000 = Just ""
-      _ ⊡ _              = Just " "
+      _ ⊡ Lit n | n < 1000 = Just ""
+      _ ⊡ _                = Just " "
 
       symMap = M.fromList
                [ (0, const "cero")
                , (1, \c → case c of
-                            AddL (C 10)  _ → "on"
-                            _              → "uno"
+                            CtxAddL (Lit 10)  _ → "on"
+                            _                   → "uno"
                  )
                , (2, \c → case c of
-                            AddL (C 10)  _ → "do"
-                            AddR (C 20)  _ → "dós"
-                            _              → "dos"
+                            CtxAddL (Lit 10)  _ → "do"
+                            CtxAddR (Lit 20)  _ → "dós"
+                            _                   → "dos"
                  )
                , (3, \c → case c of
-                            AddL (C 10)  _ → "tre"
-                            AddR (C 20)  _ → "trés"
-                            MulL (C 10)  _ → "trein"
-                            _              → "tres"
+                            CtxAddL (Lit 10)  _ → "tre"
+                            CtxAddR (Lit 20)  _ → "trés"
+                            CtxMulL (Lit 10)  _ → "trein"
+                            _                   → "tres"
                  )
                , (4, \c → case c of
-                            AddL (C 10)  _ → "cator"
-                            MulL (C 10)  _ → "cuaren"
-                            _              → "cuatro"
+                            CtxAddL (Lit 10)  _ → "cator"
+                            CtxMulL (Lit 10)  _ → "cuaren"
+                            _                   → "cuatro"
                  )
                , (5, \c → case c of
-                            AddL (C 10)  _ → "quin"
-                            MulL (C 10)  _ → "cincuen"
-                            MulL (C 100) _ → "quin"
-                            _              → "cinco"
+                            CtxAddL (Lit 10)  _ → "quin"
+                            CtxMulL (Lit 10)  _ → "cincuen"
+                            CtxMulL (Lit 100) _ → "quin"
+                            _                   → "cinco"
                  )
                , (6, \c → case c of
-                            AddR (C 10)  _ → "séis"
-                            AddR (C 20)  _ → "séis"
-                            MulL (C 10)  _ → "sesen"
-                            _              → "seis"
+                            CtxAddR (Lit 10)  _ → "séis"
+                            CtxAddR (Lit 20)  _ → "séis"
+                            CtxMulL (Lit 10)  _ → "sesen"
+                            _                   → "seis"
                  )
                , (7, \c → case c of
-                            MulL (C 10)  _ → "seten"
-                            MulL (C 100) _ → "sete"
-                            _              → "siete"
+                            CtxMulL (Lit 10)  _ → "seten"
+                            CtxMulL (Lit 100) _ → "sete"
+                            _                   → "siete"
                  )
                , (8, \c → case c of
-                            MulL (C 10)  _ → "ochen"
-                            _              → "ocho"
+                            CtxMulL (Lit 10)  _ → "ochen"
+                            _                   → "ocho"
                  )
                , (9, \c → case c of
-                            MulL (C 10)  _ → "noven"
-                            MulL (C 100) _ → "nove"
-                            _              → "nueve"
+                            CtxMulL (Lit 10)  _ → "noven"
+                            CtxMulL (Lit 100) _ → "nove"
+                            _                   → "nueve"
                  )
                , (10, \c → case c of
-                             AddR (C _)  _ → "ce"
-                             AddL (C _)  _ → "dieci"
-                             MulR {}       → "ta"
-                             _             → "diez"
+                             CtxAddR (Lit _)  _ → "ce"
+                             CtxAddL (Lit _)  _ → "dieci"
+                             CtxMulR {}         → "ta"
+                             _                  → "diez"
                  )
                , (20, \c → case c of
-                             AddL (C _)  _ → "veinti"
-                             _             → "veinte"
+                             CtxAddL (Lit _)  _ → "veinti"
+                             _                  → "veinte"
                  )
                , (100, \c → case c of
-                              Empty        → "cien"
-                              AddL {}      → "ciento"
-                              MulR (C 5) _ → "ientos"
-                              MulL {}      → "cien"
-                              _            → "cientos"
+                              CtxEmpty          → "cien"
+                              CtxAddL {}        → "ciento"
+                              CtxMulR (Lit 5) _ → "ientos"
+                              CtxMulL {}        → "cien"
+                              _                 → "cientos"
                  )
                , (1000, const "mil")
                ]
 
 longScaleRepr ∷ (IsString s, Monoid s)
-              ⇒ Integer → Integer → Exp → SymbolContext → Maybe s
+              ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
 longScaleRepr _ _ e c = let s = case c of
-                                  MulR {} → "illones"
-                                  _       → "illón"
+                                  CtxMulR {} → "illones"
+                                  _          → "illón"
                         in (⊕ s) <$> textify repr e
     where
       repr = BN.cardinalRepr { reprValue = \n → M.lookup n $ diff ∪ BN.symMap }

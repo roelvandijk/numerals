@@ -10,22 +10,6 @@
 [@Native name@]     -
 
 [@English name@]    Ndom
-
-[@French name@]     -
-
-[@Spanish name@]    -
-
-[@Chinese name@]    -
-
-[@Russian name@]    -
-
-[@German name@]     -
-
-[@Language family@] Trans-New Guinea, Kolopom, Ndom
-
-[@Scope@]           Individual
-
-[@Type@]            Living
 -}
 
 module Text.Numeral.Language.NQM
@@ -41,17 +25,18 @@ module Text.Numeral.Language.NQM
 
 -- from base:
 import Control.Monad ( (>=>) )
-import Data.Function ( const, fix )
+import Data.Function ( ($), const, fix )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Num, Integral )
+import Prelude       ( Integral )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import qualified Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
@@ -61,20 +46,19 @@ import Text.Numeral
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, Num β) ⇒ α → Maybe β
-struct = positive (fix rule)
-
-rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (  1, atom      )
-              [ (  7, add  6 R  )
-              , ( 12, mul  6 R R)
-              , ( 18, atom      )
-              , ( 19, add 18 R  )
-              , ( 36, atom      )
-              , ( 37, add 36 R  )
-              , ( 72, mul 36 R R)
-              ]
-                 107
+struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ α → Maybe β
+struct = checkPos
+       $ fix
+       $ findRule (  1, lit       )
+                [ (  7, add  6 R  )
+                , ( 12, mul  6 R R)
+                , ( 18, lit       )
+                , ( 19, add 18 R  )
+                , ( 36, lit       )
+                , ( 37, add 36 R  )
+                , ( 72, mul 36 R R)
+                ]
+                   107
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
@@ -83,16 +67,16 @@ cardinalRepr = textify defaultRepr
                , reprMul   = (⊡)
                }
     where
-      C 36 ⊡ _ = Just " "
-      _    ⊡ _ = Just " an "
+      Lit 36 ⊡ _ = Just " "
+      _      ⊡ _ = Just " an "
 
       symMap = M.fromList
-               [ (1, const "sas")
-               , (2, const "thef")
-               , (3, const "ithin")
-               , (4, const "thonith")
-               , (5, const "meregh")
-               , (6, const "mer")
+               [ ( 1, const "sas")
+               , ( 2, const "thef")
+               , ( 3, const "ithin")
+               , ( 4, const "thonith")
+               , ( 5, const "meregh")
+               , ( 6, const "mer")
                , (18, const "tondor")
                , (36, const "nif")
                ]

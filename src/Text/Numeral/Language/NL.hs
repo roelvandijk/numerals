@@ -10,26 +10,6 @@
 [@Native name@]     Nederlands
 
 [@English name@]    Dutch
-
-[@French name@]     Néerlandais
-
-[@Spanish name@]    Neerlandés
-
-[@Chinese name@]    荷兰语
-
-[@Russian name@]    нидерландский
-
-[@German name@]     Niederländisch
-
-[@Language family@] Indo-European,
-                    Germanic,
-                    West Germanic,
-                    Low Franconian,
-                    Dutch
-
-[@Scope@]           Individual language
-
-[@Type@]            Living
 -}
 
 module Text.Numeral.Language.NL
@@ -51,11 +31,10 @@ import Data.Maybe    ( Maybe(Nothing, Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integral, Num )
+import Prelude       ( Integral )
 
 -- from base-unicode-symbols:
-import Data.Bool.Unicode   ( (∨) )
-import Data.Eq.Unicode     ( (≡) )
+import Data.List.Unicode   ( (∈) )
 import Data.Monoid.Unicode ( (⊕) )
 
 -- from containers:
@@ -63,6 +42,7 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import qualified Text.Numeral.Exp.Classes as C
 import qualified Text.Numeral.BigNum as BN ( rule, cardinalRepr )
 
 
@@ -71,20 +51,21 @@ import qualified Text.Numeral.BigNum as BN ( rule, cardinalRepr )
 --------------------------------------------------------------------------------
 -- scale 3 R L
 
-cardinal ∷ (Monoid s, IsString s, Integral α, Scale α) ⇒ α → Maybe s
+cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
-struct = positive (fix $ rule `combine` pelletierScale R L BN.rule)
+struct ∷ (Integral α, C.Scale α, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β)
+       ⇒ α → Maybe β
+struct = pos (fix $ rule `combine` pelletierScale R L BN.rule)
 
-rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (   0, atom        )
+rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
+rule = findRule (   0, lit         )
               [ (  13, add   10 L  )
               , (  20, mul   10 L L)
-              , ( 100, atom        )
+              , ( 100, lit         )
               , ( 101, add  100 R  )
               , ( 200, mul  100 R L)
-              , (1000, atom        )
+              , (1000, lit         )
               , (1001, add 1000 R  )
               , (2000, mul 1000 R L)
               ]
@@ -105,11 +86,11 @@ cardinalRepr = textify defaultRepr
 
       big s e = (⊕ s) <$> textify BN.cardinalRepr e
 
-      _   ⊞ C 10 = Just ""
-      C n ⊞ _ | n ≡ 2 ∨ n ≡ 3 = Just "ën"
-              | n < 10        = Just "en"
-              | otherwise     = Just ""
-      _   ⊞ _ = Just " "
+      _     ⊞ Lit 10         = Just ""
+      Lit n ⊞ _ | n ∈ [2,3]  = Just "ën"
+                | n < 10     = Just "en"
+                | otherwise  = Just ""
+      _     ⊞ _              = Just " "
 
       symMap = M.fromList
                [ (0, const "nul")
@@ -121,14 +102,14 @@ cardinalRepr = textify defaultRepr
                , (6, const "zes")
                , (7, const "zeven")
                , (8, \c → case c of
-                            MulL (C 10) _ → "tach"
-                            AddL (C 10) _ → "ach"
-                            _             → "acht"
+                            CtxMulL (Lit 10) _ → "tach"
+                            CtxAddL (Lit 10) _ → "ach"
+                            _                  → "acht"
                  )
                , (9, const "negen")
                , (10, \c → case c of
-                             MulR {} → "tig"
-                             _       → "tien"
+                             CtxMulR {} → "tig"
+                             _          → "tien"
                  )
                , (11, const "elf")
                , (12, const "twaalf")
@@ -137,6 +118,6 @@ cardinalRepr = textify defaultRepr
                ]
 
       ten n t ctx = case ctx of
-                      MulL (C 10) _ → t
-                      AddL (C 10) _ → t
-                      _             → n
+                      CtxMulL (Lit 10) _ → t
+                      CtxAddL (Lit 10) _ → t
+                      _                  → n

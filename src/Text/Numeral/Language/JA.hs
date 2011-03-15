@@ -10,23 +10,6 @@
 [@Native name@]     日本語
 
 [@English name@]    Japanese
-
-[@French name@]     Japonais
-
-[@Spanish name@]    Japonés
-
-[@Chinese name@]    日语
-
-[@Russian name@]    японский
-
-[@German name@]     Japanisch
-
-[@Language family@] Japonic,
-                    Japanese
-
-[@Scope@]           Individual language
-
-[@Type@]            Living
 -}
 
 module Text.Numeral.Language.JA
@@ -69,6 +52,7 @@ import qualified Data.Map as M ( fromList, lookup )
 -- from numerals:
 import Text.Numeral
 import Text.Numeral.Misc  ( dec )
+import qualified Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
@@ -81,23 +65,22 @@ Sources:
   http://www.guidetojapanese.org/numbers.html
 -}
 
-struct ∷ (Integral α, Num β) ⇒ α → Maybe β
-struct = positive (fix rule)
-
-rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (   0, atom        )
-            ( [ (  11, add   10 R  )
-              , (  20, mul   10 R L)
-              , ( 100, atom        )
-              , ( 101, add  100 R  )
-              , ( 200, mul  100 R L)
-              , (1000, atom        )
-              , (1001, add 1000 R  )
-              , (2000, mul 1000 R L)
-              ]
-            ⊕ take (3 ⋅ 17) (scale1Rules 4 R L)
-            )
-           (dec 72 - 1)
+struct ∷ (Integral α, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → Maybe β
+struct = pos
+       $ fix
+       $ findRule (   0, lit         )
+              ( [ (  11, add   10 R  )
+                , (  20, mul   10 R L)
+                , ( 100, lit         )
+                , ( 101, add  100 R  )
+                , ( 200, mul  100 R L)
+                , (1000, lit         )
+                , (1001, add 1000 R  )
+                , (2000, mul 1000 R L)
+                ]
+              ⊕ take (3 ⋅ 17) (scale1Rules 4 R L)
+              )
+             (dec 72 - 1)
 
 
 --------------------------------------------------------------------------------
@@ -207,8 +190,8 @@ generic_repr four seven = defaultRepr
                , (9, const "kyū")
                , (10, const "jū")
                , (100, \c → case c of
-                              (MulR 3 _) → "byaku" -- rendaku
-                              _          → "hyaku"
+                              (CtxMulR (Lit 3) _) → "byaku" -- rendaku
+                              _                   → "hyaku"
                  )
                , (dec 3, const "sen")
                , (dec 4, const "man")

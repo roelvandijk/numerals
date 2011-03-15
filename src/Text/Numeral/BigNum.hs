@@ -17,12 +17,13 @@ module Text.Numeral.BigNum
 -------------------------------------------------------------------------------
 
 -- from base:
+import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
-import Data.Function ( const )
+import Data.Function ( const, fix )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Integral, Num )
+import Prelude       ( Integral )
 
 -- from base-unicode-symbols:
 import Data.List.Unicode ( (∈) )
@@ -32,6 +33,7 @@ import qualified Data.Map as M ( Map, fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import qualified Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
@@ -39,18 +41,18 @@ import Text.Numeral
 --------------------------------------------------------------------------------
 
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
-cardinal = mkCardinal rule cardinalRepr
+cardinal = pos (fix rule) >=> textify cardinalRepr
 
-rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (1, atom)
-                [ (  11, add  10 L  )
-                , (  20, mul  10 L L)
-                , ( 100, atom       )
-                , ( 101, add 100 L  )
-                , ( 200, mul 100 R L)
-                , (1000, atom       )
-                ]
-                   1000
+rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
+rule = findRule (1, lit)
+              [ (  11, add  10 L  )
+              , (  20, mul  10 L L)
+              , ( 100, lit        )
+              , ( 101, add 100 L  )
+              , ( 200, mul 100 R L)
+              , (1000, lit        )
+              ]
+                 1000
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 cardinalRepr =
@@ -59,7 +61,7 @@ cardinalRepr =
                 , reprMul   = \_ _ → Just ""
                 }
 
-symMap ∷ (Integral α, IsString s) ⇒ M.Map α (SymbolContext → s)
+symMap ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
 symMap = M.fromList
          [ (1, forms "m"     "un"       "un"       "?"       "?")
          , (2, forms "b"     "duo"      "duo"      "vi"      "du")
@@ -71,25 +73,26 @@ symMap = M.fromList
          , (8, forms "oct"   "octo"     "octo"     "octo"    "octin")
          , (9, forms "non"   "novem"    "novem"    "nona"    "non")
          , (10, \c → case c of
-                       AddL (C 100) _ → "deci"
-                       MulR _ (AddL (C 100) _) → "ginta"
-                       MulR {}        → "gint"
-                       _              → "dec"
+                       CtxAddL (Lit 100) _             → "deci"
+                       CtxMulR _ (CtxAddL (Lit 100) _) → "ginta"
+                       CtxMulR {}                      → "gint"
+                       _                               → "dec"
            )
          , (100, \c → case c of
-                        MulR (C n) _ | n ∈ [2,3,6] → "cent"
-                                     | otherwise   → "gent"
-                        _                          → "cent"
+                        CtxMulR (Lit n) _
+                            | n ∈ [2,3,6] → "cent"
+                            | otherwise   → "gent"
+                        _                 → "cent"
            )
          , (1000, const "millin")
          , (10000, const "myr")
          ]
 
-forms ∷ s → s → s → s → s → SymbolContext → s
+forms ∷ s → s → s → s → s → Ctx Exp → s
 forms t a1 a2 m1 m2 ctx =
     case ctx of
-      AddL (C 10)  _ → a1
-      AddL {}        → a2
-      MulL (C 100) _ → m2
-      MulL {}        → m1
-      _              → t
+      CtxAddL (Lit 10)  _ → a1
+      CtxAddL {}          → a2
+      CtxMulL (Lit 100) _ → m2
+      CtxMulL {}          → m1
+      _                   → t

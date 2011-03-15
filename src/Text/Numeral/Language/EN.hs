@@ -10,27 +10,6 @@
 [@Native name@]     English
 
 [@English name@]    English
-
-[@French name@]     anglais
-
-[@Spanish name@]    inglés
-
-[@Chinese name@]    英语
-
-[@Russian name@]    английский
-
-[@German name@]     Englisch
-
-[@Language family@] Indo-European,
-                    Germanic,
-                    West Germanic,
-                    Anglo-Frisian,
-                    Anglic,
-                    English
-
-[@Scope@]           Individual language
-
-[@Type@]            Living
 -}
 
 module Text.Numeral.Language.EN
@@ -57,7 +36,7 @@ import Data.Maybe    ( Maybe(Nothing, Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Num, Integral, Integer )
+import Prelude       ( Integral, Integer )
 
 -- from base-unicode-symbols:
 import Data.Monoid.Unicode ( (⊕) )
@@ -67,6 +46,7 @@ import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import qualified Text.Numeral.Exp.Classes as C
 import qualified Text.Numeral.BigNum as BN ( rule, cardinalRepr )
 
 
@@ -102,32 +82,38 @@ Base 12:
 1728    great gross     1728 (12³)
 -}
 
-uk_cardinal ∷ (Monoid s, IsString s, Integral α, Scale α) ⇒ α → Maybe s
+uk_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
 uk_cardinal = shortScaleStruct >=> uk_cardinalRepr
 
-us_cardinal ∷ (Monoid s, IsString s, Integral α, Scale α) ⇒ α → Maybe s
+us_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
 us_cardinal = shortScaleStruct >=> us_cardinalRepr
 
-shortScaleStruct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
-shortScaleStruct = positive
+shortScaleStruct ∷ ( Integral α, C.Scale α
+                   , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+                   ) ⇒ α → Maybe β
+shortScaleStruct = pos
                  $ fix $ rule `combine` shortScale1 R L BN.rule
 
-longScaleStruct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
-longScaleStruct = positive
+longScaleStruct ∷ ( Integral α, C.Scale α
+                  , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+                  ) ⇒ α → Maybe β
+longScaleStruct = pos
                 $ fix $ rule `combine` longScale1 R L BN.rule
 
-pelletierScaleStruct ∷ (Integral α, Scale α, Num β, Scale β) ⇒ α → Maybe β
-pelletierScaleStruct = positive
+pelletierScaleStruct ∷ ( Integral α, C.Scale α
+                       , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+                       ) ⇒ α → Maybe β
+pelletierScaleStruct = pos
                      $ fix $ rule `combine` pelletierScale1 R L BN.rule
 
-rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (   0, atom         )
+rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
+rule = findRule (   0, lit          )
               [ (  13, add    10 L  )
               , (  20, mul    10 R L)
-              , ( 100, atom1        )
+              , ( 100, lit1         )
               , ( 101, add   100 R  )
               , ( 200, mul1  100 R L)
-              , (1000, atom1        )
+              , (1000, lit1         )
               , (1001, add  1000 R  )
               , (2000, mul1 1000 R L)
               ]
@@ -136,17 +122,18 @@ rule = findRule (   0, atom         )
 us_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 us_cardinalRepr = textify $ cardinalRepr (⊞)
   where
-    (_ :*: C 10) ⊞ _ = Just "-"
-    (_ :*: _   ) ⊞ _ = Just " "
-    _            ⊞ _ = Just ""
+    (_ `Mul` Lit 10) ⊞ _ = Just "-"
+    (_ `Mul` _     ) ⊞ _ = Just " "
+    _                ⊞ _ = Just ""
 
 uk_cardinalRepr' ∷ (Monoid s, IsString s) ⇒ Repr s
 uk_cardinalRepr' = cardinalRepr (⊞)
   where
-    (_ :*: C 10) ⊞ _ = Just "-"
-    (_ :*: _   ) ⊞ x | eval x < (100 ∷ Integer) = Just " and "
-                     | otherwise    = Just " "
-    _            ⊞ _ = Just ""
+    (_ `Mul` Lit 10) ⊞ _             = Just "-"
+    (_ `Mul` _     ) ⊞ x
+        | eval x < (100 ∷ Integer) = Just " and "
+        | otherwise                = Just " "
+    _ ⊞ _ = Just ""
 
 uk_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 uk_cardinalRepr = textify $ uk_cardinalRepr'
@@ -170,8 +157,8 @@ cardinalRepr f =
     , reprNeg   = \_ → Just "minus "
     }
     where
-      _ ⊞ (C 10) = Just ""
-      _ ⊞ _      = Just " "
+      _ ⊞ (Lit 10) = Just ""
+      _ ⊞ _        = Just " "
 
       symMap = M.fromList
                [ (0, const "zero")
@@ -185,9 +172,9 @@ cardinalRepr f =
                , (8, ten   "eight" "eigh" "eigh")
                , (9, const "nine")
                , (10, \c → case c of
-                             AddR (C _) _ → "teen"
-                             MulR {}      → "ty"
-                             _            → "ten"
+                             CtxAddR (Lit _) _ → "teen"
+                             CtxMulR {}        → "ty"
+                             _                 → "ten"
                  )
                , (11,   const "eleven")
                , (12,   const "twelve")
@@ -195,8 +182,8 @@ cardinalRepr f =
                , (1000, const "thousand")
                ]
 
-      ten ∷ s → s → s → SymbolContext → s
+      ten ∷ s → s → s → Ctx Exp → s
       ten n a m = \c → case c of
-                         AddL (C 10) _ → a
-                         MulL (C 10) _ → m
-                         _             → n
+                         CtxAddL (Lit 10) _ → a
+                         CtxMulL (Lit 10) _ → m
+                         _                  → n

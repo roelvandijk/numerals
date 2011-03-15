@@ -10,26 +10,6 @@
 [@Native name@]     svenska
 
 [@English name@]    Swedish
-
-[@French name@]     suédois
-
-[@Spanish name@]    sueco
-
-[@Chinese name@]    瑞典语
-
-[@Russian name@]    шведский
-
-[@German name@]     Schwedisch
-
-[@Language family@] Indo-European,
-                    Germanic,
-                    North Germanic,
-                    East Scandinavian,
-                    Swedish
-
-[@Scope@]           Individual language
-
-[@Type@]            Living
 -}
 
 module Text.Numeral.Language.SV
@@ -44,17 +24,18 @@ module Text.Numeral.Language.SV
 
 -- from base:
 import Control.Monad ( (>=>) )
-import Data.Function ( const, fix )
+import Data.Function ( ($), const, fix )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Integral, Num )
+import Prelude       ( Integral )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import qualified Text.Numeral.Exp.Classes as C
 
 
 -------------------------------------------------------------------------------
@@ -64,20 +45,19 @@ import Text.Numeral
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, Num β) ⇒ α → Maybe β
-struct = positive (fix rule)
-
-rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (  0, atom        )
-              [ ( 13, add   10 L  )
-              , ( 20, atom        )
-              , ( 21, add   20 R  )
-              , ( 30, mul   10 R L)
-              , (100, atom1       )
-              , (101, add  100 R  )
-              , (200, mul1 100 R L)
-              ]
-                1000
+struct ∷ (Integral α, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → Maybe β
+struct = pos
+       $ fix
+       $ findRule (  0, lit         )
+                [ ( 13, add   10 L  )
+                , ( 20, lit         )
+                , ( 21, add   20 R  )
+                , ( 30, mul   10 R L)
+                , (100, lit1        )
+                , (101, add  100 R  )
+                , (200, mul1 100 R L)
+                ]
+                  1000
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
@@ -99,8 +79,8 @@ cardinalRepr = textify defaultRepr
                , (8,  ten   "åtta" "ar"   "åt")
                , (9,  ten   "nio"  "nit"  "nit")
                , (10, \c → case c of
-                             AddR {} → "ton"
-                             _       → "tio"
+                             CtxAddR {} → "ton"
+                             _          → "tio"
                  )
                , (11, const "elva")
                , (12, const "tolv")
@@ -110,6 +90,6 @@ cardinalRepr = textify defaultRepr
                ]
 
       ten n a m = \c → case c of
-                         AddL (C 10) _ → a
-                         MulL (C 10) _ → m
-                         _             → n
+                         CtxAddL (Lit 10) _ → a
+                         CtxMulL (Lit 10) _ → m
+                         _                  → n

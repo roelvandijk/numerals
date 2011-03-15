@@ -33,7 +33,7 @@ import qualified Text.Numeral.Language.PAA as PAA
 import qualified Text.Numeral.Language.SV  as SV
 import qualified Text.Numeral.Language.YOR as YOR
 
-import qualified Text.Numeral.Language.BigNum as BN
+import qualified Text.Numeral.BigNum as BN
 
 
 --------------------------------------------------------------------------------

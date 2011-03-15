@@ -10,22 +10,6 @@
 [@Native name@]     -
 
 [@English name@]    Huli
-
-[@French name@]     -
-
-[@Spanish name@]    -
-
-[@Chinese name@]    -
-
-[@Russian name@]    -
-
-[@German name@]     -
-
-[@Language family@] Trans-New Guinea, Engan, South, Huli
-
-[@Scope@]           Individual
-
-[@Type@]            Living
 -}
 
 module Text.Numeral.Language.PAA
@@ -41,17 +25,18 @@ module Text.Numeral.Language.PAA
 
 -- from base:
 import Control.Monad ( (>=>) )
-import Data.Function ( const, fix )
+import Data.Function ( ($), const, fix )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Num, Integral )
+import Prelude       ( Integral )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import qualified Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
@@ -69,16 +54,15 @@ Probably also need a constructor to express "4 obj" as opposed to just "4".
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, Num β) ⇒ α → Maybe β
-struct = positive (fix rule)
-
-rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule ( 1, atom    )
-              [ (16, add 15 R)
-              , (30, mul 15 R R)
-              , (31, add 30 R)
-              ]
-                 100
+struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ α → Maybe β
+struct = checkPos
+       $ fix
+       $ findRule ( 1, lit       )
+                [ (16, add 15 R  )
+                , (30, mul 15 R R)
+                , (31, add 30 R  )
+                ]
+                  100
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
@@ -95,8 +79,8 @@ cardinalRepr = textify defaultRepr
       symMap = M.fromList
                [ ( 1, const "mbira")
                , ( 2, \c → case c of
-                             MulR {} → "ki"
-                             _       → "kira"
+                             CtxMulR {} → "ki"
+                             _          → "kira"
                  )
                , ( 3, const "tebira")
                , ( 4, const "maria")
@@ -111,7 +95,7 @@ cardinalRepr = textify defaultRepr
                , (13, const "haleria")
                , (14, const "deria")
                , (15, \c → case c of
-                             MulL {} → "ngui"
-                             _       → "nguira"
+                             CtxMulL {} → "ngui"
+                             _          → "nguira"
                  )
                ]

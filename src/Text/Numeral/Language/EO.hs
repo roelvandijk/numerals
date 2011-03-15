@@ -10,22 +10,6 @@
 [@Native name@]     Esperanto
 
 [@English name@]    Esperanto
-
-[@French name@]     espéranto
-
-[@Spanish name@]    esperanto
-
-[@Chinese name@]    世界语
-
-[@Russian name@]    эсперанто
-
-[@German name@]     Esperanto
-
-[@Language family@] Constructed
-
-[@Scope@]           Individual language
-
-[@Type@]            Living
 -}
 
 module Text.Numeral.Language.EO
@@ -41,17 +25,18 @@ module Text.Numeral.Language.EO
 
 -- from base:
 import Control.Monad ( (>=>) )
-import Data.Function ( const, fix )
+import Data.Function ( ($), const, fix )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Num, Integral )
+import Prelude       ( Integral )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import qualified Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
@@ -61,18 +46,17 @@ import Text.Numeral
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, Num β) ⇒ α → Maybe β
-struct = positive (fix rule)
-
-rule ∷ (Integral α, Num β) ⇒ Rule α β
-rule = findRule (  0, atom       )
-              [ ( 11, add  10 R  )
-              , ( 20, mul  10 R L)
-              , (100, atom       )
-              , (101, add 100 R  )
-              , (200, mul 100 R L)
-              ]
-                1000
+struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ α → Maybe β
+struct = checkPos
+       $ fix
+       $ findRule (  0, lit        )
+                [ ( 11, add  10 R  )
+                , ( 20, mul  10 R L)
+                , (100, lit        )
+                , (101, add 100 R  )
+                , (200, mul 100 R L)
+                ]
+                  1000
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr

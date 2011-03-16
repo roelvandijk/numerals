@@ -44,7 +44,7 @@ import Data.Map.Unicode ( (∪) )
 -- from numerals:
 import Text.Numeral
 import Text.Numeral.Misc ( dec )
-import qualified Text.Numeral.BigNum as BN
+import qualified Text.Numeral.BigNum      as BN
 import qualified Text.Numeral.Exp.Classes as C
 
 

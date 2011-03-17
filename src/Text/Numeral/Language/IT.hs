@@ -1,6 +1,22 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
-module Text.Numeral.Language.IT (it) where
+{-|
+[@ISO639-1@]        it
+
+[@ISO639-2B@]       ita
+
+[@ISO639-3@]        ita
+
+[@Native name@]     Italiano
+
+[@English name@]    Italian
+-}
+
+module Text.Numeral.Language.IT
+    ( cardinal
+    , struct
+    , cardinalRepr
+    ) where
 
 
 --------------------------------------------------------------------------------
@@ -8,26 +24,24 @@ module Text.Numeral.Language.IT (it) where
 --------------------------------------------------------------------------------
 
 -- from base:
-import Data.Bool     ( otherwise )
-import Data.Function ( const, ($) )
-import Data.List     ( (++) )
+import Control.Monad ( (>=>) )
+import Data.Function ( ($), const, fix )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
-import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Data.Tuple    ( snd )
-import Prelude       ( Integer, error )
+import Prelude       ( Integral, (-) )
 
 -- from base-unicode-symbols:
-import Data.Eq.Unicode   ( (≡) )
-import Data.Bool.Unicode ( (∧) )
+import Data.List.Unicode ( (∈) )
+import Data.Ord.Unicode  ( (≥) )
+
+-- from containers:
+import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc      ( d )
-import Text.Numeral.Pelletier ( longScalePlural )
-
--- from string-combinators:
-import Data.String.Combinators ( (<>), (<+>) )
+import Text.Numeral.Misc ( dec )
+import qualified Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
@@ -35,59 +49,109 @@ import Data.String.Combinators ( (<>), (<+>) )
 --------------------------------------------------------------------------------
 
 -- Sources:
+--   http://www.sf.airnet.ne.jp/~ts/language/number/italian.html
+--   http://www.orbilat.com/Languages/Italian/Grammar/Italian-Numerals.html
 --   http://italian.about.com/library/weekly/aa042600a.htm
 
+cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+cardinal = struct >=> cardinalRepr
 
-it ∷ (Monoid s, IsString s) ⇒ NumConfig s
-it = NumConfig { ncNeg      = error "itNeg: undefined"
-               , ncOne      = snd
-               , ncAdd      = itAdd
-               , ncMul      = itMul
-               , ncCardinal = findSym itTable
+struct ∷ (Integral α, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → Maybe β
+struct = pos
+       $ fix
+       $ findRule (   0, lit         )
+                [ (  11, add   10 L  )
+                , (  17, add   10 R  )
+                , (  20, lit         )
+                , (  21, add   20 R  )
+                , (  30, mul   10 R L)
+                , ( 100, lit         )
+                , ( 101, add  100 R  )
+                , ( 200, mul  100 R L)
+                , (1000, lit         )
+                , (1001, add 1000 R  )
+                , (2000, mul 1000 R L)
+                ]
+                  (dec 6 - 1)
+
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr = textify defaultRepr
+               { reprValue = \n → M.lookup n symMap
+               , reprAdd   = (⊞)
+               , reprMul   = (⊡)
+               , reprNeg   = \_ → Just "meno "
                }
+    where
+      Lit 10 ⊞ Lit 7 = Just "as"
+      Lit 10 ⊞ Lit 9 = Just "an"
+      _      ⊞ _     = Just ""
 
-itAdd ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-itAdd (x, x') (y, y') | x ≡ 10 ∧ y < 7 = y' <> x'
-                      | y ≡ 3    = x' <> "tré"
-                      | otherwise = x' <> y'
 
-itMul ∷ (Monoid s, IsString s) ⇒ (Integer, s) → (Integer, s) → s
-itMul (_, x') (y, y') | y < d 6   = x' <> y'
-                      | otherwise = x' <+> y'
+      Lit n ⊡ Lit 10 | n ≥ 4 = Just "an"
+      _     ⊡ _              = Just ""
 
-itTable ∷ (Monoid s, IsString s) ⇒ [NumSymbol s]
-itTable = [ term  0       $ const "zero"
-          , termG 1       $ tenFormsG (gender "uno" "una") (const "un") (const "uno")
-          , term  2       $ tenForms "due"     "do"      "due"
-          , term  3       $ tenForms "tre"     "tre"     "ten"
-          , term  4       $ tenForms "quattro" "quattor" "quar"
-          , term  5       $ tenForms "cinque"  "quin"    "cinqu"
-          , term  6       $ tenForms "sei"     "se"      "sess"
-          , term  7       $ tenForms "sette"   "assette" "sett"
-          , term  8       $ tenForms "otto"    "otto"    "ott"
-          , term  9       $ tenForms "nove"    "annove"  "nove"
-          , mul   10      $ \ctx → case ctx of
-                                       AddL _ _ → "dici"
-                                       MulR 3 _ → "ta"
-                                       MulR _ _ → "anta"
-                                       _      → "dieci"
-          , add   20   10 $ const "venti"
-          , term  21      $ const "ventuno"
-          , term  28      $ const "ventotto"
-          , term  31      $ const "trentuno"
-          , term  38      $ const "trentotto"
-          , term  41      $ const "quarantuno"
-          , term  48      $ const "quarantotto"
-          , term  51      $ const "cinquantuno"
-          , term  58      $ const "cinquantotto"
-          , term  61      $ const "sessantuno"
-          , term  68      $ const "sessantotto"
-          , term  71      $ const "settantuno"
-          , term  78      $ const "settantotto"
-          , term  81      $ const "ottantuno"
-          , term  88      $ const "ottantotto"
-          , term  91      $ const "novantuno"
-          , term  98      $ const "novantotto"
-          , mul   100     $ const "cento"
-          , mul   1000    $ mulForms "mille" "mila"
-          ] ++ longScalePlural "ilione" "ilioni" "iliardo" "iliardi"
+      symMap = M.fromList
+               [ (0, const "zero")
+               , (1, \c → case c of
+                            CtxAddL (Lit 10) _ → "un"
+                            _                  → "uno"
+                 )
+               , (2, \c → case c of
+                            CtxAddL (Lit 10) _ → "do"
+                            _                  → "due"
+                 )
+               , (3, \c → case c of
+                            CtxAddR {}         → "tré"
+                            CtxMulL (Lit 10) _ → "tren"
+                            _                  → "tre"
+                 )
+               , (4, \c → case c of
+                            CtxAddL (Lit 10) _ → "quattor"
+                            CtxMulL (Lit 10) _ → "quar"
+                            _                  → "quattro"
+                 )
+               , (5, \c → case c of
+                            CtxAddL (Lit 10) _ → "quin"
+                            CtxMulL (Lit 10) _ → "cinqu"
+                            _                  → "cinque"
+                 )
+               , (6, \c → case c of
+                            CtxAddL (Lit 10) _ → "se"
+                            CtxMulL (Lit 10) _ → "sess"
+                            _                  → "sei"
+                 )
+               , (7, \c → case c of
+                            CtxMulL (Lit 10) _ → "sett"
+                            _                  → "sette"
+                 )
+               , (8, \c → case c of
+                            CtxMulL (Lit 10) _ → "ott"
+                            _                  → "otto"
+                 )
+               , (9, \c → case c of
+                            CtxMulL (Lit 10) _ → "nov"
+                            _                  → "nove"
+                 )
+               , (10, \c → case c of
+                             CtxAddR (Lit _) _ → "dici"
+                             CtxAddL (Lit _) _ → "dici"
+                             -- Last vowel removed because of a
+                             -- phonetic rule:
+                             CtxMulR (Lit _) (CtxAddL (Lit n) _)
+                                 | n ∈ [1,8]   → "t"
+                             CtxMulR (Lit _) _ → "ta"
+                             _                 → "dieci"
+                 )
+               , (20, \c → case c of
+                             CtxAddL (Lit n) _
+                                 | n ∈ [1,8]   → "vent"
+                             _                 → "venti"
+                 )
+               , (100, \c → case c of
+                              _ → "cento"
+                 )
+               , (1000, \c → case c of
+                               CtxMulR {} → "mila"
+                               _          → "mille"
+                 )
+               ]

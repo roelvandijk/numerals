@@ -25,22 +25,30 @@ module Text.Numeral.Language.IT
 
 -- from base:
 import Control.Monad ( (>=>) )
+import Data.Bool     ( otherwise )
 import Data.Function ( ($), const, fix )
-import Data.Maybe    ( Maybe(Just) )
+import Data.Functor  ( (<$>) )
+import Data.Maybe    ( Maybe(Nothing, Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
-import Prelude       ( Integral, (-) )
+import Prelude       ( Integral, (-), Integer )
 
 -- from base-unicode-symbols:
-import Data.List.Unicode ( (∈) )
-import Data.Ord.Unicode  ( (≥) )
+import Data.Eq.Unicode     ( (≡) )
+import Data.List.Unicode   ( (∈) )
+import Data.Monoid.Unicode ( (⊕) )
+import Data.Ord.Unicode    ( (≥) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
+-- from containers-unicode-symbols:
+import Data.Map.Unicode ( (∪) )
+
 -- from numerals:
 import Text.Numeral
 import Text.Numeral.Misc ( dec )
+import qualified Text.Numeral.BigNum      as BN
 import qualified Text.Numeral.Exp.Classes as C
 
 
@@ -52,42 +60,49 @@ import qualified Text.Numeral.Exp.Classes as C
 --   http://www.sf.airnet.ne.jp/~ts/language/number/italian.html
 --   http://www.orbilat.com/Languages/Italian/Grammar/Italian-Numerals.html
 --   http://italian.about.com/library/weekly/aa042600a.htm
+--   http://www.suite101.com/content/how-to-count-in-italian-a146487
 
-cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → Maybe β
-struct = pos
-       $ fix
-       $ findRule (   0, lit         )
-                [ (  11, add   10 L  )
-                , (  17, add   10 R  )
-                , (  20, lit         )
-                , (  21, add   20 R  )
-                , (  30, mul   10 R L)
-                , ( 100, lit         )
-                , ( 101, add  100 R  )
-                , ( 200, mul  100 R L)
-                , (1000, lit         )
-                , (1001, add 1000 R  )
-                , (2000, mul 1000 R L)
-                ]
-                  (dec 6 - 1)
+struct ∷ ( Integral α, C.Scale α
+         , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+         )
+       ⇒ α → Maybe β
+struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
+    where
+      rule = findRule (   0, lit         )
+                    [ (  11, add   10 L  )
+                    , (  17, add   10 R  )
+                    , (  20, lit         )
+                    , (  21, add   20 R  )
+                    , (  30, mul   10 R L)
+                    , ( 100, lit         )
+                    , ( 101, add  100 R  )
+                    , ( 200, mul  100 R L)
+                    , (1000, lit         )
+                    , (1001, add 1000 R  )
+                    , (2000, mul 1000 R L)
+                    ]
+                      (dec 6 - 1)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n symMap
+               , reprScale = pelletierRepr
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
                , reprNeg   = \_ → Just "meno "
                }
     where
-      Lit 10 ⊞ Lit 7 = Just "as"
-      Lit 10 ⊞ Lit 9 = Just "an"
-      _      ⊞ _     = Just ""
+      Lit 10                ⊞ Lit 7 = Just "as"
+      Lit 10                ⊞ Lit 9 = Just "an"
+      (_ `Mul` Scale _ _ _) ⊞ _     = Just " "
+      _                     ⊞ _     = Just ""
 
 
       Lit n ⊡ Lit 10 | n ≥ 4 = Just "an"
+      _     ⊡ Scale _ _ _    = Just " "
       _     ⊡ _              = Just ""
 
       symMap = M.fromList
@@ -147,11 +162,36 @@ cardinalRepr = textify defaultRepr
                                  | n ∈ [1,8]   → "vent"
                              _                 → "venti"
                  )
-               , (100, \c → case c of
-                              _ → "cento"
+               , ( 100
+                 , let f c = case c of
+                               CtxAddL (Lit 8)                      _  → "cent"
+                               CtxAddL (Lit 8 `Mul` Lit 10)         _  → "cent"
+                               CtxAddL (Lit 8 `Mul` Lit 10 `Add` _) _  → "cent"
+                               CtxMulR (Lit _) c2 → f c2
+                               _ → "cento"
+                   in f
                  )
                , (1000, \c → case c of
                                CtxMulR {} → "mila"
                                _          → "mille"
                  )
                ]
+
+pelletierRepr ∷ (IsString s, Monoid s)
+              ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
+pelletierRepr _ o e c | o ≡ 0 = big "ilione"  "ilioni"
+                      | o ≡ 3 = big "iliardo" "iliardi"
+                      | otherwise = Nothing
+    where
+      big s1 s2 = let s = case c of
+                            CtxMulR {} → s2
+                            _          → s1
+                  in (⊕ s) <$> textify repr e
+
+      repr = BN.cardinalRepr { reprValue = \n → M.lookup n $ diff ∪ BN.symMap }
+      diff = M.fromList
+             [ (6, BN.forms "sest" "sex"    "ses"    "sexa"   "ses")
+             , (7, BN.forms "sett" "septen" "septem" "septua" "septin")
+             , (8, BN.forms "ott"  "otto"   "otto"   "otto"   "ottin")
+             ]
+

@@ -49,6 +49,8 @@ import qualified Text.Numeral.Language.ES           as ES  ( cardinal  )
 import qualified Text.Numeral.Language.ES.TestData  as ES  ( cardinals )
 import qualified Text.Numeral.Language.FR           as FR  ( cardinal  )
 import qualified Text.Numeral.Language.FR.TestData  as FR  ( cardinals )
+import qualified Text.Numeral.Language.GV           as GV  ( cardinal  )
+import qualified Text.Numeral.Language.GV.TestData  as GV  ( cardinals )
 import qualified Text.Numeral.Language.IT           as IT  ( cardinal  )
 import qualified Text.Numeral.Language.IT.TestData  as IT  ( cardinals )
 import qualified Text.Numeral.Language.JA           as JA  ( preferred_cardinal
@@ -122,6 +124,7 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "EO"  [mkTests "cardinal" EO.cardinal EO.cardinals]
         , testGroup "ES"  [mkTests "cardinal" ES.cardinal  ES.cardinals]
         , testGroup "FR"  [mkTests "cardinal" FR.cardinal FR.cardinals]
+        , testGroup "GV"  [mkTests "cardinal" GV.cardinal GV.cardinals]
         , testGroup "IT"  [mkTests "cardinal" IT.cardinal IT.cardinals]
         , testGroup "JA"
           [ testGroup "preferred"

@@ -54,6 +54,7 @@ library
                  , Text.Numeral.Language.EO
                  , Text.Numeral.Language.ES
                  , Text.Numeral.Language.FR
+                 , Text.Numeral.Language.GV
                  , Text.Numeral.Language.IT
                  , Text.Numeral.Language.JA
                  , Text.Numeral.Language.LA
@@ -82,6 +83,7 @@ executable test-numerals
                , Text.Numeral.Language.EO.TestData
                , Text.Numeral.Language.ES.TestData
                , Text.Numeral.Language.FR.TestData
+               , Text.Numeral.Language.GV.TestData
                , Text.Numeral.Language.IT.TestData
                , Text.Numeral.Language.JA.TestData
                , Text.Numeral.Language.LA.TestData

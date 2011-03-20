@@ -26,7 +26,6 @@ module Text.Numeral.Language.PT
 import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
 import Data.Function ( ($), const, fix )
-import Data.Functor  ( (<$>) )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
@@ -35,14 +34,10 @@ import Prelude       ( Integral, (-), Integer )
 
 -- from base-unicode-symbols:
 import Data.Eq.Unicode     ( (≡) )
-import Data.Monoid.Unicode ( (⊕) )
 import Data.Ord.Unicode    ( (≤) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
-
--- from containers-unicode-symbols:
-import Data.Map.Unicode ( (∪) )
 
 -- from numerals:
 import Text.Numeral
@@ -63,10 +58,10 @@ cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ ( Integral α, C.Scale α
-         , C.Lit β, C.Add β, C.Mul β, C.Scale β
+         , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
          )
        ⇒ α → Maybe β
-struct = checkPos (fix $ rule `combine` shortScale R L BN.rule)
+struct = pos $ fix $ rule `combine` shortScale R L BN.rule
     where
       rule = findRule (   0, lit         )
                     [ (  11, add   10 L  )
@@ -87,6 +82,7 @@ cardinalRepr = textify defaultRepr
                , reprScale = shortScaleRepr
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
+               , reprNeg   = \_ → Just "menos "
                }
     where
       Lit 10 ⊞ Lit n | n < 8     = Just "as"
@@ -165,13 +161,6 @@ cardinalRepr = textify defaultRepr
 
 shortScaleRepr ∷ (IsString s, Monoid s)
                ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
-shortScaleRepr _ _ e c = let s = case c of
-                                   CtxMulR {} → "ilhões"
-                                   _          → "ilhão"
-                         in (⊕ s) <$> textify repr e
-    where
-      repr = BN.cardinalRepr { reprValue = \n → M.lookup n $ diff ∪ BN.symMap }
-      diff = M.fromList
-             [ (4, BN.forms "quatr" "quator" "quator" "quatra" "quatri")
-             ]
-
+shortScaleRepr =
+    BN.scaleRepr "ilhão" "ilhões"
+                 [(4, BN.forms "quatr" "quator" "quator" "quatra" "quatri")]

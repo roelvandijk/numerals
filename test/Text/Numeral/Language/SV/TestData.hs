@@ -9,14 +9,17 @@ module Text.Numeral.Language.SV.TestData (cardinals) where
 
 -- from base:
 import Data.String ( IsString )
-import Prelude     ( Num )
+import Prelude     ( Integral )
+
+-- from numerals:
+import Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
 -- SV
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
 cardinals =
   [ (0, "noll")
   , (1, "ett")
@@ -118,5 +121,29 @@ cardinals =
   , (97, "nittiosju")
   , (98, "nittioåtta")
   , (99, "nittionio")
-  , (100, "etthundra")
+  , (100, "hundra")
+  , (200, "tvåhundra")
+  , (300, "trehundra")
+  , (500, "femhundra")
+  , (600, "sexhundra")
+  , (800, "åttahundra")
+  , (1000, "tusen")
+  , (3000, "tretusen")
+  , (3502, "tretusenfemhundratvå")
+  , (5000, "femtusen")
+  , (dec 4, "tiotusen")
+  , (dec 5, "hundratusen")
+  , (dec 6, "miljon")
+  , (dec 9, "miljard")
+  , (dec 12, "biljon")
+  , (dec 15, "biljard")
+  , (dec 18, "triljon")
+  , (dec 24, "kvadriljon")
+  , (dec 30, "kvintiljon")
+  , (dec 36, "sextiljon")
+  , (dec 42, "septiljon")
+  , (dec 48, "oktiljon")
+  , (dec 54, "noniljon")
+  , (dec 60, "deciljon")
+  , (dec 66, "undeciljon")
   ]

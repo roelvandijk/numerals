@@ -27,23 +27,17 @@ module Text.Numeral.Language.FR
 import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
 import Data.Function ( ($), const, fix )
-import Data.Functor  ( (<$>) )
-import Data.Maybe    ( Maybe(Nothing, Just) )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Prelude       ( Integral, (-), Integer )
 
 -- from base-unicode-symbols:
-import Data.Eq.Unicode     ( (≡) )
-import Data.Ord.Unicode    ( (≤), (≥) )
-import Data.Monoid.Unicode ( (⊕) )
+import Data.Ord.Unicode ( (≤), (≥) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
-
--- from containers-unicode-symbols:
-import Data.Map.Unicode ( (∪) )
 
 -- from numerals:
 import Text.Numeral
@@ -147,25 +141,15 @@ cardinalRepr = textify defaultRepr
 
 pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
-pelletierRepr _ o e ctx | o ≡ 0 = big "illion"  "illions"
-                        | o ≡ 3 = big "illiard" "illiards"
-                        | otherwise = Nothing
-    where
-      big s1 s2 = let s = case ctx of
-                            CtxMulR (Lit 1) _ → s1
-                            CtxMulR {} → s2
-                            _          → s1
-                  in (⊕ s) <$> textify repr e
-
-      repr = BN.cardinalRepr { reprValue = \n → M.lookup n $ diff ∪ BN.symMap }
-      diff = M.fromList
-             [ (1, BN.forms "m"  "uno" "uno"  ""    "")
-             , (3, BN.forms "tr" "tré" "tres" "tri" "tre")
-             , (10, \c → case c of
-                           CtxAddL (Lit 100) _             → "deci"
-                           CtxMulR _ (CtxAddL (Lit 100) _) → "ginta"
-                           CtxMulR {}                      → "gint"
-                           _                               → "déc"
-               )
-             ]
-
+pelletierRepr = BN.pelletierRepr
+                  "illion" "illions"
+                  "illiard" "illiards"
+                  [ (1, BN.forms "m"  "uno" "uno"  ""    "")
+                  , (3, BN.forms "tr" "tré" "tres" "tri" "tre")
+                  , (10, \c → case c of
+                                CtxAddL (Lit 100) _             → "deci"
+                                CtxMulR _ (CtxAddL (Lit 100) _) → "ginta"
+                                CtxMulR {}                      → "gint"
+                                _                               → "déc"
+                    )
+                  ]

@@ -25,25 +25,18 @@ module Text.Numeral.Language.IT
 
 -- from base:
 import Control.Monad ( (>=>) )
-import Data.Bool     ( otherwise )
 import Data.Function ( ($), const, fix )
-import Data.Functor  ( (<$>) )
-import Data.Maybe    ( Maybe(Nothing, Just) )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
 import Prelude       ( Integral, (-), Integer )
 
 -- from base-unicode-symbols:
-import Data.Eq.Unicode     ( (≡) )
 import Data.List.Unicode   ( (∈) )
-import Data.Monoid.Unicode ( (⊕) )
 import Data.Ord.Unicode    ( (≥) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
-
--- from containers-unicode-symbols:
-import Data.Map.Unicode ( (∪) )
 
 -- from numerals:
 import Text.Numeral
@@ -179,19 +172,10 @@ cardinalRepr = textify defaultRepr
 
 pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
-pelletierRepr _ o e c | o ≡ 0 = big "ilione"  "ilioni"
-                      | o ≡ 3 = big "iliardo" "iliardi"
-                      | otherwise = Nothing
-    where
-      big s1 s2 = let s = case c of
-                            CtxMulR {} → s2
-                            _          → s1
-                  in (⊕ s) <$> textify repr e
-
-      repr = BN.cardinalRepr { reprValue = \n → M.lookup n $ diff ∪ BN.symMap }
-      diff = M.fromList
-             [ (6, BN.forms "sest" "sex"    "ses"    "sexa"   "ses")
-             , (7, BN.forms "sett" "septen" "septem" "septua" "septin")
-             , (8, BN.forms "ott"  "otto"   "otto"   "otto"   "ottin")
-             ]
-
+pelletierRepr = BN.pelletierRepr
+                  "ilione"  "ilioni"
+                  "iliardo" "iliardi"
+                  [ (6, BN.forms "sest" "sex"    "ses"    "sexa"   "ses")
+                  , (7, BN.forms "sett" "septen" "septem" "septua" "septin")
+                  , (8, BN.forms "ott"  "otto"   "otto"   "otto"   "ottin")
+                  ]

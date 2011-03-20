@@ -9,14 +9,17 @@ module Text.Numeral.Language.DE.TestData (cardinals) where
 
 -- from base:
 import Data.String ( IsString )
-import Prelude     ( Num )
+import Prelude     ( Integral )
+
+-- from numerals
+import Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
 -- DE
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
 cardinals =
   [ (0, "null")
   , (1, "eins")
@@ -120,5 +123,40 @@ cardinals =
   , (99, "neunundneunzig")
   , (100, "einhundert")
   , (200, "zweihundert")
+  , (300, "dreihundert")
   , (1000, "tausend")
+  , (dec 6, "million")
+  , (dec 9, "milliarde")
+  , (dec 12, "billion")
+  , (dec 15, "billiarde")
+  , (dec 18, "trillion")
+  , (dec 21, "trilliarde")
+  , (dec 24, "quadrillion")
+  , (dec 27, "quadrilliarde")
+  , (dec 30, "quintillion")
+  , (dec 33, "quintilliarde")
+  , (dec 36, "sextillion")
+  , (dec 39, "sextilliarde")
+  , (dec 42, "septillion")
+  , (dec 45, "septilliarde")
+  , (dec 48, "oktillion")
+  , (dec 51, "oktilliarde")
+  , (dec 54, "nonillion")
+  , (dec 57, "nonilliarde")
+  , (dec 60, "dezillion")
+  , (dec 63, "dezilliarde")
+  , (dec 66, "undezillion")
+  , (dec 69, "undezilliarde")
+  , (dec 72, "duodezillion")
+  , (dec 75, "duodezilliarde")
+  , (dec 78, "tredezillion")
+  , (dec 81, "tredezilliarde")
+  , (dec 84, "quattuordezillion")
+  , (dec 87, "quattuordezilliarde")
+  , (dec 90, "quindezillion")
+  , (dec 93, "quindezilliarde")
+  , (dec 180, "trigintillion")
+  , (dec 600, "zentillion")
+  , (dec 603, "zentilliarde")
+  , (dec 6000, "millinillion")
   ]

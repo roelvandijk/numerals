@@ -25,21 +25,14 @@ module Text.Numeral.Language.ES
 -- from base:
 import Control.Monad ( (>=>) )
 import Data.Function ( ($), const, fix )
-import Data.Functor  ( (<$>) )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Prelude       ( Integral, (-), Integer )
 
--- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
-
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
-
--- from containers-unicode-symbols:
-import Data.Map.Unicode ( (∪) )
 
 -- from numerals:
 import Text.Numeral
@@ -171,14 +164,9 @@ cardinalRepr = textify defaultRepr
 
 longScaleRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
-longScaleRepr _ _ e c = let s = case c of
-                                  CtxMulR {} → "illones"
-                                  _          → "illón"
-                        in (⊕ s) <$> textify repr e
-    where
-      repr = BN.cardinalRepr { reprValue = \n → M.lookup n $ diff ∪ BN.symMap }
-      diff = M.fromList
-             [ (4, BN.forms "cuatr" "cuator" "cuator" "cuatra" "cuatri")
-             , (9, BN.forms "non"   "noven"  "noven"  "nona"   "non")
-             ]
+longScaleRepr =
+    BN.scaleRepr "illón" "illones"
+                 [ (4, BN.forms "cuatr" "cuator" "cuator" "cuatra" "cuatri")
+                 , (9, BN.forms "non"   "noven"  "noven"  "nona"   "non")
+                 ]
 

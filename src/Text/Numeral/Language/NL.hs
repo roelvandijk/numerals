@@ -26,24 +26,23 @@ module Text.Numeral.Language.NL
 import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
 import Data.Function ( ($), const, fix )
-import Data.Functor  ( (<$>) )
-import Data.Maybe    ( Maybe(Nothing, Just) )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integral )
+import Prelude       ( Integral, (-) )
 
 -- from base-unicode-symbols:
-import Data.List.Unicode   ( (∈) )
-import Data.Monoid.Unicode ( (⊕) )
+import Data.List.Unicode ( (∈) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import Text.Numeral.Misc ( dec )
 import qualified Text.Numeral.Exp.Classes as C
-import qualified Text.Numeral.BigNum as BN ( rule, cardinalRepr )
+import qualified Text.Numeral.BigNum as BN ( rule, pelletierRepr )
 
 
 --------------------------------------------------------------------------------
@@ -56,7 +55,7 @@ cardinal = struct >=> cardinalRepr
 
 struct ∷ (Integral α, C.Scale α, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β)
        ⇒ α → Maybe β
-struct = pos (fix $ rule `combine` pelletierScale R L BN.rule)
+struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
 
 rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
 rule = findRule (   0, lit         )
@@ -69,23 +68,19 @@ rule = findRule (   0, lit         )
               , (1001, add 1000 R  )
               , (2000, mul 1000 R L)
               ]
-               999999
+                (dec 6 - 1)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n symMap
-               , reprScale = pelletier
+               , reprScale = BN.pelletierRepr "iljoen" "iljoen"
+                                              "iljard" "iljard"
+                                              []
                , reprAdd   = (⊞)
                , reprMul   = \_ _ → Just ""
                , reprNeg   = \_   → Just "min "
                }
     where
-      pelletier _ 0 e _ = big "iljoen" e
-      pelletier _ 3 e _ = big "iljard" e
-      pelletier _ _ _ _ = Nothing
-
-      big s e = (⊕ s) <$> textify BN.cardinalRepr e
-
       _     ⊞ Lit 10         = Just ""
       Lit n ⊞ _ | n ∈ [2,3]  = Just "ën"
                 | n < 10     = Just "en"

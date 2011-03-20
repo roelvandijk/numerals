@@ -31,15 +31,11 @@ module Text.Numeral.Language.EN
 import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
 import Data.Function ( ($), const, fix )
-import Data.Functor  ( (<$>) )
-import Data.Maybe    ( Maybe(Nothing, Just) )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
 import Prelude       ( Integral, Integer )
-
--- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
@@ -47,40 +43,12 @@ import qualified Data.Map as M ( fromList, lookup )
 -- from numerals:
 import Text.Numeral
 import qualified Text.Numeral.Exp.Classes as C
-import qualified Text.Numeral.BigNum as BN ( rule, cardinalRepr )
+import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, pelletierRepr )
 
 
 --------------------------------------------------------------------------------
 -- EN
 --------------------------------------------------------------------------------
-
-{-
-TODO? Other interesting number names in English:
-
-Base 20:
-20      score           20
-40      twoscore        2 × 20
-60      threescore      3 × 20
-80      fourscore       4 × 20
-100     fivescore       5 × 20
-120     sixscore        6 × 20
-140     sevenscore      7 × 20
-160     eightscore      8 × 20
-180     ninescore       9 × 20
-200     tenscore        10 × 20
-
-Base 12:
-6       half dozen      ½ × 12
-12      dozen           12
-13      baker's dozen   baker's 12
-13      long dozen      long 12
-72      half gross      ½ × 144
-120     long hundred    long 100 (12 × 10)
-144     gross           144 (12²)
-156     long gross      long 144 (12 × 13)
-1200    long thousand   long 1000 (12 × 10²)
-1728    great gross     1728 (12³)
--}
 
 uk_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
 uk_cardinal = shortScaleStruct >=> uk_cardinalRepr
@@ -90,21 +58,21 @@ us_cardinal = shortScaleStruct >=> us_cardinalRepr
 
 shortScaleStruct ∷ ( Integral α, C.Scale α
                    , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
-                   ) ⇒ α → Maybe β
-shortScaleStruct = pos
-                 $ fix $ rule `combine` shortScale1 R L BN.rule
+                   )
+                 ⇒ α → Maybe β
+shortScaleStruct = pos $ fix $ rule `combine` shortScale1 R L BN.rule
 
 longScaleStruct ∷ ( Integral α, C.Scale α
                   , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
-                  ) ⇒ α → Maybe β
-longScaleStruct = pos
-                $ fix $ rule `combine` longScale1 R L BN.rule
+                  )
+                ⇒ α → Maybe β
+longScaleStruct = pos $ fix $ rule `combine` longScale1 R L BN.rule
 
 pelletierScaleStruct ∷ ( Integral α, C.Scale α
                        , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
-                       ) ⇒ α → Maybe β
-pelletierScaleStruct = pos
-                     $ fix $ rule `combine` pelletierScale1 R L BN.rule
+                       )
+                     ⇒ α → Maybe β
+pelletierScaleStruct = pos $ fix $ rule `combine` pelletierScale1 R L BN.rule
 
 rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
 rule = findRule (   0, lit          )
@@ -139,19 +107,18 @@ uk_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 uk_cardinalRepr = textify $ uk_cardinalRepr'
 
 ukPelletier_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-ukPelletier_cardinalRepr = textify uk_cardinalRepr' { reprScale = pelletier }
+ukPelletier_cardinalRepr = textify uk_cardinalRepr'
+                                   { reprScale = pelletierRepr }
     where
-      pelletier _ 0 e _ = big "illion"  e
-      pelletier _ 3 e _ = big "illiard" e
-      pelletier _ _ _ _ = Nothing
-
-      big s e = (⊕ s) <$> textify BN.cardinalRepr e
+      pelletierRepr = BN.pelletierRepr "illion"  "illion"
+                                       "illiard" "illiard"
+                                       []
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Maybe s) → Repr s
 cardinalRepr f =
     defaultRepr
     { reprValue = \n → M.lookup n symMap
-    , reprScale = \_ _ e _ → (⊕ "illion") <$> textify BN.cardinalRepr e
+    , reprScale = BN.scaleRepr "illion" "illion" []
     , reprAdd   = f
     , reprMul   = (⊞)
     , reprNeg   = \_ → Just "minus "

@@ -85,6 +85,7 @@ cardinalRepr = textify defaultRepr
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
                , reprSub   = \_ _ → Just "dē"
+               , reprNeg   = \_ → Just "minus "
                }
     where
       (_ `Mul` Lit _) ⊞ _ = Just " "

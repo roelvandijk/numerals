@@ -68,6 +68,7 @@ cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n symMap
                , reprAdd   = \_ _ → Just ""
                , reprMul   = \_ _ → Just ""
+               , reprNeg   = \_ → Just "minus "
                }
     where
       symMap = M.fromList

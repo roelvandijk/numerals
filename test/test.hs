@@ -61,6 +61,8 @@ import qualified Text.Numeral.Language.JA.TestData  as JA  ( preferred_cardinals
                                                            )
 import qualified Text.Numeral.Language.LA           as LA  ( cardinal  )
 import qualified Text.Numeral.Language.LA.TestData  as LA  ( cardinals )
+import qualified Text.Numeral.Language.MG           as MG  ( cardinal  )
+import qualified Text.Numeral.Language.MG.TestData  as MG  ( cardinals )
 import qualified Text.Numeral.Language.NL           as NL  ( cardinal  )
 import qualified Text.Numeral.Language.NL.TestData  as NL  ( cardinals )
 import qualified Text.Numeral.Language.NO           as NO  ( cardinal  )
@@ -130,6 +132,7 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
             [mkTests "cardinal" JA.daiji_cardinal JA.daiji_cardinals]
           ]
         , testGroup "LA"  [mkTests "cardinal" LA.cardinal  LA.cardinals]
+        , testGroup "MG"  [mkTests "cardinal" MG.cardinal  MG.cardinals]
         , testGroup "NL"  [mkTests "cardinal" NL.cardinal  NL.cardinals]
         , testGroup "NO"  [mkTests "cardinal" NO.cardinal  NO.cardinals]
         , testGroup "NQM" [mkTests "cardinal" NQM.cardinal NQM.cardinals]

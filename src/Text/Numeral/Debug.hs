@@ -28,6 +28,7 @@ import qualified Text.Numeral.Language.FR  as FR
 import qualified Text.Numeral.Language.IT  as IT
 import qualified Text.Numeral.Language.JA  as JA
 import qualified Text.Numeral.Language.LA  as LA
+import qualified Text.Numeral.Language.MG  as MG
 import qualified Text.Numeral.Language.NL  as NL
 import qualified Text.Numeral.Language.NO  as NO
 import qualified Text.Numeral.Language.NQM as NQM

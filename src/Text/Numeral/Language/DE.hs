@@ -82,7 +82,6 @@ cardinalRepr = textify defaultRepr
                , reprScale = pelletierRepr
                , reprAdd   = (⊞)
                , reprMul   = \_ _ → Just ""
-               , reprSub   = \_ _ → Just ""
                , reprNeg   = \_   → Just "minus "
                }
     where

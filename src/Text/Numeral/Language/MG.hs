@@ -55,12 +55,10 @@ Sources:
   http://www.sf.airnet.ne.jp/~ts/language/number/malagasy.html
 -}
 
-cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ ( Integral α, C.Scale α
-         , C.Lit β, C.Add β, C.Mul β, C.Scale β
-         )
+struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
        ⇒ α → Maybe β
 struct = checkPos
        $ fix

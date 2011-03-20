@@ -47,6 +47,7 @@ library
   exposed-modules: Text.Numeral
                  , Text.Numeral.BigNum
                  , Text.Numeral.Exp
+                 , Text.Numeral.Language.AMP
                  , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.DE
                  , Text.Numeral.Language.EN
@@ -74,6 +75,7 @@ executable test-numerals
   hs-source-dirs: src, test
 
   other-modules: Text.Numeral.Language.CHN.TestData
+               , Text.Numeral.Language.AMP.TestData
                , Text.Numeral.Language.DE.TestData
                , Text.Numeral.Language.EN.TestData
                , Text.Numeral.Language.EO.TestData

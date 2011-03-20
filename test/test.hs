@@ -31,6 +31,8 @@ import Test.Framework ( Test, defaultMain, testGroup )
 import Test.Framework.Providers.HUnit ( testCase )
 
 -- from numerals:
+import qualified Text.Numeral.Language.AMP          as AMP ( cardinal  )
+import qualified Text.Numeral.Language.AMP.TestData as AMP ( cardinals )
 import qualified Text.Numeral.Language.CHN          as CHN ( cardinal  )
 import qualified Text.Numeral.Language.CHN.TestData as CHN ( cardinals )
 import qualified Text.Numeral.Language.DE           as DE  ( cardinal  )
@@ -106,7 +108,8 @@ mkTests n f xs = testCase n $ testAsGroup f xs
 --mkTests n f xs = testGroup n $ testIndividually f xs
 
 tests ∷ [Test]
-tests = [ testGroup "CHN" [mkTests "cardinal" CHN.cardinal CHN.cardinals]
+tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
+        , testGroup "CHN" [mkTests "cardinal" CHN.cardinal CHN.cardinals]
         , testGroup "DE"  [mkTests "cardinal" DE.cardinal DE.cardinals]
         , testGroup "EN"
           [ testGroup "UK"

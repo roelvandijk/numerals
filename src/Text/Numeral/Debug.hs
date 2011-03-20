@@ -18,6 +18,7 @@ import Data.Monoid.Unicode   ( (⊕) )
 -- from numerals:
 import Text.Numeral
 import Text.Numeral.Misc
+import qualified Text.Numeral.Language.AMP as AMP
 import qualified Text.Numeral.Language.CHN as CHN
 import qualified Text.Numeral.Language.DE  as DE
 import qualified Text.Numeral.Language.EN  as EN

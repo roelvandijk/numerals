@@ -83,8 +83,8 @@ cardinalRepr = textify defaultRepr
                , (8,  ten   "åtte" "at"   "åt")
                , (9,  ten   "ni"   "nit"  "nit")
                , (10, \c → case c of
-                             CtxAddR {} → "ten"
-                             _          → "ti"
+                             CtxAdd {} → "ten"
+                             _         → "ti"
                  )
                , (11, const "elleve")
                , (12, const "tolv")
@@ -94,6 +94,6 @@ cardinalRepr = textify defaultRepr
                ]
 
       ten n a m = \c → case c of
-                         CtxAddL (Lit 10) _ → a
-                         CtxMulL (Lit 10) _ → m
-                         _                  → n
+                         CtxAdd _ (Lit 10) _ → a
+                         CtxMul {}           → m
+                         _                   → n

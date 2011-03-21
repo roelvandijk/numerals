@@ -88,8 +88,8 @@ cardinalRepr = textify defaultRepr
                , (8,  ten   "åtta" "ar"   "åt")
                , (9,  ten   "nio"  "nit"  "nit")
                , (10, \c → case c of
-                             CtxAddR {} → "ton"
-                             _          → "tio"
+                             CtxAdd {} → "ton"
+                             _         → "tio"
                  )
                , (11, const "elva")
                , (12, const "tolv")
@@ -99,9 +99,9 @@ cardinalRepr = textify defaultRepr
                ]
 
       ten n a m = \c → case c of
-                         CtxAddL (Lit 10) _ → a
-                         CtxMulL (Lit 10) _ → m
-                         _                  → n
+                         CtxAdd _ (Lit 10) _ → a
+                         CtxMul _ (Lit 10) _ → m
+                         _                   → n
 
 pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s

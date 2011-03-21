@@ -97,14 +97,14 @@ cardinalRepr = textify defaultRepr
                , (6, const "zes")
                , (7, const "zeven")
                , (8, \c → case c of
-                            CtxMulL (Lit 10) _ → "tach"
-                            CtxAddL (Lit 10) _ → "ach"
+                            CtxMul {}          → "tach"
+                            CtxAdd _ (Lit _) _ → "ach"
                             _                  → "acht"
                  )
                , (9, const "negen")
                , (10, \c → case c of
-                             CtxMulR {} → "tig"
-                             _          → "tien"
+                             CtxMul {} → "tig"
+                             _         → "tien"
                  )
                , (11, const "elf")
                , (12, const "twaalf")
@@ -113,6 +113,6 @@ cardinalRepr = textify defaultRepr
                ]
 
       ten n t ctx = case ctx of
-                      CtxMulL (Lit 10) _ → t
-                      CtxAddL (Lit 10) _ → t
+                      CtxMul {}          → t
+                      CtxAdd _ (Lit _) _ → t
                       _                  → n

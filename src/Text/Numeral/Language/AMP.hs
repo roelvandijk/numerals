@@ -83,11 +83,11 @@ cardinalRepr = textify defaultRepr
                [ (1,  const "rpat")
                , (2,  const "hosf")
                , (5,  \c → case c of
-                             CtxMulL {} → "tir"
-                             _          → "tir yohtt"
+                             CtxMul L _ _ → "tir"
+                             _            → "tir yohtt"
                  )
                , (20, \c → case c of
-                             CtxMulL {} → "yima"
-                             _          → "yima yohtt"
+                             CtxMul L _ _ → "yima"
+                             _            → "yima yohtt"
                  )
                ]

@@ -50,11 +50,11 @@ struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ α → Maybe β
 struct = checkPos (fix rule)
 
 rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
-rule = findRule (  0, lit      )
-              [ (  1, lit      )
+rule = findRule (  0, lit       )
+              [ (  1, lit       )
               , ( 11, add 10 R  )
               , ( 20, mul 10 R L)
-              , (100, lit      )
+              , (100, lit       )
               ]
                  100
 

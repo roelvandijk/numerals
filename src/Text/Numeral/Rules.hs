@@ -12,7 +12,6 @@ module Text.Numeral.Rules
   , findRule
   , pos, checkPos
 
-  , Side(L, R)
   , lit, lit1
   , add
   , mul, mul1
@@ -42,7 +41,6 @@ import Data.Ord            ( Ord, (<), (>) )
 import Prelude             ( Integral, fromIntegral
                            , Num, (+), (-), abs, divMod, div, even
                            )
-import Text.Show           ( Show )
 
 -- from base-unicode-symbols:
 import Data.Eq.Unicode       ( (≡) )
@@ -51,6 +49,7 @@ import Prelude.Unicode       ( (⋅) )
 
 -- from numerals:
 import qualified Text.Numeral.Exp.Classes as C
+import Text.Numeral.Exp ( Side(L, R) )
 import Text.Numeral.Misc ( dec, intLog )
 
 -- from fingertree:
@@ -219,8 +218,6 @@ pelletierScale1 aSide mSide bigNumRule =
 --------------------------------------------------------------------------------
 -- Miscellaneous
 --------------------------------------------------------------------------------
-
-data Side = L | R deriving Show
 
 flipIfR ∷ Side → (α → α → α) → (α → α → α)
 flipIfR L = id

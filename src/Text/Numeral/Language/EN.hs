@@ -139,9 +139,9 @@ cardinalRepr f =
                , (8, ten   "eight" "eigh" "eigh")
                , (9, const "nine")
                , (10, \c → case c of
-                             CtxAddR (Lit _) _ → "teen"
-                             CtxMulR {}        → "ty"
-                             _                 → "ten"
+                             CtxAdd _ (Lit _) _ → "teen"
+                             CtxMul R _       _ → "ty"
+                             _                  → "ten"
                  )
                , (11,   const "eleven")
                , (12,   const "twelve")
@@ -151,6 +151,6 @@ cardinalRepr f =
 
       ten ∷ s → s → s → Ctx Exp → s
       ten n a m = \c → case c of
-                         CtxAddL (Lit 10) _ → a
-                         CtxMulL (Lit 10) _ → m
-                         _                  → n
+                         CtxAdd _ (Lit 10) _ → a
+                         CtxMul _ (Lit 10) _ → m
+                         _                   → n

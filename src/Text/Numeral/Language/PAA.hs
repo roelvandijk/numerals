@@ -79,8 +79,8 @@ cardinalRepr = textify defaultRepr
       symMap = M.fromList
                [ ( 1, const "mbira")
                , ( 2, \c → case c of
-                             CtxMulR {} → "ki"
-                             _          → "kira"
+                             CtxMul {} → "ki"
+                             _         → "kira"
                  )
                , ( 3, const "tebira")
                , ( 4, const "maria")
@@ -95,7 +95,7 @@ cardinalRepr = textify defaultRepr
                , (13, const "haleria")
                , (14, const "deria")
                , (15, \c → case c of
-                             CtxMulL {} → "ngui"
-                             _          → "nguira"
+                             CtxMul {} → "ngui"
+                             _         → "nguira"
                  )
                ]

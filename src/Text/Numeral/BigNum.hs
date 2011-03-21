@@ -82,13 +82,13 @@ symMap = M.fromList
          , (8, forms "oct"   "octo"     "octo"     "octo"    "octin")
          , (9, forms "non"   "novem"    "novem"    "nona"    "non")
          , (10, \c → case c of
-                       CtxAddL (Lit 100) _             → "deci"
-                       CtxMulR _ (CtxAddL (Lit 100) _) → "ginta"
-                       CtxMulR {}                      → "gint"
-                       _                               → "dec"
+                       CtxAdd _ (Lit 100) _              → "deci"
+                       CtxMul _ _ (CtxAdd L (Lit 100) _) → "ginta"
+                       CtxMul {}                         → "gint"
+                       _                                 → "dec"
            )
          , (100, \c → case c of
-                        CtxMulR (Lit n) _
+                        CtxMul _ (Lit n) _
                             | n ∈ [2,3,6] → "cent"
                             | otherwise   → "gent"
                         _                 → "cent"
@@ -100,11 +100,11 @@ symMap = M.fromList
 forms ∷ s → s → s → s → s → Ctx Exp → s
 forms t a1 a2 m1 m2 ctx =
     case ctx of
-      CtxAddL (Lit 10)  _ → a1
-      CtxAddL {}          → a2
-      CtxMulL (Lit 100) _ → m2
-      CtxMulL {}          → m1
-      _                   → t
+      CtxAdd _ (Lit 10)  _ → a1
+      CtxAdd {}            → a2
+      CtxMul _ (Lit 100) _ → m2
+      CtxMul {}            → m1
+      _                    → t
 
 --------------------------------------------------------------------------------
 -- Representations of scales
@@ -118,9 +118,9 @@ scaleRepr ∷ (IsString s, Monoid s)
 scaleRepr s p syms _ _ e ctx = (⊕ pf) <$> textify repr e
     where
       pf = case ctx of
-             CtxMulR (Lit 1) _ → s
-             CtxMulR {}        → p
-             _                 → s
+             CtxMul _ (Lit 1) _ → s
+             CtxMul {}          → p
+             _                  → s
       repr = cardinalRepr { reprValue = \n → M.lookup n syms' }
       syms' = M.fromList syms ∪ symMap
 

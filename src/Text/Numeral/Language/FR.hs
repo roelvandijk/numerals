@@ -117,27 +117,27 @@ cardinalRepr = textify defaultRepr
                , (8, const "huit")
                , (9, const "neuf")
                , (10, \c → case c of
-                             CtxAddR (Lit n) _ | n < 7     → "ze"
-                                               | otherwise → "dix"
-                             CtxMulR (Lit 3) _             → "te"
-                             CtxMulR {}                    → "ante"
-                             _                             → "dix"
+                             CtxAdd _ (Lit n) _ | n < 7     → "ze"
+                                                | otherwise → "dix"
+                             CtxMul _ (Lit 3) _             → "te"
+                             CtxMul R _       _             → "ante"
+                             _                              → "dix"
                  )
-               , (20,   \c → case c of
-                               CtxMulR _ CtxEmpty → "vingts"
-                               _ → "vingt"
+               , (20, \c → case c of
+                             CtxMul _ _ CtxEmpty → "vingts"
+                             _                   → "vingt"
                  )
-               , (100,  \c → case c of
-                               CtxMulR _ CtxEmpty → "cents"
-                               _ → "cent"
+               , (100, \c → case c of
+                              CtxMul R _ CtxEmpty → "cents"
+                              _                   → "cent"
                  )
                , (1000, const "mille")
                ]
 
       ten n a m ctx = case ctx of
-                        CtxAddL (Lit 10) _ → a
-                        CtxMulL (Lit 10) _ → m
-                        _                  → n
+                        CtxAdd _ (Lit 10) _ → a
+                        CtxMul _ (Lit 10) _ → m
+                        _                   → n
 
 pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
@@ -147,9 +147,9 @@ pelletierRepr = BN.pelletierRepr
                   [ (1, BN.forms "m"  "uno" "uno"  ""    "")
                   , (3, BN.forms "tr" "tré" "tres" "tri" "tre")
                   , (10, \c → case c of
-                                CtxAddL (Lit 100) _             → "deci"
-                                CtxMulR _ (CtxAddL (Lit 100) _) → "ginta"
-                                CtxMulR {}                      → "gint"
-                                _                               → "déc"
+                                CtxAdd _ (Lit 100) _              → "deci"
+                                CtxMul _ _ (CtxAdd _ (Lit 100) _) → "ginta"
+                                CtxMul {}                         → "gint"
+                                _                                 → "déc"
                     )
                   ]

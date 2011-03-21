@@ -190,8 +190,8 @@ generic_repr four seven = defaultRepr
                , (9, const "kyū")
                , (10, const "jū")
                , (100, \c → case c of
-                              (CtxMulR (Lit 3) _) → "byaku" -- rendaku
-                              _                   → "hyaku"
+                              (CtxMul _ (Lit 3) _) → "byaku" -- rendaku
+                              _                    → "hyaku"
                  )
                , (dec 3, const "sen")
                , (dec 4, const "man")

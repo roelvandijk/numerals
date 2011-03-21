@@ -26,22 +26,16 @@ module Text.Numeral.Language.GV
 -- from base:
 import Control.Monad ( (>=>) )
 import Data.Function ( ($), const, fix )
-import Data.List     ( concat, map )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
-import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integral, (+), (-) )
-
--- from base-unicode-symobls:
-import Prelude.Unicode ( (⋅) )
+import Prelude       ( Integral )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
-import Text.Numeral.Misc ( dec )
 import qualified Text.Numeral.Exp.Classes as C
 
 
@@ -90,9 +84,9 @@ cardinalRepr = textify defaultRepr
       symMap = M.fromList
                [ (1, const "nane")
                , (2, \c → case c of
-                            CtxAddL (Lit 10) _ → "daa"
-                            CtxMulL {}         → "daa"
-                            _                  → "jees"
+                            CtxAdd _ (Lit 10) _ → "daa"
+                            CtxMul {}           → "daa"
+                            _                   → "jees"
                  )
                , (3, const "tree")
                , (4, const "kiare")
@@ -102,16 +96,16 @@ cardinalRepr = textify defaultRepr
                , (8, const "hoght")
                , (9, const "nuy")
                , (10, \c → case c of
-                             CtxAddR (Lit 2)              _ → "yeig"
-                             CtxAddR (Lit _ `Mul` Lit 20) _ → "jeih"
-                             CtxAddR {}                     → "jeig"
-                             _                              → "jeih"
+                             CtxAdd _ (Lit 2)              _ → "yeig"
+                             CtxAdd _ (Lit _ `Mul` Lit 20) _ → "jeih"
+                             CtxAdd R _                    _ → "jeig"
+                             _                               → "jeih"
                  )
                , (20, const "feed")
                , (40, const "daeed")
                , (100, \c → case c of
-                              CtxMulR {} → "cheead"
-                              _          → "keead"
+                              CtxMul {} → "cheead"
+                              _         → "keead"
                  )
                , (1000, const "thousane")
                ]

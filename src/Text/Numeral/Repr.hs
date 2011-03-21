@@ -26,7 +26,7 @@ import Prelude       ( Integer )
 import Data.Monoid.Unicode ( (⊕) )
 
 -- from numerals:
-import Text.Numeral.Exp ( Exp(..), Ctx(..) )
+import Text.Numeral.Exp ( Exp(..), Side(L, R), Ctx(..) )
 
 
 --------------------------------------------------------------------------------
@@ -71,15 +71,15 @@ textify (Repr {..}) e = go CtxEmpty e
       go ctx (Neg x) = do x' ← go (CtxNeg ctx) x
                           n' ← reprNeg x
                           reprNegCombine n' x'
-      go ctx (Add x y) = do x' ← go (CtxAddL y ctx) x
-                            y' ← go (CtxAddR x ctx) y
+      go ctx (Add x y) = do x' ← go (CtxAdd L y ctx) x
+                            y' ← go (CtxAdd R x ctx) y
                             a' ← reprAdd x y
                             reprAddCombine a' x' y'
-      go ctx (Mul x y) = do x' ← go (CtxMulL y ctx) x
-                            y' ← go (CtxMulR x ctx) y
+      go ctx (Mul x y) = do x' ← go (CtxMul L y ctx) x
+                            y' ← go (CtxMul R x ctx) y
                             m' ← reprMul x y
                             reprMulCombine m' x' y'
-      go ctx (Sub x y) = do x' ← go (CtxSubL y ctx) x
-                            y' ← go (CtxSubR x ctx) y
+      go ctx (Sub x y) = do x' ← go (CtxSub L y ctx) x
+                            y' ← go (CtxSub R x ctx) y
                             s' ← reprSub x y
                             reprSubCombine s' x' y'

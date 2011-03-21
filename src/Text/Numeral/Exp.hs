@@ -3,6 +3,7 @@
 module Text.Numeral.Exp
     ( Exp(..)
     , eval
+    , Side(L, R)
     , Ctx(..)
     ) where
 
@@ -57,16 +58,20 @@ eval (Scale b o r) = C.scale b o (eval r)
 
 
 -------------------------------------------------------------------------------
+-- Side
+-------------------------------------------------------------------------------
+
+data Side = L | R deriving Show
+
+
+-------------------------------------------------------------------------------
 -- Context of expressions
 -------------------------------------------------------------------------------
 
 data Ctx α = CtxEmpty
            | CtxNeg (Ctx α)
-           | CtxAddL α (Ctx α)
-           | CtxAddR α (Ctx α)
-           | CtxMulL α (Ctx α)
-           | CtxMulR α (Ctx α)
-           | CtxSubL α (Ctx α)
-           | CtxSubR α (Ctx α)
+           | CtxAdd Side α (Ctx α)
+           | CtxMul Side α (Ctx α)
+           | CtxSub Side α (Ctx α)
            | CtxScale (Ctx α)
              deriving Show

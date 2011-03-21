@@ -119,9 +119,9 @@ cardinalRepr = textify defaultRepr
       symMap = M.fromList
                [ (-5, const "med")
                , ( 1, \c → case c of
-                             CtxAddL {} → "mokan"
-                             CtxSubL {} → "mokan"
-                             _          → "ikan"
+                             CtxAdd {} → "mokan"
+                             CtxSub {} → "mokan"
+                             _         → "ikan"
                  )
                , ( 2, twentyForm "me" "go" "ji")
                , ( 3, twentyForm "me" "go" "ta")
@@ -132,12 +132,12 @@ cardinalRepr = textify defaultRepr
                , ( 8, const    $ "me"  ⊕   "jo")
                , ( 9, const    $ "me"  ⊕   "san")
                , (10, \c → case c of
-                             CtxAddR {} → "la"
-                             _          → "mewa"
+                             CtxAdd {} → "la"
+                             _         → "mewa"
                  )
                , (20, \c → case c of
-                             CtxMulL {} → "o"
-                             _          → "ogun"
+                             CtxMul {} → "o"
+                             _         → "ogun"
                  )
                , (30, const "ogbon")
                , (50, const "adota")
@@ -147,6 +147,6 @@ cardinalRepr = textify defaultRepr
                ]
 
       twentyForm c m s = \ctx → case ctx of
-                                  CtxMulR (Lit 20) _ → m
-                                  _                  → c
+                                  CtxMul _ (Lit 20) _ → m
+                                  _                   → c
                                 ⊕ s

@@ -58,8 +58,7 @@ Sources:
 cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
-struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
-       ⇒ α → Maybe β
+struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ α → Maybe β
 struct = checkPos
        $ fix
        $ findRule (0, lit)
@@ -90,8 +89,8 @@ cardinalRepr = textify defaultRepr
       symMap = M.fromList
                [ (0, const "haotra")
                , (1, \c → case c of
-                            CtxAddL {} → "iraika"
-                            _          → "iray"
+                            CtxAdd {} → "iraika"
+                            _         → "iray"
                  )
                , (2, mulForms "roa"    "roa"   "roan")
                , (3, mulForms "telo"   "telo"  "telon")
@@ -102,12 +101,13 @@ cardinalRepr = textify defaultRepr
                , (8, mulForms "valo"   "valo"  "valon")
                , (9, mulForms "sivy"   "sivi"  "sivin")
                , (10, \c → case c of
-                             CtxMulR (Lit n) _ | n < 9 → "polo"
-                             _ → "folo"
+                             CtxMul _ (Lit n) _
+                                 | n < 9 → "polo"
+                             _           → "folo"
                  )
                , (100, \c → case c of
-                              CtxMulR {} → "jato"
-                              _          → "zato"
+                              CtxMul {} → "jato"
+                              _         → "zato"
                  )
                , (1000, const "arivo")
                , (dec 4, const "alina")
@@ -116,6 +116,6 @@ cardinalRepr = textify defaultRepr
                ]
 
       mulForms o t h = \c → case c of
-                              CtxMulL (Lit 10) _  → t
-                              CtxMulL (Lit 100) _ → h
-                              _                   → o
+                              CtxMul _ (Lit 10)  _ → t
+                              CtxMul _ (Lit 100) _ → h
+                              _                    → o

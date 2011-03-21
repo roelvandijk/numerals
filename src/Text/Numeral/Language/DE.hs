@@ -91,35 +91,35 @@ cardinalRepr = textify defaultRepr
       symMap = M.fromList
                [ (0, const "null")
                , (1, \c → case c of
-                            CtxAddL {}      → "ein"
-                            CtxMulL (Lit n) _
-                                | n ≥ dec 6 → "eine"
-                                | n ≥ 100   → "ein"
-                            _               → "eins"
+                            CtxAdd {}        → "ein"
+                            CtxMul _ (Lit n) _
+                                | n ≥ dec 6  → "eine"
+                                | n ≥ 100    → "ein"
+                            _                → "eins"
                  )
                , (2, \c → case c of
-                            CtxMulL (Lit 10) _ → "zwan"
-                            _                  → "zwei"
+                            CtxMul _ (Lit 10) _ → "zwan"
+                            _                   → "zwei"
                  )
                , (3, const "drei")
                , (4, const "vier")
                , (5, const "fünf")
                , (6, \c → case c of
-                            CtxAddL (Lit 10) _ → "sech"
-                            CtxMulL (Lit 10) _ → "sech"
-                            _                  → "sechs"
+                            CtxAdd _ (Lit 10) _ → "sech"
+                            CtxMul _ (Lit 10) _ → "sech"
+                            _                   → "sechs"
                  )
                , (7, \c → case c of
-                            CtxAddL (Lit 10) _ → "sieb"
-                            CtxMulL (Lit 10) _ → "sieb"
-                            _                  → "sieben"
+                            CtxAdd _ (Lit 10) _ → "sieb"
+                            CtxMul _ (Lit 10) _ → "sieb"
+                            _                   → "sieben"
                  )
                , (8, const "acht")
                , (9, const "neun")
                , (10, \c → case c of
-                             CtxMulR (Lit 3) _ → "ßig"
-                             CtxMulR (Lit _) _ → "zig"
-                             _                 → "zehn"
+                             CtxMul _ (Lit 3) _ → "ßig"
+                             CtxMul _ (Lit _) _ → "zig"
+                             _                  → "zehn"
                  )
                , (11, const "elf")
                , (12, const "zwölf")
@@ -135,13 +135,13 @@ pelletierRepr =
       "illiarde" "illiarde"
       [ (8, BN.forms "okt" "okto" "okto" "okto" "oktin")
       , (10, \c → case c of
-                    CtxAddL (Lit 100) _             → "dezi"
-                    CtxMulR _ (CtxAddL (Lit 100) _) → "ginta"
-                    CtxMulR {}                      → "gint"
-                    _                               → "dez"
+                    CtxAdd _ (Lit 100) _              → "dezi"
+                    CtxMul _ _ (CtxAdd _ (Lit 100) _) → "ginta"
+                    CtxMul {}                         → "gint"
+                    _                                 → "dez"
         )
       , (100, \c → case c of
-                     CtxMulR (Lit n) _
+                     CtxMul _ (Lit n) _
                          | n ∈ [2,3,6] → "zent"
                          | otherwise   → "gent"
                      _                 → "zent"

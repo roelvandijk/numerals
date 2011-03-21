@@ -35,13 +35,14 @@ import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integral, Integer )
+import Prelude       ( Integral, (-), Integer )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
 
 -- from numerals:
 import Text.Numeral
+import Text.Numeral.Misc ( dec )
 import qualified Text.Numeral.Exp.Classes as C
 import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, pelletierRepr )
 
@@ -75,17 +76,13 @@ pelletierScaleStruct ∷ ( Integral α, C.Scale α
 pelletierScaleStruct = pos $ fix $ rule `combine` pelletierScale1 R L BN.rule
 
 rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
-rule = findRule (   0, lit          )
-              [ (  13, add    10 L  )
-              , (  20, mul    10 R L)
-              , ( 100, lit1         )
-              , ( 101, add   100 R  )
-              , ( 200, mul1  100 R L)
-              , (1000, lit1         )
-              , (1001, add  1000 R  )
-              , (2000, mul1 1000 R L)
+rule = findRule (   0, lit       )
+              [ (  13, add 10 L  )
+              , (  20, mul 10 R L)
+              , ( 100, step1  100   10 R L)
+              , (1000, step1 1000 1000 R L)
               ]
-               999999
+                (dec 6 - 1)
 
 us_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 us_cardinalRepr = textify $ cardinalRepr (⊞)

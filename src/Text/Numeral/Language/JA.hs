@@ -36,7 +36,7 @@ module Text.Numeral.Language.JA
 -- from base:
 import Control.Monad ( (>=>) )
 import Data.Function ( ($), const, fix )
-import Data.List     ( take )
+import Data.List     ( map )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
@@ -44,7 +44,6 @@ import Prelude       ( Num, Integral, (-) )
 
 -- from base-unicode-symbols:
 import Data.Monoid.Unicode ( (⊕) )
-import Prelude.Unicode     ( (⋅) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
@@ -68,17 +67,13 @@ Sources:
 struct ∷ (Integral α, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → Maybe β
 struct = pos
        $ fix
-       $ findRule (   0, lit         )
-              ( [ (  11, add   10 R  )
-                , (  20, mul   10 R L)
-                , ( 100, lit         )
-                , ( 101, add  100 R  )
-                , ( 200, mul  100 R L)
-                , (1000, lit         )
-                , (1001, add 1000 R  )
-                , (2000, mul 1000 R L)
+       $ findRule (   0, lit             )
+              ( [ (  11, add    10    R  )
+                , (  20, mul    10    R L)
+                , ( 100, step  100 10 R L)
+                , (1000, step 1000 10 R L)
                 ]
-              ⊕ take (3 ⋅ 17) (scale1Rules 4 R L)
+              ⊕ [ (n, step1 n (dec 4) R L) | n ← map dec [4,8..68] ]
               )
              (dec 72 - 1)
 

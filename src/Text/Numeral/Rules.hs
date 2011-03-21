@@ -21,7 +21,7 @@ module Text.Numeral.Rules
   , shortScale,  longScale,  pelletierScale
   , shortScale1, longScale1, pelletierScale1
 
-  , scaleRules, scale1Rules
+  , step, step1
   ) where
 
 
@@ -35,11 +35,11 @@ import Control.Monad       ( (>>=) )
 import Data.Bool           ( Bool, otherwise )
 import Data.Function       ( ($), id, const, flip, fix )
 import Data.Functor        ( (<$>) )
-import Data.List           ( foldr, concatMap )
+import Data.List           ( foldr )
 import Data.Maybe          ( Maybe(Nothing, Just) )
 import Data.Ord            ( Ord, (<), (>) )
 import Prelude             ( Integral, fromIntegral
-                           , Num, (+), (-), abs, divMod, div, even
+                           , Num, (-), abs, divMod, div, even
                            )
 
 -- from base-unicode-symbols:
@@ -50,7 +50,7 @@ import Prelude.Unicode       ( (⋅) )
 -- from numerals:
 import qualified Text.Numeral.Exp.Classes as C
 import Text.Numeral.Exp ( Side(L, R) )
-import Text.Numeral.Misc ( dec, intLog )
+import Text.Numeral.Misc ( intLog )
 
 -- from fingertree:
 import qualified Data.IntervalMap.FingerTree as FT
@@ -149,6 +149,24 @@ mul1 val aSide mSide =
 sub ∷ (Integral α, C.Sub β) ⇒ α → Rule α β
 sub val = \f n → liftA2 C.sub (f $ val - n) (f val)
 
+step ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
+     ⇒ α → α → Side → Side → Rule α β
+step val r aSide mSide
+     f n | n < val   = Nothing
+         | n ≡ val   = lit                 f n
+         | n < val⋅2 = add val aSide       f n
+         | n < val⋅r = mul val aSide mSide f n
+         | otherwise = Nothing
+
+step1 ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
+      ⇒ α → α → Side → Side → Rule α β
+step1 val r aSide mSide
+     f n | n < val   = Nothing
+         | n ≡ val   = lit1                 f n
+         | n < val⋅2 = add  val aSide       f n
+         | n < val⋅r = mul1 val aSide mSide f n
+         | otherwise = Nothing
+
 -- See: http://en.wikipedia.org/wiki/Names_of_large_numbers
 mulScale ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)
          ⇒ α → α → Side → Side → Rule α β → Rule α β
@@ -233,24 +251,3 @@ mkIntervalMap ∷ (Ord v) ⇒ [((v, v), α)] → FT.IntervalMap v α
 mkIntervalMap = foldr ins FT.empty
   where ins ((lo, hi), n) = FT.insert (FT.Interval lo hi) n
 
-scaleRules ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
-           ⇒ α → Side → Side → [(α, Rule α β)]
-scaleRules g aSide mSide = concatMap step [g, 2⋅g ..]
-    where
-      step n = [ (s,   lit)
-               , (s+1, add s aSide)
-               , (2⋅s, mul s aSide mSide)
-               ]
-          where
-            s = dec n
-
-scale1Rules ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
-            ⇒ α → Side → Side → [(α, Rule α β)]
-scale1Rules g aSide mSide = concatMap step [g, 2⋅g ..]
-    where
-      step n = [ (s,   lit1)
-               , (s+1, add s aSide)
-               , (2⋅s, mul1 s aSide mSide)
-               ]
-          where
-            s = dec n

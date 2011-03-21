@@ -64,15 +64,11 @@ struct ∷ ( Integral α, C.Scale α
        ⇒ α → Maybe β
 struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
     where
-      rule = findRule (   0, lit         )
-                    [ (  13, add   10   L)
-                    , (  20, mul   10 L L)
-                    , ( 100, lit1        )
-                    , ( 101, add  100 R  )
-                    , ( 200, mul1 100 R L)
-                    , (1000, lit         )
-                    , (1001, add 1000 R  )
-                    , (2000, mul 1000 R L)
+      rule = findRule (   0, lit       )
+                    [ (  13, add 10 L  )
+                    , (  20, mul 10 L L)
+                    , ( 100, step1 100   10 R L)
+                    , (1000, step 1000 1000 R L)
                     ]
                       (dec 6 - 1)
 

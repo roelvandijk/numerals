@@ -61,18 +61,14 @@ struct ∷ ( Integral α, C.Scale α
        ⇒ α → Maybe β
 struct = pos (fix $ rule `combine` longScale R L BN.rule)
     where
-      rule = findRule (   0, lit         )
-                    [ (  11, add   10 L  )
-                    , (  16, add   10 R  )
-                    , (  20, lit         )
-                    , (  21, add   20 R  )
-                    , (  30, mul   10 R L)
-                    , ( 100, lit         )
-                    , ( 101, add  100 R  )
-                    , ( 200, mul  100 R L)
-                    , (1000, lit         )
-                    , (1001, add 1000 R  )
-                    , (2000, mul 1000 R L)
+      rule = findRule (   0, lit       )
+                    [ (  11, add 10 L  )
+                    , (  16, add 10 R  )
+                    , (  20, lit       )
+                    , (  21, add 20 R  )
+                    , (  30, mul 10 R L)
+                    , ( 100, step  100   10 R L)
+                    , (1000, step 1000 1000 R L)
                     ]
                     (dec 6 - 1)
 

@@ -49,12 +49,9 @@ cardinal = struct >=> cardinalRepr
 struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ α → Maybe β
 struct = checkPos
        $ fix
-       $ findRule (  0, lit        )
-                [ ( 11, add  10 R  )
-                , ( 20, mul  10 R L)
-                , (100, lit        )
-                , (101, add 100 R  )
-                , (200, mul 100 R L)
+       $ findRule (  0, lit            )
+                [ ( 11, step 10  10 R L)
+                , (100, step 100 10 R L)
                 ]
                   1000
 

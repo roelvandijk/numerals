@@ -26,15 +26,12 @@ module Text.Numeral.Language.MG
 -- from base:
 import Control.Monad ( (>=>) )
 import Data.Function ( ($), const, fix )
-import Data.List     ( concat, map )
+import Data.List     ( map )
 import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.Ord      ( (<) )
 import Data.String   ( IsString )
-import Prelude       ( Integral, (+), (-) )
-
--- from base-unicode-symobls:
-import Prelude.Unicode ( (⋅) )
+import Prelude       ( Integral, (-) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
@@ -62,13 +59,7 @@ struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ α → Maybe β
 struct = checkPos
        $ fix
        $ findRule (0, lit)
-                  (concat [ [ (  n  , lit)
-                            , (  n+1, add n L)
-                            , (2⋅n  , mul n L L)
-                            ]
-                          | n ← map dec [1..6]
-                          ]
-                  )
+                  [(n, step n 10 L L) | n ← map dec [1..6]]
                   (dec 7 - 1)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s

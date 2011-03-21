@@ -11,9 +11,6 @@ module Text.Numeral.Language.GV.TestData (cardinals) where
 import Data.String ( IsString )
 import Prelude     ( Integral )
 
--- from numerals:
-import Text.Numeral.Misc ( dec )
-
 
 --------------------------------------------------------------------------------
 -- GV

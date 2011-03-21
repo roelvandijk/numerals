@@ -74,12 +74,8 @@ struct = pos $ fix $ rule `combine` pelletierScale1 R L BN.rule
                     , (  70, add   60 R  )
                     , (  80, mul   20 R L)
                     , (  89, add   80 R  )
-                    , ( 100, lit         )
-                    , ( 101, add  100 R  )
-                    , ( 200, mul  100 R L)
-                    , (1000, lit         )
-                    , (1001, add 1000 R  )
-                    , (2000, mul 1000 R L)
+                    , ( 100, step  100   10 R L)
+                    , (1000, step 1000 1000 R L)
                     ]
                       (dec 6 - 1)
 

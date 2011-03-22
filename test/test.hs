@@ -71,8 +71,8 @@ import qualified Text.Numeral.Language.NO           as NO  ( cardinal  )
 import qualified Text.Numeral.Language.NO.TestData  as NO  ( cardinals )
 import qualified Text.Numeral.Language.NQM          as NQM ( cardinal  )
 import qualified Text.Numeral.Language.NQM.TestData as NQM ( cardinals )
-import qualified Text.Numeral.Language.PAA          as PAA ( cardinal  )
-import qualified Text.Numeral.Language.PAA.TestData as PAA ( cardinals )
+-- import qualified Text.Numeral.Language.PAA          as PAA ( cardinal  )
+-- import qualified Text.Numeral.Language.PAA.TestData as PAA ( cardinals )
 import qualified Text.Numeral.Language.PT           as PT  ( cardinal  )
 import qualified Text.Numeral.Language.PT.TestData  as PT  ( cardinals )
 import qualified Text.Numeral.Language.SCO          as SCO ( cardinal  )
@@ -141,7 +141,7 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "NL"  [mkTests "cardinal" NL.cardinal  NL.cardinals]
         , testGroup "NO"  [mkTests "cardinal" NO.cardinal  NO.cardinals]
         , testGroup "NQM" [mkTests "cardinal" NQM.cardinal NQM.cardinals]
-        , testGroup "PAA" [mkTests "cardinal" PAA.cardinal PAA.cardinals]
+        -- , testGroup "PAA" [mkTests "cardinal" PAA.cardinal PAA.cardinals]
         , testGroup "PT"  [mkTests "cardinal" PT.cardinal  PT.cardinals]
         , testGroup "SCO" [mkTests "cardinal" SCO.cardinal SCO.cardinals]
         , testGroup "SV"  [mkTests "cardinal" SV.cardinal  SV.cardinals]

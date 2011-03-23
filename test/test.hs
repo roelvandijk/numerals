@@ -79,6 +79,8 @@ import qualified Text.Numeral.Language.SCO          as SCO ( cardinal  )
 import qualified Text.Numeral.Language.SCO.TestData as SCO ( cardinals )
 import qualified Text.Numeral.Language.SV           as SV  ( cardinal  )
 import qualified Text.Numeral.Language.SV.TestData  as SV  ( cardinals )
+import qualified Text.Numeral.Language.WO           as WO  ( cardinal  )
+import qualified Text.Numeral.Language.WO.TestData  as WO  ( cardinals )
 import qualified Text.Numeral.Language.YOR          as YOR ( cardinal  )
 import qualified Text.Numeral.Language.YOR.TestData as YOR ( cardinals )
 
@@ -145,5 +147,6 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "PT"  [mkTests "cardinal" PT.cardinal  PT.cardinals]
         , testGroup "SCO" [mkTests "cardinal" SCO.cardinal SCO.cardinals]
         , testGroup "SV"  [mkTests "cardinal" SV.cardinal  SV.cardinals]
+        , testGroup "WO"  [mkTests "cardinal" WO.cardinal  WO.cardinals]
         , testGroup "YOR" [mkTests "cardinal" YOR.cardinal YOR.cardinals]
         ]

@@ -38,6 +38,7 @@ import qualified Text.Numeral.Language.PT  as PT
 import qualified Text.Numeral.Language.SV  as SV
 import qualified Text.Numeral.Language.WO  as WO
 import qualified Text.Numeral.Language.YOR as YOR
+import qualified Text.Numeral.Language.ZH  as ZH
 
 import qualified Text.Numeral.BigNum as BN
 
@@ -46,20 +47,20 @@ import qualified Text.Numeral.BigNum as BN
 -- Debug and test stuff
 --------------------------------------------------------------------------------
 
-test ∷ (Integer → Maybe Exp) → (Exp → Maybe String) → [Integer] → IO ()
-test struct repr xs =
+test ∷ (Integer → Maybe Exp) → (Integer → Maybe String) → [Integer] → IO ()
+test struct num xs =
     forM_ xs $ \x → do putStr $ (show x) ⊕ " - "
                        case struct x of
                          Nothing → putStrLn "error"
                          Just e → do putStr $ show e
                                      putStr " - "
-                                     putStrLn $ fromMaybe "error" (repr e)
+                                     putStrLn $ fromMaybe "error" (num x)
 
 -- | Like 'test' but doesn't print the numbers that are converted.
-test2 ∷ (Integer → Maybe Exp) → (Exp → Maybe String) → [Integer] → IO ()
-test2 struct repr xs =
+test2 ∷ (Integer → Maybe Exp) → (Integer → Maybe String) → [Integer] → IO ()
+test2 struct num xs =
     forM_ xs $ \x → case struct x of
                       Nothing → putStrLn "error"
                       Just e → do putStr $ show e
                                   putStr " - "
-                                  putStrLn $ fromMaybe "error" (repr e)
+                                  putStrLn $ fromMaybe "error" (num x)

@@ -53,14 +53,16 @@ import qualified Text.Numeral.Language.GV           as GV  ( cardinal  )
 import qualified Text.Numeral.Language.GV.TestData  as GV  ( cardinals )
 import qualified Text.Numeral.Language.IT           as IT  ( cardinal  )
 import qualified Text.Numeral.Language.IT.TestData  as IT  ( cardinals )
-import qualified Text.Numeral.Language.JA           as JA  ( preferred_cardinal
-                                                           , kanji_cardinal
-                                                           , daiji_cardinal
-                                                           )
-import qualified Text.Numeral.Language.JA.TestData  as JA  ( preferred_cardinals
-                                                           , kanji_cardinals
-                                                           , daiji_cardinals
-                                                           )
+import qualified Text.Numeral.Language.JA           as JA
+    ( preferred_cardinal
+    , kanji_cardinal
+    , daiji_cardinal
+    )
+import qualified Text.Numeral.Language.JA.TestData  as JA
+    ( preferred_cardinals
+    , kanji_cardinals
+    , daiji_cardinals
+    )
 import qualified Text.Numeral.Language.LA           as LA  ( cardinal  )
 import qualified Text.Numeral.Language.LA.TestData  as LA  ( cardinals )
 import qualified Text.Numeral.Language.MG           as MG  ( cardinal  )
@@ -83,7 +85,20 @@ import qualified Text.Numeral.Language.WO           as WO  ( cardinal  )
 import qualified Text.Numeral.Language.WO.TestData  as WO  ( cardinals )
 import qualified Text.Numeral.Language.YOR          as YOR ( cardinal  )
 import qualified Text.Numeral.Language.YOR.TestData as YOR ( cardinals )
-
+import qualified Text.Numeral.Language.ZH           as ZH
+    ( trad_cardinal
+    , simpl_cardinal
+    , finance_trad_cardinal
+    , finance_simpl_cardinal
+    , pinyin_cardinal
+    )
+import qualified Text.Numeral.Language.ZH.TestData  as ZH
+    ( trad_cardinals
+    , simpl_cardinals
+    , finance_trad_cardinals
+    , finance_simpl_cardinals
+    , pinyin_cardinals
+    )
 
 
 --------------------------------------------------------------------------------
@@ -132,7 +147,9 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "IT"  [mkTests "cardinal" IT.cardinal IT.cardinals]
         , testGroup "JA"
           [ testGroup "preferred"
-            [mkTests "cardinal" JA.preferred_cardinal JA.preferred_cardinals]
+            [mkTests "cardinal" JA.preferred_cardinal
+                                JA.preferred_cardinals
+            ]
           , testGroup "kanji"
             [mkTests "cardinal" JA.kanji_cardinal JA.kanji_cardinals]
           , testGroup "daiji"
@@ -149,4 +166,26 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "SV"  [mkTests "cardinal" SV.cardinal  SV.cardinals]
         , testGroup "WO"  [mkTests "cardinal" WO.cardinal  WO.cardinals]
         , testGroup "YOR" [mkTests "cardinal" YOR.cardinal YOR.cardinals]
+        , testGroup "ZH"
+          [ testGroup "characters (traditional)"
+            [mkTests "cardinal" ZH.trad_cardinal
+                                ZH.trad_cardinals
+            ]
+          , testGroup "characters (simplified)"
+            [mkTests "cardinal" ZH.simpl_cardinal
+                                ZH.simpl_cardinals
+            ]
+          , testGroup "financial characters (traditional)"
+            [mkTests "cardinal" ZH.finance_trad_cardinal
+                                ZH.finance_trad_cardinals
+            ]
+          , testGroup "financial characters (simplified)"
+            [mkTests "cardinal" ZH.finance_simpl_cardinal
+                                ZH.finance_simpl_cardinals
+            ]
+          , testGroup "pinyin"
+            [mkTests "cardinal" ZH.pinyin_cardinal
+                                ZH.pinyin_cardinals
+            ]
+          ]
         ]

@@ -9,14 +9,16 @@ module Text.Numeral.Language.NL.TestData (cardinals) where
 
 -- from base:
 import Data.String ( IsString )
-import Prelude     ( Num )
+import Prelude     ( Integral )
 
+-- from numerals:
+import Text.Numeral.Misc ( dec )
 
 --------------------------------------------------------------------------------
 -- NL
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
 cardinals =
   [ (0, "nul")
   , (1, "een")
@@ -119,4 +121,19 @@ cardinals =
   , (98, "achtennegentig")
   , (99, "negenennegentig")
   , (100, "honderd")
+  , (101, "honderdeen")
+  , (115, "honderdvijftien")
+  , (500, "vijfhonderd")
+  , (999, "negenhonderdnegenennegentig")
+  , (1000, "duizend")
+  , (8000, "achtduizend")
+  , (900000, "negenhonderdduizend")
+  , (dec 6, "miljoen")
+  , (dec 9, "miljard")
+  , (dec 12, "biljoen")
+  , (dec 15, "biljard")
+  , (dec 18, "triljoen")
+  , (dec 21, "triljard")
+  , (dec 24, "quadriljoen")
+  , (dec 27, "quadriljard")
   ]

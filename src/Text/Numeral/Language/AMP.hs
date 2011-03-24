@@ -15,7 +15,6 @@
 module Text.Numeral.Language.AMP
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -71,7 +70,7 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = (⊞)
                , reprMul   = \_ _ → Just " "
                }
@@ -79,15 +78,16 @@ cardinalRepr = textify defaultRepr
       Lit 2 ⊞ Lit _ = Just "i"
       _     ⊞ _     = Just "i "
 
-      symMap = M.fromList
-               [ (1,  const "rpat")
-               , (2,  const "hosf")
-               , (5,  \c → case c of
-                             CtxMul L _ _ → "tir"
-                             _            → "tir yohtt"
-                 )
-               , (20, \c → case c of
-                             CtxMul L _ _ → "yima"
-                             _            → "yima yohtt"
-                 )
-               ]
+      syms =
+          M.fromList
+          [ (1,  const "rpat")
+          , (2,  const "hosf")
+          , (5,  \c → case c of
+                        CtxMul L _ _ → "tir"
+                        _            → "tir yohtt"
+            )
+          , (20, \c → case c of
+                        CtxMul L _ _ → "yima"
+                        _            → "yima yohtt"
+            )
+          ]

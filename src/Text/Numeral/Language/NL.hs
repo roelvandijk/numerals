@@ -15,7 +15,6 @@
 module Text.Numeral.Language.NL
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 --------------------------------------------------------------------------------
@@ -68,7 +67,7 @@ rule = findRule (   0, lit               )
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprScale = BN.pelletierRepr "iljoen" "iljoen"
                                               "iljard" "iljard"
                                               []
@@ -81,34 +80,35 @@ cardinalRepr = textify defaultRepr
       Lit n ⊞ _ | n ∈ [2,3]  = Just "ën"
                 | n < 10     = Just "en"
                 | otherwise  = Just ""
-      _     ⊞ _              = Just " "
+      _     ⊞ _              = Just ""
 
-      symMap = M.fromList
-               [ (0, const "nul")
-               , (1, const "een")
-               , (2, ten   "twee" "twin")
-               , (3, ten   "drie" "der")
-               , (4, ten   "vier" "veer")
-               , (5, const "vijf")
-               , (6, const "zes")
-               , (7, const "zeven")
-               , (8, \c → case c of
-                            CtxMul {}          → "tach"
-                            CtxAdd _ (Lit _) _ → "ach"
-                            _                  → "acht"
-                 )
-               , (9, const "negen")
-               , (10, \c → case c of
-                             CtxMul {} → "tig"
-                             _         → "tien"
-                 )
-               , (11, const "elf")
-               , (12, const "twaalf")
-               , (100, const "honderd")
-               , (1000, const "duizend")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "nul")
+          , (1, const "een")
+          , (2, tenForms "twee" "twin")
+          , (3, tenForms "drie" "der")
+          , (4, tenForms "vier" "veer")
+          , (5, const "vijf")
+          , (6, const "zes")
+          , (7, const "zeven")
+          , (8, \c → case c of
+                       CtxMul _ (Lit 10) _ → "tach"
+                       CtxAdd _ (Lit _)  _ → "ach"
+                       _                   → "acht"
+            )
+          , (9, const "negen")
+          , (10, \c → case c of
+                        CtxMul {} → "tig"
+                        _         → "tien"
+            )
+          , (11, const "elf")
+          , (12, const "twaalf")
+          , (100, const "honderd")
+          , (1000, const "duizend")
+          ]
 
-      ten n t ctx = case ctx of
-                      CtxMul {}          → t
-                      CtxAdd _ (Lit _) _ → t
-                      _                  → n
+      tenForms n t ctx = case ctx of
+                           CtxMul _ (Lit 10) _ → t
+                           CtxAdd _ (Lit _)  _ → t
+                           _                   → n

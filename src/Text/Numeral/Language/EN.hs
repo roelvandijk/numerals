@@ -14,13 +14,11 @@
 
 module Text.Numeral.Language.EN
     ( uk_cardinal
+    , ukPelletier_cardinal
     , us_cardinal
     , shortScaleStruct
     , longScaleStruct
     , pelletierScaleStruct
-    , uk_cardinalRepr
-    , ukPelletier_cardinalRepr
-    , us_cardinalRepr
     ) where
 
 --------------------------------------------------------------------------------
@@ -52,10 +50,24 @@ import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, pelletierRepr )
 --------------------------------------------------------------------------------
 
 uk_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
-uk_cardinal = shortScaleStruct >=> uk_cardinalRepr
+uk_cardinal = shortScaleStruct >=> textify uk_cardinalRepr'
+
+ukPelletier_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α)
+                     ⇒ α → Maybe s
+ukPelletier_cardinal =
+    pelletierScaleStruct >=> textify uk_cardinalRepr'
+                             { reprScale = pelletierRepr }
+  where
+    pelletierRepr = BN.pelletierRepr "illion"  "illion"
+                                     "illiard" "illiard"
+                                     []
 
 us_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
-us_cardinal = shortScaleStruct >=> us_cardinalRepr
+us_cardinal = shortScaleStruct >=> textify (cardinalRepr (⊞))
+  where
+    (_ `Mul` Lit 10) ⊞ _ = Just "-"
+    (_ `Mul` _     ) ⊞ _ = Just " "
+    _                ⊞ _ = Just ""
 
 shortScaleStruct ∷ ( Integral α, C.Scale α
                    , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
@@ -84,13 +96,6 @@ rule = findRule (   0, lit       )
               ]
                 (dec 6 - 1)
 
-us_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-us_cardinalRepr = textify $ cardinalRepr (⊞)
-  where
-    (_ `Mul` Lit 10) ⊞ _ = Just "-"
-    (_ `Mul` _     ) ⊞ _ = Just " "
-    _                ⊞ _ = Just ""
-
 uk_cardinalRepr' ∷ (Monoid s, IsString s) ⇒ Repr s
 uk_cardinalRepr' = cardinalRepr (⊞)
   where
@@ -100,21 +105,10 @@ uk_cardinalRepr' = cardinalRepr (⊞)
         | otherwise                = Just " "
     _ ⊞ _ = Just ""
 
-uk_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-uk_cardinalRepr = textify $ uk_cardinalRepr'
-
-ukPelletier_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-ukPelletier_cardinalRepr = textify uk_cardinalRepr'
-                                   { reprScale = pelletierRepr }
-    where
-      pelletierRepr = BN.pelletierRepr "illion"  "illion"
-                                       "illiard" "illiard"
-                                       []
-
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Maybe s) → Repr s
 cardinalRepr f =
     defaultRepr
-    { reprValue = \n → M.lookup n symMap
+    { reprValue = \n → M.lookup n syms
     , reprScale = BN.scaleRepr "illion" "illion" []
     , reprAdd   = f
     , reprMul   = (⊞)
@@ -124,27 +118,28 @@ cardinalRepr f =
       _ ⊞ (Lit 10) = Just ""
       _ ⊞ _        = Just " "
 
-      symMap = M.fromList
-               [ (0, const "zero")
-               , (1, const "one")
-               , (2, ten   "two"   "two"  "twen")
-               , (3, ten   "three" "thir" "thir")
-               , (4, ten   "four"  "four" "for")
-               , (5, ten   "five"  "fif"  "fif")
-               , (6, const "six")
-               , (7, const "seven")
-               , (8, ten   "eight" "eigh" "eigh")
-               , (9, const "nine")
-               , (10, \c → case c of
-                             CtxAdd _ (Lit _) _ → "teen"
-                             CtxMul R _       _ → "ty"
-                             _                  → "ten"
-                 )
-               , (11,   const "eleven")
-               , (12,   const "twelve")
-               , (100,  const "hundred")
-               , (1000, const "thousand")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "zero")
+          , (1, const "one")
+          , (2, ten   "two"   "two"  "twen")
+          , (3, ten   "three" "thir" "thir")
+          , (4, ten   "four"  "four" "for")
+          , (5, ten   "five"  "fif"  "fif")
+          , (6, const "six")
+          , (7, const "seven")
+          , (8, ten   "eight" "eigh" "eigh")
+          , (9, const "nine")
+          , (10, \c → case c of
+                        CtxAdd _ (Lit _) _ → "teen"
+                        CtxMul R _       _ → "ty"
+                        _                  → "ten"
+            )
+          , (11,   const "eleven")
+          , (12,   const "twelve")
+          , (100,  const "hundred")
+          , (1000, const "thousand")
+          ]
 
       ten ∷ s → s → s → Ctx Exp → s
       ten n a m = \c → case c of

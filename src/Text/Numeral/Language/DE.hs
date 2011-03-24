@@ -15,7 +15,6 @@
 module Text.Numeral.Language.DE
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -74,7 +73,7 @@ struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprScale = pelletierRepr
                , reprAdd   = (⊞)
                , reprMul   = \_ _ → Just ""
@@ -84,44 +83,45 @@ cardinalRepr = textify defaultRepr
       _ ⊞ (_ `Mul` Lit 10) = Just "und"
       _ ⊞ _                = Just ""
 
-      symMap = M.fromList
-               [ (0, const "null")
-               , (1, \c → case c of
-                            CtxAdd {}        → "ein"
-                            CtxMul _ (Lit n) _
-                                | n ≥ dec 6  → "eine"
-                                | n ≥ 100    → "ein"
-                            _                → "eins"
-                 )
-               , (2, \c → case c of
-                            CtxMul _ (Lit 10) _ → "zwan"
-                            _                   → "zwei"
-                 )
-               , (3, const "drei")
-               , (4, const "vier")
-               , (5, const "fünf")
-               , (6, \c → case c of
-                            CtxAdd _ (Lit 10) _ → "sech"
-                            CtxMul _ (Lit 10) _ → "sech"
-                            _                   → "sechs"
-                 )
-               , (7, \c → case c of
-                            CtxAdd _ (Lit 10) _ → "sieb"
-                            CtxMul _ (Lit 10) _ → "sieb"
-                            _                   → "sieben"
-                 )
-               , (8, const "acht")
-               , (9, const "neun")
-               , (10, \c → case c of
-                             CtxMul _ (Lit 3) _ → "ßig"
-                             CtxMul _ (Lit _) _ → "zig"
-                             _                  → "zehn"
-                 )
-               , (11, const "elf")
-               , (12, const "zwölf")
-               , (100, const "hundert")
-               , (1000, const "tausend")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "null")
+          , (1, \c → case c of
+                       CtxAdd {}        → "ein"
+                       CtxMul _ (Lit n) _
+                           | n ≥ dec 6  → "eine"
+                           | n ≥ 100    → "ein"
+                       _                → "eins"
+            )
+          , (2, \c → case c of
+                       CtxMul _ (Lit 10) _ → "zwan"
+                       _                   → "zwei"
+            )
+          , (3, const "drei")
+          , (4, const "vier")
+          , (5, const "fünf")
+          , (6, \c → case c of
+                       CtxAdd _ (Lit 10) _ → "sech"
+                       CtxMul _ (Lit 10) _ → "sech"
+                       _                   → "sechs"
+            )
+          , (7, \c → case c of
+                       CtxAdd _ (Lit 10) _ → "sieb"
+                       CtxMul _ (Lit 10) _ → "sieb"
+                       _                   → "sieben"
+            )
+          , (8, const "acht")
+          , (9, const "neun")
+          , (10, \c → case c of
+                        CtxMul _ (Lit 3) _ → "ßig"
+                        CtxMul _ (Lit _) _ → "zig"
+                        _                  → "zehn"
+            )
+          , (11, const "elf")
+          , (12, const "zwölf")
+          , (100, const "hundert")
+          , (1000, const "tausend")
+          ]
 
 pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s

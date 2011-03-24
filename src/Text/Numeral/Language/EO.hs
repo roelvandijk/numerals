@@ -15,7 +15,6 @@
 module Text.Numeral.Language.EO
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -57,23 +56,24 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = \_ _ → Just " "
                , reprMul   = \_ _ → Just ""
                }
     where
-      symMap = M.fromList
-               [ (0, const "nul")
-               , (1, const "unu")
-               , (2, const "du")
-               , (3, const "tri")
-               , (4, const "kvar")
-               , (5, const "kvin")
-               , (6, const "ses")
-               , (7, const "sep")
-               , (8, const "ok")
-               , (9, const "naŭ")
-               , (10, const "dek")
-               , (100, const "cent")
-               , (1000, const "mil")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "nul")
+          , (1, const "unu")
+          , (2, const "du")
+          , (3, const "tri")
+          , (4, const "kvar")
+          , (5, const "kvin")
+          , (6, const "ses")
+          , (7, const "sep")
+          , (8, const "ok")
+          , (9, const "naŭ")
+          , (10, const "dek")
+          , (100, const "cent")
+          , (1000, const "mil")
+          ]

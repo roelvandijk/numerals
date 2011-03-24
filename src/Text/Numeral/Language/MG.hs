@@ -15,7 +15,6 @@
 module Text.Numeral.Language.MG
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -64,7 +63,7 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
                }
@@ -77,34 +76,35 @@ cardinalRepr = textify defaultRepr
       _ ⊡ Lit 100 = Just ""
       _ ⊡ _       = Just " "
 
-      symMap = M.fromList
-               [ (0, const "haotra")
-               , (1, \c → case c of
-                            CtxAdd {} → "iraika"
-                            _         → "iray"
-                 )
-               , (2, mulForms "roa"    "roa"   "roan")
-               , (3, mulForms "telo"   "telo"  "telon")
-               , (4, mulForms "efatra" "efa"   "efa"  )
-               , (5, mulForms "dimy"   "dimam" "diman")
-               , (6, mulForms "enina"  "enim"  "enin" )
-               , (7, mulForms "fito"   "fito"  "fiton")
-               , (8, mulForms "valo"   "valo"  "valon")
-               , (9, mulForms "sivy"   "sivi"  "sivin")
-               , (10, \c → case c of
-                             CtxMul _ (Lit n) _
-                                 | n < 9 → "polo"
-                             _           → "folo"
-                 )
-               , (100, \c → case c of
-                              CtxMul {} → "jato"
-                              _         → "zato"
-                 )
-               , (1000, const "arivo")
-               , (dec 4, const "alina")
-               , (dec 5, const "hetsy")
-               , (dec 6, const "tapitrisa")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "haotra")
+          , (1, \c → case c of
+                       CtxAdd {} → "iraika"
+                       _         → "iray"
+            )
+          , (2, mulForms "roa"    "roa"   "roan")
+          , (3, mulForms "telo"   "telo"  "telon")
+          , (4, mulForms "efatra" "efa"   "efa"  )
+          , (5, mulForms "dimy"   "dimam" "diman")
+          , (6, mulForms "enina"  "enim"  "enin" )
+          , (7, mulForms "fito"   "fito"  "fiton")
+          , (8, mulForms "valo"   "valo"  "valon")
+          , (9, mulForms "sivy"   "sivi"  "sivin")
+          , (10, \c → case c of
+                        CtxMul _ (Lit n) _
+                            | n < 9 → "polo"
+                        _           → "folo"
+            )
+          , (100, \c → case c of
+                         CtxMul {} → "jato"
+                         _         → "zato"
+            )
+          , (1000, const "arivo")
+          , (dec 4, const "alina")
+          , (dec 5, const "hetsy")
+          , (dec 6, const "tapitrisa")
+          ]
 
       mulForms o t h = \c → case c of
                               CtxMul _ (Lit 10)  _ → t

@@ -15,7 +15,6 @@
 module Text.Numeral.Language.IT
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -77,7 +76,7 @@ struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprScale = pelletierRepr
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
@@ -94,76 +93,77 @@ cardinalRepr = textify defaultRepr
       _     ⊡ Scale _ _ _    = Just " "
       _     ⊡ _              = Just ""
 
-      symMap = M.fromList
-               [ (0, const "zero")
-               , (1, \c → case c of
-                            CtxAdd _ (Lit 10) _ → "un"
-                            _                   → "uno"
-                 )
-               , (2, \c → case c of
-                            CtxAdd _ (Lit 10) _ → "do"
-                            _                   → "due"
-                 )
-               , (3, \c → case c of
-                            CtxAdd R _        _ → "tré"
-                            CtxMul _ (Lit 10) _ → "tren"
-                            _                   → "tre"
-                 )
-               , (4, \c → case c of
-                            CtxAdd _ (Lit 10) _ → "quattor"
-                            CtxMul _ (Lit 10) _ → "quar"
-                            _                   → "quattro"
-                 )
-               , (5, \c → case c of
-                            CtxAdd _ (Lit 10) _ → "quin"
-                            CtxMul _ (Lit 10) _ → "cinqu"
-                            _                   → "cinque"
-                 )
-               , (6, \c → case c of
-                            CtxAdd _ (Lit 10) _ → "se"
-                            CtxMul _ (Lit 10) _ → "sess"
-                            _                   → "sei"
-                 )
-               , (7, \c → case c of
-                            CtxMul _ (Lit 10) _ → "sett"
-                            _                   → "sette"
-                 )
-               , (8, \c → case c of
-                            CtxMul _ (Lit 10) _ → "ott"
-                            _                   → "otto"
-                 )
-               , (9, \c → case c of
-                            CtxMul _ (Lit 10) _ → "nov"
-                            _                   → "nove"
-                 )
-               , (10, \c → case c of
-                             CtxAdd _ (Lit _) _ → "dici"
-                             -- Last vowel removed because of a
-                             -- phonetic rule:
-                             CtxMul _ (Lit _) (CtxAdd _ (Lit n) _)
-                                 | n ∈ [1,8]    → "t"
-                             CtxMul R (Lit _) _ → "ta"
-                             _                  → "dieci"
-                 )
-               , (20, \c → case c of
-                             CtxAdd _ (Lit n) _
-                                 | n ∈ [1,8]   → "vent"
-                             _                 → "venti"
-                 )
-               , ( 100
-                 , let f c = case c of
-                               CtxAdd _ (Lit 8)                      _  → "cent"
-                               CtxAdd _ (Lit 8 `Mul` Lit 10)         _  → "cent"
-                               CtxAdd _ (Lit 8 `Mul` Lit 10 `Add` _) _  → "cent"
-                               CtxMul _ (Lit _) c2 → f c2
-                               _ → "cento"
-                   in f
-                 )
-               , (1000, \c → case c of
-                               CtxMul {} → "mila"
-                               _         → "mille"
-                 )
-               ]
+      syms =
+          M.fromList
+          [ (0, const "zero")
+          , (1, \c → case c of
+                       CtxAdd _ (Lit 10) _ → "un"
+                       _                   → "uno"
+            )
+          , (2, \c → case c of
+                       CtxAdd _ (Lit 10) _ → "do"
+                       _                   → "due"
+            )
+          , (3, \c → case c of
+                       CtxAdd R _        _ → "tré"
+                       CtxMul _ (Lit 10) _ → "tren"
+                       _                   → "tre"
+            )
+          , (4, \c → case c of
+                       CtxAdd _ (Lit 10) _ → "quattor"
+                       CtxMul _ (Lit 10) _ → "quar"
+                       _                   → "quattro"
+            )
+          , (5, \c → case c of
+                       CtxAdd _ (Lit 10) _ → "quin"
+                       CtxMul _ (Lit 10) _ → "cinqu"
+                       _                   → "cinque"
+            )
+          , (6, \c → case c of
+                       CtxAdd _ (Lit 10) _ → "se"
+                       CtxMul _ (Lit 10) _ → "sess"
+                       _                   → "sei"
+            )
+          , (7, \c → case c of
+                       CtxMul _ (Lit 10) _ → "sett"
+                       _                   → "sette"
+            )
+          , (8, \c → case c of
+                       CtxMul _ (Lit 10) _ → "ott"
+                       _                   → "otto"
+            )
+          , (9, \c → case c of
+                       CtxMul _ (Lit 10) _ → "nov"
+                       _                   → "nove"
+            )
+          , (10, \c → case c of
+                        CtxAdd _ (Lit _) _ → "dici"
+                        -- Last vowel removed because of a
+                        -- phonetic rule:
+                        CtxMul _ (Lit _) (CtxAdd _ (Lit n) _)
+                            | n ∈ [1,8]    → "t"
+                        CtxMul R (Lit _) _ → "ta"
+                        _                  → "dieci"
+            )
+          , (20, \c → case c of
+                        CtxAdd _ (Lit n) _
+                            | n ∈ [1,8]   → "vent"
+                        _                 → "venti"
+            )
+          , ( 100
+            , let f c = case c of
+                          CtxAdd _ (Lit 8)                      _  → "cent"
+                          CtxAdd _ (Lit 8 `Mul` Lit 10)         _  → "cent"
+                          CtxAdd _ (Lit 8 `Mul` Lit 10 `Add` _) _  → "cent"
+                          CtxMul _ (Lit _) c2 → f c2
+                          _ → "cento"
+              in f
+            )
+          , (1000, \c → case c of
+                          CtxMul {} → "mila"
+                          _         → "mille"
+            )
+          ]
 
 pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s

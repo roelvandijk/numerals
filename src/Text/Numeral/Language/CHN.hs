@@ -15,7 +15,6 @@
 module Text.Numeral.Language.CHN
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -58,21 +57,22 @@ rule = findRule (  0, lit           )
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = \_ _ → Just " pe "
                , reprMul   = \_ _ → Just " "
                }
     where
-      symMap = M.fromList
-               [ (1, const "ikt")
-               , (2, const "mokst")
-               , (3, const "klone")
-               , (4, const "lakit")
-               , (5, const "kwinnum")
-               , (6, const "taghum")
-               , (7, const "sinamokst")
-               , (8, const "stotekin")
-               , (9, const "kwaist")
-               , (10, const "tahtlum")
-               , (100, const "tukamonuk")
-               ]
+      syms =
+          M.fromList
+          [ (1, const "ikt")
+          , (2, const "mokst")
+          , (3, const "klone")
+          , (4, const "lakit")
+          , (5, const "kwinnum")
+          , (6, const "taghum")
+          , (7, const "sinamokst")
+          , (8, const "stotekin")
+          , (9, const "kwaist")
+          , (10, const "tahtlum")
+          , (100, const "tukamonuk")
+          ]

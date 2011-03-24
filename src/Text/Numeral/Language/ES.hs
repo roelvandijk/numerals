@@ -15,7 +15,6 @@
 module Text.Numeral.Language.ES
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 -------------------------------------------------------------------------------
@@ -74,7 +73,7 @@ struct = pos (fix $ rule `combine` longScale R L BN.rule)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprScale = longScaleRepr
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
@@ -90,73 +89,74 @@ cardinalRepr = textify defaultRepr
       _ ⊡ Lit n | n < 1000 = Just ""
       _ ⊡ _                = Just " "
 
-      symMap = M.fromList
-               [ (0, const "cero")
-               , (1, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "on"
-                            _                    → "uno"
-                 )
-               , (2, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "do"
-                            CtxAdd _ (Lit 20)  _ → "dós"
-                            _                    → "dos"
-                 )
-               , (3, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "tre"
-                            CtxAdd _ (Lit 20)  _ → "trés"
-                            CtxMul _ (Lit 10)  _ → "trein"
-                            _                    → "tres"
-                 )
-               , (4, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "cator"
-                            CtxMul _ (Lit 10)  _ → "cuaren"
-                            _                    → "cuatro"
-                 )
-               , (5, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "quin"
-                            CtxMul _ (Lit 10)  _ → "cincuen"
-                            CtxMul _ (Lit 100) _ → "quin"
-                            _                    → "cinco"
-                 )
-               , (6, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "séis"
-                            CtxAdd _ (Lit 20)  _ → "séis"
-                            CtxMul _ (Lit 10)  _ → "sesen"
-                            _                    → "seis"
-                 )
-               , (7, \c → case c of
-                            CtxMul _ (Lit 10)  _ → "seten"
-                            CtxMul _ (Lit 100) _ → "sete"
-                            _                    → "siete"
-                 )
-               , (8, \c → case c of
-                            CtxMul _ (Lit 10)  _ → "ochen"
-                            _                    → "ocho"
-                 )
-               , (9, \c → case c of
-                            CtxMul _ (Lit 10)  _ → "noven"
-                            CtxMul _ (Lit 100) _ → "nove"
-                            _                    → "nueve"
-                 )
-               , (10, \c → case c of
-                             CtxAdd R (Lit _)  _ → "ce"
-                             CtxAdd L (Lit _)  _ → "dieci"
-                             CtxMul R _        _ → "ta"
-                             _                   → "diez"
-                 )
-               , (20, \c → case c of
-                             CtxAdd _ (Lit _)  _ → "veinti"
-                             _                   → "veinte"
-                 )
-               , (100, \c → case c of
-                              CtxEmpty           → "cien"
-                              CtxAdd {}          → "ciento"
-                              CtxMul _ (Lit 5) _ → "ientos"
-                              CtxMul L _       _ → "cien"
-                              _                  → "cientos"
-                 )
-               , (1000, const "mil")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "cero")
+          , (1, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "on"
+                       _                    → "uno"
+            )
+          , (2, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "do"
+                       CtxAdd _ (Lit 20)  _ → "dós"
+                       _                    → "dos"
+            )
+          , (3, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "tre"
+                       CtxAdd _ (Lit 20)  _ → "trés"
+                       CtxMul _ (Lit 10)  _ → "trein"
+                       _                    → "tres"
+            )
+          , (4, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "cator"
+                       CtxMul _ (Lit 10)  _ → "cuaren"
+                       _                    → "cuatro"
+            )
+          , (5, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "quin"
+                       CtxMul _ (Lit 10)  _ → "cincuen"
+                       CtxMul _ (Lit 100) _ → "quin"
+                       _                    → "cinco"
+            )
+          , (6, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "séis"
+                       CtxAdd _ (Lit 20)  _ → "séis"
+                       CtxMul _ (Lit 10)  _ → "sesen"
+                       _                    → "seis"
+            )
+          , (7, \c → case c of
+                       CtxMul _ (Lit 10)  _ → "seten"
+                       CtxMul _ (Lit 100) _ → "sete"
+                       _                    → "siete"
+            )
+          , (8, \c → case c of
+                       CtxMul _ (Lit 10)  _ → "ochen"
+                       _                    → "ocho"
+            )
+          , (9, \c → case c of
+                       CtxMul _ (Lit 10)  _ → "noven"
+                       CtxMul _ (Lit 100) _ → "nove"
+                       _                    → "nueve"
+            )
+          , (10, \c → case c of
+                        CtxAdd R (Lit _)  _ → "ce"
+                        CtxAdd L (Lit _)  _ → "dieci"
+                        CtxMul R _        _ → "ta"
+                        _                   → "diez"
+            )
+          , (20, \c → case c of
+                        CtxAdd _ (Lit _)  _ → "veinti"
+                        _                   → "veinte"
+            )
+          , (100, \c → case c of
+                         CtxEmpty           → "cien"
+                         CtxAdd {}          → "ciento"
+                         CtxMul _ (Lit 5) _ → "ientos"
+                         CtxMul L _       _ → "cien"
+                         _                  → "cientos"
+            )
+          , (1000, const "mil")
+          ]
 
 longScaleRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s

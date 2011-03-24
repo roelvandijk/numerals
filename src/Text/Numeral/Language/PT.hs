@@ -15,7 +15,6 @@
 module Text.Numeral.Language.PT
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 -------------------------------------------------------------------------------
@@ -74,7 +73,7 @@ struct = pos $ fix $ rule `combine` shortScale R L BN.rule
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprScale = shortScaleRepr
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
@@ -92,68 +91,69 @@ cardinalRepr = textify defaultRepr
       _ ⊡ Lit 100 = Just ""
       _ ⊡ _       = Just " "
 
-      symMap = M.fromList
-               [ (0, const "zero")
-               , (1, \c → case c of
-                            CtxAdd _ (Lit 10) _ → "on"
-                            _                   → "um"
-                 )
-               , (2, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "do"
-                            CtxMul _ (Lit 10)  _ → "vin"
-                            CtxMul _ (Lit 100) _ → "duz"
-                            _                    → "dois"
-                 )
-               , (3, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "tre"
-                            CtxMul _ (Lit 10)  _ → "trin"
-                            CtxMul _ (Lit 100) _ → "trez"
-                            _                    → "três"
-                 )
-               , (4, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "cator"
-                            CtxMul _ (Lit 10)  _ → "quaren"
-                            _                    → "quatro"
-                 )
-               , (5, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "quin"
-                            CtxMul _ (Lit 10)  _ → "cinquen"
-                            CtxMul _ (Lit 100) _ → "quin"
-                            _                    → "cinco"
-                 )
-               , (6, \c → case c of
-                            CtxMul _ (Lit 10) _ → "sessen"
-                            _                   → "seis"
-                 )
-               , (7, \c → case c of
-                            CtxMul _ (Lit 10) _ → "seten"
-                            _                   → "sete"
-                 )
-               , (8, \c → case c of
-                            CtxMul _ (Lit 10) _ → "oiten"
-                            _                   → "oito"
-                 )
-               , (9, \c → case c of
-                            CtxMul _ (Lit 10) _ → "noven"
-                            _                   → "nove"
-                 )
-               , (10, \c → case c of
-                             CtxAdd R (Lit _) _ → "ze"
-                             CtxMul R (Lit 2) _ → "te"
-                             CtxMul R (Lit _) _ → "ta"
-                             _                  → "dez"
-                 )
-               , (100, \c → case c of
-                              CtxAdd {}       → "cento"
-                              CtxMul _ (Lit n) _
-                                  | n ≤ 3     → "entos"
-                                  | n ≡ 4     → "centos"
-                                  | n ≡ 5     → "hentos"
-                                  | otherwise → "centos"
-                              _               → "cem"
-                 )
-               , (1000, const "mil")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "zero")
+          , (1, \c → case c of
+                       CtxAdd _ (Lit 10) _ → "on"
+                       _                   → "um"
+            )
+          , (2, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "do"
+                       CtxMul _ (Lit 10)  _ → "vin"
+                       CtxMul _ (Lit 100) _ → "duz"
+                       _                    → "dois"
+            )
+          , (3, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "tre"
+                       CtxMul _ (Lit 10)  _ → "trin"
+                       CtxMul _ (Lit 100) _ → "trez"
+                       _                    → "três"
+            )
+          , (4, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "cator"
+                       CtxMul _ (Lit 10)  _ → "quaren"
+                       _                    → "quatro"
+            )
+          , (5, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "quin"
+                       CtxMul _ (Lit 10)  _ → "cinquen"
+                       CtxMul _ (Lit 100) _ → "quin"
+                       _                    → "cinco"
+            )
+          , (6, \c → case c of
+                       CtxMul _ (Lit 10) _ → "sessen"
+                       _                   → "seis"
+            )
+          , (7, \c → case c of
+                       CtxMul _ (Lit 10) _ → "seten"
+                       _                   → "sete"
+            )
+          , (8, \c → case c of
+                       CtxMul _ (Lit 10) _ → "oiten"
+                       _                   → "oito"
+            )
+          , (9, \c → case c of
+                       CtxMul _ (Lit 10) _ → "noven"
+                       _                   → "nove"
+            )
+          , (10, \c → case c of
+                        CtxAdd R (Lit _) _ → "ze"
+                        CtxMul R (Lit 2) _ → "te"
+                        CtxMul R (Lit _) _ → "ta"
+                        _                  → "dez"
+            )
+          , (100, \c → case c of
+                         CtxAdd {}       → "cento"
+                         CtxMul _ (Lit n) _
+                             | n ≤ 3     → "entos"
+                             | n ≡ 4     → "centos"
+                             | n ≡ 5     → "hentos"
+                             | otherwise → "centos"
+                         _               → "cem"
+            )
+          , (1000, const "mil")
+          ]
 
 shortScaleRepr ∷ (IsString s, Monoid s)
                ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s

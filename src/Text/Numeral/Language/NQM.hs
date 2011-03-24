@@ -15,7 +15,6 @@
 module Text.Numeral.Language.NQM
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -62,7 +61,7 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = \_ _ → Just " abo "
                , reprMul   = (⊡)
                }
@@ -70,13 +69,14 @@ cardinalRepr = textify defaultRepr
       Lit 36 ⊡ _ = Just " "
       _      ⊡ _ = Just " an "
 
-      symMap = M.fromList
-               [ ( 1, const "sas")
-               , ( 2, const "thef")
-               , ( 3, const "ithin")
-               , ( 4, const "thonith")
-               , ( 5, const "meregh")
-               , ( 6, const "mer")
-               , (18, const "tondor")
-               , (36, const "nif")
-               ]
+      syms =
+          M.fromList
+          [ ( 1, const "sas")
+          , ( 2, const "thef")
+          , ( 3, const "ithin")
+          , ( 4, const "thonith")
+          , ( 5, const "meregh")
+          , ( 6, const "mer")
+          , (18, const "tondor")
+          , (36, const "nif")
+          ]

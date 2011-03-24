@@ -15,7 +15,6 @@
 module Text.Numeral.Language.LA
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -79,7 +78,7 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
                , reprSub   = \_ _ → Just "dē"
@@ -92,70 +91,71 @@ cardinalRepr = textify defaultRepr
       _ ⊡ Lit n | n ≤ 100 = Just ""
       _ ⊡ _               = Just " "
 
-      symMap = M.fromList
-               [ (0, const "nihil")
-               , (1, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "ūn"
-                            CtxSub _ _         _ → "ūn"
-                            _                    → "ūnus"
-                 )
-               , (2, \c → case c of
-                            CtxMul _ (Lit 10)  _ → "vī"
-                            CtxMul _ (Lit 100) _ → "du"
-                            _                    → "duo"
-                 )
-               , (3, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "trē"
-                            CtxMul _ (Lit 10)  _ → "trī"
-                            CtxMul _ (Lit 100) _ → "tre"
-                            _                    → "trēs"
-                 )
-               , (4, \c → case c of
-                            CtxMul _ (Lit 10)  _ → "quadrā"
-                            CtxMul _ (Lit 100) _ → "quadrin"
-                            _                    → "quattuor"
-                 )
-               , (5, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "quīn"
-                            CtxMul _ (Lit 10)  _ → "quīnquā"
-                            CtxMul _ (Lit 100) _ → "quīn"
-                            _                    → "quīnque"
-                 )
-               , (6, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "sē"
-                            CtxMul _ (Lit 10)  _ → "sexā"
-                            CtxMul _ (Lit 100) _ → "ses"
-                            _                    → "sex"
-                 )
-               , (7, \c → case c of
-                            CtxAdd _ (Lit 10)  _ → "septen"
-                            CtxMul _ (Lit 10)  _ → "septuā"
-                            CtxMul _ (Lit 100) _ → "septin"
-                            _                    → "septem"
-                 )
-               , (8, \c → case c of
-                            CtxMul _ (Lit 100) _ → "octin"
-                            _                    → "octō"
-                 )
-               , (9, \c → case c of
-                            CtxMul _ (Lit 10)  _ → "nōnā"
-                            CtxMul _ (Lit 100) _ → "nōn"
-                            _                    → "novem"
-                 )
-               , (10, \c → case c of
-                             CtxAdd {}           → "decim"
-                             CtxMul _ (Lit 2)  _ → "gintī"
-                             CtxMul {}           → "gintā"
-                             _                   → "decem"
-                 )
-               , (100, \c → case c of
-                              CtxMul _ (Lit n) _
-                                  | n ∈ [2,3,6] → "centī"
-                                  | otherwise   → "gentī"
-                              _                 → "centum"
-                 )
-               , (1000, \c → case c of
-                               CtxMul {} → "milia"
-                               _         → "mīlle"
-                 )
-               ]
+      syms =
+          M.fromList
+          [ (0, const "nihil")
+          , (1, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "ūn"
+                       CtxSub _ _         _ → "ūn"
+                       _                    → "ūnus"
+            )
+          , (2, \c → case c of
+                       CtxMul _ (Lit 10)  _ → "vī"
+                       CtxMul _ (Lit 100) _ → "du"
+                       _                    → "duo"
+            )
+          , (3, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "trē"
+                       CtxMul _ (Lit 10)  _ → "trī"
+                       CtxMul _ (Lit 100) _ → "tre"
+                       _                    → "trēs"
+            )
+          , (4, \c → case c of
+                       CtxMul _ (Lit 10)  _ → "quadrā"
+                       CtxMul _ (Lit 100) _ → "quadrin"
+                       _                    → "quattuor"
+            )
+          , (5, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "quīn"
+                       CtxMul _ (Lit 10)  _ → "quīnquā"
+                       CtxMul _ (Lit 100) _ → "quīn"
+                       _                    → "quīnque"
+            )
+          , (6, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "sē"
+                       CtxMul _ (Lit 10)  _ → "sexā"
+                       CtxMul _ (Lit 100) _ → "ses"
+                       _                    → "sex"
+            )
+          , (7, \c → case c of
+                       CtxAdd _ (Lit 10)  _ → "septen"
+                       CtxMul _ (Lit 10)  _ → "septuā"
+                       CtxMul _ (Lit 100) _ → "septin"
+                       _                    → "septem"
+            )
+          , (8, \c → case c of
+                       CtxMul _ (Lit 100) _ → "octin"
+                       _                    → "octō"
+            )
+          , (9, \c → case c of
+                       CtxMul _ (Lit 10)  _ → "nōnā"
+                       CtxMul _ (Lit 100) _ → "nōn"
+                       _                    → "novem"
+            )
+          , (10, \c → case c of
+                        CtxAdd {}           → "decim"
+                        CtxMul _ (Lit 2)  _ → "gintī"
+                        CtxMul {}           → "gintā"
+                        _                   → "decem"
+            )
+          , (100, \c → case c of
+                         CtxMul _ (Lit n) _
+                             | n ∈ [2,3,6] → "centī"
+                             | otherwise   → "gentī"
+                         _                 → "centum"
+            )
+          , (1000, \c → case c of
+                          CtxMul {} → "milia"
+                          _         → "mīlle"
+            )
+          ]

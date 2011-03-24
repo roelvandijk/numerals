@@ -15,7 +15,6 @@
 module Text.Numeral.Language.WO
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 --------------------------------------------------------------------------------
@@ -72,7 +71,7 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
                }
@@ -83,18 +82,20 @@ cardinalRepr = textify defaultRepr
       _ ⊡ Lit 10  = Just "-"
       _ ⊡ _       = Just " "
 
-      symMap = M.fromList
-               [ (0, const "tus")
-               , (1, i "benn")
-               , (2, i "ñaar")
-               , (3, i "ñett")
-               , (4, i "ñeent")
-               , (5, i "juróom")
-               , (10, i "fukk")
-               , (100, i "téeméer")
-               , (1000, const "junni")
-               , (dec 6, const "tamndareet")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "tus")
+          , (1, i "benn")
+          , (2, i "ñaar")
+          , (3, i "ñett")
+          , (4, i "ñeent")
+          , (5, i "juróom")
+          , (10, i "fukk")
+          , (100, i "téeméer")
+          , (1000, const "junni")
+          , (dec 6, const "tamndareet")
+          ]
+
       i s = \c → s ⊕ case c of
                        CtxMul _ (Lit n) _ | n ≥ 100 → "i"
                        CtxAdd R _ (CtxMul _ (Lit n) _) | n ≥ 100 → "i"

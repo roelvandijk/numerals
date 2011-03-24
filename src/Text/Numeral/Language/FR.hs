@@ -15,7 +15,6 @@
 module Text.Numeral.Language.FR
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -81,7 +80,7 @@ struct = pos $ fix $ rule `combine` pelletierScale1 R L BN.rule
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprScale = pelletierRepr
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
@@ -101,34 +100,35 @@ cardinalRepr = textify defaultRepr
       _ ⊡ Lit 20 = Just "-"
       _ ⊡ _      = Just " "
 
-      symMap = M.fromList
-               [ (0, const "zéro")
-               , (1, ten   "un"     "on"     "un")
-               , (2, ten   "deux"   "dou"    "deux")
-               , (3, ten   "trois"  "trei"   "tren")
-               , (4, ten   "quatre" "quator" "quar")
-               , (5, ten   "cinq"   "quin"   "cinqu")
-               , (6, ten   "six"    "sei"    "soix")
-               , (7, const "sept")
-               , (8, const "huit")
-               , (9, const "neuf")
-               , (10, \c → case c of
-                             CtxAdd _ (Lit n) _ | n < 7     → "ze"
-                                                | otherwise → "dix"
-                             CtxMul _ (Lit 3) _             → "te"
-                             CtxMul R _       _             → "ante"
-                             _                              → "dix"
-                 )
-               , (20, \c → case c of
-                             CtxMul _ _ CtxEmpty → "vingts"
-                             _                   → "vingt"
-                 )
-               , (100, \c → case c of
-                              CtxMul R _ CtxEmpty → "cents"
-                              _                   → "cent"
-                 )
-               , (1000, const "mille")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "zéro")
+          , (1, ten   "un"     "on"     "un")
+          , (2, ten   "deux"   "dou"    "deux")
+          , (3, ten   "trois"  "trei"   "tren")
+          , (4, ten   "quatre" "quator" "quar")
+          , (5, ten   "cinq"   "quin"   "cinqu")
+          , (6, ten   "six"    "sei"    "soix")
+          , (7, const "sept")
+          , (8, const "huit")
+          , (9, const "neuf")
+          , (10, \c → case c of
+                        CtxAdd _ (Lit n) _ | n < 7     → "ze"
+                                           | otherwise → "dix"
+                        CtxMul _ (Lit 3) _             → "te"
+                        CtxMul R _       _             → "ante"
+                        _                              → "dix"
+            )
+          , (20, \c → case c of
+                        CtxMul _ _ CtxEmpty → "vingts"
+                        _                   → "vingt"
+            )
+          , (100, \c → case c of
+                         CtxMul R _ CtxEmpty → "cents"
+                         _                   → "cent"
+            )
+          , (1000, const "mille")
+          ]
 
       ten n a m ctx = case ctx of
                         CtxAdd _ (Lit 10) _ → a

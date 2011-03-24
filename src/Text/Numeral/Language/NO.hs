@@ -15,7 +15,6 @@
 module Text.Numeral.Language.NO
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 -------------------------------------------------------------------------------
@@ -63,33 +62,34 @@ struct = pos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = \_ _ → Just ""
                , reprMul   = \_ _ → Just ""
                , reprNeg   = \_ → Just "minus "
                }
     where
-      symMap = M.fromList
-               [ (0,  const "null")
-               , (1,  const "en")
-               , (2,  const "to")
-               , (3,  ten   "tre"  "tret" "tret")
-               , (4,  ten   "fire" "fjor" "før")
-               , (5,  const "fem")
-               , (6,  const "seks")
-               , (7,  ten   "syv"  "syt"  "syt")
-               , (8,  ten   "åtte" "at"   "åt")
-               , (9,  ten   "ni"   "nit"  "nit")
-               , (10, \c → case c of
-                             CtxAdd {} → "ten"
-                             _         → "ti"
-                 )
-               , (11, const "elleve")
-               , (12, const "tolv")
-               , (20, const "tjue")
-               , (100, const "hundre")
-               , (1000, const "tusen")
-               ]
+      syms =
+          M.fromList
+          [ (0,  const "null")
+          , (1,  const "en")
+          , (2,  const "to")
+          , (3,  ten   "tre"  "tret" "tret")
+          , (4,  ten   "fire" "fjor" "før")
+          , (5,  const "fem")
+          , (6,  const "seks")
+          , (7,  ten   "syv"  "syt"  "syt")
+          , (8,  ten   "åtte" "at"   "åt")
+          , (9,  ten   "ni"   "nit"  "nit")
+          , (10, \c → case c of
+                        CtxAdd {} → "ten"
+                        _         → "ti"
+            )
+          , (11, const "elleve")
+          , (12, const "tolv")
+          , (20, const "tjue")
+          , (100, const "hundre")
+          , (1000, const "tusen")
+          ]
 
       ten n a m = \c → case c of
                          CtxAdd _ (Lit 10) _ → a

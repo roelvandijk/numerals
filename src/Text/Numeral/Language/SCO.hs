@@ -15,7 +15,6 @@
 module Text.Numeral.Language.SCO
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -63,7 +62,7 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = (⊞)
                , reprMul   = \_ _ → Just ""
                }
@@ -71,26 +70,27 @@ cardinalRepr = textify defaultRepr
       (_ `Mul` _) ⊞ _ = Just " "
       _           ⊞ _ = Just ""
 
-      symMap = M.fromList
-               [ (1, const    "ane"                     )
-               , (2, tenForms "twa"    "twa"    "twin"  )
-               , (3, tenForms "three"  "ther"   "ther"  )
-               , (4, const    "fower"                   )
-               , (5, tenForms "five"   "feif"   "fuf"   )
-               , (6, const    "sax"                     )
-               , (7, tenForms "seeven" "seiven" "seeven")
-               , (8, tenForms "echt"   "ech"    "ech"   )
-               , (9, tenForms "nine"   "nin"    "nin"   )
-               , (10, \c → case c of
-                             CtxAdd {} → "teen"
-                             CtxMul {} → "tie"
-                             _         → "ten"
-                 )
-               , (11, const "aleeven")
-               , (12, const "twal")
-               , (100, const "hunner")
-               , (1000, const "thousant")
-               ]
+      syms =
+          M.fromList
+          [ (1, const    "ane"                     )
+          , (2, tenForms "twa"    "twa"    "twin"  )
+          , (3, tenForms "three"  "ther"   "ther"  )
+          , (4, const    "fower"                   )
+          , (5, tenForms "five"   "feif"   "fuf"   )
+          , (6, const    "sax"                     )
+          , (7, tenForms "seeven" "seiven" "seeven")
+          , (8, tenForms "echt"   "ech"    "ech"   )
+          , (9, tenForms "nine"   "nin"    "nin"   )
+          , (10, \c → case c of
+                        CtxAdd {} → "teen"
+                        CtxMul {} → "tie"
+                        _         → "ten"
+            )
+          , (11, const "aleeven")
+          , (12, const "twal")
+          , (100, const "hunner")
+          , (1000, const "thousant")
+          ]
 
       tenForms o a m = \c → case c of
                               CtxAdd L _ _ → a

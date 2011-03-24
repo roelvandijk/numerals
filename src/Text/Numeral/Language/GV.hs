@@ -15,7 +15,6 @@
 module Text.Numeral.Language.GV
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -70,7 +69,7 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = (⊞)
                , reprMul   = \_ _ → Just " "
                }
@@ -79,31 +78,32 @@ cardinalRepr = textify defaultRepr
       _                    ⊞ Lit 10 = Just "-"
       _                    ⊞ _      = Just " as "
 
-      symMap = M.fromList
-               [ (1, const "nane")
-               , (2, \c → case c of
-                            CtxAdd _ (Lit 10) _ → "daa"
-                            CtxMul {}           → "daa"
-                            _                   → "jees"
-                 )
-               , (3, const "tree")
-               , (4, const "kiare")
-               , (5, const "queig")
-               , (6, const "shey")
-               , (7, const "shiaght")
-               , (8, const "hoght")
-               , (9, const "nuy")
-               , (10, \c → case c of
-                             CtxAdd _ (Lit 2)              _ → "yeig"
-                             CtxAdd _ (Lit _ `Mul` Lit 20) _ → "jeih"
-                             CtxAdd R _                    _ → "jeig"
-                             _                               → "jeih"
-                 )
-               , (20, const "feed")
-               , (40, const "daeed")
-               , (100, \c → case c of
-                              CtxMul {} → "cheead"
-                              _         → "keead"
-                 )
-               , (1000, const "thousane")
-               ]
+      syms =
+          M.fromList
+          [ (1, const "nane")
+          , (2, \c → case c of
+                       CtxAdd _ (Lit 10) _ → "daa"
+                       CtxMul {}           → "daa"
+                       _                   → "jees"
+            )
+          , (3, const "tree")
+          , (4, const "kiare")
+          , (5, const "queig")
+          , (6, const "shey")
+          , (7, const "shiaght")
+          , (8, const "hoght")
+          , (9, const "nuy")
+          , (10, \c → case c of
+                        CtxAdd _ (Lit 2)              _ → "yeig"
+                        CtxAdd _ (Lit _ `Mul` Lit 20) _ → "jeih"
+                        CtxAdd R _                    _ → "jeig"
+                        _                               → "jeih"
+            )
+          , (20, const "feed")
+          , (40, const "daeed")
+          , (100, \c → case c of
+                         CtxMul {} → "cheead"
+                         _         → "keead"
+            )
+          , (1000, const "thousane")
+          ]

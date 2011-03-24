@@ -15,7 +15,6 @@
 module Text.Numeral.Language.YOR
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -102,7 +101,7 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
                , reprSub   = \_ _ → Just "dil"
@@ -116,35 +115,36 @@ cardinalRepr = textify defaultRepr
       (Lit 20 `Mul` Lit 5) ⊡ _ = Just " "
       _                    ⊡ _ = Just ""
 
-      symMap = M.fromList
-               [ (-5, const "med")
-               , ( 1, \c → case c of
-                             CtxAdd {} → "mokan"
-                             CtxSub {} → "mokan"
-                             _         → "ikan"
-                 )
-               , ( 2, twentyForm "me" "go" "ji")
-               , ( 3, twentyForm "me" "go" "ta")
-               , ( 4, twentyForm "me" "go" "rin")
-               , ( 5, twentyForm "ma" "go" "run")
-               , ( 6, const    $ "me"  ⊕   "fa")
-               , ( 7, const    $ "me"  ⊕   "je")
-               , ( 8, const    $ "me"  ⊕   "jo")
-               , ( 9, const    $ "me"  ⊕   "san")
-               , (10, \c → case c of
-                             CtxAdd {} → "la"
-                             _         → "mewa"
-                 )
-               , (20, \c → case c of
-                             CtxMul {} → "o"
-                             _         → "ogun"
-                 )
-               , (30, const "ogbon")
-               , (50, const "adota")
-               , (70, const "adorin")
-               , (90, const "adorun")
-               , (1000, const "egberun")
-               ]
+      syms =
+          M.fromList
+          [ (-5, const "med")
+          , ( 1, \c → case c of
+                        CtxAdd {} → "mokan"
+                        CtxSub {} → "mokan"
+                        _         → "ikan"
+            )
+          , ( 2, twentyForm "me" "go" "ji")
+          , ( 3, twentyForm "me" "go" "ta")
+          , ( 4, twentyForm "me" "go" "rin")
+          , ( 5, twentyForm "ma" "go" "run")
+          , ( 6, const    $ "me"  ⊕   "fa")
+          , ( 7, const    $ "me"  ⊕   "je")
+          , ( 8, const    $ "me"  ⊕   "jo")
+          , ( 9, const    $ "me"  ⊕   "san")
+          , (10, \c → case c of
+                        CtxAdd {} → "la"
+                        _         → "mewa"
+            )
+          , (20, \c → case c of
+                        CtxMul {} → "o"
+                        _         → "ogun"
+            )
+          , (30, const "ogbon")
+          , (50, const "adota")
+          , (70, const "adorin")
+          , (90, const "adorun")
+          , (1000, const "egberun")
+          ]
 
       twentyForm c m s = \ctx → case ctx of
                                   CtxMul _ (Lit 20) _ → m

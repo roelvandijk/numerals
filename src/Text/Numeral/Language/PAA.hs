@@ -15,7 +15,6 @@
 module Text.Numeral.Language.PAA
     ( cardinal
     , struct
-    , cardinalRepr
     ) where
 
 
@@ -66,7 +65,7 @@ struct = checkPos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
-               { reprValue = \n → M.lookup n symMap
+               { reprValue = \n → M.lookup n syms
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
                }
@@ -76,26 +75,27 @@ cardinalRepr = textify defaultRepr
 
       _ ⊡ _ = Just " "
 
-      symMap = M.fromList
-               [ ( 1, const "mbira")
-               , ( 2, \c → case c of
-                             CtxMul {} → "ki"
-                             _         → "kira"
-                 )
-               , ( 3, const "tebira")
-               , ( 4, const "maria")
-               , ( 5, const "duria")
-               , ( 6, const "waragaria")
-               , ( 7, const "karia")
-               , ( 8, const "halira")
-               , ( 9, const "dira")
-               , (10, const "pira")
-               , (11, const "bearia")
-               , (12, const "hombearia")
-               , (13, const "haleria")
-               , (14, const "deria")
-               , (15, \c → case c of
-                             CtxMul {} → "ngui"
-                             _         → "nguira"
-                 )
-               ]
+      syms =
+          M.fromList
+          [ ( 1, const "mbira")
+          , ( 2, \c → case c of
+                        CtxMul {} → "ki"
+                        _         → "kira"
+            )
+          , ( 3, const "tebira")
+          , ( 4, const "maria")
+          , ( 5, const "duria")
+          , ( 6, const "waragaria")
+          , ( 7, const "karia")
+          , ( 8, const "halira")
+          , ( 9, const "dira")
+          , (10, const "pira")
+          , (11, const "bearia")
+          , (12, const "hombearia")
+          , (13, const "haleria")
+          , (14, const "deria")
+          , (15, \c → case c of
+                        CtxMul {} → "ngui"
+                        _         → "nguira"
+            )
+          ]

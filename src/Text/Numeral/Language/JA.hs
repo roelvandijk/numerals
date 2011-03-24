@@ -14,18 +14,10 @@
 
 module Text.Numeral.Language.JA
     ( struct
-
     , kanji_cardinal
-    , kanji_cardinal_repr
-
     , daiji_cardinal
-    , daiji_cardinal_repr
-
     , on'yomi_cardinal
-    , on'yomi_cardinal_repr
-
     , preferred_cardinal
-    , preferred_cardinal_repr
     ) where
 
 
@@ -87,44 +79,45 @@ kanji_cardinal = struct >=> kanji_cardinal_repr
 
 kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 kanji_cardinal_repr = textify defaultRepr
-                      { reprValue = \n → M.lookup n symMap
+                      { reprValue = \n → M.lookup n syms
                       , reprAdd   = \_ _ → Just ""
                       , reprMul   = \_ _ → Just ""
                       , reprNeg   = \_   → Just "マイナス"
                       }
     where
-      symMap = M.fromList
-               [ (0, const "零") -- alternatives:"ゼロ" or "マル"
-               , (1, const "一")
-               , (2, const "二")
-               , (3, const "三")
-               , (4, const "四")
-               , (5, const "五")
-               , (6, const "六")
-               , (7, const "七")
-               , (8, const "八")
-               , (9, const "九")
-               , (10, const "十")
-               , (100, const "百")
-               , (dec 3, const "千")
-               , (dec 4, const "万")
-               , (dec 8, const "億")
-               , (dec 12, const "兆")
-               , (dec 16, const "京")
-               , (dec 20, const "垓")
-               , (dec 24, const "𥝱") -- or 秭?
-               , (dec 28, const "穣")
-               , (dec 32, const "溝")
-               , (dec 36, const "澗")
-               , (dec 40, const "正")
-               , (dec 44, const "載")
-               , (dec 48, const "極")
-               , (dec 52, const "恒河沙")
-               , (dec 56, const "阿僧祇")
-               , (dec 60, const "那由他/那由多")
-               , (dec 64, const "不可思議")
-               , (dec 68, const "無量大数")
-              ]
+      syms =
+          M.fromList
+          [ (0, const "零") -- alternatives:"ゼロ" or "マル"
+          , (1, const "一")
+          , (2, const "二")
+          , (3, const "三")
+          , (4, const "四")
+          , (5, const "五")
+          , (6, const "六")
+          , (7, const "七")
+          , (8, const "八")
+          , (9, const "九")
+          , (10, const "十")
+          , (100, const "百")
+          , (dec 3, const "千")
+          , (dec 4, const "万")
+          , (dec 8, const "億")
+          , (dec 12, const "兆")
+          , (dec 16, const "京")
+          , (dec 20, const "垓")
+          , (dec 24, const "𥝱") -- or 秭?
+          , (dec 28, const "穣")
+          , (dec 32, const "溝")
+          , (dec 36, const "澗")
+          , (dec 40, const "正")
+          , (dec 44, const "載")
+          , (dec 48, const "極")
+          , (dec 52, const "恒河沙")
+          , (dec 56, const "阿僧祇")
+          , (dec 60, const "那由他/那由多")
+          , (dec 64, const "不可思議")
+          , (dec 68, const "無量大数")
+          ]
 
 
 --------------------------------------------------------------------------------
@@ -136,28 +129,29 @@ daiji_cardinal = struct >=> daiji_cardinal_repr
 
 daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 daiji_cardinal_repr = textify defaultRepr
-                      { reprValue = \n → M.lookup n symMap
+                      { reprValue = \n → M.lookup n syms
                       , reprAdd   = \_ _ → Just ""
                       , reprMul   = \_ _ → Just ""
                       , reprNeg   = \_   → Just "マイナス"
                       }
     where
-      symMap = M.fromList
-               [ (0, const "零") -- alternatives:"ゼロ" or "マル"
-               , (1, const "壱")
-               , (2, const "弐")
-               , (3, const "参")
-               , (4, const "四")
-               , (5, const "五")
-               , (6, const "六")
-               , (7, const "七")
-               , (8, const "八")
-               , (9, const "九")
-               , (10, const "拾")
-               , (100, const "百")
-               , (dec 3, const "千")
-               , (dec 4, const "万")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "零") -- alternatives:"ゼロ" or "マル"
+          , (1, const "壱")
+          , (2, const "弐")
+          , (3, const "参")
+          , (4, const "四")
+          , (5, const "五")
+          , (6, const "六")
+          , (7, const "七")
+          , (8, const "八")
+          , (9, const "九")
+          , (10, const "拾")
+          , (100, const "百")
+          , (dec 3, const "千")
+          , (dec 4, const "万")
+          ]
 
 
 --------------------------------------------------------------------------------
@@ -166,47 +160,48 @@ daiji_cardinal_repr = textify defaultRepr
 
 generic_repr ∷ (Monoid s, IsString s) ⇒ s → s → Repr s
 generic_repr four seven = defaultRepr
-                          { reprValue = \n → M.lookup n symMap
+                          { reprValue = \n → M.lookup n syms
                           , reprAdd   = \_ _ → Just " "
                           , reprMul   = \_ _ → Just ""
                           , reprNeg   = \_   → Just "mainasu "
                           }
     where
-      symMap = M.fromList
-               [ (0, const "rei")
-               , (1, const "ichi")
-               , (2, const "ni")
-               , (3, const "san")
-               , (4, const four)
-               , (5, const "go")
-               , (6, const "roku")
-               , (7, const seven)
-               , (8, const "hachi")
-               , (9, const "kyū")
-               , (10, const "jū")
-               , (100, \c → case c of
-                              (CtxMul _ (Lit 3) _) → "byaku" -- rendaku
-                              _                    → "hyaku"
-                 )
-               , (dec 3, const "sen")
-               , (dec 4, const "man")
-               , (dec 8, const "oku")
-               , (dec 12, const "chō")
-               , (dec 16, const "kei")
-               , (dec 20, const "gai")
-               , (dec 24, const "jo")
-               , (dec 28, const "jō")
-               , (dec 32, const "kō")
-               , (dec 36, const "kan")
-               , (dec 40, const "sei")
-               , (dec 44, const "sai")
-               , (dec 48, const "goku")
-               , (dec 52, const "gōgasha")
-               , (dec 56, const "asōgi")
-               , (dec 60, const "nayuta")
-               , (dec 64, const "fukashigi")
-               , (dec 68, const "muryōtaisū")
-               ]
+      syms =
+          M.fromList
+          [ (0, const "rei")
+          , (1, const "ichi")
+          , (2, const "ni")
+          , (3, const "san")
+          , (4, const four)
+          , (5, const "go")
+          , (6, const "roku")
+          , (7, const seven)
+          , (8, const "hachi")
+          , (9, const "kyū")
+          , (10, const "jū")
+          , (100, \c → case c of
+                         (CtxMul _ (Lit 3) _) → "byaku" -- rendaku
+                         _                    → "hyaku"
+            )
+          , (dec 3, const "sen")
+          , (dec 4, const "man")
+          , (dec 8, const "oku")
+          , (dec 12, const "chō")
+          , (dec 16, const "kei")
+          , (dec 20, const "gai")
+          , (dec 24, const "jo")
+          , (dec 28, const "jō")
+          , (dec 32, const "kō")
+          , (dec 36, const "kan")
+          , (dec 40, const "sei")
+          , (dec 44, const "sai")
+          , (dec 48, const "goku")
+          , (dec 52, const "gōgasha")
+          , (dec 56, const "asōgi")
+          , (dec 60, const "nayuta")
+          , (dec 64, const "fukashigi")
+          , (dec 68, const "muryōtaisū")
+          ]
 
 
 --------------------------------------------------------------------------------

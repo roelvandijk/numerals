@@ -21,7 +21,7 @@ module Text.Numeral.Rules
   , shortScale,  longScale,  pelletierScale
   , shortScale1, longScale1, pelletierScale1
 
-  , step, step1
+  , mkStep, step, step1
   ) where
 
 
@@ -149,23 +149,25 @@ mul1 val aSide mSide =
 sub ∷ (Integral α, C.Sub β) ⇒ α → Rule α β
 sub val = \f n → liftA2 C.sub (f $ val - n) (f val)
 
+mkStep ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
+       ⇒ Rule α β -- ^ lit rule
+       → (α → Side → Rule α β) -- ^ add rule
+       → (α → Side → Side → Rule α β) -- ^ mul rule
+       → α → α → Side → Side → Rule α β
+mkStep lr ar mr val r aSide mSide
+       f n | n < val   = Nothing
+           | n ≡ val   = lr                 f n
+           | n < val⋅2 = ar val aSide       f n
+           | n < val⋅r = mr val aSide mSide f n
+           | otherwise = Nothing
+
 step ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
      ⇒ α → α → Side → Side → Rule α β
-step val r aSide mSide
-     f n | n < val   = Nothing
-         | n ≡ val   = lit                 f n
-         | n < val⋅2 = add val aSide       f n
-         | n < val⋅r = mul val aSide mSide f n
-         | otherwise = Nothing
+step = mkStep lit add mul
 
 step1 ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
       ⇒ α → α → Side → Side → Rule α β
-step1 val r aSide mSide
-     f n | n < val   = Nothing
-         | n ≡ val   = lit1                 f n
-         | n < val⋅2 = add  val aSide       f n
-         | n < val⋅r = mul1 val aSide mSide f n
-         | otherwise = Nothing
+step1 = mkStep lit1 add mul1
 
 -- See: http://en.wikipedia.org/wiki/Names_of_large_numbers
 mulScale ∷ (Integral α, C.Scale α, C.Add β, C.Mul β, C.Scale β)

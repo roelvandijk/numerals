@@ -77,17 +77,17 @@ cardinalRepr = textify defaultRepr
                , reprScale = longScaleRepr
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ → "menos "
+               , reprNeg   = Just $ \_ _ → "menos "
                }
     where
-      _                    ⊞ Lit 10 = ""
-      Lit 10               ⊞ _      = ""
-      Lit 20               ⊞ _      = ""
-      (Lit _ `Mul` Lit 10) ⊞ _      = " y "
-      _                    ⊞ _      = " "
+      (_                    ⊞ Lit 10) _ = ""
+      (Lit 10               ⊞ _     ) _ = ""
+      (Lit 20               ⊞ _     ) _ = ""
+      ((Lit _ `Mul` Lit 10) ⊞ _     ) _ = " y "
+      (_                    ⊞ _     ) _ = " "
 
-      _ ⊡ Lit n | n < 1000 = ""
-      _ ⊡ _                = " "
+      (_ ⊡ Lit n) _ | n < 1000 = ""
+      (_ ⊡ _    ) _            = " "
 
       syms =
           M.fromList

@@ -80,9 +80,9 @@ kanji_cardinal = struct >=> kanji_cardinal_repr
 kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 kanji_cardinal_repr = textify defaultRepr
                       { reprValue = \n → M.lookup n syms
-                      , reprAdd   = Just $ \_ _ → ""
-                      , reprMul   = Just $ \_ _ → ""
-                      , reprNeg   = Just $ \_   → "マイナス"
+                      , reprAdd   = Just $ \_ _ _ → ""
+                      , reprMul   = Just $ \_ _ _ → ""
+                      , reprNeg   = Just $ \_ _   → "マイナス"
                       }
     where
       syms =
@@ -130,9 +130,9 @@ daiji_cardinal = struct >=> daiji_cardinal_repr
 daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 daiji_cardinal_repr = textify defaultRepr
                       { reprValue = \n → M.lookup n syms
-                      , reprAdd   = Just $ \_ _ → ""
-                      , reprMul   = Just $ \_ _ → ""
-                      , reprNeg   = Just $ \_   → "マイナス"
+                      , reprAdd   = Just $ \_ _ _ → ""
+                      , reprMul   = Just $ \_ _ _ → ""
+                      , reprNeg   = Just $ \_ _   → "マイナス"
                       }
     where
       syms =
@@ -161,9 +161,9 @@ daiji_cardinal_repr = textify defaultRepr
 generic_repr ∷ (Monoid s, IsString s) ⇒ s → s → Repr s
 generic_repr four seven = defaultRepr
                           { reprValue = \n → M.lookup n syms
-                          , reprAdd   = Just $ \_ _ → " "
-                          , reprMul   = Just $ \_ _ → ""
-                          , reprNeg   = Just $ \_   → "mainasu "
+                          , reprAdd   = Just $ \_ _ _ → " "
+                          , reprMul   = Just $ \_ _ _ → ""
+                          , reprNeg   = Just $ \_ _   → "mainasu "
                           }
     where
       syms =

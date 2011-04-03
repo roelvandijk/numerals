@@ -58,8 +58,8 @@ rule = findRule (  0, lit           )
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
-               , reprAdd   = Just $ \_ _ → " pe "
-               , reprMul   = Just $ \_ _ → " "
+               , reprAdd   = Just $ \_ _ _ → " pe "
+               , reprMul   = Just $ \_ _ _ → " "
                }
     where
       syms =

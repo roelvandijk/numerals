@@ -80,18 +80,18 @@ cardinalRepr = textify defaultRepr
                , reprScale = pelletierRepr
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ → "meno "
+               , reprNeg   = Just $ \_ _ → "meno "
                }
     where
-      Lit 10                ⊞ Lit 7 = "as"
-      Lit 10                ⊞ Lit 9 = "an"
-      (_ `Mul` Scale _ _ _) ⊞ _     = " "
-      _                     ⊞ _     = ""
+      (Lit 10                ⊞ Lit 7) _ = "as"
+      (Lit 10                ⊞ Lit 9) _ = "an"
+      ((_ `Mul` Scale _ _ _) ⊞ _    ) _ = " "
+      (_                     ⊞ _    ) _ = ""
 
 
-      Lit n ⊡ Lit 10 | n ≥ 4 = "an"
-      _     ⊡ Scale _ _ _    = " "
-      _     ⊡ _              = ""
+      (Lit n ⊡ Lit 10) _ | n ≥ 4 = "an"
+      (_     ⊡ Scale _ _ _) _ = " "
+      (_     ⊡ _          ) _ = ""
 
       syms =
           M.fromList

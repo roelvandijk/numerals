@@ -65,9 +65,9 @@ ukPelletier_cardinal =
 us_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
 us_cardinal = shortScaleStruct >=> textify (cardinalRepr (⊞))
   where
-    (_ `Mul` Lit 10) ⊞ _ = "-"
-    (_ `Mul` _     ) ⊞ _ = " "
-    _                ⊞ _ = ""
+    ((_ `Mul` Lit 10) ⊞ _) _ = "-"
+    ((_ `Mul` _     ) ⊞ _) _ = " "
+    (_                ⊞ _) _ = ""
 
 shortScaleStruct ∷ ( Integral α, C.Scale α
                    , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
@@ -99,24 +99,24 @@ rule = findRule (   0, lit       )
 uk_cardinalRepr' ∷ (Monoid s, IsString s) ⇒ Repr s
 uk_cardinalRepr' = cardinalRepr (⊞)
   where
-    (_ `Mul` Lit 10) ⊞ _           = "-"
-    (_ `Mul` _     ) ⊞ x
+    ((_ `Mul` Lit 10) ⊞ _) _       = "-"
+    ((_ `Mul` _     ) ⊞ x) _
         | eval x < (100 ∷ Integer) = " and "
         | otherwise                = " "
-    _                ⊞ _           = ""
+    (_                ⊞ _) _       = ""
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → s) → Repr s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Ctx Exp → s) → Repr s
 cardinalRepr f =
     defaultRepr
     { reprValue = \n → M.lookup n syms
     , reprScale = BN.scaleRepr "illion" "illion" []
     , reprAdd   = Just f
     , reprMul   = Just (⊞)
-    , reprNeg   = Just $ \_ → "minus "
+    , reprNeg   = Just $ \_ _ → "minus "
     }
     where
-      _ ⊞ (Lit 10) = ""
-      _ ⊞ _        = " "
+      (_ ⊞ Lit 10) _ = ""
+      (_ ⊞ _     ) _ = " "
 
       syms =
           M.fromList

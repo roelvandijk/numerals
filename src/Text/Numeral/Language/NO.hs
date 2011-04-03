@@ -63,9 +63,9 @@ struct = pos
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
-               , reprAdd   = Just $ \_ _ → ""
-               , reprMul   = Just $ \_ _ → ""
-               , reprNeg   = Just $ \_   → "minus "
+               , reprAdd   = Just $ \_ _ _ → ""
+               , reprMul   = Just $ \_ _ _ → ""
+               , reprNeg   = Just $ \_ _   → "minus "
                }
     where
       syms =

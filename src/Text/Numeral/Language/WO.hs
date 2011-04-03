@@ -76,11 +76,11 @@ cardinalRepr = textify defaultRepr
                , reprMul   = Just (⊡)
                }
     where
-      Lit 5 ⊞ _ = "-"
-      _     ⊞ _ = " ak "
+      (Lit 5 ⊞ _) _ = "-"
+      (_     ⊞ _) _ = " ak "
 
-      _ ⊡ Lit 10  = "-"
-      _ ⊡ _       = " "
+      (_ ⊡ Lit 10) _ = "-"
+      (_ ⊡ _     ) _ = " "
 
       syms =
           M.fromList

@@ -77,19 +77,19 @@ cardinalRepr = textify defaultRepr
                , reprScale = shortScaleRepr
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ → "menos "
+               , reprNeg   = Just $ \_ _ → "menos "
                }
     where
-      Lit 10 ⊞ Lit n | n < 8     = "as"
-                     | n ≡ 8     = ""
-                     | otherwise = "a"
-      Lit _  ⊞ Lit 10            = ""
-      _      ⊞ _                 = " e "
+      (Lit 10 ⊞ Lit n ) _ | n < 8     = "as"
+                          | n ≡ 8     = ""
+                          | otherwise = "a"
+      (Lit _  ⊞ Lit 10) _             = ""
+      (_      ⊞ _     ) _             = " e "
 
 
-      _ ⊡ Lit 10  = ""
-      _ ⊡ Lit 100 = ""
-      _ ⊡ _       = " "
+      (_ ⊡ Lit 10 ) _ = ""
+      (_ ⊡ Lit 100) _ = ""
+      (_ ⊡ _      ) _ = " "
 
       syms =
           M.fromList

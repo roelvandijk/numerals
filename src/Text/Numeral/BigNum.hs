@@ -66,8 +66,8 @@ rule = findRule (   1, lit        )
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 cardinalRepr =
     defaultRepr { reprValue = \n → M.lookup n symMap
-                , reprAdd   = Just $ \_ _ → ""
-                , reprMul   = Just $ \_ _ → ""
+                , reprAdd   = Just $ \_ _ _ → ""
+                , reprMul   = Just $ \_ _ _ → ""
                 }
 
 symMap ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)

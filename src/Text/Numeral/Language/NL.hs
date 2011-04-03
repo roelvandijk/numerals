@@ -71,15 +71,15 @@ cardinalRepr = textify defaultRepr
                                               "iljard" "iljard"
                                               []
                , reprAdd   = Just (⊞)
-               , reprMul   = Just $ \_ _ → ""
-               , reprNeg   = Just $ \_   → "min "
+               , reprMul   = Just $ \_ _ _ → ""
+               , reprNeg   = Just $ \_ _   → "min "
                }
     where
-      _     ⊞ Lit 10         = ""
-      Lit n ⊞ _ | n ∈ [2,3]  = "ën"
-                | n < 10     = "en"
-                | otherwise  = ""
-      _     ⊞ _              = ""
+      (_     ⊞ Lit 10) _         = ""
+      (Lit n ⊞ _) _ | n ∈ [2,3]  = "ën"
+                    | n < 10     = "en"
+                    | otherwise  = ""
+      (_     ⊞ _) _              = ""
 
       syms =
           M.fromList

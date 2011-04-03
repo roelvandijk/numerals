@@ -71,12 +71,12 @@ cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprAdd   = Just (⊞)
-               , reprMul   = Just $ \_ _ → " "
+               , reprMul   = Just $ \_ _ _ → " "
                }
     where
-      (Lit _ `Mul` Lit 20) ⊞ Lit 10 = " as "
-      _                    ⊞ Lit 10 = "-"
-      _                    ⊞ _      = " as "
+      ((Lit _ `Mul` Lit 20) ⊞ Lit 10) _ = " as "
+      (_                    ⊞ Lit 10) _ = "-"
+      (_                    ⊞ _     ) _ = " as "
 
       syms =
           M.fromList

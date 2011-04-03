@@ -78,14 +78,14 @@ cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ → "минус "
+               , reprNeg   = Just $ \_ _ → "минус "
                }
     where
-      Lit n ⊞ Lit 10 | n < 10 = "на"
-      _     ⊞ _               = " "
+      (Lit n ⊞ Lit 10) _ | n < 10 = "на"
+      (_     ⊞ _     ) _          = " "
 
-      _ ⊡ Lit n  | n ≤ 100 = ""
-      _ ⊡ _                = " "
+      (_ ⊡ Lit n) _ | n ≤ 100 = ""
+      (_ ⊡ _    ) _           = " "
 
       syms =
           M.fromList

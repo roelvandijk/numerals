@@ -84,21 +84,21 @@ cardinalRepr = textify defaultRepr
                , reprScale = pelletierRepr
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ → "moins "
+               , reprNeg   = Just $ \_ _ → "moins "
                }
     where
-      Lit n                ⊞ Lit 10       | n ≤ 6 = ""
-      Lit 10               ⊞ Lit n        | n ≥ 7 = "-"
-      (Lit 4 `Mul` Lit 20) ⊞ _                    = "-"
-      _                    ⊞ (Lit 1 `Add` Lit 10) = " et "
-      _                    ⊞ Lit 1                = " et "
-      (Lit _ `Mul` Lit 10) ⊞ _                    = "-"
-      Lit 20               ⊞ _                    = "-"
-      _                    ⊞ _                    = " "
+      (Lit n                ⊞ Lit 10) _       | n ≤ 6 = ""
+      (Lit 10               ⊞ Lit n ) _       | n ≥ 7 = "-"
+      ((Lit 4 `Mul` Lit 20) ⊞ _     ) _               = "-"
+      (_                    ⊞ (Lit 1 `Add` Lit 10)) _ = " et "
+      (_                    ⊞ Lit 1               ) _ = " et "
+      ((Lit _ `Mul` Lit 10) ⊞ _                   ) _ = "-"
+      (Lit 20               ⊞ _                   ) _ = "-"
+      (_                    ⊞ _                   ) _ = " "
 
-      _ ⊡ Lit 10 = ""
-      _ ⊡ Lit 20 = "-"
-      _ ⊡ _      = " "
+      (_ ⊡ Lit 10) _ = ""
+      (_ ⊡ Lit 20) _ = "-"
+      (_ ⊡ _     ) _ = " "
 
       syms =
           M.fromList

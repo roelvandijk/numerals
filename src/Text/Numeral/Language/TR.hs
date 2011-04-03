@@ -87,12 +87,11 @@ cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprScale = scaleRepr
                , reprAdd   = Just (⊞)
-               , reprMul   = Just (⊡)
+               , reprMul   = Just $ \_ _ _ → " "
                }
     where
-      _ ⊞ _ = " "
-
-      _ ⊡ _ = " "
+      (Lit 10 ⊞ _) (CtxMul {}) = ""
+      (_      ⊞ _) _           = " "
 
       syms =
           M.fromList

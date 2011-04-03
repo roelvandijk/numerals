@@ -104,16 +104,16 @@ cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprSub   = Just $ \_ _ → "dil"
+               , reprSub   = Just $ \_ _ _ → "dil"
                }
     where
-      _     ⊞ Lit 10         = ""
-      Lit n ⊞ _  | n ≡ -5    = ""
-                 | otherwise = "lel"
-      _     ⊞ _              = ""
+      (_     ⊞ Lit 10) _         = ""
+      (Lit n ⊞ _) _  | n ≡ -5    = ""
+                     | otherwise = "lel"
+      (_     ⊞ _) _              = ""
 
-      (Lit 20 `Mul` Lit 5) ⊡ _ = " "
-      _                    ⊡ _ = ""
+      ((Lit 20 `Mul` Lit 5) ⊡ _) _ = " "
+      (_                    ⊡ _) _ = ""
 
       syms =
           M.fromList

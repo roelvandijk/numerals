@@ -70,10 +70,10 @@ cardinalRepr = textify defaultRepr
                , reprMul   = Just (⊡)
                }
     where
-      -- _ ⊞ _ = ", ngui "
-      _ ⊞ _ = "-ni "
+      -- (_ ⊞ _) _ = ", ngui "
+      (_ ⊞ _) _ = "-ni "
 
-      _ ⊡ _ = " "
+      (_ ⊡ _) _ = " "
 
       syms =
           M.fromList

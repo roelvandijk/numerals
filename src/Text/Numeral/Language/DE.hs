@@ -76,12 +76,12 @@ cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprScale = pelletierRepr
                , reprAdd   = Just (⊞)
-               , reprMul   = Just $ \_ _ → ""
-               , reprNeg   = Just $ \_   → "minus "
+               , reprMul   = Just $ \_ _ _ → ""
+               , reprNeg   = Just $ \_ _   → "minus "
                }
     where
-      _ ⊞ (_ `Mul` Lit 10) = "und"
-      _ ⊞ _                = ""
+      (_ ⊞ (_ `Mul` Lit 10)) _ = "und"
+      (_ ⊞ _               ) _ = ""
 
       syms =
           M.fromList

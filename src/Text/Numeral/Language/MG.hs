@@ -68,13 +68,13 @@ cardinalRepr = textify defaultRepr
                , reprMul   = Just (⊡)
                }
     where
-      _ ⊞              Lit 10  = " ambin'ny "
-      _ ⊞ (Lit _ `Mul` Lit 10) = " amby "
-      _ ⊞ _                    = " sy "
+      (_ ⊞              Lit 10 ) _ = " ambin'ny "
+      (_ ⊞ (Lit _ `Mul` Lit 10)) _ = " amby "
+      (_ ⊞ _                   ) _ = " sy "
 
-      _ ⊡ Lit 10  = ""
-      _ ⊡ Lit 100 = ""
-      _ ⊡ _       = " "
+      (_ ⊡ Lit 10 ) _ = ""
+      (_ ⊡ Lit 100) _ = ""
+      (_ ⊡ _      ) _ = " "
 
       syms =
           M.fromList

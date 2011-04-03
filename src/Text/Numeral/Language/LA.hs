@@ -81,15 +81,15 @@ cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprSub   = Just $ \_ _ → "dē"
-               , reprNeg   = Just $ \_   → "minus "
+               , reprSub   = Just $ \_ _ _ → "dē"
+               , reprNeg   = Just $ \_ _   → "minus "
                }
     where
-      (_ `Mul` Lit _) ⊞ _ = " "
-      _               ⊞ _ = ""
+      ((_ `Mul` Lit _) ⊞ _) _ = " "
+      (_               ⊞ _) _ = ""
 
-      _ ⊡ Lit n | n ≤ 100 = ""
-      _ ⊡ _               = " "
+      (_ ⊡ Lit n) _ | n ≤ 100 = ""
+      (_ ⊡ _    ) _           = " "
 
       syms =
           M.fromList

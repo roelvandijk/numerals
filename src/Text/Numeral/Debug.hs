@@ -34,6 +34,7 @@ import qualified Text.Numeral.Language.MG  as MG
 import qualified Text.Numeral.Language.NL  as NL
 import qualified Text.Numeral.Language.NO  as NO
 import qualified Text.Numeral.Language.NQM as NQM
+import qualified Text.Numeral.Language.OJ  as OJ
 import qualified Text.Numeral.Language.PAA as PAA
 import qualified Text.Numeral.Language.PT  as PT
 import qualified Text.Numeral.Language.RU  as RU

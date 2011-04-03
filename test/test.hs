@@ -73,6 +73,8 @@ import qualified Text.Numeral.Language.NO           as NO  ( cardinal  )
 import qualified Text.Numeral.Language.NO.TestData  as NO  ( cardinals )
 import qualified Text.Numeral.Language.NQM          as NQM ( cardinal  )
 import qualified Text.Numeral.Language.NQM.TestData as NQM ( cardinals )
+import qualified Text.Numeral.Language.OJ           as OJ  ( cardinal  )
+import qualified Text.Numeral.Language.OJ.TestData  as OJ  ( cardinals )
 -- import qualified Text.Numeral.Language.PAA          as PAA ( cardinal  )
 -- import qualified Text.Numeral.Language.PAA.TestData as PAA ( cardinals )
 import qualified Text.Numeral.Language.PT           as PT  ( cardinal  )
@@ -164,6 +166,7 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "NL"  [mkTests "cardinal" NL.cardinal  NL.cardinals]
         , testGroup "NO"  [mkTests "cardinal" NO.cardinal  NO.cardinals]
         , testGroup "NQM" [mkTests "cardinal" NQM.cardinal NQM.cardinals]
+        , testGroup "OJ"  [mkTests "cardinal" OJ.cardinal  OJ.cardinals]
         -- , testGroup "PAA" [mkTests "cardinal" PAA.cardinal PAA.cardinals]
         , testGroup "PT"  [mkTests "cardinal" PT.cardinal  PT.cardinals]
         , testGroup "RU"  [mkTests "cardinal" RU.cardinal  RU.cardinals]

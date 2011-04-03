@@ -52,6 +52,7 @@ library
                  , Text.Numeral.Language.NL
                  , Text.Numeral.Language.NO
                  , Text.Numeral.Language.NQM
+                 , Text.Numeral.Language.OJ
               -- , Text.Numeral.Language.PAA
                  , Text.Numeral.Language.PT
                  , Text.Numeral.Language.RU
@@ -87,6 +88,7 @@ test-suite test-numerals
                , Text.Numeral.Language.NL.TestData
                , Text.Numeral.Language.NO.TestData
                , Text.Numeral.Language.NQM.TestData
+               , Text.Numeral.Language.OJ.TestData
             -- , Text.Numeral.Language.PAA.TestData
                , Text.Numeral.Language.PT.TestData
                , Text.Numeral.Language.RU.TestData

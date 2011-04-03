@@ -52,7 +52,9 @@ import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, forms )
 
 {-
 Sources:
+  http://www.languagesandnumbers.com/how-to-count-in-turkish/en/tur/
   http://www.sf.airnet.ne.jp/~ts/language/number/turkish.html
+  http://www.turkishlanguage.co.uk/seasons.htm#article_15
   http://www.turkeytravelplanner.com/details/LanguageGuide/100words_lessons/100Words_10.html
   http://en.wikibooks.org/wiki/Turkish/Numbers
   http://tr.wikipedia.org/wiki/B%C3%BCy%C3%BCk_say%C4%B1lar%C4%B1n_adlar%C4%B1
@@ -84,16 +86,23 @@ cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprScale = scaleRepr
-               , reprAdd   = \_ _ → Just " "
-               , reprMul   = \_ _ → Just " "
+               , reprAdd   = Just (⊞)
+               , reprMul   = Just (⊡)
                }
     where
+      _ ⊞ _ = " "
+
+      _ ⊡ _ = " "
+
       syms =
           M.fromList
           [ (0, const "sıfır")
           , (1, const "bir")
           , (2, const "iki")
-          , (3, const "üç")
+          , (3, \c → case c of
+                       CtxEmpty → "üç"
+                       _        → "uç"
+            )
           , (4, const "dört")
           , (5, const "beş")
           , (6, const "altı")

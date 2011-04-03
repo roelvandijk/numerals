@@ -64,17 +64,17 @@ struct = checkPos
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
-               , reprAdd   = (⊞)
-               , reprMul   = (⊡)
+               , reprAdd   = Just (⊞)
+               , reprMul   = Just (⊡)
                }
     where
-      _ ⊞              Lit 10  = Just " ambin'ny "
-      _ ⊞ (Lit _ `Mul` Lit 10) = Just " amby "
-      _ ⊞ _                    = Just " sy "
+      _ ⊞              Lit 10  = " ambin'ny "
+      _ ⊞ (Lit _ `Mul` Lit 10) = " amby "
+      _ ⊞ _                    = " sy "
 
-      _ ⊡ Lit 10  = Just ""
-      _ ⊡ Lit 100 = Just ""
-      _ ⊡ _       = Just " "
+      _ ⊡ Lit 10  = ""
+      _ ⊡ Lit 100 = ""
+      _ ⊡ _       = " "
 
       syms =
           M.fromList

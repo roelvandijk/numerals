@@ -26,7 +26,7 @@ module Text.Numeral.Language.YOR
 import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
 import Data.Function ( ($), const, fix )
-import Data.Maybe    ( Maybe(Nothing, Just) )
+import Data.Maybe    ( Maybe(Just) )
 import Data.Monoid   ( Monoid )
 import Data.String   ( IsString )
 import Prelude       ( Integral )
@@ -102,18 +102,18 @@ struct = checkPos
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
-               , reprAdd   = (⊞)
-               , reprMul   = (⊡)
-               , reprSub   = \_ _ → Just "dil"
+               , reprAdd   = Just (⊞)
+               , reprMul   = Just (⊡)
+               , reprSub   = Just $ \_ _ → "dil"
                }
     where
-      _     ⊞ Lit 10         = Just ""
-      Lit n ⊞ _  | n ≡ -5    = Just ""
-                 | otherwise = Just "lel"
-      _     ⊞ _              = Nothing
+      _     ⊞ Lit 10         = ""
+      Lit n ⊞ _  | n ≡ -5    = ""
+                 | otherwise = "lel"
+      _     ⊞ _              = ""
 
-      (Lit 20 `Mul` Lit 5) ⊡ _ = Just " "
-      _                    ⊡ _ = Just ""
+      (Lit 20 `Mul` Lit 5) ⊡ _ = " "
+      _                    ⊡ _ = ""
 
       syms =
           M.fromList

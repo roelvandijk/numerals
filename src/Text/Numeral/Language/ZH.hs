@@ -105,8 +105,8 @@ struct = pos
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 cardinalRepr = defaultRepr
-               { reprAdd = \_ _ → Just ""
-               , reprMul = \_ _ → Just ""
+               { reprAdd = Just $ \_ _ → ""
+               , reprMul = Just $ \_ _ → ""
                }
 
 
@@ -121,7 +121,7 @@ trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 trad_cardinalRepr =
     textify cardinalRepr
     { reprValue = \n → M.lookup n trad_syms
-    , reprNeg = \_ → Just "負"
+    , reprNeg = Just $ \_ → "負"
     }
 
 trad_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
@@ -171,7 +171,7 @@ simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 simpl_cardinalRepr =
     textify cardinalRepr
             { reprValue = \n → M.lookup n (simpl_syms ∪ trad_syms)
-            , reprNeg = \_ → Just "负"
+            , reprNeg = Just $ \_ → "负"
             }
 
 simpl_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
@@ -197,7 +197,7 @@ finance_trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 finance_trad_cardinalRepr =
     textify cardinalRepr
     { reprValue = \n → M.lookup n (finance_trad_syms ∪ trad_syms)
-    , reprNeg = \_ → Just "負"
+    , reprNeg = Just $ \_ → "負"
     }
 
 finance_trad_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
@@ -235,7 +235,7 @@ finance_simpl_cardinalRepr =
                                   ∪ finance_trad_syms
                                   ∪ trad_syms
                                   )
-    , reprNeg = \_ → Just "负"
+    , reprNeg = Just $ \_ → "负"
     }
   where
     finance_simpl_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
@@ -259,12 +259,12 @@ pinyin_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 pinyin_cardinalRepr =
     textify cardinalRepr
             { reprValue = \n → M.lookup n pinyin_syms
-            , reprNeg = \_ → Just "fù"
-            , reprAdd = (⊞)
+            , reprNeg = Just $ \_ → "fù"
+            , reprAdd = Just (⊞)
             }
   where
-    Lit 10 ⊞ _ = Just ""
-    _      ⊞ _ = Just " "
+    Lit 10 ⊞ _ = ""
+    _      ⊞ _ = " "
 
     pinyin_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
     pinyin_syms =

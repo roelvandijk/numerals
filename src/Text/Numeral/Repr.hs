@@ -35,28 +35,28 @@ import Text.Numeral.Exp ( Exp(..), Side(L, R), Ctx(..) )
 
 data Repr s = Repr { reprValue ∷ Integer → Maybe (Ctx Exp → s)
                    , reprScale ∷ Integer → Integer → Exp → Ctx Exp → Maybe s
-                   , reprAdd ∷ Exp → Exp → Maybe s
-                   , reprMul ∷ Exp → Exp → Maybe s
-                   , reprSub ∷ Exp → Exp → Maybe s
-                   , reprNeg ∷ Exp       → Maybe s
-                   , reprAddCombine ∷ s → s → s → Maybe s
-                   , reprMulCombine ∷ s → s → s → Maybe s
-                   , reprSubCombine ∷ s → s → s → Maybe s
-                   , reprNegCombine ∷ s → s     → Maybe s
+                   , reprAdd ∷ Maybe (Exp → Exp → s)
+                   , reprMul ∷ Maybe (Exp → Exp → s)
+                   , reprSub ∷ Maybe (Exp → Exp → s)
+                   , reprNeg ∷ Maybe (Exp       → s)
+                   , reprAddCombine ∷ Maybe (s → s → s → s)
+                   , reprMulCombine ∷ Maybe (s → s → s → s)
+                   , reprSubCombine ∷ Maybe (s → s → s → s)
+                   , reprNegCombine ∷ Maybe (s → s     → s)
                    }
 
 defaultRepr ∷ (Monoid s) ⇒ Repr s
 defaultRepr =
     Repr { reprValue = \_       → Nothing
          , reprScale = \_ _ _ _ → Nothing
-         , reprAdd   = \_ _     → Nothing
-         , reprMul   = \_ _     → Nothing
-         , reprSub   = \_ _     → Nothing
-         , reprNeg   = \_       → Nothing
-         , reprAddCombine = \a x y → Just $ x ⊕ a ⊕ y
-         , reprMulCombine = \m x y → Just $ x ⊕ m ⊕ y
-         , reprSubCombine = \s x y → Just $ x ⊕ s ⊕ y
-         , reprNegCombine = \n x   → Just $ n ⊕ x
+         , reprAdd   = Nothing
+         , reprMul   = Nothing
+         , reprSub   = Nothing
+         , reprNeg   = Nothing
+         , reprAddCombine = Just $ \a x y → x ⊕ a ⊕ y
+         , reprMulCombine = Just $ \m x y → x ⊕ m ⊕ y
+         , reprSubCombine = Just $ \s x y → x ⊕ s ⊕ y
+         , reprNegCombine = Just $ \n x   → n ⊕ x
          }
 
 
@@ -69,17 +69,21 @@ textify (Repr {..}) e = go CtxEmpty e
       go ctx (Lit n) = ($ ctx) <$> reprValue n
       go ctx (Scale b o r) = reprScale b o r ctx
       go ctx (Neg x) = do x' ← go (CtxNeg ctx) x
-                          n' ← reprNeg x
-                          reprNegCombine n' x'
+                          rn ← reprNeg
+                          rnc ← reprNegCombine
+                          Just $ rnc (rn x) x'
       go ctx (Add x y) = do x' ← go (CtxAdd L y ctx) x
                             y' ← go (CtxAdd R x ctx) y
-                            a' ← reprAdd x y
-                            reprAddCombine a' x' y'
+                            ra ← reprAdd
+                            rac ← reprAddCombine
+                            Just $ rac (ra x y) x' y'
       go ctx (Mul x y) = do x' ← go (CtxMul L y ctx) x
                             y' ← go (CtxMul R x ctx) y
-                            m' ← reprMul x y
-                            reprMulCombine m' x' y'
+                            rm ← reprMul
+                            rmc ← reprMulCombine
+                            Just $ rmc (rm x y) x' y'
       go ctx (Sub x y) = do x' ← go (CtxSub L y ctx) x
                             y' ← go (CtxSub R x ctx) y
-                            s' ← reprSub x y
-                            reprSubCombine s' x' y'
+                            rs ← reprSub
+                            rsc ← reprSubCombine
+                            Just $ rsc (rs x y) x' y'

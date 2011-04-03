@@ -70,16 +70,16 @@ cardinalRepr = textify defaultRepr
                , reprScale = BN.pelletierRepr "iljoen" "iljoen"
                                               "iljard" "iljard"
                                               []
-               , reprAdd   = (⊞)
-               , reprMul   = \_ _ → Just ""
-               , reprNeg   = \_   → Just "min "
+               , reprAdd   = Just (⊞)
+               , reprMul   = Just $ \_ _ → ""
+               , reprNeg   = Just $ \_   → "min "
                }
     where
-      _     ⊞ Lit 10         = Just ""
-      Lit n ⊞ _ | n ∈ [2,3]  = Just "ën"
-                | n < 10     = Just "en"
-                | otherwise  = Just ""
-      _     ⊞ _              = Just ""
+      _     ⊞ Lit 10         = ""
+      Lit n ⊞ _ | n ∈ [2,3]  = "ën"
+                | n < 10     = "en"
+                | otherwise  = ""
+      _     ⊞ _              = ""
 
       syms =
           M.fromList

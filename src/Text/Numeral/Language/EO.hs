@@ -57,8 +57,8 @@ struct = checkPos
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
-               , reprAdd   = \_ _ → Just " "
-               , reprMul   = \_ _ → Just ""
+               , reprAdd   = Just $ \_ _ → " "
+               , reprMul   = Just $ \_ _ → ""
                }
     where
       syms =

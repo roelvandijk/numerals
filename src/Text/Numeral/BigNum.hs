@@ -22,7 +22,7 @@ module Text.Numeral.BigNum
 -- from base:
 import Control.Monad ( (>=>) )
 import Data.Bool     ( otherwise )
-import Data.Function ( const, fix )
+import Data.Function ( ($), const, fix )
 import Data.Functor  ( (<$>) )
 import Data.Maybe    ( Maybe(Nothing, Just) )
 import Data.Monoid   ( Monoid )
@@ -66,8 +66,8 @@ rule = findRule (   1, lit        )
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 cardinalRepr =
     defaultRepr { reprValue = \n → M.lookup n symMap
-                , reprAdd   = \_ _ → Just ""
-                , reprMul   = \_ _ → Just ""
+                , reprAdd   = Just $ \_ _ → ""
+                , reprMul   = Just $ \_ _ → ""
                 }
 
 symMap ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)

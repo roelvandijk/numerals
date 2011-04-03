@@ -78,20 +78,20 @@ cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprScale = pelletierRepr
-               , reprAdd   = (⊞)
-               , reprMul   = (⊡)
-               , reprNeg   = \_ → Just "meno "
+               , reprAdd   = Just (⊞)
+               , reprMul   = Just (⊡)
+               , reprNeg   = Just $ \_ → "meno "
                }
     where
-      Lit 10                ⊞ Lit 7 = Just "as"
-      Lit 10                ⊞ Lit 9 = Just "an"
-      (_ `Mul` Scale _ _ _) ⊞ _     = Just " "
-      _                     ⊞ _     = Just ""
+      Lit 10                ⊞ Lit 7 = "as"
+      Lit 10                ⊞ Lit 9 = "an"
+      (_ `Mul` Scale _ _ _) ⊞ _     = " "
+      _                     ⊞ _     = ""
 
 
-      Lit n ⊡ Lit 10 | n ≥ 4 = Just "an"
-      _     ⊡ Scale _ _ _    = Just " "
-      _     ⊡ _              = Just ""
+      Lit n ⊡ Lit 10 | n ≥ 4 = "an"
+      _     ⊡ Scale _ _ _    = " "
+      _     ⊡ _              = ""
 
       syms =
           M.fromList

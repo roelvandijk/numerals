@@ -76,16 +76,16 @@ rule = findRule (   0, lit               )
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
-               , reprAdd   = (⊞)
-               , reprMul   = (⊡)
-               , reprNeg   = \_ → Just "минус "
+               , reprAdd   = Just (⊞)
+               , reprMul   = Just (⊡)
+               , reprNeg   = Just $ \_ → "минус "
                }
     where
-      Lit n ⊞ Lit 10 | n < 10 = Just "на"
-      _     ⊞ _               = Just " "
+      Lit n ⊞ Lit 10 | n < 10 = "на"
+      _     ⊞ _               = " "
 
-      _ ⊡ Lit n  | n ≤ 100 = Just ""
-      _ ⊡ _                = Just " "
+      _ ⊡ Lit n  | n ≤ 100 = ""
+      _ ⊡ _                = " "
 
       syms =
           M.fromList

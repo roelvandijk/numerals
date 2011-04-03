@@ -70,13 +70,13 @@ struct = checkPos
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
-               , reprAdd   = (⊞)
-               , reprMul   = \_ _ → Just " "
+               , reprAdd   = Just (⊞)
+               , reprMul   = Just $ \_ _ → " "
                }
     where
-      (Lit _ `Mul` Lit 20) ⊞ Lit 10 = Just " as "
-      _                    ⊞ Lit 10 = Just "-"
-      _                    ⊞ _      = Just " as "
+      (Lit _ `Mul` Lit 20) ⊞ Lit 10 = " as "
+      _                    ⊞ Lit 10 = "-"
+      _                    ⊞ _      = " as "
 
       syms =
           M.fromList

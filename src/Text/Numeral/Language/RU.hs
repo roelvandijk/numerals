@@ -32,7 +32,6 @@ import Prelude       ( Integral, (-) )
 
 -- from base-unicode-symbols:
 import Data.Eq.Unicode   ( (≡) )
-import Data.List.Unicode ( (∈) )
 import Data.Ord.Unicode  ( (≤), (≥) )
 
 -- from containers:
@@ -79,7 +78,7 @@ cardinalRepr = textify defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprAdd   = (⊞)
                , reprMul   = (⊡)
-               , reprNeg   = \_   → Just "?"
+               , reprNeg   = \_ → Just "минус "
                }
     where
       Lit n ⊞ Lit 10 | n < 10 = Just "на"

@@ -38,6 +38,7 @@ import qualified Text.Numeral.Language.PAA as PAA
 import qualified Text.Numeral.Language.PT  as PT
 import qualified Text.Numeral.Language.RU  as RU
 import qualified Text.Numeral.Language.SV  as SV
+import qualified Text.Numeral.Language.TR  as TR
 import qualified Text.Numeral.Language.WO  as WO
 import qualified Text.Numeral.Language.YOR as YOR
 import qualified Text.Numeral.Language.ZH  as ZH

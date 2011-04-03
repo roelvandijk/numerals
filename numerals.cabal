@@ -57,6 +57,7 @@ library
                  , Text.Numeral.Language.RU
                  , Text.Numeral.Language.SCO
                  , Text.Numeral.Language.SV
+                 , Text.Numeral.Language.TR
                  , Text.Numeral.Language.WO
                  , Text.Numeral.Language.YOR
                  , Text.Numeral.Language.ZH
@@ -91,6 +92,7 @@ test-suite test-numerals
                , Text.Numeral.Language.RU.TestData
                , Text.Numeral.Language.SCO.TestData
                , Text.Numeral.Language.SV.TestData
+               , Text.Numeral.Language.TR.TestData
                , Text.Numeral.Language.WO.TestData
                , Text.Numeral.Language.YOR.TestData
                , Text.Numeral.Language.ZH.TestData

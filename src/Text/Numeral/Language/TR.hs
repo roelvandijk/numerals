@@ -22,19 +22,19 @@ module Text.Numeral.Language.TR
 --------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad ( (>=>) )
-import Data.Bool     ( otherwise )
-import Data.Function ( ($), const, fix )
-import Data.List     ( concat )
-import Data.Maybe    ( Maybe(Just) )
-import Data.Monoid   ( Monoid )
-import Data.String   ( IsString )
-import Prelude       ( Integral, (+), (-), Integer )
+import Control.Applicative ( liftA2 )
+import Control.Monad       ( (>=>) )
+import Data.Bool           ( otherwise )
+import Data.Function       ( ($), const, fix )
+import Data.Maybe          ( Maybe(Just) )
+import Data.Monoid         ( Monoid )
+import Data.String         ( IsString )
+import Prelude             ( Integral, (-), divMod, Integer )
 
 -- from base-unicode-symbols:
 import Data.Eq.Unicode     ( (≡) )
 import Data.List.Unicode   ( (∉) )
-import Data.Monoid.Unicode ( (⊕) )
+import Prelude.Unicode     ( (⋅) )
 
 -- from containers:
 import qualified Data.Map as M ( fromList, lookup )
@@ -66,17 +66,19 @@ struct ∷ (Integral α, C.Scale α, C.Lit β, C.Add β, C.Mul β, C.Scale β)
 struct = checkPos $ fix $ rule `combine` shortScale1 R L BN.rule
 
 rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
-rule = findRule (0, lit)
-                ( concat [ [ (n,   lit    )
-                           , (n+1, add n R)
-                           ]
-                         | n ← [10,20..90]
-                         ]
-                ⊕ [ ( 100, step  100   10 R L)
-                  , (1000, step 1000 1000 R L)
-                  ]
-                )
+rule = findRule (   0, lit               )
+              [ (  11, addToTens         )
+              , ( 100, step  100   10 R L)
+              , (1000, step 1000 1000 R L)
+              ]
                 (dec 6 - 1)
+
+addToTens ∷ (Integral α, C.Lit β, C.Add β) ⇒ Rule α β
+addToTens f n = let (m, r) = n `divMod` 10
+                    tens   = m ⋅ 10
+                in if r ≡ 0
+                   then lit f tens
+                   else liftA2 C.add (f tens) (f r)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = textify defaultRepr

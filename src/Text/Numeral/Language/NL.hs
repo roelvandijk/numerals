@@ -47,7 +47,6 @@ import qualified Text.Numeral.BigNum as BN ( rule, pelletierRepr )
 --------------------------------------------------------------------------------
 -- NL
 --------------------------------------------------------------------------------
--- scale 3 R L
 
 cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr

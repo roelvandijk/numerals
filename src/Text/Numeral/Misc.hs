@@ -15,7 +15,7 @@ dec ∷ (Integral α) ⇒ α → α
 dec = (10 ^)
 
 intLog ∷ (Integral α) ⇒ α → α
-intLog x | x < 0 = error "undefined for negative numbers"
+intLog x | x < 0 = error "intLog: undefined for negative numbers"
          | otherwise = go x 0
     where
       go n acc = case n `div` 10 of

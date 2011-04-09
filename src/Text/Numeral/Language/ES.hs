@@ -51,7 +51,7 @@ import qualified Text.Numeral.Exp.Classes as C
 --   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
 --   http://en.wiktionary.org/wiki/Appendix:Spanish_numerals
 
-cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ ( Integral α, C.Scale α

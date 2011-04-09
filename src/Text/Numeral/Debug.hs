@@ -16,9 +16,12 @@ import Data.Maybe    ( fromMaybe )
 -- from base-unicode-symbols:
 import Data.Monoid.Unicode   ( (⊕) )
 
--- from numerals:
+-- from numerals-base:
 import Text.Numeral
 import Text.Numeral.Misc
+import qualified Text.Numeral.BigNum as BN
+
+-- from numerals:
 import qualified Text.Numeral.Language.AMP as AMP
 import qualified Text.Numeral.Language.CHN as CHN
 import qualified Text.Numeral.Language.DE  as DE
@@ -44,14 +47,13 @@ import qualified Text.Numeral.Language.WO  as WO
 import qualified Text.Numeral.Language.YOR as YOR
 import qualified Text.Numeral.Language.ZH  as ZH
 
-import qualified Text.Numeral.BigNum as BN
-
--- Stuff for the repr package
+-- Stuff for repr:
 import qualified Text.Numeral.Exp.Classes as C
 import qualified Text.Repr as R
 import qualified Prelude.Repr as R
 import Prelude.Unicode ( (⋅), (∘) )
 import Text.Show ( Show )
+
 
 --------------------------------------------------------------------------------
 -- Debug and test stuff

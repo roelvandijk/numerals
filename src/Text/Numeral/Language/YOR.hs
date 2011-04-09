@@ -60,7 +60,7 @@ It may also be the case that numbers have multiple possible deriviations.
 525 = (200*3) - (20*4) + 5
 -}
 
-cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ (Integral α, C.Lit β, C.Add β, C.Sub β, C.Mul β) ⇒ α → Maybe β

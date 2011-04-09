@@ -17,6 +17,7 @@ module Text.Numeral.Language.TR
     , struct
     ) where
 
+
 --------------------------------------------------------------------------------
 -- Imports
 --------------------------------------------------------------------------------
@@ -60,7 +61,7 @@ Sources:
   http://tr.wikipedia.org/wiki/B%C3%BCy%C3%BCk_say%C4%B1lar%C4%B1n_adlar%C4%B1
 -}
 
-cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ (Integral α, C.Scale α, C.Lit β, C.Add β, C.Mul β, C.Scale β)

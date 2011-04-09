@@ -54,7 +54,7 @@ Sources:
   http://de.wikipedia.org/wiki/Zahlennamen
 -}
 
-cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ ( Integral α, C.Scale α

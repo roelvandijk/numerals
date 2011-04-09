@@ -53,7 +53,7 @@ import qualified Text.Numeral.Exp.Classes as C
 --   http://www.sonia-portuguese.com/text/numerals.htm
 --   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
 
-cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ ( Integral α, C.Scale α

@@ -74,7 +74,7 @@ struct = pos
 -- Kanji
 --------------------------------------------------------------------------------
 
-kanji_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+kanji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 kanji_cardinal = struct >=> kanji_cardinal_repr
 
 kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
@@ -124,7 +124,7 @@ kanji_cardinal_repr = textify defaultRepr
 -- Daiji
 --------------------------------------------------------------------------------
 
-daiji_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+daiji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 daiji_cardinal = struct >=> daiji_cardinal_repr
 
 daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
@@ -208,7 +208,7 @@ generic_repr four seven = defaultRepr
 -- On'yomi
 --------------------------------------------------------------------------------
 
-on'yomi_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+on'yomi_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 on'yomi_cardinal = struct >=> on'yomi_cardinal_repr
 
 on'yomi_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
@@ -219,7 +219,7 @@ on'yomi_cardinal_repr = textify $ generic_repr "shi" "shichi"
 -- Preferred reading
 --------------------------------------------------------------------------------
 
-preferred_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+preferred_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 preferred_cardinal = struct >=> preferred_cardinal_repr
 
 preferred_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s

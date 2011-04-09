@@ -49,7 +49,7 @@ Sources:
   http://www.gaelg.iofm.net/LESSONS/mona/Lessons.pdf
 -}
 
-cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ α → Maybe β

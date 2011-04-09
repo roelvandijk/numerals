@@ -17,6 +17,7 @@ module Text.Numeral.Language.SV
     , struct
     ) where
 
+
 -------------------------------------------------------------------------------
 -- Imports
 -------------------------------------------------------------------------------
@@ -43,7 +44,7 @@ import qualified Text.Numeral.Exp.Classes as C
 -- SV
 -------------------------------------------------------------------------------
 
-cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ ( Integral α, C.Scale α

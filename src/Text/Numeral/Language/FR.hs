@@ -55,7 +55,7 @@ Sources:
   http://www.french-linguistics.co.uk/tutorials/numbers/
 -}
 
-cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ ( Integral α, C.Scale α

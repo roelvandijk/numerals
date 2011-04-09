@@ -48,7 +48,7 @@ import qualified Text.Numeral.BigNum as BN ( rule, pelletierRepr )
 -- NL
 --------------------------------------------------------------------------------
 
-cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ (Integral α, C.Scale α, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β)
@@ -98,8 +98,8 @@ cardinalRepr = textify defaultRepr
             )
           , (9, const "negen")
           , (10, \c → case c of
-                        CtxMul {} → "tig"
-                        _         → "tien"
+                        CtxMul R _ _ → "tig"
+                        _            → "tien"
             )
           , (11, const "elf")
           , (12, const "twaalf")

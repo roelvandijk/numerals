@@ -54,7 +54,7 @@ import qualified Text.Numeral.Exp.Classes as C
 --   http://italian.about.com/library/weekly/aa042600a.htm
 --   http://www.suite101.com/content/how-to-count-in-italian-a146487
 
-cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = struct >=> cardinalRepr
 
 struct ∷ ( Integral α, C.Scale α

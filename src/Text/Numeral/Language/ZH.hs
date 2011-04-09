@@ -114,7 +114,7 @@ cardinalRepr = defaultRepr
 -- Traditional Characters
 --------------------------------------------------------------------------------
 
-trad_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 trad_cardinal = struct >=> trad_cardinalRepr
 
 trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
@@ -164,7 +164,7 @@ trad_syms =
 -- Simplified Characters
 --------------------------------------------------------------------------------
 
-simpl_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 simpl_cardinal = struct >=> simpl_cardinalRepr
 
 simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
@@ -190,7 +190,7 @@ simpl_syms =
 -- Financial Characters (Traditional)
 --------------------------------------------------------------------------------
 
-finance_trad_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+finance_trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 finance_trad_cardinal = struct >=> finance_trad_cardinalRepr
 
 finance_trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
@@ -225,7 +225,7 @@ finance_trad_syms =
 -- Financial Characters (Simplified)
 --------------------------------------------------------------------------------
 
-finance_simpl_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+finance_simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 finance_simpl_cardinal = struct >=> finance_simpl_cardinalRepr
 
 finance_simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
@@ -252,7 +252,7 @@ finance_simpl_cardinalRepr =
 -- Pinyin
 --------------------------------------------------------------------------------
 
-pinyin_cardinal ∷ (Monoid s, IsString s, Integral α) ⇒ α → Maybe s
+pinyin_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 pinyin_cardinal = struct >=> pinyin_cardinalRepr
 
 pinyin_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
@@ -297,6 +297,3 @@ pinyin_cardinalRepr =
         , (dec 40, const "zhēng")
         , (dec 44, const "zài")
         ]
-
-
--- The End ---------------------------------------------------------------------

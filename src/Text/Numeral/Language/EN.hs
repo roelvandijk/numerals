@@ -49,10 +49,10 @@ import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, pelletierRepr )
 -- EN
 --------------------------------------------------------------------------------
 
-uk_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+uk_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 uk_cardinal = shortScaleStruct >=> textify uk_cardinalRepr'
 
-ukPelletier_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α)
+ukPelletier_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s)
                      ⇒ α → Maybe s
 ukPelletier_cardinal =
     pelletierScaleStruct >=> textify uk_cardinalRepr'
@@ -62,7 +62,7 @@ ukPelletier_cardinal =
                                      "illiard" "illiard"
                                      []
 
-us_cardinal ∷ (Monoid s, IsString s, Integral α, C.Scale α) ⇒ α → Maybe s
+us_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 us_cardinal = shortScaleStruct >=> textify (cardinalRepr (⊞))
   where
     ((_ `Mul` Lit 10) ⊞ _) _ = "-"

@@ -1,0 +1,176 @@
+name:          numerals
+version:       0.3
+cabal-version: >= 1.8
+build-type:    Simple
+stability:     experimental
+author:        Roel van Dijk <vandijk.roel@gmail.com>, Bas van Dijk <v.dijk.bas@gmail.com>
+maintainer:    Roel van Dijk <vandijk.roel@gmail.com>
+copyright:     2009—2011 Roel van Dijk, Bas van Dijk
+license:       BSD3
+license-file:  LICENSE
+category:      Natural Language Processing, Numerical, Text
+synopsis:      Convert numbers to number words
+description:   
+  Convert numbers to number words in a number of languages. Each
+  language has its own module. The module name is based on one of the
+  ISO 639 Alpha codes. Each module contains one or more 'cardinal'
+  functions and a 'struct' function. The 'cardinal' functions directly
+  convert cardinal numbers to a string-like representation of their
+  spoken form. The 'struct' functions convert numbers to a polymorphic
+  representation of their grammatical structure. All language modules
+  are implemented using the @numerals-base@ package.
+  .
+  The use of this package is best understood with some
+  examples. Because the results of conversion are polymorphic we need
+  to choose a specific type. For these examples we'll use simple
+  strings. But any type that has instances for 'Monoid' and 'IsString'
+  will work. First some English number names, both British and US
+  variants:
+  .
+  >>> import qualified Text.Numeral.Language.EN as EN
+  >>> EN.uk_cardinal 123 :: Maybe String
+  Just "one hundred and twenty-three"
+  >>> EN.us_cardinal (10^50 + 42) :: Maybe String
+  Just "one hundred quindecillion forty-two"
+  .
+  French, which contains some traces of a base 20 system:
+  .
+  >>> import qualified Text.Numeral.Language.FR as FR
+  >>> FR.cardinal (-99) :: Maybe String
+  Just "moins quatre-vingt-dix-neuf"
+  .
+  Conversions can fail. Alamblak, a language spoken by a few people in
+  Papua New Guinea, has no representation for negative numbers:
+  .
+  >>> import qualified Text.Numeral.Language.AMP as AMP
+  >>> AMP.cardinal (-3) :: Maybe String
+  Nothing
+  .
+  Some languages have multiple scripts and methods for writing number
+  names. Take Chinese for example, which can be written using Han
+  characters or transcribed to the Latin script using Pinyin.
+  .
+  Traditional Chinese characters:
+  .
+  >>> import qualified Text.Numeral.Language.ZH as ZH
+  >>> ZH.trad_cardinal 123456 :: Maybe String
+  Just "十二萬三千四百五十六"
+  .
+  Simplified characters for use in financial contexts:
+  .
+  >>> ZH.finance_simpl_cardinal 123456 :: Maybe String
+  Just "拾贰万参仟肆伯伍拾陆"
+  .
+  Transcribed using Pinyin:
+  .
+  >>> ZH.pinyin_cardinal 123456 :: Maybe String
+  Just "shíèrwàn sānqiān sìbǎi wǔshí liù"
+  .
+  Using the 'struct' functions you can see the grammatical structure
+  of number names. Because the results of these functions are
+  polymorphic you need to specify a specific type.
+  .
+  >>> import qualified Text.Numeral.Language.NL as NL
+  >>> NL.struct 123 :: Maybe Integer
+  Just 123
+  >>> import Text.Numeral
+  >>> NL.struct 123 :: Maybe Exp
+  Just (Add (Lit 100) (Add (Lit 3) (Mul (Lit 2) (Lit 10))))
+  .
+  Compare with:
+  .
+  >>> NL.cardinal 123 :: Maybe String
+  Just "honderddrieëntwintig"
+  .
+  100 (honderd) + (3 (drie) + (ën) 2 (twin) * 10 (tig))
+
+extra-source-files: ./LICENSE
+                  , ./Text/Numeral/Debug.hs
+
+-------------------------------------------------------------------------------
+
+source-repository head
+  Type: darcs
+  Location: http://code.haskell.org/numerals
+
+-------------------------------------------------------------------------------
+
+library
+  hs-source-dirs: src
+  ghc-options: -Wall
+
+  build-depends: base                       >= 3.0.3.1 && < 4.4
+               , base-unicode-symbols       >= 0.1.1   && < 0.3
+               , containers                 >= 0.4     && < 0.5
+               , containers-unicode-symbols >= 0.3     && < 0.4
+               , numerals-base              >= 0.3     && < 0.4
+
+  exposed-modules: Text.Numeral.Language.AMP
+                 , Text.Numeral.Language.CHN
+                 , Text.Numeral.Language.DE
+                 , Text.Numeral.Language.EN
+                 , Text.Numeral.Language.EO
+                 , Text.Numeral.Language.ES
+                 , Text.Numeral.Language.FR
+                 , Text.Numeral.Language.GV
+                 , Text.Numeral.Language.IT
+                 , Text.Numeral.Language.JA
+                 , Text.Numeral.Language.LA
+                 , Text.Numeral.Language.MG
+                 , Text.Numeral.Language.NL
+                 , Text.Numeral.Language.NO
+                 , Text.Numeral.Language.NQM
+                 , Text.Numeral.Language.OJ
+              -- , Text.Numeral.Language.PAA
+                 , Text.Numeral.Language.PT
+                 , Text.Numeral.Language.RU
+                 , Text.Numeral.Language.SCO
+                 , Text.Numeral.Language.SV
+                 , Text.Numeral.Language.TR
+                 , Text.Numeral.Language.WO
+                 , Text.Numeral.Language.YOR
+                 , Text.Numeral.Language.ZH
+
+-------------------------------------------------------------------------------
+
+test-suite test-numerals
+  type: exitcode-stdio-1.0
+  main-is: test.hs
+  hs-source-dirs: src, test
+
+  other-modules: Text.Numeral.Language.CHN.TestData
+               , Text.Numeral.Language.AMP.TestData
+               , Text.Numeral.Language.DE.TestData
+               , Text.Numeral.Language.EN.TestData
+               , Text.Numeral.Language.EO.TestData
+               , Text.Numeral.Language.ES.TestData
+               , Text.Numeral.Language.FR.TestData
+               , Text.Numeral.Language.GV.TestData
+               , Text.Numeral.Language.IT.TestData
+               , Text.Numeral.Language.JA.TestData
+               , Text.Numeral.Language.LA.TestData
+               , Text.Numeral.Language.MG.TestData
+               , Text.Numeral.Language.NL.TestData
+               , Text.Numeral.Language.NO.TestData
+               , Text.Numeral.Language.NQM.TestData
+               , Text.Numeral.Language.OJ.TestData
+            -- , Text.Numeral.Language.PAA.TestData
+               , Text.Numeral.Language.PT.TestData
+               , Text.Numeral.Language.RU.TestData
+               , Text.Numeral.Language.SCO.TestData
+               , Text.Numeral.Language.SV.TestData
+               , Text.Numeral.Language.TR.TestData
+               , Text.Numeral.Language.WO.TestData
+               , Text.Numeral.Language.YOR.TestData
+               , Text.Numeral.Language.ZH.TestData
+  ghc-options: -Wall
+
+  build-depends: base                       >= 3.0.3.1 && < 4.4
+               , base-unicode-symbols       >= 0.1.1   && < 0.3
+               , containers                 >= 0.4     && < 0.5
+               , containers-unicode-symbols >= 0.3     && < 0.4
+               , numerals-base              >= 0.3     && < 0.4
+               , HUnit                      >= 1.2.2   && < 1.3
+               , test-framework             >= 0.3.3   && < 0.4
+               , test-framework-hunit       >= 0.2.6   && < 0.3
+

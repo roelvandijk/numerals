@@ -90,8 +90,8 @@ extra-source-files: ./LICENSE
 -------------------------------------------------------------------------------
 
 source-repository head
-  Type: darcs
-  Location: http://code.haskell.org/numerals
+  Type: git
+  Location: git://github.com/roelvandijk/numerals.git
 
 -------------------------------------------------------------------------------
 

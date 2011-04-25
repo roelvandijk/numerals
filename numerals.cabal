@@ -8,6 +8,8 @@ maintainer:    Roel van Dijk <vandijk.roel@gmail.com>
 copyright:     2009—2011 Roel van Dijk, Bas van Dijk
 license:       BSD3
 license-file:  LICENSE
+homepage:      https://github.com/roelvandijk/numerals
+bug-reports:   https://github.com/roelvandijk/numerals/issues
 category:      Natural Language Processing, Numerical, Text
 synopsis:      Convert numbers to number words
 description:   

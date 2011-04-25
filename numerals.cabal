@@ -86,8 +86,7 @@ description:
   .
   100 (honderd) + (3 (drie) + (ën) 2 (twin) * 10 (tig))
 
-extra-source-files: ./LICENSE
-                  , ./Text/Numeral/Debug.hs
+extra-source-files: ./README.markdown
 
 -------------------------------------------------------------------------------
 

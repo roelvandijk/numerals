@@ -8,7 +8,7 @@ module Main where
 --------------------------------------------------------------------------------
 
 -- from base:
-import Control.Monad ( forM_, when )
+import Control.Monad ( when )
 import Data.Char     ( String )
 import Data.Function ( ($) )
 import Data.List     ( map )
@@ -124,17 +124,10 @@ testConversion f n s =
                  s
                  (fromMaybe "no result" r)
 
-testAsGroup ∷ (Integer → Maybe String) → [(Integer, String)] → Assertion
-testAsGroup f xs = forM_ xs $ \(n, s) → testConversion f n s
-
-testIndividually ∷ (Integer → Maybe String) → [(Integer, String)] → [Test]
-testIndividually f xs = let mkTest (n, s) = testCase (show n)
-                                          $ testConversion f n s
-                        in map mkTest xs
-
 mkTests ∷ String → (Integer → Maybe String) → [(Integer, String)] → Test
-mkTests n f xs = testCase n $ testAsGroup f xs
---mkTests n f xs = testGroup n $ testIndividually f xs
+mkTests name f xs = testGroup name $ map mkTest xs
+    where
+      mkTest (n, s) = testCase (show n) $ testConversion f n s
 
 tests ∷ [Test]
 tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]

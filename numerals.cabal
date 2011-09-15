@@ -1,5 +1,5 @@
 name:          numerals
-version:       0.3
+version:       0.3.0.1
 cabal-version: >= 1.8
 build-type:    Simple
 stability:     experimental
@@ -100,7 +100,7 @@ library
   hs-source-dirs: src
   ghc-options: -Wall
 
-  build-depends: base                       >= 3.0.3.1 && < 4.4
+  build-depends: base                       >= 3.0.3.1 && < 4.5
                , base-unicode-symbols       >= 0.1.1   && < 0.3
                , containers                 >= 0.4     && < 0.5
                , containers-unicode-symbols >= 0.3     && < 0.4

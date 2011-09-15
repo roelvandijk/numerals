@@ -1,4 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
 
 {-|
 [@ISO639-1@]        zh
@@ -28,50 +32,39 @@ module Text.Numeral.Language.ZH
 -- Imports
 --------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://www.sf.airnet.ne.jp/~ts/language/number/mandarin.html
--}
-
--- from base:
-import Control.Applicative ( liftA2 )
-import Control.Monad       ( (>=>) )
-import Data.Bool           ( otherwise )
-import Data.Function       ( id, const, fix, flip, ($) )
-import Data.Functor        ( (<$>) )
-import Data.Maybe          ( Maybe(Just) )
-import Data.Monoid         ( Monoid )
-import Data.Ord            ( (<) )
-import Data.String         ( IsString )
-import Prelude             ( Num, Integral, fromIntegral, (-), div, divMod )
-
--- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
-import Data.Ord.Unicode    ( (≥) )
-import Data.Eq.Unicode     ( (≡) )
-
--- from containers:
-import qualified Data.Map as M ( Map, fromList, lookup )
-
--- from containers-unicode-symbols:
-import Data.Map.Unicode ( (∪) )
-
--- from numerals:
-import Text.Numeral
-import Text.Numeral.Misc ( dec )
-import qualified Text.Numeral.Exp.Classes as C
+import "base" Data.Bool     ( otherwise )
+import "base" Data.Function ( id, const, fix, flip, ($) )
+import "base" Data.Maybe    ( Maybe(Just) )
+import "base" Data.Monoid   ( Monoid )
+import "base" Data.Ord      ( (<) )
+import "base" Data.String   ( IsString )
+import "base" Prelude       ( Num, Integral, fromIntegral, (-), div, divMod )
+import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
+import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
+import "base-unicode-symbols" Data.Ord.Unicode      ( (≥) )
+import qualified "containers" Data.Map as M ( Map, fromList, lookup )
+import "containers-unicode-symbols" Data.Map.Unicode ( (∪) )
+import           "numerals-base" Text.Numeral
+import           "numerals-base" Text.Numeral.Misc ( dec )
+import qualified "numerals-base" Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
 -- ZH
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.sf.airnet.ne.jp/~ts/language/number/mandarin.html
+-}
+
 flipIfR ∷ Side → (α → α → α) → (α → α → α)
 flipIfR L = id
 flipIfR R = flip
 
 add0 ∷ (Integral α, C.Lit β, C.Add β) ⇒ α → Rule α β
-add0 val f n | n < val `div` 10 = (C.lit 0 `C.add`) <$> f n
+add0 val f n | n < val `div` 10 = C.lit 0 `C.add` f n
              | otherwise        = f n
 
 mulX ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
@@ -79,15 +72,15 @@ mulX ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
 mulX val aSide mSide =
     \f n → let (m, a) = n `divMod` val
                mval = if m ≡ 1
-                      then Just $ C.lit 1 ⊡ C.lit (fromIntegral val)
-                      else (⊡ C.lit (fromIntegral val)) <$> f m
+                      then C.lit 1 ⊡ C.lit (fromIntegral val)
+                      else f m ⊡ C.lit (fromIntegral val)
            in if a ≡ 0
               then mval
-              else liftA2 (flipIfR aSide C.add) (add0 val f a) mval
+              else (flipIfR aSide C.add) (add0 val f a) mval
   where
      (⊡) = flipIfR mSide C.mul
 
-struct ∷ (Integral α, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → Maybe β
+struct ∷ (Integral α, C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → β
 struct = pos
        $ fix
        $ findRule (0, lit)
@@ -99,9 +92,7 @@ struct = pos
     where
       stepX = mkStep lit1 addX mulX
 
-      addX val _ = \f n → liftA2 C.add
-                                 (f val)
-                                 (add0 val f $ n - val)
+      addX val _ = \f n → C.add (f val) (add0 val f $ n - val)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 cardinalRepr = defaultRepr
@@ -115,7 +106,7 @@ cardinalRepr = defaultRepr
 --------------------------------------------------------------------------------
 
 trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-trad_cardinal = struct >=> trad_cardinalRepr
+trad_cardinal = trad_cardinalRepr ∘ struct
 
 trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 trad_cardinalRepr =
@@ -165,7 +156,7 @@ trad_syms =
 --------------------------------------------------------------------------------
 
 simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-simpl_cardinal = struct >=> simpl_cardinalRepr
+simpl_cardinal = simpl_cardinalRepr ∘ struct
 
 simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 simpl_cardinalRepr =
@@ -191,7 +182,7 @@ simpl_syms =
 --------------------------------------------------------------------------------
 
 finance_trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-finance_trad_cardinal = struct >=> finance_trad_cardinalRepr
+finance_trad_cardinal = finance_trad_cardinalRepr ∘ struct
 
 finance_trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 finance_trad_cardinalRepr =
@@ -226,7 +217,7 @@ finance_trad_syms =
 --------------------------------------------------------------------------------
 
 finance_simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-finance_simpl_cardinal = struct >=> finance_simpl_cardinalRepr
+finance_simpl_cardinal = finance_simpl_cardinalRepr ∘ struct
 
 finance_simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 finance_simpl_cardinalRepr =
@@ -253,7 +244,7 @@ finance_simpl_cardinalRepr =
 --------------------------------------------------------------------------------
 
 pinyin_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-pinyin_cardinal = struct >=> pinyin_cardinalRepr
+pinyin_cardinal = pinyin_cardinalRepr ∘ struct
 
 pinyin_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 pinyin_cardinalRepr =

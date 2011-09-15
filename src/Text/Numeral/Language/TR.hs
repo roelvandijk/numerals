@@ -1,4 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
 
 {-|
 [@ISO639-1@]        tr
@@ -22,29 +26,21 @@ module Text.Numeral.Language.TR
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Control.Applicative ( liftA2 )
-import Control.Monad       ( (>=>) )
-import Data.Bool           ( otherwise )
-import Data.Function       ( ($), const, fix )
-import Data.Maybe          ( Maybe(Just) )
-import Data.Monoid         ( Monoid )
-import Data.String         ( IsString )
-import Prelude             ( Integral, (-), divMod, Integer )
-
--- from base-unicode-symbols:
-import Data.Eq.Unicode     ( (≡) )
-import Data.List.Unicode   ( (∉) )
-import Prelude.Unicode     ( (⋅) )
-
--- from containers:
-import qualified Data.Map as M ( fromList, lookup )
-
--- from numerals:
-import Text.Numeral
-import Text.Numeral.Misc ( dec )
-import qualified Text.Numeral.Exp.Classes as C
-import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, forms )
+import "base" Data.Bool           ( otherwise )
+import "base" Data.Function       ( ($), const, fix )
+import "base" Data.Maybe          ( Maybe(Just) )
+import "base" Data.Monoid         ( Monoid )
+import "base" Data.String         ( IsString )
+import "base" Prelude             ( Integral, (-), divMod, Integer )
+import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
+import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base-unicode-symbols" Data.List.Unicode     ( (∉) )
+import "base-unicode-symbols" Prelude.Unicode       ( (⋅) )
+import qualified "containers" Data.Map as M ( fromList, lookup )
+import           "numerals-base" Text.Numeral
+import           "numerals-base" Text.Numeral.Misc ( dec )
+import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.BigNum as BN ( rule, scaleRepr, forms )
 
 
 --------------------------------------------------------------------------------
@@ -52,6 +48,7 @@ import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, forms )
 --------------------------------------------------------------------------------
 
 {-
+
 Sources:
   http://www.languagesandnumbers.com/how-to-count-in-turkish/en/tur/
   http://www.sf.airnet.ne.jp/~ts/language/number/turkish.html
@@ -62,13 +59,13 @@ Sources:
 -}
 
 cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = struct >=> cardinalRepr
+cardinal = cardinalRepr ∘ struct
 
-struct ∷ (Integral α, C.Scale α, C.Lit β, C.Add β, C.Mul β, C.Scale β)
-       ⇒ α → Maybe β
+struct ∷ (Integral α, C.Scale α, C.Unknown β, C.Lit β, C.Add β, C.Mul β, C.Scale β)
+       ⇒ α → β
 struct = checkPos $ fix $ rule `combine` shortScale1 R L BN.rule
 
-rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
+rule ∷ (Integral α, C.Unknown β, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
 rule = findRule (   0, lit               )
               [ (  11, addToTens         )
               , ( 100, step  100   10 R L)
@@ -81,7 +78,7 @@ addToTens f n = let (m, r) = n `divMod` 10
                     tens   = m ⋅ 10
                 in if r ≡ 0
                    then lit f tens
-                   else liftA2 C.add (f tens) (f r)
+                   else f tens `C.add` f r
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

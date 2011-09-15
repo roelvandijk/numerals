@@ -1,4 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
 
 {-|
 [@ISO639-1@]        en
@@ -25,24 +29,19 @@ module Text.Numeral.Language.EN
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Control.Monad ( (>=>) )
-import Data.Bool     ( otherwise )
-import Data.Function ( ($), const, fix )
-import Data.Maybe    ( Maybe(Just) )
-import Data.Monoid   ( Monoid )
-import Data.Ord      ( (<) )
-import Data.String   ( IsString )
-import Prelude       ( Integral, (-), Integer )
-
--- from containers:
-import qualified Data.Map as M ( fromList, lookup )
-
--- from numerals:
-import Text.Numeral
-import Text.Numeral.Misc ( dec )
-import qualified Text.Numeral.Exp.Classes as C
-import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, pelletierRepr )
+import "base" Data.Bool     ( otherwise )
+import "base" Data.Function ( ($), const, fix )
+import "base" Data.Maybe    ( Maybe(Just) )
+import "base" Data.Monoid   ( Monoid )
+import "base" Data.Ord      ( (<) )
+import "base" Data.String   ( IsString )
+import "base" Prelude       ( Integral, (-), Integer )
+import "base-unicode-symbols" Data.Function.Unicode ( (∘) ) 
+import qualified "containers" Data.Map as M ( fromList, lookup )
+import           "numerals-base" Text.Numeral
+import           "numerals-base" Text.Numeral.Misc ( dec )
+import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.BigNum as BN ( rule, scaleRepr, pelletierRepr )
 
 
 --------------------------------------------------------------------------------
@@ -50,44 +49,43 @@ import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, pelletierRepr )
 --------------------------------------------------------------------------------
 
 uk_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-uk_cardinal = shortScaleStruct >=> render uk_cardinalRepr'
+uk_cardinal = render uk_cardinalRepr' ∘ shortScaleStruct
 
 ukPelletier_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s)
                      ⇒ α → Maybe s
-ukPelletier_cardinal =
-    pelletierScaleStruct >=> render uk_cardinalRepr'
-                             { reprScale = pelletierRepr }
+ukPelletier_cardinal = render uk_cardinalRepr' { reprScale = pelletierRepr }
+                     ∘ pelletierScaleStruct
   where
     pelletierRepr = BN.pelletierRepr "illion"  "illion"
                                      "illiard" "illiard"
                                      []
 
 us_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-us_cardinal = shortScaleStruct >=> render (cardinalRepr (⊞))
+us_cardinal = render (cardinalRepr (⊞)) ∘ shortScaleStruct
   where
     ((_ `Mul` Lit 10) ⊞ _) _ = "-"
     ((_ `Mul` _     ) ⊞ _) _ = " "
     (_                ⊞ _) _ = ""
 
 shortScaleStruct ∷ ( Integral α, C.Scale α
-                   , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+                   , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
                    )
-                 ⇒ α → Maybe β
+                 ⇒ α → β
 shortScaleStruct = pos $ fix $ rule `combine` shortScale1 R L BN.rule
 
 longScaleStruct ∷ ( Integral α, C.Scale α
-                  , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+                  , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
                   )
-                ⇒ α → Maybe β
+                ⇒ α → β
 longScaleStruct = pos $ fix $ rule `combine` longScale1 R L BN.rule
 
 pelletierScaleStruct ∷ ( Integral α, C.Scale α
-                       , C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+                       , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
                        )
-                     ⇒ α → Maybe β
+                     ⇒ α → β
 pelletierScaleStruct = pos $ fix $ rule `combine` pelletierScale1 R L BN.rule
 
-rule ∷ (Integral α, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
+rule ∷ (Integral α, C.Unknown β, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
 rule = findRule (   0, lit       )
               [ (  13, add 10 L  )
               , (  20, mul 10 R L)

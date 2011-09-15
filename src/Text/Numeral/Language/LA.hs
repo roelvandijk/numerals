@@ -1,4 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
 
 {-|
 [@ISO639-1@]        la
@@ -22,27 +26,20 @@ module Text.Numeral.Language.LA
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Control.Monad ( (>=>) )
-import Data.Bool     ( otherwise )
-import Data.Function ( ($), const, fix )
-import Data.List     ( concat )
-import Data.Maybe    ( Maybe(Just) )
-import Data.Monoid   ( Monoid )
-import Data.String   ( IsString )
-import Prelude       ( Integral, Num, (+) )
-
--- from base-unicode-symbols:
-import Data.List.Unicode     ( (∈) )
-import Data.Ord.Unicode      ( (≤) )
-import Data.Monoid.Unicode   ( (⊕) )
-
--- from containers:
-import qualified Data.Map as M ( fromList, lookup )
-
--- from numerals:
-import Text.Numeral
-import qualified Text.Numeral.Exp.Classes as C
+import "base" Data.Bool     ( otherwise )
+import "base" Data.Function ( ($), const, fix )
+import "base" Data.List     ( concat )
+import "base" Data.Maybe    ( Maybe(Just) )
+import "base" Data.Monoid   ( Monoid )
+import "base" Data.String   ( IsString )
+import "base" Prelude       ( Integral, Num, (+) )
+import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
+import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
+import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
+import qualified "containers" Data.Map as M ( fromList, lookup )
+import           "numerals-base" Text.Numeral
+import qualified "numerals-base" Text.Numeral.Exp.Classes as C
 
 
 --------------------------------------------------------------------------------
@@ -56,9 +53,9 @@ Sources:
 -}
 
 cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = struct >=> cardinalRepr
+cardinal = cardinalRepr ∘ struct
 
-struct ∷ (Integral α, C.Lit β, C.Add β, C.Sub β, C.Mul β) ⇒ α → Maybe β
+struct ∷ (Integral α, C.Unknown β, C.Lit β, C.Add β, C.Sub β, C.Mul β) ⇒ α → β
 struct = checkPos
        $ fix
        $ findRule ( 0, lit)

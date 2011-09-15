@@ -65,7 +65,7 @@ rule = findRule (   0, lit               )
                 (dec 6 - 1)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-cardinalRepr = textify defaultRepr
+cardinalRepr = render defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprScale = BN.pelletierRepr "iljoen" "iljoen"
                                               "iljard" "iljard"

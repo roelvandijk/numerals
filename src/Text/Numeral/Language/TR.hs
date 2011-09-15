@@ -84,7 +84,7 @@ addToTens f n = let (m, r) = n `divMod` 10
                    else liftA2 C.add (f tens) (f r)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-cardinalRepr = textify defaultRepr
+cardinalRepr = render defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprScale = scaleRepr
                , reprAdd   = Just (⊞)

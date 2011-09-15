@@ -50,12 +50,12 @@ import qualified Text.Numeral.BigNum as BN ( rule, scaleRepr, pelletierRepr )
 --------------------------------------------------------------------------------
 
 uk_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-uk_cardinal = shortScaleStruct >=> textify uk_cardinalRepr'
+uk_cardinal = shortScaleStruct >=> render uk_cardinalRepr'
 
 ukPelletier_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s)
                      ⇒ α → Maybe s
 ukPelletier_cardinal =
-    pelletierScaleStruct >=> textify uk_cardinalRepr'
+    pelletierScaleStruct >=> render uk_cardinalRepr'
                              { reprScale = pelletierRepr }
   where
     pelletierRepr = BN.pelletierRepr "illion"  "illion"
@@ -63,7 +63,7 @@ ukPelletier_cardinal =
                                      []
 
 us_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-us_cardinal = shortScaleStruct >=> textify (cardinalRepr (⊞))
+us_cardinal = shortScaleStruct >=> render (cardinalRepr (⊞))
   where
     ((_ `Mul` Lit 10) ⊞ _) _ = "-"
     ((_ `Mul` _     ) ⊞ _) _ = " "

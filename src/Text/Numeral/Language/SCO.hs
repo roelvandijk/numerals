@@ -61,7 +61,7 @@ struct = checkPos
                    100
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-cardinalRepr = textify defaultRepr
+cardinalRepr = render defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just $ \_ _ _ → ""

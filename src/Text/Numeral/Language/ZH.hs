@@ -119,7 +119,7 @@ trad_cardinal = struct >=> trad_cardinalRepr
 
 trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 trad_cardinalRepr =
-    textify cardinalRepr
+    render cardinalRepr
     { reprValue = \n → M.lookup n trad_syms
     , reprNeg = Just $ \_ _ → "負"
     }
@@ -169,7 +169,7 @@ simpl_cardinal = struct >=> simpl_cardinalRepr
 
 simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 simpl_cardinalRepr =
-    textify cardinalRepr
+    render cardinalRepr
             { reprValue = \n → M.lookup n (simpl_syms ∪ trad_syms)
             , reprNeg = Just $ \_ _ → "负"
             }
@@ -195,7 +195,7 @@ finance_trad_cardinal = struct >=> finance_trad_cardinalRepr
 
 finance_trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 finance_trad_cardinalRepr =
-    textify cardinalRepr
+    render cardinalRepr
     { reprValue = \n → M.lookup n (finance_trad_syms ∪ trad_syms)
     , reprNeg = Just $ \_ _ → "負"
     }
@@ -230,7 +230,7 @@ finance_simpl_cardinal = struct >=> finance_simpl_cardinalRepr
 
 finance_simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 finance_simpl_cardinalRepr =
-    textify cardinalRepr
+    render cardinalRepr
     { reprValue = \n → M.lookup n ( finance_simpl_syms
                                   ∪ finance_trad_syms
                                   ∪ trad_syms
@@ -257,7 +257,7 @@ pinyin_cardinal = struct >=> pinyin_cardinalRepr
 
 pinyin_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 pinyin_cardinalRepr =
-    textify cardinalRepr
+    render cardinalRepr
             { reprValue = \n → M.lookup n pinyin_syms
             , reprNeg = Just $ \_ _ → "fù"
             , reprAdd = Just (⊞)

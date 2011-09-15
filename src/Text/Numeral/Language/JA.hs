@@ -78,7 +78,7 @@ kanji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 kanji_cardinal = struct >=> kanji_cardinal_repr
 
 kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-kanji_cardinal_repr = textify defaultRepr
+kanji_cardinal_repr = render defaultRepr
                       { reprValue = \n → M.lookup n syms
                       , reprAdd   = Just $ \_ _ _ → ""
                       , reprMul   = Just $ \_ _ _ → ""
@@ -128,7 +128,7 @@ daiji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 daiji_cardinal = struct >=> daiji_cardinal_repr
 
 daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-daiji_cardinal_repr = textify defaultRepr
+daiji_cardinal_repr = render defaultRepr
                       { reprValue = \n → M.lookup n syms
                       , reprAdd   = Just $ \_ _ _ → ""
                       , reprMul   = Just $ \_ _ _ → ""
@@ -212,7 +212,7 @@ on'yomi_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 on'yomi_cardinal = struct >=> on'yomi_cardinal_repr
 
 on'yomi_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-on'yomi_cardinal_repr = textify $ generic_repr "shi" "shichi"
+on'yomi_cardinal_repr = render $ generic_repr "shi" "shichi"
 
 
 --------------------------------------------------------------------------------
@@ -223,4 +223,4 @@ preferred_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 preferred_cardinal = struct >=> preferred_cardinal_repr
 
 preferred_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-preferred_cardinal_repr = textify $ generic_repr "yon" "nana"
+preferred_cardinal_repr = render $ generic_repr "yon" "nana"

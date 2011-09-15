@@ -60,7 +60,7 @@ struct = checkPos
                    107
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-cardinalRepr = textify defaultRepr
+cardinalRepr = render defaultRepr
                { reprValue = \n → M.lookup n syms
                , reprAdd   = Just $ \_ _ _ → " abo "
                , reprMul   = Just (⊡)

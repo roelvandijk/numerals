@@ -1,4 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
 
 module Text.Numeral.Language.NO.TestData (cardinals) where
 
@@ -7,16 +11,16 @@ module Text.Numeral.Language.NO.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
-
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
+import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
 --------------------------------------------------------------------------------
 -- NO
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
 cardinals =
   [ (0, "null")
   , (1, "en")
@@ -119,4 +123,26 @@ cardinals =
   , (98, "nittiåtte")
   , (99, "nittini")
   , (100, "hundre")
+  , (123, "hundre tjuetre")
+  , (200, "to hundre")
+  , (300, "tre hundre")
+  , (400, "fire hundre")
+  , (500, "fem hundre")
+  , (600, "seks hundre")
+  , (700, "syv hundre")
+  , (800, "åtte hundre")
+  , (900, "ni hundre")
+  , (1000, "tusen")
+  , (1023, "tusen tjuetre")
+  , (2000, "totusen")
+  , (3000, "tretusen")
+  , (4000, "firetusen")
+  , (5000, "femtusen")
+  , (6000, "sekstusen")
+  , (7000, "syvtusen")
+  , (8000, "åttetusen")
+  , (9000, "nitusen")
+  , (10000, "titusen")
+  , (dec 6, "million")
+  , (2 ⋅ dec 6, "to millioner")
   ]

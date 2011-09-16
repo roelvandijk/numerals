@@ -18,6 +18,7 @@
 
 module Text.Numeral.Language.NL
     ( cardinal
+    , ordinal
     , struct
     ) where
 
@@ -38,7 +39,7 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import qualified "numerals-base" Text.Numeral.Exp.Classes as C
-import qualified "numerals-base" Text.Numeral.BigNum as BN ( rule, pelletierRepr )
+import qualified "numerals-base" Text.Numeral.BigNum as BN
 
 
 --------------------------------------------------------------------------------
@@ -47,6 +48,10 @@ import qualified "numerals-base" Text.Numeral.BigNum as BN ( rule, pelletierRepr
 
 cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = cardinalRepr ∘ struct
+
+ordinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
+ordinal = ordinalRepr ∘ struct
+
 
 struct ∷ ( Integral α, C.Scale α
          , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
@@ -63,13 +68,9 @@ rule = findRule (   0, lit               )
               ]
                 (dec 6 - 1)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-cardinalRepr = render defaultRepr
-               { reprValue = \n → M.lookup n syms
-               , reprScale = BN.pelletierRepr "iljoen" "iljoen"
-                                              "iljard" "iljard"
-                                              []
-               , reprAdd   = Just (⊞)
+genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+genericRepr = defaultRepr
+               { reprAdd   = Just (⊞)
                , reprMul   = Just $ \_ _ _ → ""
                , reprNeg   = Just $ \_ _   → "min "
                }
@@ -80,6 +81,14 @@ cardinalRepr = render defaultRepr
                     | otherwise  = ""
       (_     ⊞ _) _              = ""
 
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr = render genericRepr
+               { reprValue = \n → M.lookup n syms
+               , reprScale = BN.pelletierRepr "iljoen" "iljoen"
+                                              "iljard" "iljard"
+                                              []
+               }
+    where
       syms =
           M.fromList
           [ (0, const "nul")
@@ -106,7 +115,58 @@ cardinalRepr = render defaultRepr
           , (1000, const "duizend")
           ]
 
+      tenForms ∷ s → s → Ctx Exp → s
       tenForms n t ctx = case ctx of
                            CtxMul _ (Lit 10) _ → t
                            CtxAdd _ (Lit _)  _ → t
                            _                   → n
+
+ordinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+ordinalRepr = render genericRepr
+               { reprValue = \n → M.lookup n syms
+               , reprScale = BN.ordPelletierRepr "iljoen" "iljoenste"
+                                                 "iljoen" "iljoenste"
+                                                 "iljard" "iljardste"
+                                                 "iljard" "iljardste"
+                                                 []
+               }
+    where
+      syms =
+          M.fromList
+          [ (0, const "nulde")
+          , (1, tenForms "eerste"  "een"   "een")
+          , (2, tenForms "tweede"  "twee"  "twin")
+          , (3, tenForms "derde"   "drie"  "der")
+          , (4, tenForms "vierde"  "vier"  "veer")
+          , (5, tenForms "vijfde"  "vijf"  "vijf")
+          , (6, tenForms "zesde"   "zes"   "zes")
+          , (7, tenForms "zevende" "zeven" "zeven")
+          , (8, \c → case c of
+                       _ | isOutside R c → "achtste"
+                       CtxMul _ (Lit 10) _ → "tach"
+                       CtxAdd _ (Lit _)  _ → "ach"
+                       _                   → "acht"
+            )
+          , (9, tenForms "negende" "negen" "negen")
+          , (10, \c → case c of
+                        CtxMul R _ _ | isOutside R c → "tigste"
+                                     | otherwise     → "tig"
+                        _            | isOutside R c → "tiende"
+                                     | otherwise     → "tien"
+            )
+          , (11, tenForms "elfde"    "elf"    "elf")
+          , (12, tenForms "twaalfde" "twaalf" "twaalf")
+          , (100,  \c → if isOutside R c then "honderdste" else "honderd")
+          , (1000, \c → if isOutside R c then "duizendste" else "duizend")
+          ]
+
+      tenForms ∷ s -- ^ Ordinal form.
+               → s -- ^ Cardinal form.
+               → s -- ^ Added to, or multiplied with, ten.
+               → Ctx Exp
+               → s
+      tenForms o c t ctx = case ctx of
+                             _ | isOutside R ctx → o
+                             CtxMul _ (Lit 10) _ → t
+                             CtxAdd _ (Lit _)  _ → t
+                             _                   → c

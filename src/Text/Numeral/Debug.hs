@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings, UnicodeSyntax #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
+{-|
+This modules is used to debug the various languages.
+-}
 module Text.Numeral.Debug where
 
 
@@ -10,7 +13,6 @@ module Text.Numeral.Debug where
 
 -- from base:
 import Control.Monad ( forM_ )
-import Data.Function ( fix )
 import Data.Maybe    ( fromMaybe )
 
 -- from base-unicode-symbols:
@@ -47,42 +49,20 @@ import qualified Text.Numeral.Language.WO  as WO
 import qualified Text.Numeral.Language.YOR as YOR
 import qualified Text.Numeral.Language.ZH  as ZH
 
--- Stuff for repr:
-import qualified Text.Numeral.Exp.Classes as C
-import qualified Text.Repr as R
-import qualified Prelude.Repr as R
-import Prelude.Unicode ( (⋅), (∘) )
-import Text.Show ( Show )
-
 
 --------------------------------------------------------------------------------
 -- Debug and test stuff
 --------------------------------------------------------------------------------
 
-test ∷ (Integer → Maybe (R.Repr Integer)) → (Integer → Maybe String) → [Integer] → IO ()
+-- | Simple testing function. Quickly inspect the structure and
+-- rendered result of some numbers.
+--
+-- Example:
+-- >>> test NL.struct NL.cardinal [1..10]
+test ∷ (Integer → Exp) → (Integer → Maybe String) → [Integer] → IO ()
 test struct num xs =
-    forM_ xs $ \x → do putStr $ (show x) ⊕ " = "
-                       case struct x of
-                         Nothing → putStrLn "error"
-                         Just e → do putStr $ show e
-                                     putStr " = "
-                                     putStrLn $ fromMaybe "error" (num x)
-
--- | Like 'test' but doesn't print the numbers that are converted.
-test2 ∷ (Integer → Maybe (R.Repr Integer)) → (Integer → Maybe String) → [Integer] → IO ()
-test2 struct num xs =
-    forM_ xs $ \x → case struct x of
-                      Nothing → putStrLn "error"
-                      Just e → do putStr $ show e
-                                  putStr " = "
-                                  putStrLn $ fromMaybe "error" (num x)
-
-instance (C.Lit α, Show α) ⇒ C.Lit (R.Repr α) where lit = R.pure ∘ C.lit
-instance (C.Neg α) ⇒ C.Neg (R.Repr α) where neg = R.app C.neg "neg"
-instance (C.Add α) ⇒ C.Add (R.Repr α) where add = R.infx R.L 6 C.add "+"
-instance (C.Mul α) ⇒ C.Mul (R.Repr α) where mul = R.infx R.L 7 C.mul "×"
-instance (C.Sub α) ⇒ C.Sub (R.Repr α) where sub = R.infx R.L 9 C.sub "`sub`"
-instance (C.Scale α, Integral α) ⇒ C.Scale (R.Repr α) where
-    scale b o r = R.repr (C.scale b o $ R.extract r) (R.renderer x)
-        where
-          x = 10 R.^ (r ⋅ fromInteger b + fromInteger o)
+    forM_ xs $ \x → do putStr $ (show x)
+                       putStr " = "
+                       putStr $ show (struct x)
+                       putStr " = "
+                       putStrLn $ fromMaybe "<error>" (num x)

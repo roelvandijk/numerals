@@ -70,7 +70,7 @@ cardinalRepr = render defaultRepr
       syms =
           M.fromList
           [ (0,  const "null")
-          , (1,  const "en")
+          , (1,  const "én")
           , (2,  const "to")
           , (3,  ten   "tre"  "tret" "tret")
           , (4,  ten   "fire" "fjor" "før")

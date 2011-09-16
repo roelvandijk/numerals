@@ -96,10 +96,7 @@ cardinalRepr = render defaultRepr
           [ (0, const "sıfır")
           , (1, const "bir")
           , (2, const "iki")
-          , (3, \c → case c of
-                       CtxEmpty → "üç"
-                       _        → "uç"
-            )
+          , (3, const "üç")
           , (4, const "dört")
           , (5, const "beş")
           , (6, const "altı")

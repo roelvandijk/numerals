@@ -76,7 +76,7 @@ cardinalRepr = render defaultRepr
           , (4,  ten   "fire" "fjor" "før")
           , (5,  const "fem")
           , (6,  const "seks")
-          , (7,  ten   "syv"  "syt"  "syt")
+          , (7,  ten   "sju"  "syt"  "syt")
           , (8,  ten   "åtte" "at"   "åt")
           , (9,  ten   "ni"   "nit"  "nit")
           , (10, \c → case c of

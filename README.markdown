@@ -60,11 +60,11 @@ number names. Because the results of these functions are polymorphic
 you need to specify a specific type.
 
     >>> import qualified Text.Numeral.Language.NL as NL
-    >>> NL.struct 123 :: Maybe Integer
-    Just 123
+    >>> NL.struct 123 :: Integer
+    123
     >>> import Text.Numeral
-    >>> NL.struct 123 :: Maybe Exp
-    Just (Add (Lit 100) (Add (Lit 3) (Mul (Lit 2) (Lit 10))))
+    >>> NL.struct 123 :: Exp
+    Add (Lit 100) (Add (Lit 3) (Mul (Lit 2) (Lit 10)))
 
 Compare with:
 

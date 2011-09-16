@@ -1,5 +1,5 @@
 name:          numerals
-version:       0.3.0.1
+version:       0.3.1
 cabal-version: >= 1.8
 build-type:    Simple
 stability:     experimental
@@ -104,7 +104,7 @@ library
                , base-unicode-symbols       >= 0.1.1   && < 0.3
                , containers                 >= 0.4     && < 0.5
                , containers-unicode-symbols >= 0.3     && < 0.4
-               , numerals-base              >= 0.3     && < 0.4
+               , numerals-base              >= 0.3.1   && < 0.4
 
   exposed-modules: Text.Numeral.Language.AMP
                  , Text.Numeral.Language.CHN

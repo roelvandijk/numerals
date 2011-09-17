@@ -35,6 +35,8 @@ import qualified Text.Numeral.Language.AMP          as AMP ( cardinal  )
 import qualified Text.Numeral.Language.AMP.TestData as AMP ( cardinals )
 import qualified Text.Numeral.Language.CHN          as CHN ( cardinal  )
 import qualified Text.Numeral.Language.CHN.TestData as CHN ( cardinals )
+import qualified Text.Numeral.Language.CHR          as CHR ( cardinal  )
+import qualified Text.Numeral.Language.CHR.TestData as CHR ( cardinals )
 import qualified Text.Numeral.Language.DE           as DE  ( cardinal  )
 import qualified Text.Numeral.Language.DE.TestData  as DE  ( cardinals )
 import qualified Text.Numeral.Language.EN           as EN  ( uk_cardinal
@@ -132,6 +134,7 @@ mkTests name f xs = testGroup name $ map mkTest xs
 tests ∷ [Test]
 tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "CHN" [mkTests "cardinal" CHN.cardinal CHN.cardinals]
+        , testGroup "CHR" [mkTests "cardinal" CHR.cardinal CHR.cardinals]
         , testGroup "DE"  [mkTests "cardinal" DE.cardinal DE.cardinals]
         , testGroup "EN"
           [ testGroup "UK"

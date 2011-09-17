@@ -26,6 +26,7 @@ import qualified Text.Numeral.BigNum as BN
 -- from numerals:
 import qualified Text.Numeral.Language.AMP as AMP
 import qualified Text.Numeral.Language.CHN as CHN
+import qualified Text.Numeral.Language.CHR as CHR
 import qualified Text.Numeral.Language.DE  as DE
 import qualified Text.Numeral.Language.EN  as EN
 import qualified Text.Numeral.Language.EO  as EO

@@ -18,8 +18,10 @@
 
 module Text.Numeral.Language.EN
     ( uk_cardinal
+    , uk_ordinal
     , ukPelletier_cardinal
     , us_cardinal
+    , us_ordinal
     , shortScaleStruct
     , longScaleStruct
     , pelletierScaleStruct
@@ -41,7 +43,7 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import qualified "numerals-base" Text.Numeral.Exp.Classes as C
-import qualified "numerals-base" Text.Numeral.BigNum as BN ( rule, scaleRepr, pelletierRepr )
+import qualified "numerals-base" Text.Numeral.BigNum as BN
 
 
 --------------------------------------------------------------------------------
@@ -49,11 +51,14 @@ import qualified "numerals-base" Text.Numeral.BigNum as BN ( rule, scaleRepr, pe
 --------------------------------------------------------------------------------
 
 uk_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-uk_cardinal = render uk_cardinalRepr' ∘ shortScaleStruct
+uk_cardinal = render (cardinalRepr uk_add) ∘ shortScaleStruct
+
+uk_ordinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
+uk_ordinal = render (ordinalRepr uk_add) ∘ shortScaleStruct
 
 ukPelletier_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s)
                      ⇒ α → Maybe s
-ukPelletier_cardinal = render uk_cardinalRepr' { reprScale = pelletierRepr }
+ukPelletier_cardinal = render (cardinalRepr uk_add) { reprScale = pelletierRepr }
                      ∘ pelletierScaleStruct
   where
     pelletierRepr = BN.pelletierRepr "illion"  "illion"
@@ -61,11 +66,10 @@ ukPelletier_cardinal = render uk_cardinalRepr' { reprScale = pelletierRepr }
                                      []
 
 us_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-us_cardinal = render (cardinalRepr (⊞)) ∘ shortScaleStruct
-  where
-    ((_ `Mul` Lit 10) ⊞ _) _ = "-"
-    ((_ `Mul` _     ) ⊞ _) _ = " "
-    (_                ⊞ _) _ = ""
+us_cardinal = render (cardinalRepr us_add) ∘ shortScaleStruct
+
+us_ordinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
+us_ordinal = render (ordinalRepr us_add) ∘ shortScaleStruct
 
 shortScaleStruct ∷ ( Integral α, C.Scale α
                    , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
@@ -94,21 +98,10 @@ rule = findRule (   0, lit       )
               ]
                 (dec 6 - 1)
 
-uk_cardinalRepr' ∷ (Monoid s, IsString s) ⇒ Repr s
-uk_cardinalRepr' = cardinalRepr (⊞)
-  where
-    ((_ `Mul` Lit 10) ⊞ _) _       = "-"
-    ((_ `Mul` _     ) ⊞ x) _
-        | eval x < (100 ∷ Integer) = " and "
-        | otherwise                = " "
-    (_                ⊞ _) _       = ""
-
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Ctx Exp → s) → Repr s
-cardinalRepr f =
+genericRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Ctx Exp → s) → Repr s
+genericRepr f =
     defaultRepr
-    { reprValue = \n → M.lookup n syms
-    , reprScale = BN.scaleRepr "illion" "illion" []
-    , reprAdd   = Just f
+    { reprAdd   = Just f
     , reprMul   = Just (⊞)
     , reprNeg   = Just $ \_ _ → "minus "
     }
@@ -116,6 +109,24 @@ cardinalRepr f =
       (_ ⊞ Lit 10) _ = ""
       (_ ⊞ _     ) _ = " "
 
+uk_add ∷ (IsString s) ⇒ Exp → Exp → Ctx Exp → s
+((_ `Mul` Lit 10) `uk_add` _) _ = "-"
+((_ `Mul` _     ) `uk_add` x) _
+    | eval x < (100 ∷ Integer)  = " and "
+    | otherwise                 = " "
+(_                `uk_add` _) _ = ""
+
+us_add ∷ (IsString s) ⇒ Exp → Exp → Ctx Exp → s
+((_ `Mul` Lit 10) `us_add` _) _ = "-"
+((_ `Mul` _     ) `us_add` _) _ = " "
+(_                `us_add` _) _ = ""
+
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Ctx Exp → s) → Repr s
+cardinalRepr f = (genericRepr f)
+                 { reprValue = \n → M.lookup n syms
+                 , reprScale = BN.scaleRepr "illion" "illion" []
+                 }
+    where
       syms =
           M.fromList
           [ (0, const "zero")
@@ -144,3 +155,52 @@ cardinalRepr f =
                          CtxAdd _ (Lit 10) _ → a
                          CtxMul _ (Lit 10) _ → m
                          _                   → n
+
+ordinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Ctx Exp → s) → Repr s
+ordinalRepr f = (genericRepr f)
+                { reprValue = \n → M.lookup n syms
+                , reprScale = BN.ordScaleRepr "illion" "illionth"
+                                              "illion" "illionth"
+                                              []
+                }
+    where
+      syms =
+          M.fromList
+          [ (0, const "zeroth")
+          , (1, \c → case c of
+                       _ | isOutside R c → "first"
+                         | otherwise     → "one"
+            )
+          , (2, ten   "second" "two"   "two"  "twen")
+          , (3, ten   "third"  "three" "thir" "thir")
+          , (4, ten   "fourth" "four"  "four" "for")
+          , (5, ten   "fifth"  "five"  "fif"  "fif")
+          , (6, \c → if isOutside R c then "sixth"   else "six")
+          , (7, \c → if isOutside R c then "seventh" else "seven")
+          , (8, ten   "eighth" "eight" "eigh" "eigh")
+          , (9, \c → if isOutside R c then "ninth"   else "nine")
+          , (10, \c → case c of
+                        CtxAdd _ (Lit _) _ | isOutside R c → "teenth"
+                                           | otherwise     → "teen"
+                        CtxMul R _       _ | isOutside R c → "tieth"
+                                           | otherwise     → "ty"
+                        _                  | isOutside R c → "tenth"
+                                           | otherwise     → "ten"
+            )
+          , (11,   \c → if isOutside R c then "eleventh"   else "eleven")
+          , (12,   \c → if isOutside R c then "twelfth"    else "twelf")
+          , (100,  \c → if isOutside R c then "hundreth"   else "hundred")
+          , (1000, \c → if isOutside R c then "thousandth" else "thousand")
+          ]
+
+      ten ∷ s -- ^ Ordinal form.
+          → s -- ^ Cardinal form; normal.
+          → s -- ^ Cardinal form; added to ten.
+          → s -- ^ Cardinal form; multiplied with ten.
+          → Ctx Exp
+          → s
+      ten o n a m ctx = case ctx of
+                          _ | isOutside R ctx → o
+                          CtxAdd _ (Lit 10) _ → a
+                          CtxMul _ (Lit 10) _ → m
+                          _                   → n

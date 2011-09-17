@@ -40,10 +40,14 @@ import qualified Text.Numeral.Language.CHR.TestData as CHR ( cardinals )
 import qualified Text.Numeral.Language.DE           as DE  ( cardinal  )
 import qualified Text.Numeral.Language.DE.TestData  as DE  ( cardinals )
 import qualified Text.Numeral.Language.EN           as EN  ( uk_cardinal
+                                                           , uk_ordinal
                                                            , us_cardinal
+                                                           , us_ordinal
                                                            )
 import qualified Text.Numeral.Language.EN.TestData  as EN  ( uk_cardinals
+                                                           , uk_ordinals
                                                            , us_cardinals
+                                                           , us_ordinals
                                                            )
 import qualified Text.Numeral.Language.EO           as EO  ( cardinal  )
 import qualified Text.Numeral.Language.EO.TestData  as EO  ( cardinals )
@@ -138,9 +142,13 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "DE"  [mkTests "cardinal" DE.cardinal DE.cardinals]
         , testGroup "EN"
           [ testGroup "UK"
-            [mkTests "cardinal" EN.uk_cardinal EN.uk_cardinals]
+            [ mkTests "cardinal" EN.uk_cardinal EN.uk_cardinals
+            , mkTests "ordinal"  EN.uk_ordinal  EN.uk_ordinals
+            ]
           , testGroup "US"
-            [mkTests "cardinal" EN.us_cardinal EN.us_cardinals]
+            [ mkTests "cardinal" EN.us_cardinal EN.us_cardinals
+            , mkTests "ordinal"  EN.us_ordinal  EN.us_ordinals
+            ]
           ]
         , testGroup "EO"  [mkTests "cardinal" EO.cardinal EO.cardinals]
         , testGroup "ES"  [mkTests "cardinal" ES.cardinal  ES.cardinals]

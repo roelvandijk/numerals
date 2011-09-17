@@ -118,7 +118,8 @@ cardinalRepr = render genericRepr
       tenForms ∷ s → s → Ctx Exp → s
       tenForms n t ctx = case ctx of
                            CtxMul _ (Lit 10) _ → t
-                           CtxAdd _ (Lit _)  _ → t
+                           CtxAdd _ (Lit 10) _ → t
+                           CtxAdd _ (Lit _)  _ → n
                            _                   → n
 
 ordinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
@@ -134,7 +135,11 @@ ordinalRepr = render genericRepr
       syms =
           M.fromList
           [ (0, const "nulde")
-          , (1, tenForms "eerste"  "een"   "een")
+          , (1, \c → case c of
+                       CtxEmpty → "eerste"
+                       _ | isOutside R c → "eende"
+                         | otherwise    → "een"
+            )
           , (2, tenForms "tweede"  "twee"  "twin")
           , (3, tenForms "derde"   "drie"  "der")
           , (4, tenForms "vierde"  "vier"  "veer")

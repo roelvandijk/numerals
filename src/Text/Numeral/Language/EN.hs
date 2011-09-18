@@ -37,8 +37,9 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (-), Integer )
+import "base" Prelude       ( (+), (-), subtract, negate, (^), error, Integral )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) ) 
+import "base-unicode-symbols" Prelude.Unicode ( ℤ, (⋅) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
@@ -109,10 +110,22 @@ genericRepr f =
       (_ ⊞ Lit 10) _ = ""
       (_ ⊞ _     ) _ = " "
 
+eval ∷ Exp → ℤ
+eval (Lit x)       = x
+eval (Add x y)     = eval x + eval y
+eval (Mul x y)     = eval x ⋅ eval y
+eval (Sub x y)     = subtract (eval x) (eval y)
+eval (Neg x)       = negate (eval x)
+eval (Scale b o r) = 10 ^ (eval r ⋅ b + o)
+eval (Dual x)      = eval x
+eval (Plural x)    = eval x
+eval Unknown       = error "eval: unknown"
+
+
 uk_add ∷ (IsString s) ⇒ Exp → Exp → Ctx Exp → s
 ((_ `Mul` Lit 10) `uk_add` _) _ = "-"
 ((_ `Mul` _     ) `uk_add` x) _
-    | eval x < (100 ∷ Integer)  = " and "
+    | eval x < (100 ∷ ℤ)        = " and "
     | otherwise                 = " "
 (_                `uk_add` _) _ = ""
 

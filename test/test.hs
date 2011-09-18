@@ -49,6 +49,8 @@ import qualified Text.Numeral.Language.FR           as FR
 import qualified Text.Numeral.Language.FR.TestData  as FR
 import qualified Text.Numeral.Language.GV           as GV
 import qualified Text.Numeral.Language.GV.TestData  as GV
+import qualified Text.Numeral.Language.HE           as HE
+import qualified Text.Numeral.Language.HE.TestData  as HE
 import qualified Text.Numeral.Language.IT           as IT
 import qualified Text.Numeral.Language.IT.TestData  as IT
 import qualified Text.Numeral.Language.JA           as JA
@@ -126,6 +128,10 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "ES"  [mkTests "cardinal" ES.cardinal  ES.cardinals]
         , testGroup "FR"  [mkTests "cardinal" FR.cardinal FR.cardinals]
         , testGroup "GV"  [mkTests "cardinal" GV.cardinal GV.cardinals]
+        , testGroup "HE"
+          [ testGroup "cardinal"
+            [mkTests "feminine" HE.fem_cardinal HE.fem_cardinals]
+          ]
         , testGroup "IT"  [mkTests "cardinal" IT.cardinal IT.cardinals]
         , testGroup "JA"
           [ testGroup "preferred"

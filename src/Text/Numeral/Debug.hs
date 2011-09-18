@@ -33,6 +33,7 @@ import qualified Text.Numeral.Language.EO  as EO
 import qualified Text.Numeral.Language.ES  as ES
 import qualified Text.Numeral.Language.FR  as FR
 import qualified Text.Numeral.Language.GV  as GV
+import qualified Text.Numeral.Language.HE  as HE
 import qualified Text.Numeral.Language.IT  as IT
 import qualified Text.Numeral.Language.JA  as JA
 import qualified Text.Numeral.Language.LA  as LA

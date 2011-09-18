@@ -15,12 +15,13 @@ synopsis:      Convert numbers to number words
 description:   
   Convert numbers to number words in a number of languages. Each
   language has its own module. The module name is based on one of the
-  ISO 639 Alpha codes. Each module contains one or more 'cardinal'
-  functions and a 'struct' function. The 'cardinal' functions directly
-  convert cardinal numbers to a string-like representation of their
-  spoken form. The 'struct' functions convert numbers to a polymorphic
-  representation of their grammatical structure. All language modules
-  are implemented using the @numerals-base@ package.
+  ISO 639 Alpha codes. Each module contains one or more 'cardinal' and
+  'ordinal' functions and a 'struct' function. The 'cardinal'
+  functions directly convert cardinal numbers to a string-like
+  representation of their spoken form. The 'ordinal' functions do the
+  same but for ordinal numbers. The 'struct' functions convert numbers
+  to a polymorphic representation of their grammatical structure. All
+  language modules are implemented using the @numerals-base@ package.
   .
   The use of this package is best understood with some
   examples. Because the results of conversion are polymorphic we need

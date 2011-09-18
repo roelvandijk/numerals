@@ -33,7 +33,6 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), String )
-import "base-unicode-symbols" Data.Eq.Unicode ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral

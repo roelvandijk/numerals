@@ -31,86 +31,58 @@ import Test.Framework ( Test, defaultMain, testGroup )
 import Test.Framework.Providers.HUnit ( testCase )
 
 -- from numerals:
-import qualified Text.Numeral.Language.AMP          as AMP ( cardinal  )
-import qualified Text.Numeral.Language.AMP.TestData as AMP ( cardinals )
-import qualified Text.Numeral.Language.CHN          as CHN ( cardinal  )
-import qualified Text.Numeral.Language.CHN.TestData as CHN ( cardinals )
-import qualified Text.Numeral.Language.CHR          as CHR ( cardinal  )
-import qualified Text.Numeral.Language.CHR.TestData as CHR ( cardinals )
-import qualified Text.Numeral.Language.DE           as DE  ( cardinal  )
-import qualified Text.Numeral.Language.DE.TestData  as DE  ( cardinals )
-import qualified Text.Numeral.Language.EN           as EN  ( uk_cardinal
-                                                           , uk_ordinal
-                                                           , us_cardinal
-                                                           , us_ordinal
-                                                           )
-import qualified Text.Numeral.Language.EN.TestData  as EN  ( uk_cardinals
-                                                           , uk_ordinals
-                                                           , us_cardinals
-                                                           , us_ordinals
-                                                           )
-import qualified Text.Numeral.Language.EO           as EO  ( cardinal  )
-import qualified Text.Numeral.Language.EO.TestData  as EO  ( cardinals )
-import qualified Text.Numeral.Language.ES           as ES  ( cardinal  )
-import qualified Text.Numeral.Language.ES.TestData  as ES  ( cardinals )
-import qualified Text.Numeral.Language.FR           as FR  ( cardinal  )
-import qualified Text.Numeral.Language.FR.TestData  as FR  ( cardinals )
-import qualified Text.Numeral.Language.GV           as GV  ( cardinal  )
-import qualified Text.Numeral.Language.GV.TestData  as GV  ( cardinals )
-import qualified Text.Numeral.Language.IT           as IT  ( cardinal  )
-import qualified Text.Numeral.Language.IT.TestData  as IT  ( cardinals )
+import qualified Text.Numeral.Language.AMP          as AMP
+import qualified Text.Numeral.Language.AMP.TestData as AMP
+import qualified Text.Numeral.Language.CHN          as CHN
+import qualified Text.Numeral.Language.CHN.TestData as CHN
+import qualified Text.Numeral.Language.CHR          as CHR
+import qualified Text.Numeral.Language.CHR.TestData as CHR
+import qualified Text.Numeral.Language.DE           as DE
+import qualified Text.Numeral.Language.DE.TestData  as DE
+import qualified Text.Numeral.Language.EN           as EN
+import qualified Text.Numeral.Language.EN.TestData  as EN
+import qualified Text.Numeral.Language.EO           as EO
+import qualified Text.Numeral.Language.EO.TestData  as EO
+import qualified Text.Numeral.Language.ES           as ES
+import qualified Text.Numeral.Language.ES.TestData  as ES
+import qualified Text.Numeral.Language.FR           as FR
+import qualified Text.Numeral.Language.FR.TestData  as FR
+import qualified Text.Numeral.Language.GV           as GV
+import qualified Text.Numeral.Language.GV.TestData  as GV
+import qualified Text.Numeral.Language.IT           as IT
+import qualified Text.Numeral.Language.IT.TestData  as IT
 import qualified Text.Numeral.Language.JA           as JA
-    ( preferred_cardinal
-    , kanji_cardinal
-    , daiji_cardinal
-    )
 import qualified Text.Numeral.Language.JA.TestData  as JA
-    ( preferred_cardinals
-    , kanji_cardinals
-    , daiji_cardinals
-    )
-import qualified Text.Numeral.Language.LA           as LA  ( cardinal  )
-import qualified Text.Numeral.Language.LA.TestData  as LA  ( cardinals )
-import qualified Text.Numeral.Language.MG           as MG  ( cardinal  )
-import qualified Text.Numeral.Language.MG.TestData  as MG  ( cardinals )
-import qualified Text.Numeral.Language.NL           as NL  ( cardinal,  ordinal  )
-import qualified Text.Numeral.Language.NL.TestData  as NL  ( cardinals, ordinals )
-import qualified Text.Numeral.Language.NO           as NO  ( cardinal  )
-import qualified Text.Numeral.Language.NO.TestData  as NO  ( cardinals )
-import qualified Text.Numeral.Language.NQM          as NQM ( cardinal  )
-import qualified Text.Numeral.Language.NQM.TestData as NQM ( cardinals )
-import qualified Text.Numeral.Language.OJ           as OJ  ( cardinal  )
-import qualified Text.Numeral.Language.OJ.TestData  as OJ  ( cardinals )
--- import qualified Text.Numeral.Language.PAA          as PAA ( cardinal  )
--- import qualified Text.Numeral.Language.PAA.TestData as PAA ( cardinals )
-import qualified Text.Numeral.Language.PT           as PT  ( cardinal  )
-import qualified Text.Numeral.Language.PT.TestData  as PT  ( cardinals )
-import qualified Text.Numeral.Language.RU           as RU  ( cardinal  )
-import qualified Text.Numeral.Language.RU.TestData  as RU  ( cardinals )
-import qualified Text.Numeral.Language.SCO          as SCO ( cardinal  )
-import qualified Text.Numeral.Language.SCO.TestData as SCO ( cardinals )
-import qualified Text.Numeral.Language.SV           as SV  ( cardinal  )
-import qualified Text.Numeral.Language.SV.TestData  as SV  ( cardinals )
-import qualified Text.Numeral.Language.TR           as TR  ( cardinal  )
-import qualified Text.Numeral.Language.TR.TestData  as TR  ( cardinals )
-import qualified Text.Numeral.Language.WO           as WO  ( cardinal  )
-import qualified Text.Numeral.Language.WO.TestData  as WO  ( cardinals )
-import qualified Text.Numeral.Language.YOR          as YOR ( cardinal  )
-import qualified Text.Numeral.Language.YOR.TestData as YOR ( cardinals )
+import qualified Text.Numeral.Language.LA           as LA
+import qualified Text.Numeral.Language.LA.TestData  as LA
+import qualified Text.Numeral.Language.MG           as MG
+import qualified Text.Numeral.Language.MG.TestData  as MG
+import qualified Text.Numeral.Language.NL           as NL
+import qualified Text.Numeral.Language.NL.TestData  as NL
+import qualified Text.Numeral.Language.NO           as NO
+import qualified Text.Numeral.Language.NO.TestData  as NO
+import qualified Text.Numeral.Language.NQM          as NQM
+import qualified Text.Numeral.Language.NQM.TestData as NQM
+import qualified Text.Numeral.Language.OJ           as OJ
+import qualified Text.Numeral.Language.OJ.TestData  as OJ
+-- import qualified Text.Numeral.Language.PAA          as PAA
+-- import qualified Text.Numeral.Language.PAA.TestData as PAA
+import qualified Text.Numeral.Language.PT           as PT
+import qualified Text.Numeral.Language.PT.TestData  as PT
+import qualified Text.Numeral.Language.RU           as RU
+import qualified Text.Numeral.Language.RU.TestData  as RU
+import qualified Text.Numeral.Language.SCO          as SCO
+import qualified Text.Numeral.Language.SCO.TestData as SCO
+import qualified Text.Numeral.Language.SV           as SV
+import qualified Text.Numeral.Language.SV.TestData  as SV
+import qualified Text.Numeral.Language.TR           as TR
+import qualified Text.Numeral.Language.TR.TestData  as TR
+import qualified Text.Numeral.Language.WO           as WO
+import qualified Text.Numeral.Language.WO.TestData  as WO
+import qualified Text.Numeral.Language.YOR          as YOR
+import qualified Text.Numeral.Language.YOR.TestData as YOR
 import qualified Text.Numeral.Language.ZH           as ZH
-    ( trad_cardinal
-    , simpl_cardinal
-    , finance_trad_cardinal
-    , finance_simpl_cardinal
-    , pinyin_cardinal
-    )
 import qualified Text.Numeral.Language.ZH.TestData  as ZH
-    ( trad_cardinals
-    , simpl_cardinals
-    , finance_trad_cardinals
-    , finance_simpl_cardinals
-    , pinyin_cardinals
-    )
 
 
 --------------------------------------------------------------------------------

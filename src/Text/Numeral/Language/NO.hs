@@ -86,13 +86,16 @@ cardinalRepr = render defaultRepr
       syms =
           M.fromList
           [ (0,  const "null")
-          , (1,  const "en")
+          , (1,  \c → case c of
+                        CtxEmpty → "én"
+                        _        → "en"
+            )
           , (2,  const "to")
           , (3,  tenForms   "tre"  "tret" "tret")
           , (4,  tenForms   "fire" "fjor" "før")
           , (5,  const "fem")
           , (6,  const "seks")
-          , (7,  tenForms   "syv"  "syt"  "syt")
+          , (7,  tenForms   "sju"  "syt"  "syt")
           , (8,  tenForms   "åtte" "at"   "åt")
           , (9,  tenForms   "ni"   "nit"  "nit")
           , (10, \c → case c of

@@ -1,16 +1,25 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
 
 module Text.Numeral.Language.PL.TestData (cardinals) where
+
 
 --------------------------------------------------------------------------------
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
-cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+--------------------------------------------------------------------------------
+-- PL
+--------------------------------------------------------------------------------
+
+cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
 cardinals =
   [ (0, "zero")
   , (1, "jeden")
@@ -121,20 +130,33 @@ cardinals =
   , (144, "sto czterdzieści cztery")
   , (200, "dwieście")
   , (300, "trzysta")
+  , (400, "czterysta")
+  , (500, "pięćset")
+  , (600, "sześćset")
+  , (700, "siedemset")
   , (777, "siedemset siedemdziesiąt siedem")
+  , (800, "osiemset")
+  , (900, "dziewięćset")
   , (1000, "tysiąc")
   , (1001, "tysiąc jeden")
   , (1010, "tysiąc dziesięć")
-  , (1011, "tysiąć jedenaście")
+  , (1011, "tysiąc jedenaście")
   , (1024, "tysiąc dwadzieścia cztery")
   , (1100, "tysiąc sto")
   , (1728, "tysiąc siedemset dwadzieścia osiem")
   , (2000, "dwa tysiące")
+  , (3000, "trzy tysiące")
+  , (4000, "cztery tysiące")
+  , (5000, "pięć tysięcy")
+  , (6000, "sześć tysięcy")
+  , (7000, "siedem tysięcy")
+  , (8000, "osiem tysięcy")
+  , (9000, "dziewięć tysięcy")
   , (10000, "dziesięć tysięcy")
   , (100000, "sto tysięcy")
   , (500000, "pięćset tysięcy")
   , (1000000, "milion")
   , (1048576, "milion czterdzieści osiem tysięcy pięćset siedemdziesiąt sześć")
-  , (10000000, "dziesięć milionów")
+  , (dec 7, "dziesięć milionów")
   ]
 

@@ -69,6 +69,8 @@ import qualified Text.Numeral.Language.OJ           as OJ
 import qualified Text.Numeral.Language.OJ.TestData  as OJ
 -- import qualified Text.Numeral.Language.PAA          as PAA
 -- import qualified Text.Numeral.Language.PAA.TestData as PAA
+import qualified Text.Numeral.Language.PL           as PL
+import qualified Text.Numeral.Language.PL.TestData  as PL
 import qualified Text.Numeral.Language.PT           as PT
 import qualified Text.Numeral.Language.PT.TestData  as PT
 import qualified Text.Numeral.Language.RU           as RU
@@ -152,6 +154,7 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "NQM" [mkTests "cardinal" NQM.cardinal NQM.cardinals]
         , testGroup "OJ"  [mkTests "cardinal" OJ.cardinal  OJ.cardinals]
         -- , testGroup "PAA" [mkTests "cardinal" PAA.cardinal PAA.cardinals]
+        , testGroup "PL"  [mkTests "cardinal" PL.cardinal  PL.cardinals]
         , testGroup "PT"  [mkTests "cardinal" PT.cardinal  PT.cardinals]
         , testGroup "RU"  [mkTests "cardinal" RU.cardinal  RU.cardinals]
         , testGroup "SCO" [mkTests "cardinal" SCO.cardinal SCO.cardinals]

@@ -84,8 +84,8 @@ genericRepr = defaultRepr
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render genericRepr
                { reprValue = \n → M.lookup n syms
-               , reprScale = BN.pelletierRepr "iljoen" "iljoen"
-                                              "iljard" "iljard"
+               , reprScale = BN.pelletierRepr (const "iljoen")
+                                              (const "iljard")
                                               []
                }
     where
@@ -125,11 +125,13 @@ cardinalRepr = render genericRepr
 ordinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 ordinalRepr = render genericRepr
                { reprValue = \n → M.lookup n syms
-               , reprScale = BN.ordPelletierRepr "iljoen" "iljoenste"
-                                                 "iljoen" "iljoenste"
-                                                 "iljard" "iljardste"
-                                                 "iljard" "iljardste"
-                                                 []
+               , reprScale = BN.pelletierRepr ( BN.ordQuantityName "iljoen" "iljoenste"
+                                                                   "iljoen" "iljoenste"
+                                              )
+                                              ( BN.ordQuantityName "iljard" "iljardste"
+                                                                   "iljard" "iljardste"
+                                              )
+                                              []
                }
     where
       syms =

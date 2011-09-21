@@ -103,8 +103,8 @@ pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
 pelletierRepr =
     BN.pelletierRepr
-      "iljon"  "iljon"
-      "iljard" "iljard"
+      (const "iljon")
+      (const "iljard")
       [ (4, BN.forms "kvadr" "kvattuor" "kvattuor" "kvadra"  "kvadri")
       , (5, BN.forms "kvint" "kvin"     "kvinkva"  "kvinkva" "kvin")
       , (8, BN.forms "okt"   "okto"     "okto"     "okto"    "oktin")

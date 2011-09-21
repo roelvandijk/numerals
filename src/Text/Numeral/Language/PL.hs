@@ -71,19 +71,26 @@ struct = pos
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr
                { reprValue = \n → M.lookup n syms
-               , reprScale = BN.pelletierRepr "ilion"  "ilionów"
-                                              "iliard" "iliardów"
+               , reprScale = BN.pelletierRepr (quantityRepr "ilion"  "iliony"  "ilionów")
+                                              (quantityRepr "iliard" "iliardy" "iliardów")
                                               []
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
                }
     where
       (Lit n ⊞ Lit 10) _ | n ≤ 9 = ""
-      (_ ⊞ _) _ = " "
+      (_     ⊞ _     ) _         = " "
 
-      (_ ⊡ Lit 10) _ = ""
+      (_ ⊡ Lit 10 ) _ = ""
       (_ ⊡ Lit 100) _ = ""
-      (_ ⊡ _) _ = " "
+      (_ ⊡ _      ) _ = " "
+
+      quantityRepr s p1 p2 ctx =
+          case ctx of
+            CtxMul _ (Lit 1) _ → s
+            CtxMul _ (Lit n) _ | n ≤ 4 → p1
+            CtxMul {}          → p2
+            _                  → s
 
       syms =
           M.fromList

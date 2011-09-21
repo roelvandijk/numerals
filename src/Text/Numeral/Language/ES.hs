@@ -160,7 +160,7 @@ cardinalRepr = render defaultRepr
 longScaleRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
 longScaleRepr =
-    BN.scaleRepr "illón" "illones"
+    BN.scaleRepr (BN.quantityName "illón" "illones")
                  [ (4, BN.forms "cuatr" "cuator" "cuator" "cuatra" "cuatri")
                  , (9, BN.forms "non"   "noven"  "noven"  "nona"   "non")
                  ]

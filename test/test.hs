@@ -9,11 +9,10 @@ module Main where
 
 -- from base:
 import Control.Monad ( when )
-import Data.Char     ( String )
 import Data.Function ( ($) )
 import Data.List     ( map )
 import Data.Maybe    ( Maybe(Just), fromMaybe )
-import Prelude       ( Integer )
+import Prelude       ( Integer, String )
 import System.IO     ( IO )
 import Text.Printf   ( printf )
 import Text.Show     ( show )

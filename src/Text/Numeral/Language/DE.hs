@@ -124,8 +124,8 @@ pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
 pelletierRepr =
     BN.pelletierRepr
-      "illion"   "illion"
-      "illiarde" "illiarde"
+      (const "illion")
+      (const "illiarde")
       [ (8, BN.forms "okt" "okto" "okto" "okto" "oktin")
       , (10, \c → case c of
                     CtxAdd _ (Lit 100) _              → "dezi"

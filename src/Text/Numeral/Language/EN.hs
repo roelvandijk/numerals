@@ -62,8 +62,8 @@ ukPelletier_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s)
 ukPelletier_cardinal = render (cardinalRepr uk_add) { reprScale = pelletierRepr }
                      ∘ pelletierScaleStruct
   where
-    pelletierRepr = BN.pelletierRepr "illion"  "illion"
-                                     "illiard" "illiard"
+    pelletierRepr = BN.pelletierRepr (const "illion")
+                                     (const "illiard")
                                      []
 
 us_cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
@@ -137,7 +137,7 @@ us_add ∷ (IsString s) ⇒ Exp → Exp → Ctx Exp → s
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Ctx Exp → s) → Repr s
 cardinalRepr f = (genericRepr f)
                  { reprValue = \n → M.lookup n syms
-                 , reprScale = BN.scaleRepr "illion" "illion" []
+                 , reprScale = BN.scaleRepr (const "illion") []
                  }
     where
       syms =
@@ -172,9 +172,10 @@ cardinalRepr f = (genericRepr f)
 ordinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Ctx Exp → s) → Repr s
 ordinalRepr f = (genericRepr f)
                 { reprValue = \n → M.lookup n syms
-                , reprScale = BN.ordScaleRepr "illion" "illionth"
-                                              "illion" "illionth"
-                                              []
+                , reprScale = BN.scaleRepr (BN.ordQuantityName "illion" "illionth"
+                                                               "illion" "illionth"
+                                           )
+                                           []
                 }
     where
       syms =

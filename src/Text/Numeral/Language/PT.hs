@@ -57,16 +57,17 @@ struct ∷ ( Integral α, C.Scale α
          , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
          )
        ⇒ α → β
-struct = pos $ fix $ rule `combine` shortScale R L BN.rule
-    where
-      rule = findRule (   0, lit       )
-                    [ (  11, add 10 L  )
-                    , (  16, add 10 R  )
-                    , (  20, mul 10 R L)
-                    , ( 100, step  100   10 R L)
-                    , (1000, step 1000 1000 R L)
-                    ]
-                    (dec 6 - 1)
+struct = pos
+       $ fix
+       $ findRule (   0, lit       )
+                [ (  11, add 10 L  )
+                , (  16, add 10 R  )
+                , (  20, mul 10 R L)
+                , ( 100, step  100   10 R L)
+                , (1000, step 1000 1000 R L)
+                ]
+                  (dec 6 - 1)
+       `combine` shortScale R L BN.rule
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr
@@ -155,5 +156,5 @@ cardinalRepr = render defaultRepr
 shortScaleRepr ∷ (IsString s, Monoid s)
                ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
 shortScaleRepr =
-    BN.scaleRepr "ilhão" "ilhões"
+    BN.scaleRepr (BN.quantityName "ilhão" "ilhões")
                  [(4, BN.forms "quatr" "quator" "quator" "quatra" "quatri")]

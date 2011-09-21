@@ -165,8 +165,8 @@ cardinalRepr = render defaultRepr
 pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
 pelletierRepr = BN.pelletierRepr
-                  "ilione"  "ilioni"
-                  "iliardo" "iliardi"
+                  (BN.quantityName "ilione"  "ilioni")
+                  (BN.quantityName "iliardo" "iliardi")
                   [ (6, BN.forms "sest" "sex"    "ses"    "sexa"   "ses")
                   , (7, BN.forms "sett" "septen" "septem" "septua" "septin")
                   , (8, BN.forms "ott"  "otto"   "otto"   "otto"   "ottin")

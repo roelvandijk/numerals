@@ -69,7 +69,7 @@ struct = pos
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr
                { reprValue = \n → M.lookup n syms
-               , reprScale = BN.scaleRepr "illion" "illioner" []
+               , reprScale = BN.scaleRepr (BN.quantityName "illion" "illioner") []
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
                , reprNeg   = Just $ \_ _   → "minus "

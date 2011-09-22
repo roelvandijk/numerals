@@ -114,7 +114,10 @@ tests ∷ [Test]
 tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "CHN" [mkTests "cardinal" CHN.cardinal CHN.cardinals]
         , testGroup "CHR" [mkTests "cardinal" CHR.cardinal CHR.cardinals]
-        , testGroup "DE"  [mkTests "cardinal" DE.cardinal DE.cardinals]
+        , testGroup "DE"
+          [ mkTests "cardinal" DE.cardinal DE.cardinals
+          , mkTests "ordinal"  DE.ordinal  DE.ordinals
+          ]
         , testGroup "EN"
           [ testGroup "UK"
             [ mkTests "cardinal" EN.uk_cardinal EN.uk_cardinals

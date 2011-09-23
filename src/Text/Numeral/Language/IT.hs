@@ -18,6 +18,7 @@
 
 module Text.Numeral.Language.IT
     ( cardinal
+    , ordinal
     , struct
     ) where
 
@@ -26,14 +27,16 @@ module Text.Numeral.Language.IT
 -- Imports
 --------------------------------------------------------------------------------
 
+import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (-), Integer )
+import "base" Prelude       ( Integral, (-) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≥) )
+import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
@@ -54,6 +57,9 @@ import qualified "numerals-base" Text.Numeral.Exp.Classes as C
 cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = cardinalRepr ∘ struct
 
+ordinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
+ordinal = ordinalRepr ∘ struct
+
 struct ∷ ( Integral α, C.Scale α
          , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
          )
@@ -71,14 +77,12 @@ struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
                     ]
                       (dec 6 - 1)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-cardinalRepr = render defaultRepr
-               { reprValue = \n → M.lookup n syms
-               , reprScale = pelletierRepr
-               , reprAdd   = Just (⊞)
-               , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ _ → "meno "
-               }
+genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+genericRepr = defaultRepr
+              { reprAdd   = Just (⊞)
+              , reprMul   = Just (⊡)
+              , reprNeg   = Just $ \_ _ → "meno "
+              }
     where
       (Lit 10                ⊞ Lit 7) _ = "as"
       (Lit 10                ⊞ Lit 9) _ = "an"
@@ -90,53 +94,34 @@ cardinalRepr = render defaultRepr
       (_     ⊡ Scale _ _ _) _ = " "
       (_     ⊡ _          ) _ = ""
 
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr = render genericRepr
+               { reprValue = \n → M.lookup n syms
+               , reprScale = BN.pelletierRepr
+                               (BN.quantityName "ilione"  "ilioni")
+                               (BN.quantityName "iliardo" "iliardi")
+                               bigNumSyms
+               }
+    where
       syms =
           M.fromList
           [ (0, const "zero")
-          , (1, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "un"
-                       _                   → "uno"
-            )
-          , (2, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "do"
-                       _                   → "due"
-            )
+          , (1, forms "uno" "un" "uno")
+          , (2, forms "due" "do" "du")
           , (3, \c → case c of
                        CtxAdd R _        _ → "tré"
                        CtxMul _ (Lit 10) _ → "tren"
                        _                   → "tre"
             )
-          , (4, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "quattor"
-                       CtxMul _ (Lit 10) _ → "quar"
-                       _                   → "quattro"
-            )
-          , (5, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "quin"
-                       CtxMul _ (Lit 10) _ → "cinqu"
-                       _                   → "cinque"
-            )
-          , (6, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "se"
-                       CtxMul _ (Lit 10) _ → "sess"
-                       _                   → "sei"
-            )
-          , (7, \c → case c of
-                       CtxMul _ (Lit 10) _ → "sett"
-                       _                   → "sette"
-            )
-          , (8, \c → case c of
-                       CtxMul _ (Lit 10) _ → "ott"
-                       _                   → "otto"
-            )
-          , (9, \c → case c of
-                       CtxMul _ (Lit 10) _ → "nov"
-                       _                   → "nove"
-            )
+          , (4, forms "quattro" "quattor" "quar")
+          , (5, forms "cinque"  "quin"    "cinqu")
+          , (6, forms "sei"     "se"      "sess")
+          , (7, forms "sette"   "sette"   "sett")
+          , (8, forms "otto"    "otto"    "ott")
+          , (9, forms "nove"    "nove"    "nov")
           , (10, \c → case c of
                         CtxAdd _ (Lit _) _ → "dici"
-                        -- Last vowel removed because of a
-                        -- phonetic rule:
+                        -- Last vowel removed because of a phonetic rule:
                         CtxMul _ (Lit _) (CtxAdd _ (Lit n) _)
                             | n ∈ [1,8]    → "t"
                         CtxMul R (Lit _) _ → "ta"
@@ -162,12 +147,89 @@ cardinalRepr = render defaultRepr
             )
           ]
 
-pelletierRepr ∷ (IsString s, Monoid s)
-              ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
-pelletierRepr = BN.pelletierRepr
-                  (BN.quantityName "ilione"  "ilioni")
-                  (BN.quantityName "iliardo" "iliardi")
-                  [ (6, BN.forms "sest" "sex"    "ses"    "sexa"   "ses")
-                  , (7, BN.forms "sett" "septen" "septem" "septua" "septin")
-                  , (8, BN.forms "ott"  "otto"   "otto"   "otto"   "ottin")
-                  ]
+      forms ∷ s → s → s → Ctx Exp → s
+      forms n a m c = case c of
+                        CtxAdd _ (Lit 10) _ → a
+                        CtxMul _ (Lit 10) _ → m
+                        _                   → n
+
+ordinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+ordinalRepr = render genericRepr
+              { reprValue = \n → M.lookup n syms
+              , reprScale = BN.pelletierRepr
+                              ( BN.ordQuantityName "ilione" "ilionesimo"
+                                                   "ilioni" "ilionesimo"
+                              )
+                              ( BN.ordQuantityName "iliardo" "iliardesimo"
+                                                   "iliardi" "iliardesimo"
+                              )
+                              bigNumSyms
+              }
+    where
+      syms =
+          M.fromList
+          [ (0, const "zero")
+          , (1, forms "primo"   "unesimo" "uno" "un" "uno")
+          , (2, forms "secondo" "duesimo" "due" "do" "due")
+          , (3, \c → case c of
+                       CtxEmpty            → "terzo"
+                       _ | isOutside R c   → "treesimo"
+                       CtxAdd R _        _ → "tré"
+                       CtxMul _ (Lit 10) _ → "tren"
+                       _                   → "tre"
+            )
+          , (4, forms "quarto"  "quattresimo" "quattro" "quattor" "quar")
+          , (5, forms "quinto"  "cinquesimo"  "cinque"  "quin"    "cinqu")
+          , (6, forms "sesto"   "seiesimo"    "sei"     "se"      "sess")
+          , (7, forms "settimo" "settesimo"   "sette"   "sette"   "sett")
+          , (8, forms "ottavo"  "ottesimo"    "otto"    "otto"    "ott")
+          , (9, forms "nono"    "novesimo"    "nove"    "nove"    "nov")
+          , (10, \c → case c of
+                        CtxAdd _ (Lit _) _ | isOutside R c → "dicesimo"
+                                           | otherwise     → "dici"
+                        -- Last vowel removed because of a phonetic rule:
+                        CtxMul _ (Lit _) (CtxAdd _ (Lit n) _)
+                            | n ∈ [1,8]    → "t"
+                        CtxMul R (Lit _) _ | isOutside R c → "tesimo"
+                                           | otherwise     → "ta"
+                        _                  | isOutside R c → "decimo"
+                                           | otherwise     → "dieci"
+            )
+          , (20, \c → case c of
+                        _ | isOutside R c  → "ventesimo"
+                        CtxAdd _ (Lit n) _
+                          | n ∈ [1,8]      → "vent"
+                        _                  → "venti"
+            )
+          , ( 100
+            , let f c = case c of
+                          _ | isOutside R c                        → "centesimo"
+                          CtxAdd _ (Lit 8)                      _  → "cent"
+                          CtxAdd _ (Lit 8 `Mul` Lit 10)         _  → "cent"
+                          CtxAdd _ (Lit 8 `Mul` Lit 10 `Add` _) _  → "cent"
+                          CtxMul _ (Lit _) c2                      → f c2
+                          _                                        → "cento"
+              in f
+            )
+          , (1000, \c → case c of
+                          _ | isOutside R c → "millesimo"
+                          CtxMul {}         → "mila"
+                          _                 → "mille"
+            )
+          ]
+
+      forms ∷ s → s → s → s → s → Ctx Exp → s
+      forms o1 o2 n a m c =
+          case c of
+            CtxEmpty            → o1
+            _ | isOutside R c   → o2
+            CtxAdd _ (Lit 10) _ → a
+            CtxMul _ (Lit 10) _ → m
+            _                   → n
+
+bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx Exp → s)]
+bigNumSyms =
+  [ (6, BN.forms "sest" "sex"    "ses"    "sexa"   "ses")
+  , (7, BN.forms "sett" "septen" "septem" "septua" "septin")
+  , (8, BN.forms "ott"  "otto"   "otto"   "otto"   "ottin")
+  ]

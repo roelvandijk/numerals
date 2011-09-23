@@ -1,28 +1,27 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
 
-module Text.Numeral.Language.IT.TestData (cardinals) where
+module Text.Numeral.Language.IT.TestData (cardinals, ordinals) where
 
 
 --------------------------------------------------------------------------------
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num, Integral )
-
--- from base-unicode-symobls:
-import Prelude.Unicode ( (⋅) )
-
--- from numerals:
-import Text.Numeral.Misc ( dec )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
+import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
 -- IT
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Num i, Integral i, IsString s) ⇒ [(i, s)]
+cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
 cardinals =
   [ (0, "zero")
   , (1, "uno")
@@ -148,6 +147,7 @@ cardinals =
   , (1100, "millecento")
   , (1200, "milleduecento")
   , (2000, "duemila")
+  , (3000, "tremila")
   , (6827, "seimilaottocentoventisette")
   , (10000, "diecimila")
   , (11000, "undicimila")
@@ -179,4 +179,69 @@ cardinals =
   , (dec 57, "noniliardo")
   , (dec 60, "decilione")
   , (dec 63, "deciliardo")
+  ]
+
+ordinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
+ordinals =
+  [ (1, "primo")
+  , (2, "secondo")
+  , (3, "terzo")
+  , (4, "quarto")
+  , (5, "quinto")
+  , (6, "sesto")
+  , (7, "settimo")
+  , (8, "ottavo")
+  , (9, "nono")
+  , (10, "decimo")
+  , (11, "undicesimo")
+  , (12, "dodicesimo")
+  , (13, "tredicesimo")
+  , (14, "quattordicesimo")
+  , (15, "quindicesimo")
+  , (16, "sedicesimo")
+  , (17, "diciassettesimo")
+  , (18, "diciottesimo")
+  , (19, "diciannovesimo")
+  , (20, "ventesimo")
+  , (21, "ventunesimo")
+  , (22, "ventiduesimo")
+  , (23, "ventitreesimo")
+  , (24, "ventiquattresimo")
+  , (25, "venticinquesimo")
+  , (26, "ventiseiesimo")
+  , (27, "ventisettesimo")
+  , (28, "ventottesimo")
+  , (29, "ventinovesimo")
+  , (30, "trentesimo")
+  , (31, "trentunesimo")
+  , (32, "trentaduesimo")
+  , (33, "trentatreesimo")
+  , (34, "trentaquattresimo")
+  , (35, "trentacinquesimo")
+  , (36, "trentaseiesimo")
+  , (37, "trentasettesimo")
+  , (38, "trentottesimo")
+  , (39, "trentanovesimo")
+  , (40, "quarantesimo")
+  , (43, "quarantatreesimo")
+  , (50, "cinquantesimo")
+  , (60, "sessantesimo")
+  , (70, "settantesimo")
+  , (80, "ottantesimo")
+  , (89, "ottantanovesimo")
+  , (90, "novantesimo")
+  , (100, "centesimo")
+  , (200, "duecentesimo")
+  , (278, "duecentosettantottesimo")
+  , (300, "trecentesimo")
+  , (400, "quattrocentesimo")
+  , (500, "cinquecentesimo")
+  , (600, "seicentesimo")
+  , (700, "settecentesimo")
+  , (800, "ottocentesimo")
+  , (900, "novecentesimo")
+  , (1000, "millesimo")
+  , (2000, "duemillesimo")
+  , (dec 6, "milionesimo")
+  , (dec 12, "bilionesimo")
   ]

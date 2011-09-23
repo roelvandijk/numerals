@@ -25,6 +25,7 @@ import qualified "this" Text.Numeral.Language.EN  as EN
 import qualified "this" Text.Numeral.Language.EO  as EO
 import qualified "this" Text.Numeral.Language.ES  as ES
 import qualified "this" Text.Numeral.Language.FR  as FR
+import qualified "this" Text.Numeral.Language.GSW as GSW
 import qualified "this" Text.Numeral.Language.GV  as GV
 import qualified "this" Text.Numeral.Language.HE  as HE
 import qualified "this" Text.Numeral.Language.IT  as IT

@@ -36,6 +36,8 @@ import qualified "this" Text.Numeral.Language.ES           as ES
 import qualified "this" Text.Numeral.Language.ES.TestData  as ES
 import qualified "this" Text.Numeral.Language.FR           as FR
 import qualified "this" Text.Numeral.Language.FR.TestData  as FR
+import qualified "this" Text.Numeral.Language.GSW          as GSW
+import qualified "this" Text.Numeral.Language.GSW.TestData as GSW
 import qualified "this" Text.Numeral.Language.GV           as GV
 import qualified "this" Text.Numeral.Language.GV.TestData  as GV
 import qualified "this" Text.Numeral.Language.HE           as HE
@@ -124,12 +126,16 @@ tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
           [ mkTests "cardinal" FR.cardinal FR.cardinals
           , mkTests "ordinal"  FR.ordinal  FR.ordinals
           ]
+        , testGroup "GSW" [mkTests "cardinal" GSW.cardinal GSW.cardinals]
         , testGroup "GV"  [mkTests "cardinal" GV.cardinal GV.cardinals]
         , testGroup "HE"
           [ testGroup "cardinal"
             [mkTests "feminine" HE.fem_cardinal HE.fem_cardinals]
           ]
-        , testGroup "IT"  [mkTests "cardinal" IT.cardinal IT.cardinals]
+        , testGroup "IT"
+          [ mkTests "cardinal" IT.cardinal IT.cardinals
+          , mkTests "ordinal"  IT.ordinal  IT.ordinals
+          ]
         , testGroup "JA"
           [ testGroup "preferred"
             [mkTests "cardinal" JA.preferred_cardinal

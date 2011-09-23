@@ -12,7 +12,7 @@ homepage:      https://github.com/roelvandijk/numerals
 bug-reports:   https://github.com/roelvandijk/numerals/issues
 category:      Natural Language Processing, Numerical, Text
 synopsis:      Convert numbers to number words
-description:   
+description:
   Convert numbers to number words in a number of languages. Each
   language has its own module. The module name is based on one of the
   ISO 639 Alpha codes. Each module contains one or more 'cardinal' and
@@ -115,6 +115,7 @@ library
                  , Text.Numeral.Language.EO
                  , Text.Numeral.Language.ES
                  , Text.Numeral.Language.FR
+                 , Text.Numeral.Language.GSW
                  , Text.Numeral.Language.GV
                  , Text.Numeral.Language.HE
                  , Text.Numeral.Language.IT
@@ -151,6 +152,7 @@ test-suite test-numerals
                , Text.Numeral.Language.EO.TestData
                , Text.Numeral.Language.ES.TestData
                , Text.Numeral.Language.FR.TestData
+               , Text.Numeral.Language.GSW.TestData
                , Text.Numeral.Language.GV.TestData
                , Text.Numeral.Language.HE.TestData
                , Text.Numeral.Language.IT.TestData

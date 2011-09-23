@@ -35,7 +35,7 @@ import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
-import "base-unicode-symbols" Data.Ord.Unicode      ( (≥) )
+import "base-unicode-symbols" Data.Ord.Unicode      ( (≤), (≥) )
 import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
@@ -82,8 +82,8 @@ genericRepr = defaultRepr
               , reprNeg   = Just $ \_ _   → "minus "
               }
     where
-      (_ ⊞ (_ `Mul` Lit 10)) _ = "und"
-      (_ ⊞ _               ) _ = ""
+      (Lit n ⊞ (_ `Mul` Lit 10)) _ | n ≤ 9 = "und"
+      (_ ⊞ _ ) _ = ""
 
       (_ ⊡ Scale _ _ _) _ = " "
       (_ ⊡ _)           _ = ""

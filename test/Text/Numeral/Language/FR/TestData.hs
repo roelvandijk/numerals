@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        fr
+
+[@ISO639-2B@]       fre
+
+[@ISO639-3@]        fra
+
+[@Native name@]     Français
+
+[@English name@]    French
+-}
+
 module Text.Numeral.Language.FR.TestData (cardinals, ordinals) where
 
 
@@ -17,7 +29,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- FR
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

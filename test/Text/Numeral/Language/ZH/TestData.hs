@@ -1,4 +1,22 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        zh
+
+[@ISO639-2B@]       chi
+
+[@ISO639-2T@]       zho
+
+[@ISO639-3@]        cmn
+
+[@Native name@]     官話
+
+[@English name@]    Chinese
+-}
 
 module Text.Numeral.Language.ZH.TestData
     ( trad_cardinals
@@ -13,18 +31,14 @@ module Text.Numeral.Language.ZH.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Integral )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
+import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
--- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
-
--- from numerals:
-import Text.Numeral.Misc ( dec )
 
 --------------------------------------------------------------------------------
--- ZH
+-- Test data
 --------------------------------------------------------------------------------
 
 -- | Cardinal numbers that are written the same using either

@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        da
+
+[@ISO639-2@]        dan
+
+[@ISO639-3@]        dan
+
+[@Native name@]     dansk
+
+[@English name@]    Danish
+-}
+
 module Text.Numeral.Language.DA.TestData (cardinals) where
 
 
@@ -17,7 +29,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- DA - Danish
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        -
+
+[@ISO639-2@]        gse
+
+[@ISO639-3@]        gse
+
+[@Native name@]     Schwyzerdütsch
+
+[@English name@]    Swiss German
+-}
+
 module Text.Numeral.Language.GSW.TestData (cardinals) where
 
 
@@ -16,7 +28,7 @@ import "base" Prelude     ( Integral )
 
 
 --------------------------------------------------------------------------------
--- GSW
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

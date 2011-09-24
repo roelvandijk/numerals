@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        gv
+
+[@ISO639-2@]        glv
+
+[@ISO639-3@]        glv
+
+[@Native name@]     Gaelg
+
+[@English name@]    Manx
+-}
 
 module Text.Numeral.Language.GV.TestData (cardinals) where
 
@@ -7,13 +23,12 @@ module Text.Numeral.Language.GV.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Integral )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
 
 
 --------------------------------------------------------------------------------
--- GV
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

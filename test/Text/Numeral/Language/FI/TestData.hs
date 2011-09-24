@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        fi
+
+[@ISO639-2@]        fin
+
+[@ISO639-3@]        fin
+
+[@Native name@]     suomi
+
+[@English name@]    Finnish
+-}
+
 module Text.Numeral.Language.FI.TestData (cardinals) where
 
 
@@ -17,7 +29,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- FI - Finnish
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

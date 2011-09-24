@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        wo
+
+[@ISO639-2@]        wo1
+
+[@ISO639-3@]        wo1
+
+[@Native name@]     Wolof
+
+[@English name@]    Wolof
+-}
 
 module Text.Numeral.Language.WO.TestData (cardinals) where
 
@@ -7,13 +23,12 @@ module Text.Numeral.Language.WO.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num )
 
 
 --------------------------------------------------------------------------------
--- WO
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]

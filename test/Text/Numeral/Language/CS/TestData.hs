@@ -4,6 +4,20 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        cs
+
+[@ISO639-2B@]       cze
+
+[@ISO639-2T@]       ces
+
+[@ISO639-3@]        ces
+
+[@Native name@]     Čeština
+
+[@English name@]    Czech
+-}
+
 module Text.Numeral.Language.CS.TestData (cardinals) where
 
 
@@ -17,7 +31,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- CS - Czech
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

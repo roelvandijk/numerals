@@ -9,6 +9,8 @@
 
 [@ISO639-2B@]       ger
 
+[@ISO639-2T@]       deu
+
 [@ISO639-3@]        deu
 
 [@Native name@]     Deutsch

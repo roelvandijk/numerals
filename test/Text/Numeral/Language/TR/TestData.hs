@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        tr
+
+[@ISO639-2@]        tur
+
+[@ISO639-3@]        tur
+
+[@Native name@]     Türkçe
+
+[@English name@]    Turkish
+-}
 
 module Text.Numeral.Language.TR.TestData (cardinals) where
 
@@ -7,16 +23,13 @@ module Text.Numeral.Language.TR.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Integral )
-
--- from numerals:
-import Text.Numeral.Misc ( dec )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- TR
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

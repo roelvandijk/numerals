@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        hu
+
+[@ISO639-2@]        hun
+
+[@ISO639-3@]        hun
+
+[@Native name@]     magyar
+
+[@English name@]    Hungarian
+-}
+
 module Text.Numeral.Language.HU.TestData (cardinals) where
 
 
@@ -17,7 +29,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- HU - Hungarian
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

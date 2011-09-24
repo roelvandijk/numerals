@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        hr
+
+[@ISO639-2@]        hrv
+
+[@ISO639-3@]        hrv
+
+[@Native name@]     Hrvatski
+
+[@English name@]    Croatian
+-}
+
 module Text.Numeral.Language.HR.TestData (cardinals) where
 
 

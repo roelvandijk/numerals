@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        sv
+
+[@ISO639-2B@]       swe
+
+[@ISO639-3@]        swe
+
+[@Native name@]     svenska
+
+[@English name@]    Swedish
+-}
 
 module Text.Numeral.Language.SV.TestData (cardinals) where
 
@@ -7,16 +23,13 @@ module Text.Numeral.Language.SV.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Integral )
-
--- from numerals:
-import Text.Numeral.Misc ( dec )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- SV
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        he
+
+[@ISO639-2@]        heb
+
+[@ISO639-3@]        heb
+
+[@Native name@]     עִבְרִית
+
+[@English name@]    Modern Hebrew
+-}
+
 module Text.Numeral.Language.HE.TestData
   ( fem_cardinals
   , masc_cardinals
@@ -20,7 +32,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- HE
+-- Test data
 --------------------------------------------------------------------------------
 
 fem_cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

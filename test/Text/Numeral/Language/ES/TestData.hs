@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        es
+
+[@ISO639-2B@]       spa
+
+[@ISO639-3@]        spa
+
+[@Native name@]     Español
+
+[@English name@]    Spanish
+-}
 
 module Text.Numeral.Language.ES.TestData (cardinals) where
 
@@ -7,19 +23,14 @@ module Text.Numeral.Language.ES.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num, Integral )
-
--- from base-unicode-symbols:
-import Prelude.Unicode ( (⋅) )
-
--- from numerals:
-import Text.Numeral.Misc ( dec )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num, Integral )
+import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- ES
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Num i, Integral i, IsString s) ⇒ [(i, s)]

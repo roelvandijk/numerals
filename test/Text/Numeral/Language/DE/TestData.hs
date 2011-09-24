@@ -4,6 +4,20 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        de
+
+[@ISO639-2B@]       ger
+
+[@ISO639-2T@]       deu
+
+[@ISO639-3@]        deu
+
+[@Native name@]     Deutsch
+
+[@English name@]    German
+-}
+
 module Text.Numeral.Language.DE.TestData (cardinals, ordinals) where
 
 
@@ -18,7 +32,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- DE
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        nl
+
+[@ISO639-2B@]       dut
+
+[@ISO639-3@]        nld
+
+[@Native name@]     Nederlands
+
+[@English name@]    Dutch
+-}
+
 module Text.Numeral.Language.NL.TestData (cardinals, ordinals) where
 
 
@@ -17,7 +29,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- NL
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

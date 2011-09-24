@@ -4,6 +4,20 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        ro
+
+[@ISO639-2B@]       rum
+
+[@ISO639-2T@]       ron
+
+[@ISO639-3@]        ron
+
+[@Native name@]     română
+
+[@English name@]    Romanian
+-}
+
 module Text.Numeral.Language.RO.TestData (cardinals) where
 
 
@@ -17,7 +31,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- RO - Romanian
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

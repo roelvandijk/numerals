@@ -31,11 +31,11 @@ import "base" Data.Function       ( ($), const, fix )
 import "base" Data.Maybe          ( Maybe(Just) )
 import "base" Data.Monoid         ( Monoid )
 import "base" Data.String         ( IsString )
-import "base" Prelude             ( Integral, (-), divMod, Integer )
+import "base" Prelude             ( Integral, (-), divMod )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∉) )
-import "base-unicode-symbols" Prelude.Unicode       ( (⋅) )
+import "base-unicode-symbols" Prelude.Unicode       ( ℤ, (⋅) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
@@ -117,7 +117,7 @@ cardinalRepr = render defaultRepr
           ]
 
 scaleRepr ∷ (IsString s, Monoid s)
-              ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
+          ⇒ ℤ → ℤ → Exp → Ctx Exp → Maybe s
 scaleRepr = BN.scaleRepr
               (const "ilyon")
               [ (1, BN.forms "m"     "an"     "an"     ""       "")

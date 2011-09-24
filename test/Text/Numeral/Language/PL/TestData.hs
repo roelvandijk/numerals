@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        pl
+
+[@ISO639-2@]        pol
+
+[@ISO639-3@]        pol
+
+[@Native name@]     język polski
+
+[@English name@]    Polish
+-}
+
 module Text.Numeral.Language.PL.TestData (cardinals) where
 
 
@@ -16,8 +28,9 @@ import "base" Prelude     ( Integral )
 import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "numerals-base" Text.Numeral.Misc ( dec )
 
+
 --------------------------------------------------------------------------------
--- PL
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

@@ -4,6 +4,20 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        cy
+
+[@ISO639-2B@]       wel
+
+[@ISO639-2T@]       cym
+
+[@ISO639-3@]        cym
+
+[@Native name@]     Cymraeg
+
+[@English name@]    Welsh
+-}
+
 module Text.Numeral.Language.CY.TestData (cardinals) where
 
 
@@ -17,7 +31,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- CY - Welsh
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

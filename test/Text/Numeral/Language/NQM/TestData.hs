@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        -
+
+[@ISO639-2B@]       -
+
+[@ISO639-3@]        nqm
+
+[@Native name@]     -
+
+[@English name@]    Ndom
+-}
 
 module Text.Numeral.Language.NQM.TestData (cardinals) where
 
@@ -7,13 +23,12 @@ module Text.Numeral.Language.NQM.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num )
 
 
 --------------------------------------------------------------------------------
--- NQM
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]

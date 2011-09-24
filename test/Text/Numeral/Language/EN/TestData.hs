@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        en
+
+[@ISO639-2B@]       eng
+
+[@ISO639-3@]        eng
+
+[@Native name@]     English
+
+[@English name@]    English
+-}
 
 module Text.Numeral.Language.EN.TestData
     ( uk_cardinals, uk_ordinals
@@ -10,16 +26,13 @@ module Text.Numeral.Language.EN.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
-
--- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num )
+import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
 
 
 --------------------------------------------------------------------------------
--- EN
+-- Test data
 --------------------------------------------------------------------------------
 
 -- Sources: http://en.wikipedia.org/wiki/List_of_numbers

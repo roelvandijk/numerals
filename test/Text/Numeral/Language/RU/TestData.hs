@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        ru
+
+[@ISO639-2@]        rus
+
+[@ISO639-3@]        rus
+
+[@Native name@]     Русский язык
+
+[@English name@]    Russian
+-}
 
 module Text.Numeral.Language.RU.TestData (cardinals) where
 
@@ -7,19 +23,14 @@ module Text.Numeral.Language.RU.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Integral )
-
--- from base-unicode-symbols:
-import Prelude.Unicode ( (⋅)  )
-
--- from numerals:
-import Text.Numeral.Misc ( dec )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
+import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- RU
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+   #-}
+
+{-|
+[@ISO639-1@]        -
+
+[@ISO639-2@]        -
+
+[@ISO639-3@]        amp
+
+[@Native name@]     -
+
+[@English name@]    Alamblak
+-}
 
 module Text.Numeral.Language.AMP.TestData (cardinals) where
 
@@ -7,13 +23,12 @@ module Text.Numeral.Language.AMP.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num )
 
 
 --------------------------------------------------------------------------------
--- AMP
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]

@@ -31,10 +31,11 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (-), Integer )
+import "base" Prelude       ( Integral, (-) )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
+import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
@@ -154,7 +155,7 @@ cardinalRepr = render defaultRepr
           ]
 
 shortScaleRepr ∷ (IsString s, Monoid s)
-               ⇒ Integer → Integer → Exp → Ctx Exp → Maybe s
+               ⇒ ℤ → ℤ → Exp → Ctx Exp → Maybe s
 shortScaleRepr =
     BN.scaleRepr (BN.quantityName "ilhão" "ilhões")
                  [(4, BN.forms "quatr" "quator" "quator" "quatra" "quatri")]

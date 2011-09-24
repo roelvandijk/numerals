@@ -1,5 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
 
+{-|
+[@ISO639-1@]        -
+
+[@ISO639-2@]        chr
+
+[@ISO639-3@]        chr
+
+[@Native name@]     ᏣᎳᎩ ᎦᏬᏂᎯᏍᏗ (Tsalagi Gawonihisdi)
+
+[@English name@]    Cherokee
+-}
 module Text.Numeral.Language.CHR.TestData (cardinals) where
 
 
@@ -7,13 +22,12 @@ module Text.Numeral.Language.CHR.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num )
 
 
 --------------------------------------------------------------------------------
--- CHR
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]

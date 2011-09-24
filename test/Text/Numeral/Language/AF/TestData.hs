@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        af
+
+[@ISO639-2@]        afr
+
+[@ISO639-3@]        afr
+
+[@Native name@]     Afrikaans
+
+[@English name@]    Afrikaans
+-}
+
 module Text.Numeral.Language.AF.TestData (cardinals, ordinals) where
 
 
@@ -17,7 +29,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- AF
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

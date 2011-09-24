@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        et
+
+[@ISO639-2@]        est
+
+[@ISO639-3@]        est
+
+[@Native name@]     eesti keel
+
+[@English name@]    Estonian
+-}
+
 module Text.Numeral.Language.ET.TestData (cardinals) where
 
 
@@ -17,7 +29,7 @@ import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
--- ET - Estonian
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

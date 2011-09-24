@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        -
+
+[@ISO639-2@]        sco
+
+[@ISO639-3@]        sco
+
+[@Native name@]     Scots
+
+[@English name@]    Scots
+-}
 
 module Text.Numeral.Language.SCO.TestData (cardinals) where
 
@@ -7,13 +23,12 @@ module Text.Numeral.Language.SCO.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num )
 
 
 --------------------------------------------------------------------------------
--- SCO
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]

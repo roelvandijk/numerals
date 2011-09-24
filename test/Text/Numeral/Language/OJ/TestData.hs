@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        oj
+
+[@ISO639-2@]        oji
+
+[@ISO639-3@]        oji
+
+[@Native name@]     ᐊᓂᔑᓈᐯᒧᐎᓐ (Anishinaabemowin)
+
+[@English name@]    Ojibwe
+-}
 
 module Text.Numeral.Language.OJ.TestData (cardinals) where
 
@@ -7,13 +23,12 @@ module Text.Numeral.Language.OJ.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Integral )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
 
 
 --------------------------------------------------------------------------------
--- OJ
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        -
+
+[@ISO639-2B@]       chn
+
+[@ISO639-3@]        chn
+
+[@Native name@]     -
+
+[@English name@]    Chinook Jargon
+-}
 
 module Text.Numeral.Language.CHN.TestData (cardinals) where
 
@@ -7,13 +23,12 @@ module Text.Numeral.Language.CHN.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num )
 
 
 --------------------------------------------------------------------------------
--- CHN
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]

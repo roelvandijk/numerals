@@ -4,6 +4,18 @@
            , UnicodeSyntax
   #-}
 
+{-|
+[@ISO639-1@]        nb
+
+[@ISO639-2B@]       nob
+
+[@ISO639-3@]        nob
+
+[@Native name@]     Bokmål
+
+[@English name@]    Norwegian Bokmål
+-}
+
 module Text.Numeral.Language.NO.TestData (cardinals) where
 
 
@@ -17,7 +29,7 @@ import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "numerals-base" Text.Numeral.Misc ( dec )
 
 --------------------------------------------------------------------------------
--- NO
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

@@ -7,7 +7,7 @@
 {-|
 [@ISO639-1@]        he
 
-[@ISO639-B@]        heb
+[@ISO639-2@]        heb
 
 [@ISO639-3@]        heb
 

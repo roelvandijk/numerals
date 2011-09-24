@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        yo
+
+[@ISO639-2@]        yor
+
+[@ISO639-3@]        yor
+
+[@Native name@]     èdè Yorùbá
+
+[@English name@]    Yoruba
+-}
 
 module Text.Numeral.Language.YOR.TestData (cardinals) where
 
@@ -7,13 +23,12 @@ module Text.Numeral.Language.YOR.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num )
 
 
 --------------------------------------------------------------------------------
--- YOR
+-- Test data
 --------------------------------------------------------------------------------
 
 cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]

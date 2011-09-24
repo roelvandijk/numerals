@@ -1,4 +1,20 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+{-|
+[@ISO639-1@]        ja
+
+[@ISO639-2B@]       jpn
+
+[@ISO639-3@]        jpn
+
+[@Native name@]     日本語
+
+[@English name@]    Japanese
+-}
 
 module Text.Numeral.Language.JA.TestData
     ( preferred_cardinals
@@ -11,12 +27,9 @@ module Text.Numeral.Language.JA.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Num, Integral )
-
--- from numerals:
-import Text.Numeral.Misc ( dec )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Num, Integral )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------

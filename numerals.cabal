@@ -153,6 +153,7 @@ test-suite test-numerals
                , Text.Numeral.Language.EN.TestData
                , Text.Numeral.Language.EO.TestData
                , Text.Numeral.Language.ES.TestData
+               , Text.Numeral.Language.ET.TestData
                , Text.Numeral.Language.FR.TestData
                , Text.Numeral.Language.GSW.TestData
                , Text.Numeral.Language.GV.TestData

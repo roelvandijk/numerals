@@ -162,6 +162,7 @@ test-suite test-numerals
                , Text.Numeral.Language.GV.TestData
                , Text.Numeral.Language.HE.TestData
                , Text.Numeral.Language.HR.TestData
+               , Text.Numeral.Language.HU.TestData
                , Text.Numeral.Language.IT.TestData
                , Text.Numeral.Language.JA.TestData
                , Text.Numeral.Language.LA.TestData

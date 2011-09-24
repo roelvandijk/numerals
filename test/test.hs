@@ -20,6 +20,8 @@ import "base-unicode-symbols" Prelude.Unicode ( ℤ )
 import "HUnit" Test.HUnit ( Assertion, assertFailure )
 import "test-framework" Test.Framework ( Test, defaultMain, testGroup )
 import "test-framework-hunit" Test.Framework.Providers.HUnit ( testCase )
+import qualified "this" Text.Numeral.Language.AF           as AF
+import qualified "this" Text.Numeral.Language.AF.TestData  as AF
 import qualified "this" Text.Numeral.Language.AMP          as AMP
 import qualified "this" Text.Numeral.Language.AMP.TestData as AMP
 import qualified "this" Text.Numeral.Language.CHN          as CHN
@@ -103,7 +105,11 @@ mkTests name f xs = testGroup name $ map mkTest xs
       mkTest (n, s) = testCase (show n) $ testConversion f n s
 
 tests ∷ [Test]
-tests = [ testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
+tests = [ testGroup "AF"
+          [ mkTests "cardinal" AF.cardinal AF.cardinals
+          , mkTests "ordinal"  AF.ordinal  AF.ordinals
+          ]
+        , testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "CHN" [mkTests "cardinal" CHN.cardinal CHN.cardinals]
         , testGroup "CHR" [mkTests "cardinal" CHR.cardinal CHR.cardinals]
         , testGroup "DE"

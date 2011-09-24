@@ -17,6 +17,7 @@ import "base-unicode-symbols" Prelude.Unicode ( ℤ )
 import "numerals-base" Text.Numeral
 import "numerals-base" Text.Numeral.Misc
 import qualified "numerals-base" Text.Numeral.BigNum as BN
+import qualified "this" Text.Numeral.Language.AF  as AF
 import qualified "this" Text.Numeral.Language.AMP as AMP
 import qualified "this" Text.Numeral.Language.CHN as CHN
 import qualified "this" Text.Numeral.Language.CHR as CHR

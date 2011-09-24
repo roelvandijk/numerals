@@ -107,7 +107,8 @@ library
                , containers-unicode-symbols >= 0.3     && < 0.4
                , numerals-base              >= 0.4     && < 0.5
 
-  exposed-modules: Text.Numeral.Language.AMP
+  exposed-modules: Text.Numeral.Language.AF
+                 , Text.Numeral.Language.AMP
                  , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.CHR
                  , Text.Numeral.Language.DE
@@ -144,9 +145,10 @@ test-suite test-numerals
   main-is: test.hs
   hs-source-dirs: src, test
 
-  other-modules: Text.Numeral.Language.CHN.TestData
-               , Text.Numeral.Language.CHR.TestData
+  other-modules: Text.Numeral.Language.AF.TestData
                , Text.Numeral.Language.AMP.TestData
+               , Text.Numeral.Language.CHN.TestData
+               , Text.Numeral.Language.CHR.TestData
                , Text.Numeral.Language.DE.TestData
                , Text.Numeral.Language.EN.TestData
                , Text.Numeral.Language.EO.TestData

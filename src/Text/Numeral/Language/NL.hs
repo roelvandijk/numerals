@@ -52,21 +52,20 @@ cardinal = cardinalRepr ∘ struct
 ordinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
 ordinal = ordinalRepr ∘ struct
 
-
 struct ∷ ( Integral α, C.Scale α
          , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
          )
        ⇒ α → β
-struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
-
-rule ∷ (Integral α, C.Unknown β, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
-rule = findRule (   0, lit               )
-              [ (  13, add    10      L  )
-              , (  20, mul    10      L L)
-              , ( 100, step  100   10 R L)
-              , (1000, step 1000 1000 R L)
-              ]
-                (dec 6 - 1)
+struct = pos
+       $ fix
+       $ findRule (   0, lit               )
+                [ (  13, add    10      L  )
+                , (  20, mul    10      L L)
+                , ( 100, step  100   10 R L)
+                , (1000, step 1000 1000 R L)
+                ]
+                  (dec 6 - 1)
+         `combine` pelletierScale R L BN.rule
 
 genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 genericRepr = defaultRepr
@@ -93,9 +92,9 @@ cardinalRepr = render genericRepr
           M.fromList
           [ (0, const "nul")
           , (1, const "een")
-          , (2, tenForms "twee" "twin")
-          , (3, tenForms "drie" "der")
-          , (4, tenForms "vier" "veer")
+          , (2, forms "twee" "twin")
+          , (3, forms "drie" "der")
+          , (4, forms "vier" "veer")
           , (5, const "vijf")
           , (6, const "zes")
           , (7, const "zeven")
@@ -115,12 +114,11 @@ cardinalRepr = render genericRepr
           , (1000, const "duizend")
           ]
 
-      tenForms ∷ s → s → Ctx Exp → s
-      tenForms n t ctx = case ctx of
-                           CtxMul _ (Lit 10) _ → t
-                           CtxAdd _ (Lit 10) _ → t
-                           CtxAdd _ (Lit _)  _ → n
-                           _                   → n
+      forms ∷ s → s → Ctx Exp → s
+      forms n t ctx = case ctx of
+                        CtxMul _ (Lit 10) _ → t
+                        CtxAdd _ (Lit 10) _ → t
+                        _                   → n
 
 ordinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 ordinalRepr = render genericRepr
@@ -138,42 +136,42 @@ ordinalRepr = render genericRepr
           M.fromList
           [ (0, const "nulde")
           , (1, \c → case c of
-                       CtxEmpty → "eerste"
+                       CtxEmpty          → "eerste"
                        _ | isOutside R c → "eende"
-                         | otherwise    → "een"
+                         | otherwise     → "een"
             )
-          , (2, tenForms "tweede"  "twee"  "twin")
-          , (3, tenForms "derde"   "drie"  "der")
-          , (4, tenForms "vierde"  "vier"  "veer")
-          , (5, tenForms "vijfde"  "vijf"  "vijf")
-          , (6, tenForms "zesde"   "zes"   "zes")
-          , (7, tenForms "zevende" "zeven" "zeven")
+          , (2, forms "tweede"  "twee"  "twin")
+          , (3, forms "derde"   "drie"  "der")
+          , (4, forms "vierde"  "vier"  "veer")
+          , (5, forms "vijfde"  "vijf"  "vijf")
+          , (6, forms "zesde"   "zes"   "zes")
+          , (7, forms "zevende" "zeven" "zeven")
           , (8, \c → case c of
                        _ | isOutside R c → "achtste"
                        CtxMul _ (Lit 10) _ → "tach"
                        CtxAdd _ (Lit _)  _ → "ach"
                        _                   → "acht"
             )
-          , (9, tenForms "negende" "negen" "negen")
+          , (9, forms "negende" "negen" "negen")
           , (10, \c → case c of
                         CtxMul R _ _ | isOutside R c → "tigste"
                                      | otherwise     → "tig"
                         _            | isOutside R c → "tiende"
                                      | otherwise     → "tien"
             )
-          , (11, tenForms "elfde"    "elf"    "elf")
-          , (12, tenForms "twaalfde" "twaalf" "twaalf")
+          , (11, \c → if isOutside R c then "elfde"    else "elf")
+          , (12, \c → if isOutside R c then "twaalfde" else "twaalf")
           , (100,  \c → if isOutside R c then "honderdste" else "honderd")
           , (1000, \c → if isOutside R c then "duizendste" else "duizend")
           ]
 
-      tenForms ∷ s -- ^ Ordinal form.
-               → s -- ^ Cardinal form.
-               → s -- ^ Added to, or multiplied with, ten.
-               → Ctx Exp
-               → s
-      tenForms o c t ctx = case ctx of
-                             _ | isOutside R ctx → o
-                             CtxMul _ (Lit 10) _ → t
-                             CtxAdd _ (Lit _)  _ → t
-                             _                   → c
+      forms ∷ s -- ^ Ordinal form.
+            → s -- ^ Cardinal form.
+            → s -- ^ Added to, or multiplied with, ten.
+            → Ctx Exp
+            → s
+      forms o c t ctx = case ctx of
+                          _ | isOutside R ctx → o
+                          CtxMul _ (Lit 10) _ → t
+                          CtxAdd _ (Lit _)  _ → t
+                          _                   → c

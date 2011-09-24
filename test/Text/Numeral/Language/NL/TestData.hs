@@ -1,4 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
+{-# LANGUAGE NoImplicitPrelude
+           , OverloadedStrings
+           , PackageImports
+           , UnicodeSyntax
+  #-}
 
 module Text.Numeral.Language.NL.TestData (cardinals, ordinals) where
 
@@ -7,12 +11,10 @@ module Text.Numeral.Language.NL.TestData (cardinals, ordinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
--- from base:
-import Data.String ( IsString )
-import Prelude     ( Integral )
+import "base" Data.String ( IsString )
+import "base" Prelude     ( Integral )
+import "numerals-base" Text.Numeral.Misc ( dec )
 
--- from numerals:
-import Text.Numeral.Misc ( dec )
 
 --------------------------------------------------------------------------------
 -- NL

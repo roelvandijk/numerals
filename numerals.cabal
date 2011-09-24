@@ -150,6 +150,7 @@ test-suite test-numerals
                , Text.Numeral.Language.CHN.TestData
                , Text.Numeral.Language.CHR.TestData
                , Text.Numeral.Language.CS.TestData
+               , Text.Numeral.Language.CY.TestData
                , Text.Numeral.Language.DA.TestData
                , Text.Numeral.Language.DE.TestData
                , Text.Numeral.Language.EN.TestData

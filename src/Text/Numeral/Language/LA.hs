@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.LA
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -72,6 +76,9 @@ struct = checkPos
                     ]
                   )
                   1000
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = (0, 1000)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

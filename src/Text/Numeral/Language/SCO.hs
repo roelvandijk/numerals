@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.SCO
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -58,6 +62,9 @@ struct = checkPos
                 , (100, lit       )
                 ]
                    100
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = (1, 100)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

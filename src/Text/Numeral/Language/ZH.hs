@@ -19,12 +19,16 @@
 -}
 
 module Text.Numeral.Language.ZH
-    ( struct
-    , trad_cardinal
+    ( -- * Conversions
+      trad_cardinal
     , simpl_cardinal
     , finance_trad_cardinal
     , finance_simpl_cardinal
     , pinyin_cardinal
+      -- * Structure
+    , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -38,7 +42,7 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Num, Integral, fromIntegral, (-), div, divMod )
+import "base" Prelude       ( Num, Integral, fromIntegral, (-), div, divMod, negate )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
@@ -93,6 +97,9 @@ struct = pos
       stepX = mkStep lit1 addX mulX
 
       addX val _ = \f n → C.add (f val) (add0 val f $ n - val)
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = dec 48 - 1 in (negate x, x)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 cardinalRepr = defaultRepr

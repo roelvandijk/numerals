@@ -17,11 +17,16 @@
 -}
 
 module Text.Numeral.Language.JA
-    ( struct
-    , kanji_cardinal
+    ( -- * Conversions
+      kanji_cardinal
     , daiji_cardinal
     , on'yomi_cardinal
     , preferred_cardinal
+      -- * Structure
+    , struct
+      -- * Bounds
+    , bounds
+    , daiji_bounds
     ) where
 
 
@@ -34,7 +39,7 @@ import "base" Data.List     ( map )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Num, Integral, (-) )
+import "base" Prelude       ( Num, Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
@@ -66,6 +71,11 @@ struct = pos
               )
              (dec 72 - 1)
 
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = dec 72 - 1 in (negate x, x)
+
+daiji_bounds ∷ (Integral α) ⇒ (α, α)
+daiji_bounds = let x = dec 4 - 1 in (negate x, x)
 
 --------------------------------------------------------------------------------
 -- Kanji

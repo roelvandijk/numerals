@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.TR
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -31,7 +35,7 @@ import "base" Data.Function       ( ($), const, fix )
 import "base" Data.Maybe          ( Maybe(Just) )
 import "base" Data.Monoid         ( Monoid )
 import "base" Data.String         ( IsString )
-import "base" Prelude             ( Integral, (-), divMod )
+import "base" Prelude             ( Integral, (-), divMod, negate )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∉) )
@@ -79,6 +83,9 @@ addToTens f n = let (m, r) = n `divMod` 10
                 in if r ≡ 0
                    then lit f tens
                    else f tens `C.add` f r
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = dec 60000 - 1 in (negate x, x)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

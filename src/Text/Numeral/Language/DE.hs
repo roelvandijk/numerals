@@ -19,9 +19,13 @@
 -}
 
 module Text.Numeral.Language.DE
-    ( cardinal
+    ( -- * Conversions
+      cardinal
     , ordinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -34,7 +38,7 @@ import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (-) )
+import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤), (≥) )
@@ -76,6 +80,9 @@ struct = pos
                ]
                  (dec 6 - 1)
          `combine` pelletierScale R L BN.rule
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = dec 60000 - 1 in (negate x, x)
 
 genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 genericRepr = defaultRepr

@@ -17,14 +17,17 @@
 -}
 
 module Text.Numeral.Language.EN
-    ( uk_cardinal
+    ( -- * Conversions
+      uk_cardinal
     , uk_ordinal
     , ukPelletier_cardinal
     , us_cardinal
     , us_ordinal
+      -- * Structure
     , shortScaleStruct
-    , longScaleStruct
     , pelletierScaleStruct
+      -- * Bounds
+    , bounds
     ) where
 
 --------------------------------------------------------------------------------
@@ -38,7 +41,7 @@ import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
 import "base" Prelude       ( (+), (-), subtract, negate, (^), error, Integral )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) ) 
+import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Prelude.Unicode ( ℤ, (⋅) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
@@ -78,12 +81,6 @@ shortScaleStruct ∷ ( Integral α, C.Scale α
                  ⇒ α → β
 shortScaleStruct = pos $ fix $ rule `combine` shortScale1 R L BN.rule
 
-longScaleStruct ∷ ( Integral α, C.Scale α
-                  , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
-                  )
-                ⇒ α → β
-longScaleStruct = pos $ fix $ rule `combine` longScale1 R L BN.rule
-
 pelletierScaleStruct ∷ ( Integral α, C.Scale α
                        , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
                        )
@@ -98,6 +95,9 @@ rule = findRule (   0, lit       )
               , (1000, step1 1000 1000 R L)
               ]
                 (dec 6 - 1)
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = dec 30003 - 1 in (negate x, x)
 
 genericRepr ∷ (Monoid s, IsString s) ⇒ (Exp → Exp → Ctx Exp → s) → Repr s
 genericRepr f =

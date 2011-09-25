@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.OJ
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 --------------------------------------------------------------------------------
@@ -59,6 +63,9 @@ struct = checkPos
                 , (1000, step 1000  2 R L)
                 ]
                    1999
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = (1, 1999)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

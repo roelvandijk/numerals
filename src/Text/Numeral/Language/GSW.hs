@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.GSW
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -30,11 +34,12 @@ import "base" Data.Function ( ($), const )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral )
+import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import           "numerals-base" Text.Numeral.Misc ( dec )
 import qualified "this"          Text.Numeral.Language.DE as DE
 
 
@@ -55,6 +60,9 @@ struct ∷ ( Integral α, C.Scale α
          )
        ⇒ α → β
 struct = DE.struct
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = dec 6 - 1 in (negate x, x)
 
 genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 genericRepr = defaultRepr

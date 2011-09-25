@@ -17,9 +17,13 @@
 -}
 
 module Text.Numeral.Language.HE
-    ( fem_cardinal
+    ( -- * Conversions
+      fem_cardinal
     -- , masc_cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -32,7 +36,7 @@ import "base" Data.List     ( concat )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (+), div )
+import "base" Prelude       ( Integral, (+), div, negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
@@ -58,10 +62,10 @@ fem_cardinal = fem_cardinalRepr ∘ struct
 -- masc_cardinal = masc_cardinalRepr ∘ struct
 
 struct ∷ ( Integral α
-         , C.Unknown β, C.Lit β, C.Add β, C.Mul β, C.Dual β, C.Plural β
+         , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Dual β, C.Plural β
          )
        ⇒ α → β
-struct = checkPos
+struct = pos
        $ fix
        $ findRule (  0, lit)
                   ( [ (11, add 10 L)
@@ -80,6 +84,9 @@ struct = checkPos
                     ]
                   )
                   1000
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = 1000 in (negate x, x)
 
 fem_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 fem_cardinalRepr = render defaultRepr

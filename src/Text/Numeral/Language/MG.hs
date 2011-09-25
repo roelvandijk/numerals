@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.MG
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -59,6 +63,9 @@ struct = checkPos
        $ findRule (0, lit)
                   [(n, step n 10 L L) | n ← map dec [1..6]]
                   (dec 7 - 1)
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = (0, dec 7 - 1)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.RU
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -31,7 +35,7 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<), (>) )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (-) )
+import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤), (≥) )
@@ -57,8 +61,8 @@ cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = cardinalRepr ∘ struct
 
 struct ∷ (Integral α, C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → β
-struct = pos 
-       $ fix 
+struct = pos
+       $ fix
        $ findRule (   0, lit               )
                 [ (  11, add 10 L          )
                 , (  20, mul 10 R L        )
@@ -69,6 +73,9 @@ struct = pos
                 , (1000, step 1000 1000 R L)
                 ]
                   (dec 6 - 1)
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = dec 6 - 1 in (negate x, x)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

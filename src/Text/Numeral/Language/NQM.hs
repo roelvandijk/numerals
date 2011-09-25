@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.NQM
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -57,6 +61,9 @@ struct = checkPos
                 , ( 72, mul 36 R R)
                 ]
                    107
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = (1, 107)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

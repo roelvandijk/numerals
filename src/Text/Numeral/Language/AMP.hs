@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.AMP
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -62,6 +66,9 @@ struct = checkPos
                 , (40, mul 20 R R)
                 ]
                   399
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = (1, 399)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

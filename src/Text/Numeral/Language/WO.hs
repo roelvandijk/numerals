@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.WO
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 --------------------------------------------------------------------------------
@@ -65,6 +69,9 @@ struct = checkPos
                 , (dec 6, lit)
                 ]
                   (dec 6)
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = (0, dec 6)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

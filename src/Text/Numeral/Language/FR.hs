@@ -17,10 +17,14 @@
 -}
 
 module Text.Numeral.Language.FR
-    ( cardinal
+    ( -- * Conversions
+      cardinal
     , ordinal
+      -- * Structure
     , cardinalStruct
     , ordinalStruct
+      -- * Bounds
+    , bounds
     ) where
 
 
@@ -34,7 +38,7 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (-) )
+import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Ord.Unicode ( (≤), (≥) )
 import "base-unicode-symbols" Prelude.Unicode ( ℤ )
@@ -88,6 +92,9 @@ rule = findRule (   0, lit         )
               , (1000, step 1000 1000 R L)
               ]
                 (dec 6 - 1)
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = dec 60000 - 1 in (negate x, x)
 
 genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
 genericRepr = defaultRepr

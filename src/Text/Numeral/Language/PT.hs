@@ -17,8 +17,12 @@
 -}
 
 module Text.Numeral.Language.PT
-    ( cardinal
+    ( -- * Conversions
+      cardinal
+      -- * Structure
     , struct
+      -- * Bounds
+    , bounds
     ) where
 
 -------------------------------------------------------------------------------
@@ -31,7 +35,7 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (-) )
+import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
@@ -69,6 +73,9 @@ struct = pos
                 ]
                   (dec 6 - 1)
        `combine` shortScale R L BN.rule
+
+bounds ∷ (Integral α) ⇒ (α, α)
+bounds = let x = dec 60000 - 1 in (negate x, x)
 
 cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
 cardinalRepr = render defaultRepr

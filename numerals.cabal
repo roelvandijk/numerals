@@ -111,6 +111,7 @@ library
                  , Text.Numeral.Language.AMP
                  , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.CHR
+                 , Text.Numeral.Language.CS
                  , Text.Numeral.Language.DE
                  , Text.Numeral.Language.EN
                  , Text.Numeral.Language.EO

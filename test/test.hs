@@ -28,6 +28,8 @@ import qualified "this" Text.Numeral.Language.CHN          as CHN
 import qualified "this" Text.Numeral.Language.CHN.TestData as CHN
 import qualified "this" Text.Numeral.Language.CHR          as CHR
 import qualified "this" Text.Numeral.Language.CHR.TestData as CHR
+import qualified "this" Text.Numeral.Language.CS           as CS
+import qualified "this" Text.Numeral.Language.CS.TestData  as CS
 import qualified "this" Text.Numeral.Language.DE           as DE
 import qualified "this" Text.Numeral.Language.DE.TestData  as DE
 import qualified "this" Text.Numeral.Language.EN           as EN
@@ -112,6 +114,7 @@ tests = [ testGroup "AF"
         , testGroup "AMP" [mkTests "cardinal" AMP.cardinal AMP.cardinals]
         , testGroup "CHN" [mkTests "cardinal" CHN.cardinal CHN.cardinals]
         , testGroup "CHR" [mkTests "cardinal" CHR.cardinal CHR.cardinals]
+        , testGroup "CS" [mkTests "cardinal" CS.cardinal CS.cardinals]
         , testGroup "DE"
           [ mkTests "cardinal" DE.cardinal DE.cardinals
           , mkTests "ordinal"  DE.ordinal  DE.ordinals

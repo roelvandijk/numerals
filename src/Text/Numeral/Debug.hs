@@ -21,6 +21,7 @@ import qualified "this" Text.Numeral.Language.AF  as AF
 import qualified "this" Text.Numeral.Language.AMP as AMP
 import qualified "this" Text.Numeral.Language.CHN as CHN
 import qualified "this" Text.Numeral.Language.CHR as CHR
+import qualified "this" Text.Numeral.Language.CS  as CS
 import qualified "this" Text.Numeral.Language.DE  as DE
 import qualified "this" Text.Numeral.Language.EN  as EN
 import qualified "this" Text.Numeral.Language.EO  as EO

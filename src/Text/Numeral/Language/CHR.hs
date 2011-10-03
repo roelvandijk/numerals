@@ -42,7 +42,7 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.Exp as E
 
 
 --------------------------------------------------------------------------------
@@ -55,10 +55,10 @@ Sources:
   http://www.languagesandnumbers.com/how-to-count-in-cherokee/en/chr/
 -}
 
-cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
+cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
-struct ∷ (Integral α, C.Unknown β, C.Lit β, C.Add β, C.Mul β) ⇒ α → β
+struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β
 struct = checkPos
        $ fix
        $ findRule (   0, lit                )
@@ -72,9 +72,9 @@ struct = checkPos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = (0, dec 6 - 1)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render defaultRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \_ n → M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
                }

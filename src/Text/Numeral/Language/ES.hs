@@ -1,4 +1,5 @@
-{-# LANGUAGE NoImplicitPrelude
+{-# LANGUAGE FlexibleContexts
+           , NoImplicitPrelude
            , OverloadedStrings
            , PackageImports
            , UnicodeSyntax
@@ -29,19 +30,24 @@ module Text.Numeral.Language.ES
 -- Imports
 -------------------------------------------------------------------------------
 
-import "base" Data.Function ( ($), const, fix )
+import "base" Data.Bool     ( otherwise )
+import "base" Data.Function ( ($), const, fix, id, flip )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (-), negate )
+import "base" Prelude       ( (-), negate, div, divMod
+                            , Integral, fromIntegral
+                            )
+import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.BigNum      as BN
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import           "numerals-base" Text.Numeral.Misc ( dec, intLog )
+import qualified "numerals-base" Text.Numeral.BigNum  as BN
+import qualified "numerals-base" Text.Numeral.Exp     as E
+import qualified "numerals-base" Text.Numeral.Grammar as G
 
 
 -------------------------------------------------------------------------------
@@ -55,14 +61,19 @@ import qualified "numerals-base" Text.Numeral.Exp.Classes as C
 --   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
 --   http://en.wiktionary.org/wiki/Appendix:Spanish_numerals
 
-cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
+cardinal ∷ ( G.Feminine i, G.Masculine i
+           , Integral α, E.Scale α
+           , Monoid s, IsString s
+           )
+         ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
-struct ∷ ( Integral α, C.Scale α
-         , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+struct ∷ ( Integral α, E.Scale α
+         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
+         , E.Inflection β, G.Masculine (E.Inf β)
          )
        ⇒ α → β
-struct = pos (fix $ rule `combine` longScale R L BN.rule)
+struct = pos $ fix $ rule `combine` mulScale1_es 6 0 R L BN.rule
     where
       rule = findRule (   0, lit       )
                     [ (  11, add 10 L  )
@@ -75,12 +86,44 @@ struct = pos (fix $ rule `combine` longScale R L BN.rule)
                     ]
                     (dec 6 - 1)
 
+mulScale1_es ∷ ( Integral α, E.Scale α
+               , E.Unknown β, E.Add β, E.Mul β, E.Scale β
+               , E.Inflection β, G.Masculine (E.Inf β)
+               )
+             ⇒ α        -- ^ Base.
+             → α        -- ^ Offset.
+             → Side     -- ^ Add side.
+             → Side     -- ^ Mul side.
+             → Rule α β -- ^ Big num rule.
+             → Rule α β
+mulScale1_es base offset aSide mSide bigNumRule =
+    \f n → let rank    = (intLog n - offset) `div` base
+               base'   = fromIntegral base
+               offset' = fromIntegral offset
+               rank'   = fromIntegral rank
+               rankExp = (fix bigNumRule) rank
+               (m, a)  = n `divMod` E.scale base' offset' rank'
+               scale'  = E.scale base' offset' rankExp
+               mval    = (flipIfR mSide (\x y → E.inflection (G.masculine) $ E.mul x y))
+                         (f m)
+                         scale'
+           in if E.isUnknown rankExp
+              then E.unknown
+              else if a ≡ 0
+                   then mval
+                   else (flipIfR aSide E.add) (f a) mval
+
+flipIfR ∷ Side → (α → α → α) → (α → α → α)
+flipIfR L = id
+flipIfR R = flip
+
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ ( G.Feminine i, G.Masculine i, Monoid s, IsString s)
+             ⇒ i → Exp i → Maybe s
 cardinalRepr = render defaultRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = longScaleRepr
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
@@ -96,12 +139,16 @@ cardinalRepr = render defaultRepr
       (_ ⊡ Lit n) _ | n < 1000 = ""
       (_ ⊡ _    ) _            = " "
 
-      syms =
+      syms inf =
           M.fromList
           [ (0, const "cero")
           , (1, \c → case c of
-                       CtxAdd _ (Lit 10)  _ → "on"
-                       _                    → "uno"
+                       CtxAdd _ (Lit 10)  _    → "on"
+                       CtxAdd _ (Lit 20)  _
+                           | G.isMasculine inf → "ún"
+                       _   | G.isFeminine  inf → "una"
+                           | G.isMasculine inf → "un"
+                           | otherwise         → "uno"
             )
           , (2, \c → case c of
                        CtxAdd _ (Lit 10)  _ → "do"
@@ -156,20 +203,22 @@ cardinalRepr = render defaultRepr
                         _                   → "veinte"
             )
           , (100, \c → case c of
-                         CtxEmpty           → "cien"
-                         CtxAdd {}          → "ciento"
-                         CtxMul _ (Lit 5) _ → "ientos"
-                         CtxMul L _       _ → "cien"
-                         _                  → "cientos"
+                         CtxEmpty             → "cien"
+                         CtxAdd {}            → "ciento"
+                         CtxMul _ (Lit 5) _
+                           | G.isFeminine inf → "ientas"
+                           | otherwise        → "ientos"
+                         CtxMul L _       _   → "cien"
+                         _ | G.isFeminine inf → "cientas"
+                           | otherwise        → "cientos"
             )
           , (1000, const "mil")
           ]
 
 longScaleRepr ∷ (IsString s, Monoid s)
-              ⇒ ℤ → ℤ → Exp → Ctx Exp → Maybe s
+              ⇒ i → ℤ → ℤ → (Exp i) → Ctx (Exp i) → Maybe s
 longScaleRepr =
     BN.scaleRepr (BN.quantityName "illón" "illones")
                  [ (4, BN.forms "cuatr" "cuator" "cuator" "cuatra" "cuatri")
                  , (9, BN.forms "non"   "noven"  "noven"  "nona"   "non")
                  ]
-

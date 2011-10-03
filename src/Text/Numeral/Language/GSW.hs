@@ -38,9 +38,9 @@ import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "this"          Text.Numeral.Language.DE as DE
+import "this" Text.Numeral.Language.DE ( struct )
 
 
 --------------------------------------------------------------------------------
@@ -52,19 +52,13 @@ Sources:
   http://www.languagesandnumbers.com/how-to-count-in-swiss-german/en/gsw-che/
 -}
 
-cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
-
-struct ∷ ( Integral α, C.Scale α
-         , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
-         )
-       ⇒ α → β
-struct = DE.struct
+cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 6 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+genericRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
 genericRepr = defaultRepr
               { reprAdd   = Just (⊞)
               , reprMul   = Just $ \_ _ _ → ""
@@ -74,9 +68,9 @@ genericRepr = defaultRepr
       (Lit 100 ⊞ Lit 1)            _ = "und"
       (_       ⊞ _ )               _ = ""
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render genericRepr
-               { reprValue = \n → M.lookup n syms }
+               { reprValue = \_ n → M.lookup n syms }
     where
       syms =
           M.fromList

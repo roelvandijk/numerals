@@ -43,7 +43,7 @@ import "base-unicode-symbols" Prelude.Unicode       ( ℤ, (⋅) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.Exp    as E
 import qualified "numerals-base" Text.Numeral.BigNum as BN ( rule, scaleRepr, forms )
 
 
@@ -62,14 +62,14 @@ Sources:
   http://tr.wikipedia.org/wiki/B%C3%BCy%C3%BCk_say%C4%B1lar%C4%B1n_adlar%C4%B1
 -}
 
-cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
+cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
-struct ∷ (Integral α, C.Scale α, C.Unknown β, C.Lit β, C.Add β, C.Mul β, C.Scale β)
+struct ∷ (Integral α, E.Scale α, E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β)
        ⇒ α → β
 struct = checkPos $ fix $ rule `combine` shortScale1 R L BN.rule
 
-rule ∷ (Integral α, C.Unknown β, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
+rule ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ Rule α β
 rule = findRule (   0, lit               )
               [ (  11, addToTens         )
               , ( 100, step  100   10 R L)
@@ -77,19 +77,19 @@ rule = findRule (   0, lit               )
               ]
                 (dec 6 - 1)
 
-addToTens ∷ (Integral α, C.Lit β, C.Add β) ⇒ Rule α β
+addToTens ∷ (Integral α, E.Lit β, E.Add β) ⇒ Rule α β
 addToTens f n = let (m, r) = n `divMod` 10
                     tens   = m ⋅ 10
                 in if r ≡ 0
                    then lit f tens
-                   else f tens `C.add` f r
+                   else f tens `E.add` f r
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render defaultRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \_ n → M.lookup n syms
                , reprScale = scaleRepr
                , reprAdd   = Just (⊞)
                , reprMul   = Just $ \_ _ _ → " "
@@ -124,7 +124,7 @@ cardinalRepr = render defaultRepr
           ]
 
 scaleRepr ∷ (IsString s, Monoid s)
-          ⇒ ℤ → ℤ → Exp → Ctx Exp → Maybe s
+          ⇒ i → ℤ → ℤ → Exp i → Ctx (Exp i) → Maybe s
 scaleRepr = BN.scaleRepr
               (const "ilyon")
               [ (1, BN.forms "m"     "an"     "an"     ""       "")

@@ -39,7 +39,7 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import qualified "numerals-base" Text.Numeral.BigNum as BN
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.Exp    as E
 
 
 -------------------------------------------------------------------------------
@@ -50,11 +50,11 @@ import qualified "numerals-base" Text.Numeral.Exp.Classes as C
 --   http://en.wikibooks.org/wiki/Norwegian_Numbers
 --   http://www.sf.airnet.ne.jp/~ts/language/number/norwegian.html
 
-cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
+cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
-struct ∷ ( Integral α, C.Scale α
-         , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+struct ∷ ( Integral α, E.Scale α
+         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
          )
        ⇒ α → β
 struct = pos
@@ -73,9 +73,9 @@ struct = pos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render defaultRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \_ n → M.lookup n syms
                , reprScale = BN.scaleRepr (BN.quantityName "illion" "illioner") []
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)

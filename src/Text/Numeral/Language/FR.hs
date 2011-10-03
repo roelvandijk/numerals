@@ -45,8 +45,8 @@ import "base-unicode-symbols" Prelude.Unicode ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.BigNum      as BN
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.BigNum as BN
+import qualified "numerals-base" Text.Numeral.Exp    as E
 
 
 --------------------------------------------------------------------------------
@@ -60,25 +60,25 @@ Sources:
   http://www.parisbypod.com/2007/10/23/french-ordinal-numbers/
 -}
 
-cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ cardinalStruct
+cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ cardinalStruct
 
-ordinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-ordinal = ordinalRepr ∘ ordinalStruct
+ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+ordinal inf = ordinalRepr inf ∘ ordinalStruct
 
-cardinalStruct ∷ ( Integral α, C.Scale α
-                 , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+cardinalStruct ∷ ( Integral α, E.Scale α
+                 , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
                  )
                ⇒ α → β
 cardinalStruct = pos $ fix $ rule `combine` pelletierScale1 R L BN.rule
 
-ordinalStruct ∷ ( Integral α, C.Scale α
-                , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+ordinalStruct ∷ ( Integral α, E.Scale α
+                , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
                 )
               ⇒ α → β
 ordinalStruct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
 
-rule ∷ (Integral α, C.Unknown β, C.Lit β, C.Add β, C.Mul β) ⇒ Rule α β
+rule ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ Rule α β
 rule = findRule (   0, lit         )
               [ (  11, add   10 L  )
               , (  17, add   10 R  )
@@ -96,7 +96,7 @@ rule = findRule (   0, lit         )
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+genericRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
 genericRepr = defaultRepr
               { reprAdd   = Just (⊞)
               , reprMul   = Just (⊡)
@@ -116,9 +116,9 @@ genericRepr = defaultRepr
       (_ ⊡ Lit 20) _ = "-"
       (_ ⊡ _     ) _ = " "
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render genericRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \_ n → M.lookup n syms
                , reprScale = BN.pelletierRepr (BN.quantityName "illion"  "illions")
                                               (BN.quantityName "illiard" "illiards")
                                               bigNumSyms
@@ -159,9 +159,9 @@ cardinalRepr = render genericRepr
                         CtxMul _ (Lit 10) _ → m
                         _                   → n
 
-ordinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+ordinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 ordinalRepr = render genericRepr
-              { reprValue = \n → M.lookup n syms
+              { reprValue = \_ n → M.lookup n syms
               , reprScale = BN.pelletierRepr ( BN.ordQuantityName "illion"  "illionième"
                                                                   "illions" "illionième"
                                              )
@@ -225,7 +225,7 @@ ordinalRepr = render genericRepr
             _                   | isOutside R ctx → o
                                 | otherwise       → n
 
-bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx Exp → s)]
+bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx (Exp i) → s)]
 bigNumSyms =
     [ (1, BN.forms "m"  "uno" "uno"  ""    "")
     , (3, BN.forms "tr" "tré" "tres" "tri" "tre")

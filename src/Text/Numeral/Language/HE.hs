@@ -18,8 +18,7 @@
 
 module Text.Numeral.Language.HE
     ( -- * Conversions
-      fem_cardinal
-    -- , masc_cardinal
+      cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -42,7 +41,7 @@ import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.Exp as E
 
 
 --------------------------------------------------------------------------------
@@ -55,14 +54,11 @@ Sources:
   http://www.hebrew4christians.com/Grammar/Unit_Eight/Cardinal_Numbers/cardinal_numbers.html
 -}
 
-fem_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-fem_cardinal = fem_cardinalRepr ∘ struct
-
--- masc_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
--- masc_cardinal = masc_cardinalRepr ∘ struct
+cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ ( Integral α
-         , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Dual β, C.Plural β
+         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Dual β, E.Plural β
          )
        ⇒ α → β
 struct = pos
@@ -88,14 +84,17 @@ struct = pos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = 1000 in (negate x, x)
 
-fem_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-fem_cardinalRepr = render defaultRepr
-                   { reprValue = \n → M.lookup n syms
-                   , reprAdd   = Just (⊞)
-                   , reprMul   = Just (⊡)
-                   , reprNeg   = Just $ \_ _ → "מינוס "
-                   , reprAddCombine = Just addCombine
-                   }
+-- TODO: Handle inflection, mainly masculine and feminine
+-- gender. Maybe get rid of Dual and Plural in the expression language
+-- and use grammatical number for that.
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr = render defaultRepr
+               { reprValue = \_ n → M.lookup n syms
+               , reprAdd   = Just (⊞)
+               , reprMul   = Just (⊡)
+               , reprNeg   = Just $ \_ _ → "מינוס "
+               , reprAddCombine = Just addCombine
+               }
     where
       (_        ⊞ Lit 10) _ = "ה"
       (Dual   _ ⊞ _     ) _ = " ו"

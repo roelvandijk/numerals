@@ -46,8 +46,8 @@ import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.BigNum      as BN
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.BigNum as BN
+import qualified "numerals-base" Text.Numeral.Exp    as E
 
 
 -------------------------------------------------------------------------------
@@ -60,14 +60,14 @@ Sources:
   http://german.about.com/library/blzahlen.htm
 -}
 
-cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
+cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
-ordinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-ordinal = ordinalRepr ∘ struct
+ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+ordinal inf = ordinalRepr inf ∘ struct
 
-struct ∷ ( Integral α, C.Scale α
-         , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+struct ∷ ( Integral α, E.Scale α
+         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
          )
        ⇒ α → β
 struct = pos
@@ -84,7 +84,7 @@ struct = pos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+genericRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
 genericRepr = defaultRepr
               { reprAdd   = Just (⊞)
               , reprMul   = Just (⊡)
@@ -98,9 +98,9 @@ genericRepr = defaultRepr
       (_ ⊡ _)           _ = ""
 
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render genericRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \_ n → M.lookup n syms
                , reprScale = BN.pelletierRepr (BN.quantityName "illion"   "illionen")
                                               (BN.quantityName "illiarde" "illiarden")
                                               bigNumSyms
@@ -147,9 +147,9 @@ cardinalRepr = render genericRepr
           , (1000, const "tausend")
           ]
 
-ordinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+ordinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 ordinalRepr = render genericRepr
-              { reprValue = \n → M.lookup n syms
+              { reprValue = \_ n → M.lookup n syms
               , reprScale = BN.pelletierRepr (BN.ordQuantityName "illion" "illionste"
                                                                  "illion" "illionste"
                                              )
@@ -209,7 +209,7 @@ ordinalRepr = render genericRepr
           , (1000, \c → if isOutside R c then "tausendste" else "tausend")
           ]
 
-bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx Exp → s)]
+bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx (Exp i) → s)]
 bigNumSyms =
     [ (8, BN.forms "okt" "okto" "okto" "okto" "oktin")
     , (10, \c → case c of

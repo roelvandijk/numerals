@@ -41,7 +41,7 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.Exp as E
 
 
 --------------------------------------------------------------------------------
@@ -61,10 +61,10 @@ It may also be the case that numbers have multiple possible deriviations.
 525 = (200*3) - (20*4) + 5
 -}
 
-cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
+cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
-struct ∷ (Integral α, C.Unknown β, C.Lit β, C.Add β, C.Sub β, C.Mul β) ⇒ α → β
+struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Sub β, E.Mul β) ⇒ α → β
 struct = checkPos
        $ fix
        $ conditional (≡ -5) lit
@@ -103,9 +103,9 @@ struct = checkPos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = (1, 1000)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render defaultRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \_ n → M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
                , reprSub   = Just $ \_ _ _ → "dil"

@@ -1,5 +1,5 @@
 name:          numerals
-version:       0.3.1
+version:       0.4
 cabal-version: >= 1.8
 build-type:    Simple
 stability:     experimental
@@ -107,19 +107,26 @@ library
                , containers-unicode-symbols >= 0.3     && < 0.4
                , numerals-base              >= 0.4     && < 0.5
 
-  exposed-modules: Text.Numeral.Language.AF
+  exposed-modules:
+                   Text.Numeral.Language.AF
                  , Text.Numeral.Language.AMP
                  , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.CHR
                  , Text.Numeral.Language.CS
+              -- , Text.Numeral.Language.CY
+              -- , Text.Numeral.Language.DA
                  , Text.Numeral.Language.DE
                  , Text.Numeral.Language.EN
                  , Text.Numeral.Language.EO
                  , Text.Numeral.Language.ES
+              -- , Text.Numeral.Language.ET
+              -- , Text.Numeral.Language.FI
                  , Text.Numeral.Language.FR
                  , Text.Numeral.Language.GSW
                  , Text.Numeral.Language.GV
                  , Text.Numeral.Language.HE
+              -- , Text.Numeral.Language.HR
+              -- , Text.Numeral.Language.HU
                  , Text.Numeral.Language.IT
                  , Text.Numeral.Language.JA
                  , Text.Numeral.Language.LA
@@ -131,6 +138,7 @@ library
               -- , Text.Numeral.Language.PAA
                  , Text.Numeral.Language.PL
                  , Text.Numeral.Language.PT
+              -- , Text.Numeral.Language.RO
                  , Text.Numeral.Language.RU
                  , Text.Numeral.Language.SCO
                  , Text.Numeral.Language.SV
@@ -138,6 +146,7 @@ library
                  , Text.Numeral.Language.WO
                  , Text.Numeral.Language.YOR
                  , Text.Numeral.Language.ZH
+
 
 -------------------------------------------------------------------------------
 
@@ -184,7 +193,8 @@ test-suite test-numerals
                , Text.Numeral.Language.WO.TestData
                , Text.Numeral.Language.YOR.TestData
                , Text.Numeral.Language.ZH.TestData
-  ghc-options: -Wall
+               , Text.Numeral.Test
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
 
   build-depends: base                       >= 3.0.3.1 && < 4.5
                , base-unicode-symbols       >= 0.1.1   && < 0.3

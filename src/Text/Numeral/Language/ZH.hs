@@ -51,7 +51,7 @@ import qualified "containers" Data.Map as M ( Map, fromList, lookup )
 import "containers-unicode-symbols" Data.Map.Unicode ( (∪) )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.Exp as E
 
 
 --------------------------------------------------------------------------------
@@ -67,24 +67,24 @@ flipIfR ∷ Side → (α → α → α) → (α → α → α)
 flipIfR L = id
 flipIfR R = flip
 
-add0 ∷ (Integral α, C.Lit β, C.Add β) ⇒ α → Rule α β
-add0 val f n | n < val `div` 10 = C.lit 0 `C.add` f n
+add0 ∷ (Integral α, E.Lit β, E.Add β) ⇒ α → Rule α β
+add0 val f n | n < val `div` 10 = E.lit 0 `E.add` f n
              | otherwise        = f n
 
-mulX ∷ (Integral α, C.Lit β, C.Add β, C.Mul β)
+mulX ∷ (Integral α, E.Lit β, E.Add β, E.Mul β)
      ⇒ α → Side → Side → Rule α β
 mulX val aSide mSide =
     \f n → let (m, a) = n `divMod` val
                mval = if m ≡ 1
-                      then C.lit 1 ⊡ C.lit (fromIntegral val)
-                      else f m ⊡ C.lit (fromIntegral val)
+                      then E.lit 1 ⊡ E.lit (fromIntegral val)
+                      else f m ⊡ E.lit (fromIntegral val)
            in if a ≡ 0
               then mval
-              else (flipIfR aSide C.add) (add0 val f a) mval
+              else (flipIfR aSide E.add) (add0 val f a) mval
   where
-     (⊡) = flipIfR mSide C.mul
+     (⊡) = flipIfR mSide E.mul
 
-struct ∷ (Integral α, C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → β
+struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β) ⇒ α → β
 struct = pos
        $ fix
        $ findRule (0, lit)
@@ -96,12 +96,12 @@ struct = pos
     where
       stepX = mkStep lit1 addX mulX
 
-      addX val _ = \f n → C.add (f val) (add0 val f $ n - val)
+      addX val _ = \f n → E.add (f val) (add0 val f $ n - val)
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 48 - 1 in (negate x, x)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
 cardinalRepr = defaultRepr
                { reprAdd = Just $ \_ _ _ → ""
                , reprMul = Just $ \_ _ _ → ""
@@ -112,17 +112,17 @@ cardinalRepr = defaultRepr
 -- Traditional Characters
 --------------------------------------------------------------------------------
 
-trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-trad_cardinal = trad_cardinalRepr ∘ struct
+trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+trad_cardinal inf = trad_cardinalRepr inf ∘ struct
 
-trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 trad_cardinalRepr =
     render cardinalRepr
-    { reprValue = \n → M.lookup n trad_syms
-    , reprNeg = Just $ \_ _ → "負"
-    }
+           { reprValue = \_ n → M.lookup n trad_syms
+           , reprNeg = Just $ \_ _ → "負"
+           }
 
-trad_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
+trad_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
 trad_syms =
     M.fromList
     [ (0, \c → case c of
@@ -162,17 +162,17 @@ trad_syms =
 -- Simplified Characters
 --------------------------------------------------------------------------------
 
-simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-simpl_cardinal = simpl_cardinalRepr ∘ struct
+simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+simpl_cardinal inf = simpl_cardinalRepr inf ∘ struct
 
-simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 simpl_cardinalRepr =
     render cardinalRepr
-            { reprValue = \n → M.lookup n (simpl_syms ∪ trad_syms)
-            , reprNeg = Just $ \_ _ → "负"
-            }
+           { reprValue = \_ n → M.lookup n (simpl_syms ∪ trad_syms)
+           , reprNeg = Just $ \_ _ → "负"
+           }
 
-simpl_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
+simpl_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
 simpl_syms =
     M.fromList
     [ (2, \c → case c of
@@ -188,17 +188,17 @@ simpl_syms =
 -- Financial Characters (Traditional)
 --------------------------------------------------------------------------------
 
-finance_trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-finance_trad_cardinal = finance_trad_cardinalRepr ∘ struct
+finance_trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+finance_trad_cardinal inf = finance_trad_cardinalRepr inf ∘ struct
 
-finance_trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+finance_trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 finance_trad_cardinalRepr =
     render cardinalRepr
-    { reprValue = \n → M.lookup n (finance_trad_syms ∪ trad_syms)
-    , reprNeg = Just $ \_ _ → "負"
-    }
+           { reprValue = \_ n → M.lookup n (finance_trad_syms ∪ trad_syms)
+           , reprNeg = Just $ \_ _ → "負"
+           }
 
-finance_trad_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
+finance_trad_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
 finance_trad_syms =
     M.fromList
     [ (0, const "零")
@@ -223,20 +223,20 @@ finance_trad_syms =
 -- Financial Characters (Simplified)
 --------------------------------------------------------------------------------
 
-finance_simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-finance_simpl_cardinal = finance_simpl_cardinalRepr ∘ struct
+finance_simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+finance_simpl_cardinal inf = finance_simpl_cardinalRepr inf ∘ struct
 
-finance_simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+finance_simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 finance_simpl_cardinalRepr =
     render cardinalRepr
-    { reprValue = \n → M.lookup n ( finance_simpl_syms
-                                  ∪ finance_trad_syms
-                                  ∪ trad_syms
-                                  )
-    , reprNeg = Just $ \_ _ → "负"
-    }
+           { reprValue = \_ n → M.lookup n ( finance_simpl_syms
+                                           ∪ finance_trad_syms
+                                           ∪ trad_syms
+                                           )
+           , reprNeg = Just $ \_ _ → "负"
+           }
   where
-    finance_simpl_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
+    finance_simpl_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
     finance_simpl_syms =
         M.fromList
         [ (2, const "贰")
@@ -250,21 +250,21 @@ finance_simpl_cardinalRepr =
 -- Pinyin
 --------------------------------------------------------------------------------
 
-pinyin_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-pinyin_cardinal = pinyin_cardinalRepr ∘ struct
+pinyin_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+pinyin_cardinal inf = pinyin_cardinalRepr inf ∘ struct
 
-pinyin_cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+pinyin_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 pinyin_cardinalRepr =
     render cardinalRepr
-            { reprValue = \n → M.lookup n pinyin_syms
-            , reprNeg = Just $ \_ _ → "fù"
-            , reprAdd = Just (⊞)
-            }
+           { reprValue = \_ n → M.lookup n pinyin_syms
+           , reprNeg = Just $ \_ _ → "fù"
+           , reprAdd = Just (⊞)
+           }
   where
     (Lit 10 ⊞ _) _ = ""
     (_      ⊞ _) _ = " "
 
-    pinyin_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx Exp → s)
+    pinyin_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
     pinyin_syms =
         M.fromList
         [ (0, const "líng")

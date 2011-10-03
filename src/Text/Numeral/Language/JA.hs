@@ -45,7 +45,7 @@ import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc  ( dec )
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.Exp as E
 
 
 --------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ Sources:
   http://www.guidetojapanese.org/numbers.html
 -}
 
-struct ∷ (Integral α, C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β) ⇒ α → β
+struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β) ⇒ α → β
 struct = pos
        $ fix
        $ findRule (   0, lit             )
@@ -81,12 +81,12 @@ daiji_bounds = let x = dec 4 - 1 in (negate x, x)
 -- Kanji
 --------------------------------------------------------------------------------
 
-kanji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-kanji_cardinal = kanji_cardinal_repr ∘ struct
+kanji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+kanji_cardinal inf = kanji_cardinal_repr inf ∘ struct
 
-kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 kanji_cardinal_repr = render defaultRepr
-                      { reprValue = \n → M.lookup n syms
+                      { reprValue = \_ n → M.lookup n syms
                       , reprAdd   = Just $ \_ _ _ → ""
                       , reprMul   = Just $ \_ _ _ → ""
                       , reprNeg   = Just $ \_ _   → "マイナス"
@@ -131,12 +131,12 @@ kanji_cardinal_repr = render defaultRepr
 -- Daiji
 --------------------------------------------------------------------------------
 
-daiji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-daiji_cardinal = daiji_cardinal_repr ∘ struct
+daiji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+daiji_cardinal inf = daiji_cardinal_repr inf ∘ struct
 
-daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 daiji_cardinal_repr = render defaultRepr
-                      { reprValue = \n → M.lookup n syms
+                      { reprValue = \_ n → M.lookup n syms
                       , reprAdd   = Just $ \_ _ _ → ""
                       , reprMul   = Just $ \_ _ _ → ""
                       , reprNeg   = Just $ \_ _   → "マイナス"
@@ -165,9 +165,9 @@ daiji_cardinal_repr = render defaultRepr
 -- Generic reading
 --------------------------------------------------------------------------------
 
-generic_repr ∷ (Monoid s, IsString s) ⇒ s → s → Repr s
+generic_repr ∷ (Monoid s, IsString s) ⇒ s → s → Repr i s
 generic_repr four seven = defaultRepr
-                          { reprValue = \n → M.lookup n syms
+                          { reprValue = \_ n → M.lookup n syms
                           , reprAdd   = Just $ \_ _ _ → " "
                           , reprMul   = Just $ \_ _ _ → ""
                           , reprNeg   = Just $ \_ _   → "mainasu "
@@ -215,19 +215,19 @@ generic_repr four seven = defaultRepr
 -- On'yomi
 --------------------------------------------------------------------------------
 
-on'yomi_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-on'yomi_cardinal = on'yomi_cardinal_repr ∘ struct
+on'yomi_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+on'yomi_cardinal inf = on'yomi_cardinal_repr inf ∘ struct
 
-on'yomi_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-on'yomi_cardinal_repr = render $ generic_repr "shi" "shichi"
+on'yomi_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+on'yomi_cardinal_repr = render (generic_repr "shi" "shichi")
 
 
 --------------------------------------------------------------------------------
 -- Preferred reading
 --------------------------------------------------------------------------------
 
-preferred_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-preferred_cardinal = preferred_cardinal_repr ∘ struct
+preferred_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+preferred_cardinal inf = preferred_cardinal_repr inf ∘ struct
 
-preferred_cardinal_repr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
-preferred_cardinal_repr = render $ generic_repr "yon" "nana"
+preferred_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+preferred_cardinal_repr = render (generic_repr "yon" "nana")

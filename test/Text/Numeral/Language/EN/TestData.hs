@@ -29,6 +29,8 @@ module Text.Numeral.Language.EN.TestData
 import "base" Data.String ( IsString )
 import "base" Prelude     ( Num )
 import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
+import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "this" Text.Numeral.Test ( TestData )
 
 
 --------------------------------------------------------------------------------
@@ -247,114 +249,130 @@ en_ordinals =
   , (100, "one hundreth")
   ]
 
-uk_cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+uk_cardinals ∷ (Num i, IsString s) ⇒ TestData i s
 uk_cardinals =
-    en_cardinals
-  ⊕ [ (101, "one hundred and one")
-    , (110, "one hundred and ten")
-    , (111, "one hundred and eleven")
-    , (120, "one hundred and twenty")
-    , (121, "one hundred and twenty-one")
-    , (144, "one hundred and forty-four")
-    , (200, "two hundred")
-    , (300, "three hundred")
-    , (666, "six hundred and sixty-six")
-    , (1000, "one thousand")
-    , (1001, "one thousand and one")
-    , (1010, "one thousand and ten")
-    , (1011, "one thousand and eleven")
-    , (1024, "one thousand and twenty-four")
-    , (1100, "one thousand one hundred")
-    , (1728, "one thousand seven hundred and twenty-eight")
-    , (2000, "two thousand")
-    , (10000, "ten thousand")
-    , (100000, "one hundred thousand")
-    , (500000, "five hundred thousand")
-    , (1000000, "one million")
-    , (1048576, "one million forty-eight thousand five hundred and seventy-six")
-    , (10000000, "ten million")
-    ]
+  [ ( "default"
+    , defaultInflection
+    , en_cardinals
+      ⊕ [ (101, "one hundred and one")
+        , (110, "one hundred and ten")
+        , (111, "one hundred and eleven")
+        , (120, "one hundred and twenty")
+        , (121, "one hundred and twenty-one")
+        , (144, "one hundred and forty-four")
+        , (200, "two hundred")
+        , (300, "three hundred")
+        , (666, "six hundred and sixty-six")
+        , (1000, "one thousand")
+        , (1001, "one thousand and one")
+        , (1010, "one thousand and ten")
+        , (1011, "one thousand and eleven")
+        , (1024, "one thousand and twenty-four")
+        , (1100, "one thousand one hundred")
+        , (1728, "one thousand seven hundred and twenty-eight")
+        , (2000, "two thousand")
+        , (10000, "ten thousand")
+        , (100000, "one hundred thousand")
+        , (500000, "five hundred thousand")
+        , (1000000, "one million")
+        , (1048576, "one million forty-eight thousand five hundred and seventy-six")
+        , (10000000, "ten million")
+        ]
+    )
+  ]
 
-uk_ordinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+uk_ordinals ∷ (Num i, IsString s) ⇒ TestData i s
 uk_ordinals =
-    en_ordinals
-  ⊕ [ (101, "one hundred and first")
-    , (110, "one hundred and tenth")
-    , (111, "one hundred and eleventh")
-    , (120, "one hundred and twentieth")
-    , (121, "one hundred and twenty-first")
-    , (144, "one hundred and forty-fourth")
-    , (200, "two hundreth")
-    , (300, "three hundreth")
-    , (666, "six hundred and sixty-sixth")
-    , (1000, "one thousandth")
-    , (1001, "one thousand and first")
-    , (1010, "one thousand and tenth")
-    , (1011, "one thousand and eleventh")
-    , (1024, "one thousand and twenty-fourth")
-    , (1100, "one thousand one hundreth")
-    , (1728, "one thousand seven hundred and twenty-eighth")
-    , (2000, "two thousandth")
-    , (10000, "ten thousandth")
-    , (100000, "one hundred thousandth")
-    , (500000, "five hundred thousandth")
-    , (1000000, "one millionth")
-    , (1048576, "one million forty-eight thousand five hundred and seventy-sixth")
-    , (10000000, "ten millionth")
-    ]
+  [ ( "default"
+    , defaultInflection
+    , en_ordinals
+      ⊕ [ (101, "one hundred and first")
+        , (110, "one hundred and tenth")
+        , (111, "one hundred and eleventh")
+        , (120, "one hundred and twentieth")
+        , (121, "one hundred and twenty-first")
+        , (144, "one hundred and forty-fourth")
+        , (200, "two hundreth")
+        , (300, "three hundreth")
+        , (666, "six hundred and sixty-sixth")
+        , (1000, "one thousandth")
+        , (1001, "one thousand and first")
+        , (1010, "one thousand and tenth")
+        , (1011, "one thousand and eleventh")
+        , (1024, "one thousand and twenty-fourth")
+        , (1100, "one thousand one hundreth")
+        , (1728, "one thousand seven hundred and twenty-eighth")
+        , (2000, "two thousandth")
+        , (10000, "ten thousandth")
+        , (100000, "one hundred thousandth")
+        , (500000, "five hundred thousandth")
+        , (1000000, "one millionth")
+        , (1048576, "one million forty-eight thousand five hundred and seventy-sixth")
+        , (10000000, "ten millionth")
+        ]
+    )
+  ]
 
-us_cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+us_cardinals ∷ (Num i, IsString s) ⇒ TestData i s
 us_cardinals =
-    en_cardinals
-  ⊕ [ (101, "one hundred one")
-    , (110, "one hundred ten")
-    , (111, "one hundred eleven")
-    , (120, "one hundred twenty")
-    , (121, "one hundred twenty-one")
-    , (144, "one hundred forty-four")
-    , (200, "two hundred")
-    , (300, "three hundred")
-    , (666, "six hundred sixty-six")
-    , (1000, "one thousand")
-    , (1001, "one thousand one")
-    , (1010, "one thousand ten")
-    , (1011, "one thousand eleven")
-    , (1024, "one thousand twenty-four")
-    , (1100, "one thousand one hundred")
-    , (1728, "one thousand seven hundred twenty-eight")
-    , (2000, "two thousand")
-    , (10000, "ten thousand")
-    , (100000, "one hundred thousand")
-    , (500000, "five hundred thousand")
-    , (1000000, "one million")
-    , (1048576, "one million forty-eight thousand five hundred seventy-six")
-    , (10000000, "ten million")
-    ]
+  [ ( "default"
+    , defaultInflection
+    , en_cardinals
+      ⊕ [ (101, "one hundred one")
+        , (110, "one hundred ten")
+        , (111, "one hundred eleven")
+        , (120, "one hundred twenty")
+        , (121, "one hundred twenty-one")
+        , (144, "one hundred forty-four")
+        , (200, "two hundred")
+        , (300, "three hundred")
+        , (666, "six hundred sixty-six")
+        , (1000, "one thousand")
+        , (1001, "one thousand one")
+        , (1010, "one thousand ten")
+        , (1011, "one thousand eleven")
+        , (1024, "one thousand twenty-four")
+        , (1100, "one thousand one hundred")
+        , (1728, "one thousand seven hundred twenty-eight")
+        , (2000, "two thousand")
+        , (10000, "ten thousand")
+        , (100000, "one hundred thousand")
+        , (500000, "five hundred thousand")
+        , (1000000, "one million")
+        , (1048576, "one million forty-eight thousand five hundred seventy-six")
+        , (10000000, "ten million")
+        ]
+    )
+  ]
 
-us_ordinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+us_ordinals ∷ (Num i, IsString s) ⇒ TestData i s
 us_ordinals =
-    en_ordinals
-  ⊕ [ (101, "one hundred first")
-    , (110, "one hundred tenth")
-    , (111, "one hundred eleventh")
-    , (120, "one hundred twentieth")
-    , (121, "one hundred twenty-first")
-    , (144, "one hundred forty-fourth")
-    , (200, "two hundreth")
-    , (300, "three hundreth")
-    , (666, "six hundred sixty-sixth")
-    , (1000, "one thousandth")
-    , (1001, "one thousand first")
-    , (1010, "one thousand tenth")
-    , (1011, "one thousand eleventh")
-    , (1024, "one thousand twenty-fourth")
-    , (1100, "one thousand one hundreth")
-    , (1728, "one thousand seven hundred twenty-eighth")
-    , (2000, "two thousandth")
-    , (10000, "ten thousandth")
-    , (100000, "one hundred thousandth")
-    , (500000, "five hundred thousandth")
-    , (1000000, "one millionth")
-    , (1048576, "one million forty-eight thousand five hundred seventy-sixth")
-    , (10000000, "ten millionth")
-    ]
+  [ ( "default"
+    , defaultInflection
+    , en_ordinals
+      ⊕ [ (101, "one hundred first")
+        , (110, "one hundred tenth")
+        , (111, "one hundred eleventh")
+        , (120, "one hundred twentieth")
+        , (121, "one hundred twenty-first")
+        , (144, "one hundred forty-fourth")
+        , (200, "two hundreth")
+        , (300, "three hundreth")
+        , (666, "six hundred sixty-sixth")
+        , (1000, "one thousandth")
+        , (1001, "one thousand first")
+        , (1010, "one thousand tenth")
+        , (1011, "one thousand eleventh")
+        , (1024, "one thousand twenty-fourth")
+        , (1100, "one thousand one hundreth")
+        , (1728, "one thousand seven hundred twenty-eighth")
+        , (2000, "two thousandth")
+        , (10000, "ten thousandth")
+        , (100000, "one hundred thousandth")
+        , (500000, "five hundred thousandth")
+        , (1000000, "one millionth")
+        , (1048576, "one million forty-eight thousand five hundred seventy-sixth")
+        , (10000000, "ten millionth")
+        ]
+    )
+  ]

@@ -15,11 +15,15 @@ import "base" Prelude       ( String )
 import "base" System.IO     ( IO )
 import "base" Text.Printf   ( printf )
 import "base" Text.Show     ( show )
-import "base-unicode-symbols" Data.Eq.Unicode ( (≢) )
-import "base-unicode-symbols" Prelude.Unicode ( ℤ )
+import "base-unicode-symbols" Data.Eq.Unicode       ( (≢) )
+import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import "HUnit" Test.HUnit ( Assertion, assertFailure )
+import "numerals-base" Text.Numeral.Grammar.Reified ( Inflection )
 import "test-framework" Test.Framework ( Test, defaultMain, testGroup )
 import "test-framework-hunit" Test.Framework.Providers.HUnit ( testCase )
+import "this" Text.Numeral.Test ( TestData )
+
 import qualified "this" Text.Numeral.Language.AF           as AF
 import qualified "this" Text.Numeral.Language.AF.TestData  as AF
 import qualified "this" Text.Numeral.Language.AMP          as AMP
@@ -91,21 +95,6 @@ import qualified "this" Text.Numeral.Language.ZH.TestData  as ZH
 main ∷ IO ()
 main = defaultMain tests
 
-testConversion ∷ (ℤ → Maybe String) → ℤ → String → Assertion
-testConversion f n s =
-  let r = f n
-  in when (r ≢ Just s)
-        $ assertFailure
-        $ printf "Expected %i = \"%s\" but got \"%s\""
-                 n
-                 s
-                 (fromMaybe "no result" r)
-
-mkTests ∷ String → (ℤ → Maybe String) → [(ℤ, String)] → Test
-mkTests name f xs = testGroup name $ map mkTest xs
-    where
-      mkTest (n, s) = testCase (show n) $ testConversion f n s
-
 tests ∷ [Test]
 tests = [ testGroup "AF"
           [ mkTests "cardinal" AF.cardinal AF.cardinals
@@ -130,17 +119,14 @@ tests = [ testGroup "AF"
             ]
           ]
         , testGroup "EO"  [mkTests "cardinal" EO.cardinal EO.cardinals]
-        , testGroup "ES"  [mkTests "cardinal" ES.cardinal  ES.cardinals]
+        , testGroup "ES"  [mkTests "cardinal" ES.cardinal ES.cardinals]
         , testGroup "FR"
           [ mkTests "cardinal" FR.cardinal FR.cardinals
           , mkTests "ordinal"  FR.ordinal  FR.ordinals
           ]
         , testGroup "GSW" [mkTests "cardinal" GSW.cardinal GSW.cardinals]
         , testGroup "GV"  [mkTests "cardinal" GV.cardinal GV.cardinals]
-        , testGroup "HE"
-          [ testGroup "cardinal"
-            [mkTests "feminine" HE.fem_cardinal HE.fem_cardinals]
-          ]
+        , testGroup "HE"  [mkTests "cardinal" HE.cardinal HE.cardinals]
         , testGroup "IT"
           [ mkTests "cardinal" IT.cardinal IT.cardinals
           , mkTests "ordinal"  IT.ordinal  IT.ordinals
@@ -163,7 +149,7 @@ tests = [ testGroup "AF"
         , testGroup "NO"  [mkTests "cardinal" NO.cardinal  NO.cardinals]
         , testGroup "NQM" [mkTests "cardinal" NQM.cardinal NQM.cardinals]
         , testGroup "OJ"  [mkTests "cardinal" OJ.cardinal  OJ.cardinals]
-        -- , testGroup "PAA" [mkTests "cardinal" PAA.cardinal PAA.cardinals]
+        -- -- , testGroup "PAA" [mkTests "cardinal" PAA.cardinal PAA.cardinals]
         , testGroup "PL"  [mkTests "cardinal" PL.cardinal  PL.cardinals]
         , testGroup "PT"  [mkTests "cardinal" PT.cardinal  PT.cardinals]
         , testGroup "RU"  [mkTests "cardinal" RU.cardinal  RU.cardinals]
@@ -195,3 +181,44 @@ tests = [ testGroup "AF"
             ]
           ]
         ]
+
+
+--------------------------------------------------------------------------------
+-- Utils
+--------------------------------------------------------------------------------
+
+{-
+-- TODO: this takes way to long for large values (10 ^ 60000 - 1)
+testBounds ∷ String → (ℤ → Maybe String) → (ℤ, ℤ) → Test
+testBounds name conversion bounds@(lo, hi) =
+      testGroup name
+                [ testCase "lower bound" $ assertBool "conversion error" $ checkConv lo
+                , testCase "upper bound" $ assertBool "conversion error" $ checkConv hi
+                -- , testProperty "in between" $ forAll (choose bounds) checkConv
+                ]
+    where
+      checkConv ∷ ℤ → Bool
+      checkConv = isJust ∘ conversion
+-}
+
+mkTests ∷ String
+        → (Inflection → ℤ → Maybe String)
+        → TestData ℤ String
+        → Test
+mkTests name f = testGroup name ∘ map perInflection
+    where
+      perInflection ∷ (String, Inflection, [(ℤ, String)]) → Test
+      perInflection (infName, inf, xs) = testGroup infName $ map (perValue inf) xs
+
+      perValue ∷ Inflection → (ℤ, String) → Test
+      perValue inf (n, s) = testCase (show n) $ testConversion f inf n s
+
+testConversion ∷ (Inflection → ℤ → Maybe String) → Inflection → ℤ → String → Assertion
+testConversion f inf n s =
+  let r = f inf n
+  in when (r ≢ Just s)
+        $ assertFailure
+        $ printf "Expected %i = \"%s\" but got \"%s\""
+                 n
+                 s
+                 (fromMaybe "no result" r)

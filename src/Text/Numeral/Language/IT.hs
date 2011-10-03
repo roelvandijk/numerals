@@ -44,8 +44,8 @@ import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.BigNum      as BN
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.BigNum as BN
+import qualified "numerals-base" Text.Numeral.Exp    as E
 
 
 --------------------------------------------------------------------------------
@@ -58,14 +58,14 @@ import qualified "numerals-base" Text.Numeral.Exp.Classes as C
 --   http://italian.about.com/library/weekly/aa042600a.htm
 --   http://www.suite101.com/content/how-to-count-in-italian-a146487
 
-cardinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
+cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
-ordinal ∷ (Integral α, C.Scale α, Monoid s, IsString s) ⇒ α → Maybe s
-ordinal = ordinalRepr ∘ struct
+ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+ordinal inf = ordinalRepr inf ∘ struct
 
-struct ∷ ( Integral α, C.Scale α
-         , C.Unknown β, C.Lit β, C.Neg β, C.Add β, C.Mul β, C.Scale β
+struct ∷ ( Integral α, E.Scale α
+         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
          )
        ⇒ α → β
 struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
@@ -84,7 +84,7 @@ struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ Repr s
+genericRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
 genericRepr = defaultRepr
               { reprAdd   = Just (⊞)
               , reprMul   = Just (⊡)
@@ -101,9 +101,9 @@ genericRepr = defaultRepr
       (_     ⊡ Scale _ _ _) _ = " "
       (_     ⊡ _          ) _ = ""
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render genericRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \_ n → M.lookup n syms
                , reprScale = BN.pelletierRepr
                                (BN.quantityName "ilione"  "ilioni")
                                (BN.quantityName "iliardo" "iliardi")
@@ -154,15 +154,15 @@ cardinalRepr = render genericRepr
             )
           ]
 
-      forms ∷ s → s → s → Ctx Exp → s
+      forms ∷ s → s → s → Ctx (Exp i) → s
       forms n a m c = case c of
                         CtxAdd _ (Lit 10) _ → a
                         CtxMul _ (Lit 10) _ → m
                         _                   → n
 
-ordinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+ordinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 ordinalRepr = render genericRepr
-              { reprValue = \n → M.lookup n syms
+              { reprValue = \_ n → M.lookup n syms
               , reprScale = BN.pelletierRepr
                               ( BN.ordQuantityName "ilione" "ilionesimo"
                                                    "ilioni" "ilionesimo"
@@ -225,7 +225,7 @@ ordinalRepr = render genericRepr
             )
           ]
 
-      forms ∷ s → s → s → s → s → Ctx Exp → s
+      forms ∷ s → s → s → s → s → Ctx (Exp i) → s
       forms o1 o2 n a m c =
           case c of
             CtxEmpty            → o1
@@ -234,7 +234,7 @@ ordinalRepr = render genericRepr
             CtxMul _ (Lit 10) _ → m
             _                   → n
 
-bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx Exp → s)]
+bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx (Exp i) → s)]
 bigNumSyms =
   [ (6, BN.forms "sest" "sex"    "ses"    "sexa"   "ses")
   , (7, BN.forms "sett" "septen" "septem" "septua" "septin")

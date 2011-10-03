@@ -25,6 +25,7 @@ module Text.Numeral.Language.OJ
     , bounds
     ) where
 
+
 --------------------------------------------------------------------------------
 -- Imports
 --------------------------------------------------------------------------------
@@ -37,7 +38,7 @@ import "base" Prelude       ( Integral )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import qualified "numerals-base" Text.Numeral.Exp.Classes as C
+import qualified "numerals-base" Text.Numeral.Exp as E
 
 
 --------------------------------------------------------------------------------
@@ -50,10 +51,10 @@ Sources:
   http://www.languagesandnumbers.com/how-to-count-in-ojibwa/en/oji/
 -}
 
-cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
+cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal inf = cardinalRepr inf ∘ struct
 
-struct ∷ (Integral α, C.Unknown β, C.Lit β, C.Add β, C.Mul β)
+struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β)
        ⇒ α → β
 struct = checkPos
        $ fix
@@ -67,9 +68,9 @@ struct = checkPos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = (1, 1999)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render defaultRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \_ n → M.lookup n syms
                , reprAdd   = Just $ \_ _ _ → " shaa "
                , reprMul   = Just $ \_ _ _ → ""
                }
@@ -97,7 +98,7 @@ cardinalRepr = render defaultRepr
           , (1000, const "mdaaswaak")
           ]
 
-      forms ∷ s → s → s → Ctx Exp → s
+      forms ∷ s → s → s → Ctx (Exp i) → s
       forms o t h = \c → case c of
                            CtxMul _ (Lit 10)  _ → t
                            CtxMul _ (Lit 100) _ → h

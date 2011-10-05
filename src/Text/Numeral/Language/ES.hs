@@ -31,20 +31,17 @@ module Text.Numeral.Language.ES
 -------------------------------------------------------------------------------
 
 import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( ($), const, fix, id, flip )
+import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( (-), negate, div, divMod
-                            , Integral, fromIntegral
-                            )
-import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
+import "base" Prelude       ( (-), negate, Integral )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import           "numerals-base" Text.Numeral.Misc ( dec, intLog )
+import           "numerals-base" Text.Numeral.Misc ( dec )
 import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
@@ -73,7 +70,7 @@ struct ∷ ( Integral α, E.Scale α
          , E.Inflection β, G.Masculine (E.Inf β)
          )
        ⇒ α → β
-struct = pos $ fix $ rule `combine` mulScale1_es 6 0 R L BN.rule
+struct = pos $ fix $ rule `combine` longScale1_es
     where
       rule = findRule (   0, lit       )
                     [ (  11, add 10 L  )
@@ -86,36 +83,15 @@ struct = pos $ fix $ rule `combine` mulScale1_es 6 0 R L BN.rule
                     ]
                     (dec 6 - 1)
 
-mulScale1_es ∷ ( Integral α, E.Scale α
-               , E.Unknown β, E.Add β, E.Mul β, E.Scale β
-               , E.Inflection β, G.Masculine (E.Inf β)
-               )
-             ⇒ α        -- ^ Base.
-             → α        -- ^ Offset.
-             → Side     -- ^ Add side.
-             → Side     -- ^ Mul side.
-             → Rule α β -- ^ Big num rule.
-             → Rule α β
-mulScale1_es base offset aSide mSide bigNumRule =
-    \f n → let rank    = (intLog n - offset) `div` base
-               base'   = fromIntegral base
-               offset' = fromIntegral offset
-               rank'   = fromIntegral rank
-               rankExp = (fix bigNumRule) rank
-               (m, a)  = n `divMod` E.scale base' offset' rank'
-               scale'  = E.scale base' offset' rankExp
-               mval    = (flipIfR mSide (\x y → E.inflection (G.masculine) $ E.mul x y))
-                         (f m)
-                         scale'
-           in if E.isUnknown rankExp
-              then E.unknown
-              else if a ≡ 0
-                   then mval
-                   else (flipIfR aSide E.add) (f a) mval
-
-flipIfR ∷ Side → (α → α → α) → (α → α → α)
-flipIfR L = id
-flipIfR R = flip
+longScale1_es ∷ ( Integral α, E.Scale α
+                , E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β
+                , E.Inflection β, G.Masculine (E.Inf β)
+                )
+              ⇒ Rule α β
+longScale1_es = mulScale1_es 6 0 R L BN.rule
+    where
+      mulScale1_es = mulScale_ $ \f m s _ → masculineMul (f m) s
+      masculineMul x y = E.inflection (G.masculine) $ E.mul x y
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)

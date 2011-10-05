@@ -45,8 +45,9 @@ import "base-unicode-symbols" Prelude.Unicode ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.BigNum as BN
-import qualified "numerals-base" Text.Numeral.Exp    as E
+import qualified "numerals-base" Text.Numeral.BigNum  as BN
+import qualified "numerals-base" Text.Numeral.Exp     as E
+import qualified "numerals-base" Text.Numeral.Grammar as G
 
 
 --------------------------------------------------------------------------------
@@ -60,10 +61,18 @@ Sources:
   http://www.parisbypod.com/2007/10/23/french-ordinal-numbers/
 -}
 
-cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ ( G.Feminine i
+           , Integral α, E.Scale α
+           , Monoid s, IsString s
+           )
+         ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ cardinalStruct
 
-ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+ordinal ∷ ( G.Feminine i
+          , Integral α, E.Scale α
+          , Monoid s, IsString s
+          )
+        ⇒ i → α → Maybe s
 ordinal inf = ordinalRepr inf ∘ ordinalStruct
 
 cardinalStruct ∷ ( Integral α, E.Scale α
@@ -116,18 +125,22 @@ genericRepr = defaultRepr
       (_ ⊡ Lit 20) _ = "-"
       (_ ⊡ _     ) _ = " "
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ (G.Feminine i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render genericRepr
-               { reprValue = \_ n → M.lookup n syms
+               { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = BN.pelletierRepr (BN.quantityName "illion"  "illions")
                                               (BN.quantityName "illiard" "illiards")
                                               bigNumSyms
                }
     where
-      syms =
+      syms inf =
           M.fromList
           [ (0, const "zéro")
-          , (1, ten   "un"     "on"     "un")
+          , (1, \c → case c of
+                       CtxAdd _ (Lit 10) _  → "on"
+                       _ | G.isFeminine inf → "une"
+                         | otherwise        → "un"
+            )
           , (2, ten   "deux"   "dou"    "deux")
           , (3, ten   "trois"  "trei"   "tren")
           , (4, ten   "quatre" "quator" "quar")
@@ -159,9 +172,9 @@ cardinalRepr = render genericRepr
                         CtxMul _ (Lit 10) _ → m
                         _                   → n
 
-ordinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+ordinalRepr ∷ (G.Feminine i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 ordinalRepr = render genericRepr
-              { reprValue = \_ n → M.lookup n syms
+              { reprValue = \inf n → M.lookup n (syms inf)
               , reprScale = BN.pelletierRepr ( BN.ordQuantityName "illion"  "illionième"
                                                                   "illions" "illionième"
                                              )
@@ -171,18 +184,22 @@ ordinalRepr = render genericRepr
                                              bigNumSyms
               }
     where
-      syms =
+      syms inf =
           M.fromList
           [ (0, \c → case c of
                        CtxEmpty → "zéroth"
                        _        → "zéro"
             )
           , (1, \c → case c of
-                       CtxEmpty → "premier"
-                       CtxAdd _ (Lit 10) _ → "on"
-                       CtxMul _ (Lit 10) _ → "un"
-                       _                   | isOutside R c → "unième"
-                                           | otherwise     → "un"
+                       CtxEmpty
+                         | G.isFeminine inf → "première"
+                         | otherwise        → "premier"
+                       CtxAdd _ (Lit 10) _  → "on"
+                       _ | isOutside R c    → if G.isFeminine inf
+                                              then "uneième"
+                                              else "unième"
+                         | G.isFeminine inf → "une"
+                         | otherwise        → "un"
             )
           , (2, ten   "deuxième"  "deux"   "dou"    "deux")
           , (3, ten   "troisième" "trois"  "trei"   "tren")

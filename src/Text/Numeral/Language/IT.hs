@@ -44,8 +44,9 @@ import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.BigNum as BN
-import qualified "numerals-base" Text.Numeral.Exp    as E
+import qualified "numerals-base" Text.Numeral.BigNum  as BN
+import qualified "numerals-base" Text.Numeral.Exp     as E
+import qualified "numerals-base" Text.Numeral.Grammar as G
 
 
 --------------------------------------------------------------------------------
@@ -58,10 +59,18 @@ import qualified "numerals-base" Text.Numeral.Exp    as E
 --   http://italian.about.com/library/weekly/aa042600a.htm
 --   http://www.suite101.com/content/how-to-count-in-italian-a146487
 
-cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ ( G.Masculine i, G.Feminine i
+           , Integral α, E.Scale α
+           , Monoid s, IsString s
+           )
+         ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
 
-ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+ordinal ∷ ( G.Masculine i, G.Feminine i
+          , Integral α, E.Scale α
+          , Monoid s, IsString s
+          )
+        ⇒ i → α → Maybe s
 ordinal inf = ordinalRepr inf ∘ struct
 
 struct ∷ ( Integral α, E.Scale α
@@ -101,19 +110,24 @@ genericRepr = defaultRepr
       (_     ⊡ Scale _ _ _) _ = " "
       (_     ⊡ _          ) _ = ""
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ (G.Feminine i, G.Masculine i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render genericRepr
-               { reprValue = \_ n → M.lookup n syms
+               { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = BN.pelletierRepr
                                (BN.quantityName "ilione"  "ilioni")
                                (BN.quantityName "iliardo" "iliardi")
                                bigNumSyms
                }
     where
-      syms =
+      syms inf =
           M.fromList
           [ (0, const "zero")
-          , (1, forms "uno" "un" "uno")
+          , (1, \c → case c of
+                       CtxAdd _ (Lit 10) _   → "un"
+                       _ | G.isFeminine  inf → "una"
+                         | G.isMasculine inf → "un"
+                         | otherwise         → "uno"
+            )
           , (2, forms "due" "do" "du")
           , (3, \c → case c of
                        CtxAdd R _        _ → "tré"
@@ -160,9 +174,9 @@ cardinalRepr = render genericRepr
                         CtxMul _ (Lit 10) _ → m
                         _                   → n
 
-ordinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+ordinalRepr ∷ (G.Feminine i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 ordinalRepr = render genericRepr
-              { reprValue = \_ n → M.lookup n syms
+              { reprValue = \inf n → M.lookup n (syms inf)
               , reprScale = BN.pelletierRepr
                               ( BN.ordQuantityName "ilione" "ilionesimo"
                                                    "ilioni" "ilionesimo"
@@ -173,30 +187,32 @@ ordinalRepr = render genericRepr
                               bigNumSyms
               }
     where
-      syms =
+      syms inf =
           M.fromList
           [ (0, const "zero")
-          , (1, forms "primo"   "unesimo" "uno" "un" "uno")
-          , (2, forms "secondo" "duesimo" "due" "do" "due")
+          , (1, forms "prima" "primo" "unesimo" "uno" "un" "un")
+          , (2, forms "seconda" "secondo" "duesimo" "due" "do" "due")
           , (3, \c → case c of
-                       CtxEmpty            → "terzo"
-                       _ | isOutside R c   → "treesimo"
-                       CtxAdd R _        _ → "tré"
-                       CtxMul _ (Lit 10) _ → "tren"
-                       _                   → "tre"
+                       CtxEmpty
+                         | G.isFeminine inf → "terza"
+                         | otherwise        → "terzo"
+                       _ | isOutside R c    → "treesimo"
+                       CtxAdd R _        _  → "tré"
+                       CtxMul _ (Lit 10) _  → "tren"
+                       _                    → "tre"
             )
-          , (4, forms "quarto"  "quattresimo" "quattro" "quattor" "quar")
-          , (5, forms "quinto"  "cinquesimo"  "cinque"  "quin"    "cinqu")
-          , (6, forms "sesto"   "seiesimo"    "sei"     "se"      "sess")
-          , (7, forms "settimo" "settesimo"   "sette"   "sette"   "sett")
-          , (8, forms "ottavo"  "ottesimo"    "otto"    "otto"    "ott")
-          , (9, forms "nono"    "novesimo"    "nove"    "nove"    "nov")
+          , (4, forms "quarta"  "quarto"  "quattresimo" "quattro" "quattor" "quar")
+          , (5, forms "quinta"  "quinto"  "cinquesimo"  "cinque"  "quin"    "cinqu")
+          , (6, forms "sesta"   "sesto"   "seiesimo"    "sei"     "se"      "sess")
+          , (7, forms "settimo" "settimo" "settesimo"   "sette"   "sette"   "sett")
+          , (8, forms "ottave"  "ottavo"  "ottesimo"    "otto"    "otto"    "ott")
+          , (9, forms "nono"    "nono"    "novesimo"    "nove"    "nove"    "nov")
           , (10, \c → case c of
                         CtxAdd _ (Lit _) _ | isOutside R c → "dicesimo"
                                            | otherwise     → "dici"
                         -- Last vowel removed because of a phonetic rule:
                         CtxMul _ (Lit _) (CtxAdd _ (Lit n) _)
-                            | n ∈ [1,8]    → "t"
+                            | n ∈ [1,8]                    → "t"
                         CtxMul R (Lit _) _ | isOutside R c → "tesimo"
                                            | otherwise     → "ta"
                         _                  | isOutside R c → "decimo"
@@ -224,15 +240,17 @@ ordinalRepr = render genericRepr
                           _                 → "mille"
             )
           ]
-
-      forms ∷ s → s → s → s → s → Ctx (Exp i) → s
-      forms o1 o2 n a m c =
-          case c of
-            CtxEmpty            → o1
-            _ | isOutside R c   → o2
-            CtxAdd _ (Lit 10) _ → a
-            CtxMul _ (Lit 10) _ → m
-            _                   → n
+          where
+            forms ∷ s → s → s → s → s → s → Ctx (Exp i) → s
+            forms fo1 o1 o2 n a m c =
+                case c of
+                  CtxEmpty
+                    | G.isFeminine inf → fo1
+                    | otherwise        → o1
+                  _ | isOutside R c    → o2
+                  CtxAdd _ (Lit 10) _  → a
+                  CtxMul _ (Lit 10) _  → m
+                  _                    → n
 
 bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx (Exp i) → s)]
 bigNumSyms =

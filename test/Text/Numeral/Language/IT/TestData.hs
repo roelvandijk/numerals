@@ -26,6 +26,7 @@ module Text.Numeral.Language.IT.TestData (cardinals, ordinals) where
 import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
 import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
+import "numerals-base" Text.Numeral.Grammar
 import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
@@ -37,8 +38,8 @@ import "this" Text.Numeral.Test ( TestData )
 
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
-  [ ( "default"
-    , defaultInflection
+  [ ( "neuter"
+    , neuter defaultInflection
     , [ (0, "zero")
       , (1, "uno")
       , (2, "due")
@@ -197,6 +198,16 @@ cardinals =
       , (dec 63, "deciliardo")
       ]
     )
+  , ( "masculine"
+    , masculine defaultInflection
+    , [ (1, "un")
+      ]
+    )
+  , ( "feminine"
+    , feminine defaultInflection
+    , [ (1, "una")
+      ]
+    )
   ]
 
 ordinals ∷ (Integral i, IsString s) ⇒ TestData i s
@@ -264,6 +275,16 @@ ordinals =
       , (2000, "duemillesimo")
       , (dec 6, "milionesimo")
       , (dec 12, "bilionesimo")
+      ]
+    )
+  , ( "feminine"
+    , feminine defaultInflection
+    , [ (1, "prima")
+      , (2, "seconda")
+      , (3, "terza")
+      , (4, "quarta")
+      , (5, "quinta")
+      , (6, "sesta")
       ]
     )
   ]

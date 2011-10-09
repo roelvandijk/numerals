@@ -141,22 +141,24 @@ tests = [ testGroup "AF"
           , testGroup "daiji"
             [mkTests "cardinal" JA.daiji_cardinal JA.daiji_cardinals]
           ]
-        , testGroup "LA"  [mkTests "cardinal" LA.cardinal  LA.cardinals]
-        , testGroup "MG"  [mkTests "cardinal" MG.cardinal  MG.cardinals]
-        , testGroup "NL"  [ mkTests "cardinal" NL.cardinal  NL.cardinals
-                          , mkTests "ordinal"  NL.ordinal   NL.ordinals
+        , testGroup "LA"  [mkTests "cardinal" LA.cardinal LA.cardinals]
+        , testGroup "MG"  [mkTests "cardinal" MG.cardinal MG.cardinals]
+        , testGroup "NL"  [ mkTests "cardinal" NL.cardinal NL.cardinals
+                          , mkTests "ordinal"  NL.ordinal  NL.ordinals
                           ]
         , testGroup "NO"  [mkTests "cardinal" NO.cardinal  NO.cardinals]
         , testGroup "NQM" [mkTests "cardinal" NQM.cardinal NQM.cardinals]
         , testGroup "OJ"  [mkTests "cardinal" OJ.cardinal  OJ.cardinals]
         -- -- , testGroup "PAA" [mkTests "cardinal" PAA.cardinal PAA.cardinals]
-        , testGroup "PL"  [mkTests "cardinal" PL.cardinal  PL.cardinals]
-        , testGroup "PT"  [mkTests "cardinal" PT.cardinal  PT.cardinals]
-        , testGroup "RU"  [mkTests "cardinal" RU.cardinal  RU.cardinals]
+        , testGroup "PL"  [mkTests "cardinal" PL.cardinal PL.cardinals]
+        , testGroup "PT"  [ mkTests "cardinal" PT.cardinal PT.cardinals
+                          , mkTests "ordinal"  PT.ordinal  PT.ordinals
+                          ]
+        , testGroup "RU"  [mkTests "cardinal" RU.cardinal RU.cardinals]
         , testGroup "SCO" [mkTests "cardinal" SCO.cardinal SCO.cardinals]
-        , testGroup "SV"  [mkTests "cardinal" SV.cardinal  SV.cardinals]
-        , testGroup "TR"  [mkTests "cardinal" TR.cardinal  TR.cardinals]
-        , testGroup "WO"  [mkTests "cardinal" WO.cardinal  WO.cardinals]
+        , testGroup "SV"  [mkTests "cardinal" SV.cardinal SV.cardinals]
+        , testGroup "TR"  [mkTests "cardinal" TR.cardinal TR.cardinals]
+        , testGroup "WO"  [mkTests "cardinal" WO.cardinal WO.cardinals]
         , testGroup "YOR" [mkTests "cardinal" YOR.cardinal YOR.cardinals]
         , testGroup "ZH"
           [ testGroup "characters (traditional)"

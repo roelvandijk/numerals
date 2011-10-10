@@ -111,8 +111,8 @@ pelletierRepr ∷ (IsString s, Monoid s)
               ⇒ i → ℤ → ℤ → (Exp i) → Ctx (Exp i) → Maybe s
 pelletierRepr =
     BN.pelletierRepr
-      (const "iljon")
-      (const "iljard")
+      (\_ _ → "iljon")
+      (\_ _ → "iljard")
       [ (4, BN.forms "kvadr" "kvattuor" "kvattuor" "kvadra"  "kvadri")
       , (5, BN.forms "kvint" "kvin"     "kvinkva"  "kvinkva" "kvin")
       , (8, BN.forms "okt"   "okto"     "okto"     "okto"    "oktin")

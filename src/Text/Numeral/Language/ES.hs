@@ -83,6 +83,8 @@ struct = pos $ fix $ rule `combine` longScale1_es
                     ]
                     (dec 6 - 1)
 
+-- | Like 'longScale1' with the difference that all scale elements are
+-- masculine.
 longScale1_es ∷ ( Integral α, E.Scale α
                 , E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β
                 , E.Inflection β, G.Masculine (E.Inf β)

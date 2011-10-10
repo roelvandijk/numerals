@@ -126,7 +126,7 @@ cardinalRepr = render defaultRepr
 scaleRepr ∷ (IsString s, Monoid s)
           ⇒ i → ℤ → ℤ → Exp i → Ctx (Exp i) → Maybe s
 scaleRepr = BN.scaleRepr
-              (const "ilyon")
+              (\_ _ → "ilyon")
               [ (1, BN.forms "m"     "an"     "an"     ""       "")
               , (2, BN.forms "b"     "do"     "do"     "vi"     "du")
               , (3, \c → case c of

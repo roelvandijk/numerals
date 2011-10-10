@@ -92,6 +92,8 @@ cardinalRepr = render genericRepr
                { reprValue = \_ n → M.lookup n syms
                , reprScale = BN.pelletierRepr (const "iljoen")
                                               (const "iljard")
+               , reprScale = BN.pelletierRepr (\_ _ → "iljoen")
+                                              (\_ _ → "iljard")
                                               []
                }
     where

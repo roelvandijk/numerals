@@ -93,7 +93,8 @@ cardinalRepr = render defaultRepr
       (_ ⊡ Lit 100) _ = ""
       (_ ⊡ _      ) _ = " "
 
-      quantityRepr s p1 p2 ctx =
+      quantityRepr ∷ s → s → s → BN.PostfixRepr i s
+      quantityRepr s p1 p2 _ ctx =
           case ctx of
             CtxMul _ (Lit 1) _ → s
             CtxMul _ (Lit n) _ | n ≤ 4 → p1

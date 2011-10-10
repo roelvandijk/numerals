@@ -16,7 +16,11 @@
 [@English name@]    Dutch
 -}
 
-module Text.Numeral.Language.NL.TestData (cardinals, ordinals) where
+module Text.Numeral.Language.NL.TestData
+    ( cardinals
+    , ordinals
+    , partitives
+    ) where
 
 
 --------------------------------------------------------------------------------
@@ -40,7 +44,7 @@ cardinals =
   [ ( "singular"
     , singular defaultInflection
     , [ (0, "nul")
-      , (1, "een")
+      , (1, "één")
       , (2, "twee")
       , (3, "drie")
       , (4, "vier")
@@ -60,7 +64,7 @@ cardinals =
       , (18, "achtien")
       , (19, "negentien")
       , (20, "twintig")
-      , (21, "eenentwintig")
+      , (21, "éénentwintig")
       , (22, "tweeëntwintig")
       , (23, "drieëntwintig")
       , (24, "vierentwintig")
@@ -70,7 +74,7 @@ cardinals =
       , (28, "achtentwintig")
       , (29, "negenentwintig")
       , (30, "dertig")
-      , (31, "eenendertig")
+      , (31, "éénendertig")
       , (32, "tweeëndertig")
       , (33, "drieëndertig")
       , (34, "vierendertig")
@@ -80,7 +84,7 @@ cardinals =
       , (38, "achtendertig")
       , (39, "negenendertig")
       , (40, "veertig")
-      , (41, "eenenveertig")
+      , (41, "éénenveertig")
       , (42, "tweeënveertig")
       , (43, "drieënveertig")
       , (44, "vierenveertig")
@@ -90,7 +94,7 @@ cardinals =
       , (48, "achtenveertig")
       , (49, "negenenveertig")
       , (50, "vijftig")
-      , (51, "eenenvijftig")
+      , (51, "éénenvijftig")
       , (52, "tweeënvijftig")
       , (53, "drieënvijftig")
       , (54, "vierenvijftig")
@@ -100,7 +104,7 @@ cardinals =
       , (58, "achtenvijftig")
       , (59, "negenenvijftig")
       , (60, "zestig")
-      , (61, "eenenzestig")
+      , (61, "éénenzestig")
       , (62, "tweeënzestig")
       , (63, "drieënzestig")
       , (64, "vierenzestig")
@@ -110,7 +114,7 @@ cardinals =
       , (68, "achtenzestig")
       , (69, "negenenzestig")
       , (70, "zeventig")
-      , (71, "eenenzeventig")
+      , (71, "éénenzeventig")
       , (72, "tweeënzeventig")
       , (73, "drieënzeventig")
       , (74, "vierenzeventig")
@@ -120,7 +124,7 @@ cardinals =
       , (78, "achtenzeventig")
       , (79, "negenenzeventig")
       , (80, "tachtig")
-      , (81, "eenentachtig")
+      , (81, "éénentachtig")
       , (82, "tweeëntachtig")
       , (83, "drieëntachtig")
       , (84, "vierentachtig")
@@ -130,7 +134,7 @@ cardinals =
       , (88, "achtentachtig")
       , (89, "negenentachtig")
       , (90, "negentig")
-      , (91, "eenennegentig")
+      , (91, "éénennegentig")
       , (92, "tweeënnegentig")
       , (93, "drieënnegentig")
       , (94, "vierennegentig")
@@ -140,14 +144,14 @@ cardinals =
       , (98, "achtennegentig")
       , (99, "negenennegentig")
       , (100, "honderd")
-      , (101, "honderdeen")
+      , (101, "honderdéén")
       , (108, "honderdacht")
       , (118, "honderdachtien")
       , (115, "honderdvijftien")
       , (500, "vijfhonderd")
       , (999, "negenhonderdnegenennegentig")
       , (1000, "duizend")
-      , (1001, "duizendeen")
+      , (1001, "duizendéén")
       , (1008, "duizendacht")
       , (8000, "achtduizend")
       , (900000, "negenhonderdduizend")
@@ -217,7 +221,7 @@ ordinals =
       , (18, "achtiende")
       , (19, "negentiende")
       , (20, "twintigste")
-      , (21, "eenentwintigste")
+      , (21, "éénentwintigste")
       , (22, "tweeëntwintigste")
       , (23, "drieëntwintigste")
       , (24, "vierentwintigste")
@@ -227,7 +231,7 @@ ordinals =
       , (28, "achtentwintigste")
       , (29, "negenentwintigste")
       , (30, "dertigste")
-      , (31, "eenendertigste")
+      , (31, "éénendertigste")
       , (32, "tweeëndertigste")
       , (33, "drieëndertigste")
       , (34, "vierendertigste")
@@ -237,7 +241,7 @@ ordinals =
       , (38, "achtendertigste")
       , (39, "negenendertigste")
       , (40, "veertigste")
-      , (41, "eenenveertigste")
+      , (41, "éénenveertigste")
       , (42, "tweeënveertigste")
       , (43, "drieënveertigste")
       , (44, "vierenveertigste")
@@ -247,7 +251,7 @@ ordinals =
       , (48, "achtenveertigste")
       , (49, "negenenveertigste")
       , (50, "vijftigste")
-      , (51, "eenenvijftigste")
+      , (51, "éénenvijftigste")
       , (52, "tweeënvijftigste")
       , (53, "drieënvijftigste")
       , (54, "vierenvijftigste")
@@ -257,7 +261,7 @@ ordinals =
       , (58, "achtenvijftigste")
       , (59, "negenenvijftigste")
       , (60, "zestigste")
-      , (61, "eenenzestigste")
+      , (61, "éénenzestigste")
       , (62, "tweeënzestigste")
       , (63, "drieënzestigste")
       , (64, "vierenzestigste")
@@ -267,7 +271,7 @@ ordinals =
       , (68, "achtenzestigste")
       , (69, "negenenzestigste")
       , (70, "zeventigste")
-      , (71, "eenenzeventigste")
+      , (71, "éénenzeventigste")
       , (72, "tweeënzeventigste")
       , (73, "drieënzeventigste")
       , (74, "vierenzeventigste")
@@ -277,7 +281,7 @@ ordinals =
       , (78, "achtenzeventigste")
       , (79, "negenenzeventigste")
       , (80, "tachtigste")
-      , (81, "eenentachtigste")
+      , (81, "éénentachtigste")
       , (82, "tweeëntachtigste")
       , (83, "drieëntachtigste")
       , (84, "vierentachtigste")
@@ -287,7 +291,7 @@ ordinals =
       , (88, "achtentachtigste")
       , (89, "negenentachtigste")
       , (90, "negentigste")
-      , (91, "eenennegentigste")
+      , (91, "éénennegentigste")
       , (92, "tweeënnegentigste")
       , (93, "drieënnegentigste")
       , (94, "vierennegentigste")
@@ -297,6 +301,33 @@ ordinals =
       , (98, "achtennegentigste")
       , (99, "negenennegentigste")
       , (100, "honderdste")
+      ]
+    )
+  ]
+
+partitives ∷ (Integral i, IsString s) ⇒ TestData (i, i) s
+partitives =
+  [ ( "default"
+    , defaultInflection
+    , [ ((0, 1), "nul éénde")
+      , ((1, 1), "één éénde")
+      , ((0, 2), "nul tweede")
+      , ((1, 2), "één tweede")  -- optionally "de helft"
+      , ((2, 2), "twee tweede")
+      , ((1, 3), "één derde")
+      , ((2, 3), "twee derde")
+      , ((1, 4), "één vierde")  -- optionally "één kwart"
+      , ((2, 4), "twee vierde") -- optionally "twee kwart"
+      , ((3, 4), "drie vierde") -- optionally "drie kwart"
+      , ((4, 4), "vier vierde") -- optionally "vier kwart"
+      , ((1, 5), "één vijfde")
+      , ((2, 5), "twee vijfde")
+      , ((1, 10), "één tiende")
+      , ((1, 100), "één honderdste")
+      , ((12, 144), "twaalf honderdvierenveertigste")
+      , ((-1, 2), "min één tweede")
+      , ((2, -3), "twee min derde")
+      , ((-3, -5), "min drie min vijfde")
       ]
     )
   ]

@@ -21,6 +21,7 @@ module Text.Numeral.Language.NL
     ( -- * Conversions
       cardinal
     , ordinal
+    , partitive
       -- * Structure
     , struct
       -- * Bounds
@@ -31,6 +32,7 @@ module Text.Numeral.Language.NL
 -- Imports
 --------------------------------------------------------------------------------
 
+import "base" Control.Monad ( return )
 import "base" Data.Bool     ( Bool, otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
@@ -41,6 +43,7 @@ import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Bool.Unicode     ( (∧) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
+import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
@@ -57,8 +60,19 @@ cardinal ∷ (G.Plural i, Integral α, E.Scale α, Monoid s, IsString s)
          ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
 
-ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
-ordinal inf = ordinalRepr inf ∘ struct
+ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s)
+        ⇒ i → α → Maybe s
+ordinal inf = ordinalRepr "eerste" inf ∘ struct
+
+partitive ∷ ( G.Singular i, G.Plural i
+            , Integral α, E.Scale α
+            , Monoid s, IsString s
+            )
+          ⇒ i → (α, α) → Maybe s
+partitive inf (n, d) = do
+  n' ← cardinal (G.singular inf) n
+  d' ← ordinalRepr "éénde" inf $ struct d
+  return $ n' ⊕ " " ⊕ d'
 
 struct ∷ ( Integral α, E.Scale α
          , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
@@ -105,7 +119,7 @@ cardinalRepr = render genericRepr
       syms inf =
           M.fromList
           [ (0, const "nul")
-          , (1, \c → if pluralForm c then "éénen" else "een")
+          , (1, \c → if pluralForm c then "éénen" else "één")
           , (2, forms "twee" "twin" "tweeën")
           , (3, forms "drie" "der"  "drieën")
           , (4, forms "vier" "veer" "vieren")
@@ -148,25 +162,26 @@ cardinalRepr = render genericRepr
                                 _ | pluralForm ctx  → p
                                   | otherwise       → n
 
-ordinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
-ordinalRepr = render genericRepr
-               { reprValue = \_ n → M.lookup n syms
-               , reprScale = BN.pelletierRepr ( BN.ordQuantityName "iljoen" "iljoenste"
-                                                                   "iljoen" "iljoenste"
-                                              )
-                                              ( BN.ordQuantityName "iljard" "iljardste"
-                                                                   "iljard" "iljardste"
-                                              )
-                                              []
-               }
+ordinalRepr ∷ (Monoid s, IsString s) ⇒ s → i → Exp i → Maybe s
+ordinalRepr one =
+    render genericRepr
+           { reprValue = \_ n → M.lookup n syms
+           , reprScale = BN.pelletierRepr ( BN.ordQuantityName "iljoen" "iljoenste"
+                                                               "iljoen" "iljoenste"
+                                          )
+                                          ( BN.ordQuantityName "iljard" "iljardste"
+                                                               "iljard" "iljardste"
+                                          )
+                                          []
+           }
     where
       syms =
           M.fromList
           [ (0, const "nulde")
           , (1, \c → case c of
-                       CtxEmpty          → "eerste"
-                       _ | isOutside R c → "eende"
-                         | otherwise     → "een"
+                       CtxEmpty          → one
+                       _ | isOutside R c → "éénde"
+                         | otherwise     → "één"
             )
           , (2, forms "tweede"  "twee"  "twin")
           , (3, forms "derde"   "drie"  "der")

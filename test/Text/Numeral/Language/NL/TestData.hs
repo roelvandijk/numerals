@@ -20,6 +20,7 @@ module Text.Numeral.Language.NL.TestData
     ( cardinals
     , ordinals
     , partitives
+    , multiplicatives
     ) where
 
 
@@ -307,9 +308,12 @@ ordinals =
 
 partitives ∷ (Integral i, IsString s) ⇒ TestData (i, i) s
 partitives =
-  [ ( "default"
-    , defaultInflection
-    , [ ((0, 1), "nul éénde")
+  [ ("singular", singular defaultInflection, testData)
+  , ("ignored plural", plural defaultInflection, testData)
+  ]
+  where
+    testData =
+      [ ((0, 1), "nul éénde")
       , ((1, 1), "één éénde")
       , ((0, 2), "nul tweede")
       , ((1, 2), "één tweede")  -- optionally "de helft"
@@ -329,5 +333,16 @@ partitives =
       , ((2, -3), "twee min derde")
       , ((-3, -5), "min drie min vijfde")
       ]
-    )
+
+multiplicatives ∷ (Integral i, IsString s) ⇒ TestData i s
+multiplicatives =
+  [ ("singular", singular defaultInflection, testData)
+  , ("ignored plural", plural defaultInflection, testData)
   ]
+  where
+    testData =
+      [ (1, "éénmaal")
+      , (2, "tweemaal")
+      , (3, "driemaal")
+      , (10, "tienmaal")
+      ]

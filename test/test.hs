@@ -148,10 +148,12 @@ tests =
     ]
   , testGroup "LA"  [mkTests "cardinal" LA.cardinal (LA.cardinals ∷ TestData ℤ String)]
   , testGroup "MG"  [mkTests "cardinal" MG.cardinal (MG.cardinals ∷ TestData ℤ String)]
-  , testGroup "NL"  [ mkTests "cardinal"  NL.cardinal  (NL.cardinals ∷ TestData ℤ String)
-                    , mkTests "ordinal"   NL.ordinal   (NL.ordinals ∷ TestData ℤ String)
-                    , mkTests "partitive" NL.partitive (NL.partitives ∷ TestData (ℤ, ℤ) String)
-                    ]
+  , testGroup "NL"
+    [ mkTests "cardinal"       NL.cardinal  (NL.cardinals  ∷ TestData ℤ String)
+    , mkTests "ordinal"        NL.ordinal   (NL.ordinals   ∷ TestData ℤ String)
+    , mkTests "partitive"      NL.partitive (NL.partitives ∷ TestData (ℤ, ℤ) String)
+    , mkTests "multiplicative" NL.multiplicative (NL.multiplicatives ∷ TestData ℤ String)
+    ]
   , testGroup "NO"  [mkTests "cardinal" NO.cardinal  (NO.cardinals  ∷ TestData ℤ String)]
   , testGroup "NQM" [mkTests "cardinal" NQM.cardinal (NQM.cardinals ∷ TestData ℤ String)]
   , testGroup "OJ"  [mkTests "cardinal" OJ.cardinal  (OJ.cardinals  ∷ TestData ℤ String)]

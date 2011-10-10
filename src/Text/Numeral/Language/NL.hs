@@ -22,6 +22,7 @@ module Text.Numeral.Language.NL
       cardinal
     , ordinal
     , partitive
+    , multiplicative
       -- * Structure
     , struct
       -- * Bounds
@@ -35,6 +36,7 @@ module Text.Numeral.Language.NL
 import "base" Control.Monad ( return )
 import "base" Data.Bool     ( Bool, otherwise )
 import "base" Data.Function ( ($), const, fix )
+import "base" Data.Functor  ( fmap )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
@@ -73,6 +75,13 @@ partitive inf (n, d) = do
   n' ← cardinal (G.singular inf) n
   d' ← ordinalRepr "éénde" inf $ struct d
   return $ n' ⊕ " " ⊕ d'
+
+multiplicative ∷ ( G.Singular i, G.Plural i
+                 , Integral α, E.Scale α
+                 , Monoid s, IsString s
+                 )
+               ⇒ i → α → Maybe s
+multiplicative inf = fmap (⊕ "maal") ∘ cardinal (G.singular inf)
 
 struct ∷ ( Integral α, E.Scale α
          , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β

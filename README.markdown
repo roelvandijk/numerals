@@ -22,6 +22,19 @@ because they are not yet defined in this package.
 
   Describe division into fractions - _two thirds_, _three quarters_.
 
+- Multiplicative numerals
+
+  Describe repetition, how many time - _once_, _twice_, _thrice_.
+
+### Inflection
+
+In some languages number words are modified based on a number of
+grammatical categories such as _gender_ or _number_. For instance, in
+Spanish, the numeral for the quantity '1' can be one of _uno_, _un_ or
+_una_ depending on whether it is of the neuter, masculine or feminine
+gender. In order to support this process every conversion function
+takes an inflection parameter which defines the grammatical state.
+
 ### Numeral structure
 
 The `struct` functions convert numbers to a polymorphic representation

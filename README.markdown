@@ -1,14 +1,39 @@
 Numerals
 ========
 
-Convert numbers to number words in a number of languages. Each
-language has its own module. The module name is based on one of the
-ISO 639 Alpha codes. Each module contains one or more `cardinal`
-functions and a `struct` function. The `cardinal` functions directly
-convert cardinal numbers to a string-like representation of their
-spoken form. The `struct` functions convert numbers to a polymorphic
-representation of their grammatical structure. All language modules
-are implemented using the @numerals-base@ package.
+Convert numbers to numerals (number words) in a number of
+languages. Each language has its own module. The module name is based
+on one of the ISO 639 Alpha codes. Each module contains one or more
+functions to convert numerical values to numerals. Several types of
+numerals are supported. But not every type is supported by every
+language. Some because they do not occur in that language. Others
+because they are not yet defined in this package.
+
+- Cardinal numerals
+
+  Describe quantity - _one_, _two_, _three_, etc.
+
+- Ordinal numerals
+
+  Describe position in a sequential order - _first_, _second_,
+  _third_, etc.
+
+- Partitive numerals
+
+  Describe division into fractions - _two thirds_, _three quarters_.
+
+### Numeral structure
+
+The `struct` functions convert numbers to a polymorphic representation
+of their grammatical structure. They are found in every language
+module.
+
+### Implementation
+
+All language modules are implemented using the
+[numerals-base](https://github.com/roelvandijk/numerals-base) package.
+
+### Examples
 
 The use of this package is best understood with some examples. Because
 the results of conversion are polymorphic we need to choose a specific
@@ -62,8 +87,8 @@ you need to specify a specific type.
     >>> import qualified Text.Numeral.Language.NL as NL
     >>> NL.struct 123 :: Integer
     123
-    >>> import Text.Numeral
-    >>> NL.struct 123 :: Exp
+    >>> import Text.Numeral.Exp.Reified ( Exp, showExp )
+    >>> showExp (NL.struct 123 :: Exp i)
     Add (Lit 100) (Add (Lit 3) (Mul (Lit 2) (Lit 10)))
 
 Compare with:

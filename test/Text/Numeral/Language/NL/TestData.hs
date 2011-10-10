@@ -25,6 +25,7 @@ module Text.Numeral.Language.NL.TestData (cardinals, ordinals) where
 
 import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
+import "numerals-base" Text.Numeral.Grammar
 import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
@@ -36,8 +37,8 @@ import "this" Text.Numeral.Test ( TestData )
 
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
-  [ ( "default"
-    , defaultInflection
+  [ ( "singular"
+    , singular defaultInflection
     , [ (0, "nul")
       , (1, "een")
       , (2, "twee")
@@ -140,10 +141,14 @@ cardinals =
       , (99, "negenennegentig")
       , (100, "honderd")
       , (101, "honderdeen")
+      , (108, "honderdacht")
+      , (118, "honderdachtien")
       , (115, "honderdvijftien")
       , (500, "vijfhonderd")
       , (999, "negenhonderdnegenennegentig")
       , (1000, "duizend")
+      , (1001, "duizendeen")
+      , (1008, "duizendacht")
       , (8000, "achtduizend")
       , (900000, "negenhonderdduizend")
       , (dec 6, "miljoen")
@@ -154,6 +159,36 @@ cardinals =
       , (dec 21, "triljard")
       , (dec 24, "quadriljoen")
       , (dec 27, "quadriljard")
+      ]
+    )
+  , ( "plural"
+    , plural defaultInflection
+    , [ (1, "éénen")
+      , (2, "tweeën")
+      , (3, "drieën")
+      , (4, "vieren")
+      , (5, "vijven")
+      , (6, "zessen")
+      , (7, "zevens")
+      , (8, "achten")
+      , (9, "negens")
+      , (10, "tienen")
+      , (11, "elven")
+      , (12, "twaalven")
+      , (13, "dertiens")
+      , (14, "veertiens")
+      , (15, "vijftiens")
+      , (16, "zestiens")
+      , (17, "zeventiens")
+      , (18, "achtiens")
+      , (19, "negentiens")
+      , (20, "twintigs")
+      , (100, "honderden")
+      , (1000, "duizenden")
+      , (dec 6, "miljoenen")
+      , (dec 9, "miljarden")
+      , (dec 12, "biljoenen")
+      , (dec 15, "biljarden")
       ]
     )
   ]

@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude
            , OverloadedStrings
            , PackageImports
+           , ScopedTypeVariables
            , UnicodeSyntax
   #-}
 
@@ -30,27 +31,30 @@ module Text.Numeral.Language.NL
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Bool     ( otherwise )
+import "base" Data.Bool     ( Bool, otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
+import "base-unicode-symbols" Data.Bool.Unicode     ( (∧) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.Exp    as E
-import qualified "numerals-base" Text.Numeral.BigNum as BN
+import qualified "numerals-base" Text.Numeral.BigNum  as BN
+import qualified "numerals-base" Text.Numeral.Exp     as E
+import qualified "numerals-base" Text.Numeral.Grammar as G
 
 
 --------------------------------------------------------------------------------
 -- NL
 --------------------------------------------------------------------------------
 
-cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (G.Plural i, Integral α, E.Scale α, Monoid s, IsString s)
+         ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
 
 ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
@@ -87,47 +91,62 @@ genericRepr = defaultRepr
                     | otherwise  = ""
       (_     ⊞ _) _              = ""
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ ∀ i s. (G.Plural i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 cardinalRepr = render genericRepr
-               { reprValue = \_ n → M.lookup n syms
-               , reprScale = BN.pelletierRepr (const "iljoen")
-                                              (const "iljard")
-               , reprScale = BN.pelletierRepr (\_ _ → "iljoen")
-                                              (\_ _ → "iljard")
+               { reprValue = \inf n → M.lookup n (syms inf)
+               , reprScale = BN.pelletierRepr (\i c → if doPlural i c then "iljoenen" else "iljoen")
+                                              (\i c → if doPlural i c then "iljarden" else "iljard")
                                               []
                }
     where
-      syms =
+      doPlural ∷ i → Ctx (Exp i) → Bool
+      doPlural inf ctx = G.isPlural inf ∧ isOutside R ctx
+
+      syms inf =
           M.fromList
           [ (0, const "nul")
-          , (1, const "een")
-          , (2, forms "twee" "twin")
-          , (3, forms "drie" "der")
-          , (4, forms "vier" "veer")
-          , (5, const "vijf")
-          , (6, const "zes")
-          , (7, const "zeven")
+          , (1, \c → if pluralForm c then "éénen" else "een")
+          , (2, forms "twee" "twin" "tweeën")
+          , (3, forms "drie" "der"  "drieën")
+          , (4, forms "vier" "veer" "vieren")
+          , (5, \c → if pluralForm c then "vijven" else "vijf")
+          , (6, \c → if pluralForm c then "zessen" else "zes")
+          , (7, \c → if pluralForm c then "zevens" else "zeven")
           , (8, \c → case c of
                        CtxMul _ (Lit 10) _ → "tach"
-                       CtxAdd _ (Lit _)  _ → "ach"
-                       _                   → "acht"
+                       CtxAdd _ (Lit 10) _ → "ach"
+                       _ | pluralForm c    → "achten"
+                         | otherwise       → "acht"
             )
-          , (9, const "negen")
+          , (9, \c → if pluralForm c then "negens" else "negen")
           , (10, \c → case c of
-                        CtxMul R _ _ → "tig"
-                        _            → "tien"
+                        CtxAdd R _ _
+                          | pluralForm c → "tiens"
+                        CtxMul R _ _
+                          | pluralForm c → "tigs"
+                          | otherwise    → "tig"
+                        _ | pluralForm c → "tienen"
+                          | otherwise    → "tien"
             )
-          , (11, const "elf")
-          , (12, const "twaalf")
-          , (100, const "honderd")
-          , (1000, const "duizend")
+          , (  11, \c → if pluralForm c then "elven"     else "elf")
+          , (  12, \c → if pluralForm c then "twaalven"  else "twaalf")
+          , ( 100, \c → if pluralForm c then "honderden" else "honderd")
+          , (1000, \c → if pluralForm c then "duizenden" else "duizend")
           ]
+          where
+            pluralForm ∷ Ctx (Exp i) → Bool
+            pluralForm ctx = doPlural inf ctx
 
-      forms ∷ s → s → Ctx (Exp i) → s
-      forms n t ctx = case ctx of
-                        CtxMul _ (Lit 10) _ → t
-                        CtxAdd _ (Lit 10) _ → t
-                        _                   → n
+            forms ∷ s -- ^ Normal form.
+                  → s -- ^ Added to, or multiplied with ten.
+                  → s -- ^ Plural form.
+                  → Ctx (Exp i)
+                  → s
+            forms n t p ctx = case ctx of
+                                CtxMul _ (Lit 10) _ → t
+                                CtxAdd _ (Lit 10) _ → t
+                                _ | pluralForm ctx  → p
+                                  | otherwise       → n
 
 ordinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
 ordinalRepr = render genericRepr

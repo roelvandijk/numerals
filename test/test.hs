@@ -11,20 +11,26 @@ module Main where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Control.Monad ( when )
-import "base" Data.Function ( ($) )
-import "base" Data.List     ( map )
-import "base" Data.Maybe    ( Maybe(Just), fromMaybe )
-import "base" Prelude       ( String )
-import "base" System.IO     ( IO )
-import "base" Text.Printf   ( printf )
-import "base" Text.Show     ( Show, show )
+import "base" Control.Monad      ( (=<<), when )
+import "base" Data.Bool          ( Bool(True) )
+import "base" Data.Function      ( ($) )
+import "base" Data.List          ( map )
+import "base" Data.Maybe         ( Maybe(Just), fromMaybe )
+import "base" Prelude            ( String )
+import "base" System.Environment ( getArgs )
+import "base" System.IO          ( IO )
+import "base" Text.Printf        ( printf )
+import "base" Text.Show          ( Show, show )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≢) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import "HUnit" Test.HUnit ( Assertion, assertFailure )
 import "numerals-base" Text.Numeral.Grammar.Reified ( Inflection )
-import "test-framework" Test.Framework ( Test, defaultMain, testGroup )
+import "test-framework" Test.Framework ( defaultMainWithOpts
+                                       , interpretArgsOrExit
+                                       , ropt_hide_successes
+                                       , Test, testGroup
+                                       )
 import "test-framework-hunit" Test.Framework.Providers.HUnit ( testCase )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -97,7 +103,8 @@ import qualified "this" Text.Numeral.Language.ZH.TestData  as ZH
 --------------------------------------------------------------------------------
 
 main ∷ IO ()
-main = defaultMain tests
+main = do opts ← interpretArgsOrExit =<< getArgs
+          defaultMainWithOpts tests opts { ropt_hide_successes = Just True }
 
 tests ∷ [Test]
 tests =

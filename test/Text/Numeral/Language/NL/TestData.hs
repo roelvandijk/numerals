@@ -196,6 +196,37 @@ cardinals =
       , (dec 15, "biljarden")
       ]
     )
+  , ( "dative"
+    , dative defaultInflection
+    , [ (1, "éénen")
+      , (2, "tweeën")
+      , (3, "drieën")
+      , (4, "vieren")
+      , (5, "vijven")
+      , (6, "zessen")
+      , (7, "zevenen")
+      , (8, "achten")
+      , (9, "negenen")
+      , (10, "tienen")
+      , (11, "elven")
+      , (12, "twaalven")
+      , (13, "dertienen")
+      , (14, "veertienen")
+      , (15, "vijftienen")
+      , (16, "zestienen")
+      , (17, "zeventienen")
+      , (18, "achtienen")
+      , (19, "negentienen")
+      , (20, "twintigen")
+      , (23, "drieëntwintigen")
+      , (100, "honderden")
+      , (1000, "duizenden")
+      , (dec 6, "miljoenen")
+      , (dec 9, "miljarden")
+      , (dec 12, "biljoenen")
+      , (dec 15, "biljarden")
+      ]
+    )
   ]
 
 ordinals ∷ (Integral i, IsString s) ⇒ TestData i s
@@ -310,6 +341,7 @@ partitives ∷ (Integral i, IsString s) ⇒ TestData (i, i) s
 partitives =
   [ ("singular", singular defaultInflection, testData)
   , ("ignored plural", plural defaultInflection, testData)
+  , ("ignored dative", dative defaultInflection, testData)
   ]
   where
     testData =
@@ -338,6 +370,7 @@ multiplicatives ∷ (Integral i, IsString s) ⇒ TestData i s
 multiplicatives =
   [ ("singular", singular defaultInflection, testData)
   , ("ignored plural", plural defaultInflection, testData)
+  , ("ignored dative", dative defaultInflection, testData)
   ]
   where
     testData =

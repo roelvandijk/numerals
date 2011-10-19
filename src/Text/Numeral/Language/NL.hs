@@ -42,7 +42,7 @@ import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
-import "base-unicode-symbols" Data.Bool.Unicode     ( (∧) )
+import "base-unicode-symbols" Data.Bool.Unicode     ( (∧), (∨) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
 import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
@@ -58,7 +58,7 @@ import qualified "numerals-base" Text.Numeral.Grammar as G
 -- NL
 --------------------------------------------------------------------------------
 
-cardinal ∷ (G.Plural i, Integral α, E.Scale α, Monoid s, IsString s)
+cardinal ∷ (G.Plural i, G.Dative i, Integral α, E.Scale α, Monoid s, IsString s)
          ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
 
@@ -66,22 +66,22 @@ ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s)
         ⇒ i → α → Maybe s
 ordinal inf = ordinalRepr "eerste" inf ∘ struct
 
-partitive ∷ ( G.Singular i, G.Plural i
+partitive ∷ ( G.Singular i, G.Plural i, G.NoCase i, G.Dative i
             , Integral α, E.Scale α
             , Monoid s, IsString s
             )
           ⇒ i → (α, α) → Maybe s
 partitive inf (n, d) = do
-  n' ← cardinal (G.singular inf) n
+  n' ← cardinal (G.noCase $ G.singular inf) n
   d' ← ordinalRepr "éénde" inf $ struct d
   return $ n' ⊕ " " ⊕ d'
 
-multiplicative ∷ ( G.Singular i, G.Plural i
+multiplicative ∷ ( G.Singular i, G.Plural i, G.NoCase i, G.Dative i
                  , Integral α, E.Scale α
                  , Monoid s, IsString s
                  )
                ⇒ i → α → Maybe s
-multiplicative inf = fmap (⊕ "maal") ∘ cardinal (G.singular inf)
+multiplicative inf = fmap (⊕ "maal") ∘ cardinal (G.noCase $ G.singular inf)
 
 struct ∷ ( Integral α, E.Scale α
          , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
@@ -114,7 +114,8 @@ genericRepr = defaultRepr
                     | otherwise  = ""
       (_     ⊞ _) _              = ""
 
-cardinalRepr ∷ ∀ i s. (G.Plural i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ ∀ i s. (G.Plural i, G.Dative i, Monoid s, IsString s)
+             ⇒ i → Exp i → Maybe s
 cardinalRepr = render genericRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = BN.pelletierRepr (\i c → if doPlural i c then "iljoenen" else "iljoen")
@@ -123,53 +124,69 @@ cardinalRepr = render genericRepr
                }
     where
       doPlural ∷ i → Ctx (Exp i) → Bool
-      doPlural inf ctx = G.isPlural inf ∧ isOutside R ctx
+      doPlural inf ctx = (G.isPlural inf ∨ G.isDative inf) ∧ isOutside R ctx
 
       syms inf =
           M.fromList
           [ (0, const "nul")
-          , (1, \c → if pluralForm c then "éénen" else "één")
-          , (2, forms "twee" "twin" "tweeën")
-          , (3, forms "drie" "der"  "drieën")
-          , (4, forms "vier" "veer" "vieren")
-          , (5, \c → if pluralForm c then "vijven" else "vijf")
-          , (6, \c → if pluralForm c then "zessen" else "zes")
-          , (7, \c → if pluralForm c then "zevens" else "zeven")
+          , (1, pluralDative "één" "éénen" "éénen")
+          , (2, forms "twee" "twin" "tweeën" "tweeën")
+          , (3, forms "drie" "der"  "drieën" "drieën")
+          , (4, forms "vier" "veer" "vieren" "vieren")
+          , (5, pluralDative "vijf"  "vijven" "vijven")
+          , (6, pluralDative "zes"   "zessen" "zessen")
+          , (7, pluralDative "zeven" "zevens" "zevenen")
           , (8, \c → case c of
                        CtxMul _ (Lit 10) _ → "tach"
                        CtxAdd _ (Lit 10) _ → "ach"
-                       _ | pluralForm c    → "achten"
+                       _ | dativeForm c
+                         ∨ pluralForm c    → "achten"
                          | otherwise       → "acht"
             )
-          , (9, \c → if pluralForm c then "negens" else "negen")
+          , (9, pluralDative "negen" "negens" "negenen")
           , (10, \c → case c of
                         CtxAdd R _ _
+                          | dativeForm c → "tienen"
                           | pluralForm c → "tiens"
                         CtxMul R _ _
+                          | dativeForm c → "tigen"
                           | pluralForm c → "tigs"
                           | otherwise    → "tig"
-                        _ | pluralForm c → "tienen"
+                        _ | dativeForm c
+                          ∨ pluralForm c → "tienen"
                           | otherwise    → "tien"
             )
-          , (  11, \c → if pluralForm c then "elven"     else "elf")
-          , (  12, \c → if pluralForm c then "twaalven"  else "twaalf")
-          , ( 100, \c → if pluralForm c then "honderden" else "honderd")
-          , (1000, \c → if pluralForm c then "duizenden" else "duizend")
+          , (  11, pluralDative "elf"     "elven"     "elven")
+          , (  12, pluralDative "twaalf"  "twaalven"  "twaalven")
+          , ( 100, pluralDative "honderd" "honderden" "honderden")
+          , (1000, pluralDative "duizend" "duizenden" "duizenden")
           ]
           where
+            pluralDative ∷ s → s → s → Ctx (Exp i) → s
+            pluralDative  o p d ctx
+                | pluralForm ctx = p
+                | dativeForm ctx = d
+                | otherwise      = o
+
+            dativeForm ∷ Ctx (Exp i) → Bool
+            dativeForm ctx = G.isDative inf ∧ isOutside R ctx
+
             pluralForm ∷ Ctx (Exp i) → Bool
-            pluralForm ctx = doPlural inf ctx
+            pluralForm ctx = G.isPlural inf ∧ isOutside R ctx
 
             forms ∷ s -- ^ Normal form.
                   → s -- ^ Added to, or multiplied with ten.
                   → s -- ^ Plural form.
+                  → s -- ^ Dative form.
                   → Ctx (Exp i)
                   → s
-            forms n t p ctx = case ctx of
-                                CtxMul _ (Lit 10) _ → t
-                                CtxAdd _ (Lit 10) _ → t
-                                _ | pluralForm ctx  → p
-                                  | otherwise       → n
+            forms n t p d ctx =
+                case ctx of
+                  CtxMul _ (Lit 10) _ → t
+                  CtxAdd _ (Lit 10) _ → t
+                  _ | dativeForm ctx  → d
+                    | pluralForm ctx  → p
+                    | otherwise       → n
 
 ordinalRepr ∷ (Monoid s, IsString s) ⇒ s → i → Exp i → Maybe s
 ordinalRepr one =

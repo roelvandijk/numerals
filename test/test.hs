@@ -38,6 +38,8 @@ import qualified "this" Text.Numeral.Language.AF           as AF
 import qualified "this" Text.Numeral.Language.AF.TestData  as AF
 import qualified "this" Text.Numeral.Language.AMP          as AMP
 import qualified "this" Text.Numeral.Language.AMP.TestData as AMP
+import qualified "this" Text.Numeral.Language.BG           as BG
+import qualified "this" Text.Numeral.Language.BG.TestData  as BG
 import qualified "this" Text.Numeral.Language.CHN          as CHN
 import qualified "this" Text.Numeral.Language.CHN.TestData as CHN
 import qualified "this" Text.Numeral.Language.CHR          as CHR
@@ -113,6 +115,7 @@ tests =
     , mkTests "ordinal"  AF.ordinal  (AF.ordinals  ∷ TestData ℤ String)
     ]
   , testGroup "AMP" [mkTests "cardinal" AMP.cardinal (AMP.cardinals ∷ TestData ℤ String)]
+  , testGroup "BG"  [mkTests "cardinal" BG.cardinal  (BG.cardinals  ∷ TestData ℤ String)]
   , testGroup "CHN" [mkTests "cardinal" CHN.cardinal (CHN.cardinals ∷ TestData ℤ String)]
   , testGroup "CHR" [mkTests "cardinal" CHR.cardinal (CHR.cardinals ∷ TestData ℤ String)]
   , testGroup "CS"  [mkTests "cardinal" CS.cardinal  (CS.cardinals  ∷ TestData ℤ String)]

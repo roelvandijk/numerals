@@ -84,12 +84,12 @@ cardinalRepr = render defaultRepr
                , reprNeg   = Just $ \_ _ → "минус "
                }
     where
-      (Lit 100 ⊞  Lit _) _            = " и "
-      (Lit 100 ⊞  Add _ (Lit 10)) _   = " и "
-      (Lit 100 ⊞  Mul _ _) _          = " и "
-      (_ ⊞ Lit 10) _                  = ""
-      ((Lit _ `Mul` Lit _) ⊞ Lit _) _ = " и "
-      (_     ⊞ _     ) _              = " "
+      (Lit 100 ⊞  Lit _) _          = " и "
+      (_ ⊞ Add _ (Lit 10)) _        = " и "
+      (_ ⊞ Mul _ (Lit 10)) _        = " и "
+      (_ ⊞ Lit 10) _                = ""
+      ((_ `Mul` Lit _) ⊞ Lit _) _   = " и "
+      (_     ⊞ _     ) _            = " "
 
       (_ ⊡ Lit n) _ | n ≤ 100 = ""
       (_ ⊡ _    ) _           = " "

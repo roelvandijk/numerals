@@ -22,6 +22,7 @@ import qualified "numerals-base" Text.Numeral.Grammar as G
 
 -- import qualified "this" Text.Numeral.Language.AF  as AF
 -- import qualified "this" Text.Numeral.Language.AMP as AMP
+-- import qualified "this" Text.Numeral.Language.BG  as BG
 -- import qualified "this" Text.Numeral.Language.CHN as CHN
 -- import qualified "this" Text.Numeral.Language.CHR as CHR
 -- import qualified "this" Text.Numeral.Language.CS  as CS

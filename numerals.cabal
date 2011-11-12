@@ -110,6 +110,7 @@ library
   exposed-modules:
                    Text.Numeral.Language.AF
                  , Text.Numeral.Language.AMP
+                 , Text.Numeral.Language.BG
                  , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.CHR
                  , Text.Numeral.Language.CS
@@ -157,6 +158,7 @@ test-suite test-numerals
 
   other-modules: Text.Numeral.Language.AF.TestData
                , Text.Numeral.Language.AMP.TestData
+               , Text.Numeral.Language.BG.TestData
                , Text.Numeral.Language.CHN.TestData
                , Text.Numeral.Language.CHR.TestData
                , Text.Numeral.Language.CS.TestData

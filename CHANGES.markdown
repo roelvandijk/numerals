@@ -8,7 +8,7 @@ Changelog for numerals
 - Updated languages.
   + Fixed bug in Turkish (TR).
   + Fixed bug in Norwegian (NO).
-  + Dutch (NL) ordinals.
+  + Dutch (NL) ordinals, plural & dative cardinals, partitives and multiplicatives.
   + English (EN) ordinals.
   + German (DE) ordinals.
   + French (FR) ordinals & inflection.

@@ -35,6 +35,12 @@ _una_ depending on whether it is of the neuter, masculine or feminine
 gender. In order to support this process every conversion function
 takes an inflection parameter which defines the grammatical state.
 
+Inflections are not concrete types, but polymorphic parameters
+constrained by type classes. Use the reified inflection type provided
+by the `numerals-base` package to get a concrete value:
+
+    >>> import Text.Numeral.Grammar.Reified ( defaultInflection )
+
 ### Numeral structure
 
 The `struct` functions convert numbers to a polymorphic representation
@@ -55,22 +61,22 @@ has instances for `Monoid` and `IsString` will work. First some
 English number names, both British and US variants:
 
     >>> import qualified Text.Numeral.Language.EN as EN
-    >>> EN.uk_cardinal 123 :: Maybe String
+    >>> EN.uk_cardinal defaultInflection 123 :: Maybe String
     Just "one hundred and twenty-three"
-    >>> EN.us_cardinal (10^50 + 42) :: Maybe String
+    >>> EN.us_cardinal defaultInflection (10^50 + 42) :: Maybe String
     Just "one hundred quindecillion forty-two"
 
 French, which contains some traces of a base 20 system:
 
     >>> import qualified Text.Numeral.Language.FR as FR
-    >>> FR.cardinal (-99) :: Maybe String
+    >>> FR.cardinal defaultInflection (-99) :: Maybe String
     Just "moins quatre-vingt-dix-neuf"
 
 Conversions can fail. Alamblak, a language spoken by a few people in
 Papua New Guinea, has no representation for negative numbers:
 
     >>> import qualified Text.Numeral.Language.AMP as AMP
-    >>> AMP.cardinal (-3) :: Maybe String
+    >>> AMP.cardinal defaultInflection (-3) :: Maybe String
     Nothing
 
 Some languages have multiple scripts and methods for writing number
@@ -80,18 +86,31 @@ characters or transcribed to the Latin script using Pinyin.
 Traditional Chinese characters:
 
     >>> import qualified Text.Numeral.Language.ZH as ZH
-    >>> ZH.trad_cardinal 123456 :: Maybe String
+    >>> ZH.trad_cardinal defaultInflection 123456 :: Maybe String
     Just "十二萬三千四百五十六"
 
 Simplified characters for use in financial contexts:
 
-    >>> ZH.finance_simpl_cardinal 123456 :: Maybe String
+    >>> ZH.finance_simpl_cardinal defaultInflection 123456 :: Maybe String
     Just "拾贰万参仟肆伯伍拾陆"
 
 Transcribed using Pinyin:
 
-    >>> ZH.pinyin_cardinal 123456 :: Maybe String
+    >>> ZH.pinyin_cardinal defaultInflection 123456 :: Maybe String
     Just "shíèrwàn sānqiān sìbǎi wǔshí liù"
+
+In Spanish the word for the quantity '1' differs based on its
+gender. We convey the gender via the inflection parameter:
+
+    >>> import Text.Numeral.Grammar ( masculine, feminine, neuter )
+    >>> import Text.Numeral.Grammar.Reified ( defaultInflection )
+    >>> import qualified Text.Numeral.Language.ES as ES
+    >>> ES.cardinal (masculine defaultInflection) 1 :: Maybe String
+    Just "un"
+    >>> ES.cardinal (feminine defaultInflection) 1 :: Maybe String
+    Just "una"
+    >>> ES.cardinal (neuter defaultInflection) 1 :: Maybe String
+    Just "uno"
 
 Using the `struct` functions you can see the grammatical structure of
 number names. Because the results of these functions are polymorphic
@@ -106,7 +125,7 @@ you need to specify a specific type.
 
 Compare with:
 
-    >>> NL.cardinal 123 :: Maybe String
+    >>> NL.cardinal defaultInflection 123 :: Maybe String
     Just "honderddrieëntwintig"
 
 100 (honderd) + (3 (drie) + (ën) 2 (twin) * 10 (tig))

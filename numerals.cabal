@@ -31,22 +31,22 @@ description:
   variants:
   .
   >>> import qualified Text.Numeral.Language.EN as EN
-  >>> EN.uk_cardinal 123 :: Maybe String
+  >>> EN.uk_cardinal defaultInflection 123 :: Maybe String
   Just "one hundred and twenty-three"
-  >>> EN.us_cardinal (10^50 + 42) :: Maybe String
+  >>> EN.us_cardinal defaultInflection (10^50 + 42) :: Maybe String
   Just "one hundred quindecillion forty-two"
   .
   French, which contains some traces of a base 20 system:
   .
   >>> import qualified Text.Numeral.Language.FR as FR
-  >>> FR.cardinal (-99) :: Maybe String
+  >>> FR.cardinal defaultInflection (-99) :: Maybe String
   Just "moins quatre-vingt-dix-neuf"
   .
   Conversions can fail. Alamblak, a language spoken by a few people in
   Papua New Guinea, has no representation for negative numbers:
   .
   >>> import qualified Text.Numeral.Language.AMP as AMP
-  >>> AMP.cardinal (-3) :: Maybe String
+  >>> AMP.cardinal defaultInflection (-3) :: Maybe String
   Nothing
   .
   Some languages have multiple scripts and methods for writing number
@@ -56,17 +56,17 @@ description:
   Traditional Chinese characters:
   .
   >>> import qualified Text.Numeral.Language.ZH as ZH
-  >>> ZH.trad_cardinal 123456 :: Maybe String
+  >>> ZH.trad_cardinal defaultInflection 123456 :: Maybe String
   Just "十二萬三千四百五十六"
   .
   Simplified characters for use in financial contexts:
   .
-  >>> ZH.finance_simpl_cardinal 123456 :: Maybe String
+  >>> ZH.finance_simpl_cardinal defaultInflection 123456 :: Maybe String
   Just "拾贰万参仟肆伯伍拾陆"
   .
   Transcribed using Pinyin:
   .
-  >>> ZH.pinyin_cardinal 123456 :: Maybe String
+  >>> ZH.pinyin_cardinal defaultInflection 123456 :: Maybe String
   Just "shíèrwàn sānqiān sìbǎi wǔshí liù"
   .
   Using the 'struct' functions you can see the grammatical structure
@@ -82,7 +82,7 @@ description:
   .
   Compare with:
   .
-  >>> NL.cardinal 123 :: Maybe String
+  >>> NL.cardinal defaultInflection 123 :: Maybe String
   Just "honderddrieëntwintig"
   .
   100 (honderd) + (3 (drie) + (ën) 2 (twin) * 10 (tig))

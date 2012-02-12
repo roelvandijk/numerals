@@ -56,6 +56,8 @@ import qualified "this" Text.Numeral.Language.ES           as ES
 import qualified "this" Text.Numeral.Language.ES.TestData  as ES
 import qualified "this" Text.Numeral.Language.FR           as FR
 import qualified "this" Text.Numeral.Language.FR.TestData  as FR
+import qualified "this" Text.Numeral.Language.FUR          as FUR
+import qualified "this" Text.Numeral.Language.FUR.TestData as FUR
 import qualified "this" Text.Numeral.Language.GSW          as GSW
 import qualified "this" Text.Numeral.Language.GSW.TestData as GSW
 import qualified "this" Text.Numeral.Language.GV           as GV
@@ -139,6 +141,7 @@ tests =
     [ mkTests "cardinal" FR.cardinal (FR.cardinals ∷ TestData ℤ String)
     , mkTests "ordinal"  FR.ordinal  (FR.ordinals  ∷ TestData ℤ String)
     ]
+  , testGroup "FUR" [mkTests "cardinal" FUR.cardinal (FUR.cardinals ∷ TestData ℤ String)]
   , testGroup "GSW" [mkTests "cardinal" GSW.cardinal (GSW.cardinals ∷ TestData ℤ String)]
   , testGroup "GV"  [mkTests "cardinal" GV.cardinal  (GV.cardinals  ∷ TestData ℤ String)]
   , testGroup "HE"  [mkTests "cardinal" HE.cardinal  (HE.cardinals  ∷ TestData ℤ String)]

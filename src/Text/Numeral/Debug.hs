@@ -12,10 +12,11 @@ module Text.Numeral.Debug where
 
 import "base" Control.Monad ( forM_ )
 import "base" Data.Maybe    ( fromMaybe )
-import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
-import "base-unicode-symbols" Prelude.Unicode ( ℤ )
+import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
+import "base-unicode-symbols" Prelude.Unicode     ( ℤ )
 import "numerals-base" Text.Numeral
 import "numerals-base" Text.Numeral.Misc
+import "numerals-base" Text.Numeral.Exp.Reified ( showExp )
 import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
 import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Grammar as G
@@ -66,7 +67,7 @@ import qualified "this" Text.Numeral.Language.ZH  as ZH
 test ∷ (ℤ → Exp i) → (i → ℤ → Maybe String) → i → [ℤ] → IO ()
 test struct num inf xs =
     forM_ xs $ \x → do putStr $ (show x)
-                       -- putStr " = "
-                       -- putStr $ show (struct x)
+                       putStr " = "
+                       putStr $ showExp (struct x)
                        putStr " = "
                        putStrLn $ fromMaybe "<error>" (num inf x)

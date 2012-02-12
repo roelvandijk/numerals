@@ -123,7 +123,7 @@ library
               -- , Text.Numeral.Language.ET
               -- , Text.Numeral.Language.FI
                  , Text.Numeral.Language.FR
-              -- , Text.Numeral.Language.FUR
+                 , Text.Numeral.Language.FUR
                  , Text.Numeral.Language.GSW
                  , Text.Numeral.Language.GV
                  , Text.Numeral.Language.HE

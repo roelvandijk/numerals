@@ -17,7 +17,7 @@ import "base-unicode-symbols" Prelude.Unicode ( ℤ )
 import "numerals-base" Text.Numeral
 import "numerals-base" Text.Numeral.Misc
 import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
-import qualified "numerals-base" Text.Numeral.BigNum as BN
+import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Grammar as G
 
 import qualified "this" Text.Numeral.Language.AF  as AF
@@ -31,6 +31,7 @@ import qualified "this" Text.Numeral.Language.EN  as EN
 import qualified "this" Text.Numeral.Language.EO  as EO
 import qualified "this" Text.Numeral.Language.ES  as ES
 import qualified "this" Text.Numeral.Language.FR  as FR
+import qualified "this" Text.Numeral.Language.FUR as FUR
 import qualified "this" Text.Numeral.Language.GSW as GSW
 import qualified "this" Text.Numeral.Language.GV  as GV
 import qualified "this" Text.Numeral.Language.HE  as HE

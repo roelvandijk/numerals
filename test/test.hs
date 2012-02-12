@@ -46,6 +46,8 @@ import qualified "this" Text.Numeral.Language.CHR          as CHR
 import qualified "this" Text.Numeral.Language.CHR.TestData as CHR
 import qualified "this" Text.Numeral.Language.CS           as CS
 import qualified "this" Text.Numeral.Language.CS.TestData  as CS
+import qualified "this" Text.Numeral.Language.CY.TestData  as CY
+import qualified "this" Text.Numeral.Language.DA.TestData  as DA
 import qualified "this" Text.Numeral.Language.DE           as DE
 import qualified "this" Text.Numeral.Language.DE.TestData  as DE
 import qualified "this" Text.Numeral.Language.EN           as EN
@@ -54,6 +56,8 @@ import qualified "this" Text.Numeral.Language.EO           as EO
 import qualified "this" Text.Numeral.Language.EO.TestData  as EO
 import qualified "this" Text.Numeral.Language.ES           as ES
 import qualified "this" Text.Numeral.Language.ES.TestData  as ES
+import qualified "this" Text.Numeral.Language.ET.TestData  as ET
+import qualified "this" Text.Numeral.Language.FI.TestData  as FI
 import qualified "this" Text.Numeral.Language.FR           as FR
 import qualified "this" Text.Numeral.Language.FR.TestData  as FR
 import qualified "this" Text.Numeral.Language.FUR          as FUR
@@ -64,6 +68,8 @@ import qualified "this" Text.Numeral.Language.GV           as GV
 import qualified "this" Text.Numeral.Language.GV.TestData  as GV
 import qualified "this" Text.Numeral.Language.HE           as HE
 import qualified "this" Text.Numeral.Language.HE.TestData  as HE
+import qualified "this" Text.Numeral.Language.HR.TestData  as HR
+import qualified "this" Text.Numeral.Language.HU.TestData  as HU
 import qualified "this" Text.Numeral.Language.IT           as IT
 import qualified "this" Text.Numeral.Language.IT.TestData  as IT
 import qualified "this" Text.Numeral.Language.JA           as JA
@@ -86,6 +92,7 @@ import qualified "this" Text.Numeral.Language.PL           as PL
 import qualified "this" Text.Numeral.Language.PL.TestData  as PL
 import qualified "this" Text.Numeral.Language.PT           as PT
 import qualified "this" Text.Numeral.Language.PT.TestData  as PT
+import qualified "this" Text.Numeral.Language.RO.TestData  as RO
 import qualified "this" Text.Numeral.Language.RU           as RU
 import qualified "this" Text.Numeral.Language.RU.TestData  as RU
 import qualified "this" Text.Numeral.Language.SCO          as SCO

@@ -50,8 +50,9 @@ import "base-unicode-symbols" Data.Ord.Unicode      ( (≥) )
 import qualified "containers" Data.Map as M ( Map, fromList, lookup )
 import "containers-unicode-symbols" Data.Map.Unicode ( (∪) )
 import           "numerals-base" Text.Numeral
-import           "numerals-base" Text.Numeral.Misc ( dec )
 import qualified "numerals-base" Text.Numeral.Exp as E
+import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import           "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
@@ -112,7 +113,8 @@ cardinalRepr = defaultRepr
 -- Traditional Characters
 --------------------------------------------------------------------------------
 
-trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+trad_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
+              ⇒ i → α → Maybe s
 trad_cardinal inf = trad_cardinalRepr inf ∘ struct
 
 trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
@@ -162,7 +164,8 @@ trad_syms =
 -- Simplified Characters
 --------------------------------------------------------------------------------
 
-simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+simpl_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
+               ⇒ i → α → Maybe s
 simpl_cardinal inf = simpl_cardinalRepr inf ∘ struct
 
 simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
@@ -188,7 +191,8 @@ simpl_syms =
 -- Financial Characters (Traditional)
 --------------------------------------------------------------------------------
 
-finance_trad_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+finance_trad_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
+                      ⇒ i → α → Maybe s
 finance_trad_cardinal inf = finance_trad_cardinalRepr inf ∘ struct
 
 finance_trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
@@ -223,7 +227,8 @@ finance_trad_syms =
 -- Financial Characters (Simplified)
 --------------------------------------------------------------------------------
 
-finance_simpl_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+finance_simpl_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
+                       ⇒ i → α → Maybe s
 finance_simpl_cardinal inf = finance_simpl_cardinalRepr inf ∘ struct
 
 finance_simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
@@ -250,7 +255,8 @@ finance_simpl_cardinalRepr =
 -- Pinyin
 --------------------------------------------------------------------------------
 
-pinyin_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+pinyin_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
+                ⇒ i → α → Maybe s
 pinyin_cardinal inf = pinyin_cardinalRepr inf ∘ struct
 
 pinyin_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s

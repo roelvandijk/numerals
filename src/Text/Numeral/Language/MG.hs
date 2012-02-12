@@ -40,8 +40,9 @@ import "base" Prelude       ( Integral, (-) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import           "numerals-base" Text.Numeral.Misc ( dec )
 import qualified "numerals-base" Text.Numeral.Exp as E
+import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import           "numerals-base" Text.Numeral.Misc ( dec )
 
 
 -------------------------------------------------------------------------------
@@ -54,7 +55,7 @@ Sources:
   http://www.sf.airnet.ne.jp/~ts/language/number/malagasy.html
 -}
 
-cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β

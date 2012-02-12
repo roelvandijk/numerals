@@ -39,6 +39,7 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
+import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Language.DE ( struct )
 
@@ -52,7 +53,7 @@ Sources:
   http://www.languagesandnumbers.com/how-to-count-in-swiss-german/en/gsw-che/
 -}
 
-cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
 
 bounds ∷ (Integral α) ⇒ (α, α)

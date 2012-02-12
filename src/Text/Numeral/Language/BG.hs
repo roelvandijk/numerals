@@ -42,10 +42,10 @@ import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
 import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import           "numerals-base" Text.Numeral.Misc ( dec )
 import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
+import           "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
@@ -61,12 +61,15 @@ Sources:
 
 cardinal ∷ ( G.Neuter i, G.Feminine i, G.Masculine i
            , Integral α, E.Scale α, Monoid s, IsString s
-           ) ⇒ i → α → Maybe s
+           )
+         ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
 
-struct ∷ (Integral α, E.Scale α
+struct ∷ ( Integral α, E.Scale α
          , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
-         , E.Inflection β, G.Masculine (E.Inf β)) ⇒ α → β
+         , E.Inflection β, G.Masculine (E.Inf β)
+         )
+       ⇒ α → β
 struct = pos $ fix $ rule `combine` shortScale1_bg
     where
        rule = findRule (   0, lit               )
@@ -79,9 +82,11 @@ struct = pos $ fix $ rule `combine` shortScale1_bg
 
 -- | Like 'shortScale1' but forces the right-hand-side to have
 -- masculine gender.
-shortScale1_bg ∷ (Integral α, E.Scale α
+shortScale1_bg ∷ ( Integral α, E.Scale α
                  , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
-                 , E.Inflection β, G.Masculine (E.Inf β)) ⇒ Rule α β
+                 , E.Inflection β, G.Masculine (E.Inf β)
+                 )
+               ⇒ Rule α β
 shortScale1_bg = mulScale_ bgMul 3 3 R L rule
     where
       bgMul f m scale' _ = masculineMul (f m) scale'
@@ -91,9 +96,10 @@ shortScale1_bg = mulScale_ bgMul 3 3 R L rule
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 48 - 1 in (negate x, x)
 
-cardinalRepr ∷ (G.Neuter i, G.Feminine i, G.Masculine i
+cardinalRepr ∷ ( G.Neuter i, G.Feminine i, G.Masculine i
                , Monoid s, IsString s
-               ) ⇒ i → Exp i → Maybe s
+               )
+             ⇒ i → Exp i → Maybe s
 cardinalRepr = render defaultRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = shortScaleRepr

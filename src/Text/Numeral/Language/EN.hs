@@ -45,22 +45,23 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Prelude.Unicode ( ℤ, (⋅) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "numerals-base" Text.Numeral.Exp    as E
 import qualified "numerals-base" Text.Numeral.BigNum as BN
+import qualified "numerals-base" Text.Numeral.Exp    as E
+import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import           "numerals-base" Text.Numeral.Misc ( dec )
 
 
 --------------------------------------------------------------------------------
 -- EN
 --------------------------------------------------------------------------------
 
-uk_cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+uk_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 uk_cardinal inf = render (cardinalRepr uk_add) inf ∘ shortScaleStruct
 
-uk_ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+uk_ordinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 uk_ordinal inf = render (ordinalRepr uk_add) inf ∘ shortScaleStruct
 
-ukPelletier_cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s)
+ukPelletier_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s)
                      ⇒ i → α → Maybe s
 ukPelletier_cardinal inf = render (cardinalRepr uk_add) { reprScale = pelletierRepr } inf
                          ∘ pelletierScaleStruct
@@ -69,10 +70,10 @@ ukPelletier_cardinal inf = render (cardinalRepr uk_add) { reprScale = pelletierR
                                      (\_ _ → "illiard")
                                      []
 
-us_cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+us_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 us_cardinal inf = render (cardinalRepr us_add) inf ∘ shortScaleStruct
 
-us_ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+us_ordinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 us_ordinal inf = render (ordinalRepr us_add) inf ∘ shortScaleStruct
 
 shortScaleStruct ∷ ( Integral α, E.Scale α

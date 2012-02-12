@@ -39,6 +39,7 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
+import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 
 
 --------------------------------------------------------------------------------
@@ -53,7 +54,7 @@ Need new Exp constructor to express
 Probably also need a constructor to express "4 obj" as opposed to just "4".
 -}
 
-cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
+cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = cardinalRepr ∘ struct
 
 struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β

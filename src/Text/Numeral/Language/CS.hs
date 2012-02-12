@@ -43,9 +43,10 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import           "numerals-base" Text.Numeral.Misc ( dec )
 import qualified "numerals-base" Text.Numeral.BigNum as BN
 import qualified "numerals-base" Text.Numeral.Exp as E
+import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Language.PL ( struct )
 
 
@@ -53,7 +54,7 @@ import "this" Text.Numeral.Language.PL ( struct )
 -- CS
 -------------------------------------------------------------------------------
 
-cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
 
 bounds ∷ (Integral α) ⇒ (α, α)

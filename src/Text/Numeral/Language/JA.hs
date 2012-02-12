@@ -44,8 +44,9 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
-import           "numerals-base" Text.Numeral.Misc  ( dec )
 import qualified "numerals-base" Text.Numeral.Exp as E
+import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import           "numerals-base" Text.Numeral.Misc  ( dec )
 
 
 --------------------------------------------------------------------------------
@@ -81,7 +82,7 @@ daiji_bounds = let x = dec 4 - 1 in (negate x, x)
 -- Kanji
 --------------------------------------------------------------------------------
 
-kanji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+kanji_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 kanji_cardinal inf = kanji_cardinal_repr inf ∘ struct
 
 kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
@@ -131,7 +132,7 @@ kanji_cardinal_repr = render defaultRepr
 -- Daiji
 --------------------------------------------------------------------------------
 
-daiji_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+daiji_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 daiji_cardinal inf = daiji_cardinal_repr inf ∘ struct
 
 daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
@@ -215,7 +216,8 @@ generic_repr four seven = defaultRepr
 -- On'yomi
 --------------------------------------------------------------------------------
 
-on'yomi_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+on'yomi_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
+                 ⇒ i → α → Maybe s
 on'yomi_cardinal inf = on'yomi_cardinal_repr inf ∘ struct
 
 on'yomi_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
@@ -226,7 +228,8 @@ on'yomi_cardinal_repr = render (generic_repr "shi" "shichi")
 -- Preferred reading
 --------------------------------------------------------------------------------
 
-preferred_cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+preferred_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
+                   ⇒ i → α → Maybe s
 preferred_cardinal inf = preferred_cardinal_repr inf ∘ struct
 
 preferred_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s

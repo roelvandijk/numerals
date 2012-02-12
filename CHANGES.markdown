@@ -5,6 +5,7 @@ Changelog for numerals
 0.4
 ---
 
+- Support API changes in `numerals-base` (inflection).
 - Updated languages.
   + Fixed bug in Turkish (TR).
   + Fixed bug in Norwegian (NO).
@@ -23,6 +24,7 @@ Changelog for numerals
   + Swiss German (GSW) cardinals.
   + Afrikaans (AF) cardinals & ordinals.
   + Czech (CS) cardinals.
+  + Friulan (FUR) cardinals.
 - Added numerical bounds to all language modules. All numbers within the bounds
   can be converted by the cardinal & ordinal functions.
 
@@ -45,6 +47,7 @@ Changelog for numerals
 - Added a test suite.
 - Wrote some documentation.
 - Changed package structure.
+  + Moved a number of modules to a new package `numerals-base`.
 - Updated many languages.
   + Test suite for every language.
   + Implemented large numbers (≥ million) in many languages.

@@ -108,6 +108,7 @@ library
                , numerals-base              >= 0.4     && < 0.5
 
   exposed-modules: Text.Numeral.Entry
+                 , Text.Numeral.Language.Entries
                  , Text.Numeral.Language.AF
                  , Text.Numeral.Language.AMP
                  , Text.Numeral.Language.BG

@@ -60,10 +60,6 @@ import "this" Text.Numeral.Entry
 -- PT
 -------------------------------------------------------------------------------
 
--- Sources:
---   http://www.sonia-portuguese.com/text/numerals.htm
---   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "pt"

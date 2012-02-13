@@ -52,6 +52,7 @@ import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "this" Text.Numeral.Language.PL ( struct )
 
+
 -------------------------------------------------------------------------------
 -- CS
 -------------------------------------------------------------------------------

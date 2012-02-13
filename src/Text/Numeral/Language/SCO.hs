@@ -49,11 +49,6 @@ import "this" Text.Numeral.Entry
 -- SCO
 -------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://www.sf.airnet.ne.jp/~ts/language/number/scots.html
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_2    = ["sco"]

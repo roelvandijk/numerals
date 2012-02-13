@@ -58,12 +58,6 @@ import "this" Text.Numeral.Entry
 -- DE
 -------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://de.wikipedia.org/wiki/Zahlennamen
-  http://german.about.com/library/blzahlen.htm
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "de"

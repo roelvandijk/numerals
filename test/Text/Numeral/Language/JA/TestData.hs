@@ -38,6 +38,12 @@ import "this" Text.Numeral.Test ( TestData )
 -- JA
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://en.wikipedia.org/wiki/Japanese_numerals
+  http://www.guidetojapanese.org/numbers.html
+-}
+
 preferred_cardinals ∷ (Num i, IsString s) ⇒ TestData i s
 preferred_cardinals =
   [ ( "default"

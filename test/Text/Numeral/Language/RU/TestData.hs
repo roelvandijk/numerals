@@ -35,6 +35,14 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://en.wikibooks.org/wiki/Russian/Numbers
+  http://russian.speak7.com/russian_numbers.htm
+  http://learningrussian.net/games_verbs_grammar3.php
+  http://www.waytorussia.net/WhatIsRussia/Russian/Part1a.html
+-}
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

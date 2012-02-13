@@ -43,6 +43,11 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.sf.airnet.ne.jp/~ts/language/number/mandarin.html
+-}
+
 -- | Cardinal numbers that are written the same using either
 -- traditional or simplified characters.
 trad_simpl_cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]

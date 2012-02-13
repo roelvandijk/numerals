@@ -33,6 +33,7 @@ module Text.Numeral.Language.EN
     , bounds
     ) where
 
+
 --------------------------------------------------------------------------------
 -- Imports
 --------------------------------------------------------------------------------
@@ -53,6 +54,7 @@ import qualified "numerals-base" Text.Numeral.Exp    as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+
 
 --------------------------------------------------------------------------------
 -- EN

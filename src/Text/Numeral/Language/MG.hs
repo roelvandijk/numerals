@@ -52,12 +52,6 @@ import "this" Text.Numeral.Entry
 -- MG
 -------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://en.wikipedia.org/wiki/Malagasy_language
-  http://www.sf.airnet.ne.jp/~ts/language/number/malagasy.html
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "mg"

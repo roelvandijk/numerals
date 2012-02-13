@@ -33,6 +33,12 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.sf.airnet.ne.jp/~ts/language/number/ojibwa.html
+  http://www.languagesandnumbers.com/how-to-count-in-ojibwa/en/oji/
+-}
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

@@ -54,10 +54,6 @@ import "this" Text.Numeral.Entry
 -- PL
 -------------------------------------------------------------------------------
 
--- Sources:
---   Krzysztof Skrzętnicki
---   http://www.polishforums.com/archives/2009/general-language-17/numbers-polish-language-6722/
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "pl"

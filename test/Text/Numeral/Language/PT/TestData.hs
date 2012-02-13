@@ -41,6 +41,9 @@ import "this"          Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+-- Sources:
+--   http://www.sonia-portuguese.com/text/numerals.htm
+--   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
 
 base_cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
 base_cardinals =

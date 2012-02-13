@@ -35,6 +35,10 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+-- Sources:
+--   Krzysztof Skrzętnicki
+--   http://www.polishforums.com/archives/2009/general-language-17/numbers-polish-language-6722/
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

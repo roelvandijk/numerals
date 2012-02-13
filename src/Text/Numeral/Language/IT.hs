@@ -51,15 +51,10 @@ import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 
+
 --------------------------------------------------------------------------------
 -- IT
 --------------------------------------------------------------------------------
-
--- Sources:
---   http://www.sf.airnet.ne.jp/~ts/language/number/italian.html
---   http://www.orbilat.com/Languages/Italian/Grammar/Italian-Numerals.html
---   http://italian.about.com/library/weekly/aa042600a.htm
---   http://www.suite101.com/content/how-to-count-in-italian-a146487
 
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry

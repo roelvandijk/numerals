@@ -36,6 +36,13 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.languagesandnumbers.com/how-to-count-in-bulgarian/en/bul/
+  http://en.wikipedia.org/wiki/Bulgarian_grammar#Numbers
+  http://bg.wikipedia.org/wiki/Имена_на_числата
+-}
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "neuter"

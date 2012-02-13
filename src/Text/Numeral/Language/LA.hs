@@ -54,12 +54,6 @@ import "this" Text.Numeral.Entry
 -- LA
 --------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://www.informalmusic.com/latinsoc/latnum.html
-  http://www.sf.airnet.ne.jp/~ts/language/number/latin.html
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "la"

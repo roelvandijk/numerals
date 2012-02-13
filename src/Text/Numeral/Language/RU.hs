@@ -53,14 +53,6 @@ import "this" Text.Numeral.Entry
 -- RU
 --------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://en.wikibooks.org/wiki/Russian/Numbers
-  http://russian.speak7.com/russian_numbers.htm
-  http://learningrussian.net/games_verbs_grammar3.php
-  http://www.waytorussia.net/WhatIsRussia/Russian/Part1a.html
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "ru"

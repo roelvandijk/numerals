@@ -49,12 +49,6 @@ import "this" Text.Numeral.Entry
 -- OJ
 --------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://www.sf.airnet.ne.jp/~ts/language/number/ojibwa.html
-  http://www.languagesandnumbers.com/how-to-count-in-ojibwa/en/oji/
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "oj"

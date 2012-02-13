@@ -50,16 +50,10 @@ import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 
+
 --------------------------------------------------------------------------------
 -- BG
 --------------------------------------------------------------------------------
-
-{-
-Sources:
-  http://www.languagesandnumbers.com/how-to-count-in-bulgarian/en/bul/
-  http://en.wikipedia.org/wiki/Bulgarian_grammar#Numbers
-  http://bg.wikipedia.org/wiki/Имена_на_числата
--}
 
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry

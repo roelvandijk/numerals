@@ -57,13 +57,6 @@ import "this" Text.Numeral.Entry
 -- FR
 --------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://www.sf.airnet.ne.jp/~ts/language/number/french.html
-  http://www.french-linguistics.co.uk/tutorials/numbers/
-  http://www.parisbypod.com/2007/10/23/french-ordinal-numbers/
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "fr"

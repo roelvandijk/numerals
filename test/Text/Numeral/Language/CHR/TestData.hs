@@ -32,6 +32,12 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://en.wikipedia.org/wiki/Cherokee_language
+  http://www.languagesandnumbers.com/how-to-count-in-cherokee/en/chr/
+-}
+
 cardinals ∷ (Num i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

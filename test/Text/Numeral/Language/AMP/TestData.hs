@@ -33,6 +33,11 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.sf.airnet.ne.jp/~ts/language/number/alamblak.html
+-}
+
 cardinals ∷ (Num i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

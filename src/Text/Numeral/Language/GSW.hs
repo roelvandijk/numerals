@@ -51,11 +51,6 @@ import "this" Text.Numeral.Entry
 -- GSW
 --------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://www.languagesandnumbers.com/how-to-count-in-swiss-german/en/gsw-che/
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_2    = ["gse"]

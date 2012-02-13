@@ -37,6 +37,12 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://de.wikipedia.org/wiki/Zahlennamen
+  http://german.about.com/library/blzahlen.htm
+-}
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

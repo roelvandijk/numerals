@@ -28,6 +28,7 @@ module Text.Numeral.Language.AF
     , bounds
     ) where
 
+
 --------------------------------------------------------------------------------
 -- Imports
 --------------------------------------------------------------------------------
@@ -48,15 +49,10 @@ import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 
+
 --------------------------------------------------------------------------------
 -- AF
 --------------------------------------------------------------------------------
-
-{-
-Sources:
-  http://www.languagesandnumbers.com/how-to-count-in-afrikaans/en/afr/
-  http://mylanguages.org/afrikaans_numbers.php
--}
 
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry

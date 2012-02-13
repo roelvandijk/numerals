@@ -49,13 +49,6 @@ import "this" Text.Numeral.Entry
 -- GV
 -------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://www.sf.airnet.ne.jp/~ts/language/number/manx.html
-  http://www.gaelg.iofm.net/LESSONS/P/P19.html
-  http://www.gaelg.iofm.net/LESSONS/mona/Lessons.pdf
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "gv"

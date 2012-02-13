@@ -34,6 +34,16 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.languagesandnumbers.com/how-to-count-in-turkish/en/tur/
+  http://www.sf.airnet.ne.jp/~ts/language/number/turkish.html
+  http://www.turkishlanguage.co.uk/seasons.htm#article_15
+  http://www.turkeytravelplanner.com/details/LanguageGuide/100words_lessons/100Words_10.html
+  http://en.wikibooks.org/wiki/Turkish/Numbers
+  http://tr.wikipedia.org/wiki/B%C3%BCy%C3%BCk_say%C4%B1lar%C4%B1n_adlar%C4%B1
+-}
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

@@ -27,6 +27,7 @@ module Text.Numeral.Language.NO
     , bounds
     ) where
 
+
 -------------------------------------------------------------------------------
 -- Imports
 -------------------------------------------------------------------------------
@@ -45,13 +46,10 @@ import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 
+
 -------------------------------------------------------------------------------
 -- NO
 -------------------------------------------------------------------------------
-
--- Sources:
---   http://en.wikibooks.org/wiki/Norwegian_Numbers
---   http://www.sf.airnet.ne.jp/~ts/language/number/norwegian.html
 
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry

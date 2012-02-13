@@ -34,6 +34,12 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://en.wikipedia.org/wiki/Malagasy_language
+  http://www.sf.airnet.ne.jp/~ts/language/number/malagasy.html
+-}
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

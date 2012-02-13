@@ -49,11 +49,6 @@ import "this" Text.Numeral.Entry
 -- AMP
 -------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://www.sf.airnet.ne.jp/~ts/language/number/alamblak.html
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_3    = Just "amp"

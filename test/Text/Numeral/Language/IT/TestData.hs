@@ -36,6 +36,12 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+-- Sources:
+--   http://www.sf.airnet.ne.jp/~ts/language/number/italian.html
+--   http://www.orbilat.com/Languages/Italian/Grammar/Italian-Numerals.html
+--   http://italian.about.com/library/weekly/aa042600a.htm
+--   http://www.suite101.com/content/how-to-count-in-italian-a146487
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "neuter"

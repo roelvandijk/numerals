@@ -34,6 +34,12 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.languagesandnumbers.com/how-to-count-in-afrikaans/en/afr/
+  http://mylanguages.org/afrikaans_numbers.php
+-}
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

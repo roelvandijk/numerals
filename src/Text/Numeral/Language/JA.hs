@@ -59,12 +59,6 @@ import "this" Text.Numeral.Entry
 -- JA
 --------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://en.wikipedia.org/wiki/Japanese_numerals
-  http://www.guidetojapanese.org/numbers.html
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1       = Just "ja"
@@ -92,6 +86,7 @@ bounds = let x = dec 72 - 1 in (negate x, x)
 
 daiji_bounds ∷ (Integral α) ⇒ (α, α)
 daiji_bounds = let x = dec 4 - 1 in (negate x, x)
+
 
 --------------------------------------------------------------------------------
 -- Kanji

@@ -54,13 +54,6 @@ import "this" Text.Numeral.Entry
 -- ES
 -------------------------------------------------------------------------------
 
--- Sources:
---   http://www.sf.airnet.ne.jp/~ts/language/number/spanish.html
---   http://spanish.about.com/cs/forbeginners/a/cardinalnum_beg.htm
---   http://www.learn-spanish-help.com/count-in-spanish.html
---   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
---   http://en.wiktionary.org/wiki/Appendix:Spanish_numerals
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "es"

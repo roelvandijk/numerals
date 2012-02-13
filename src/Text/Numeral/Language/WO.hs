@@ -27,15 +27,10 @@ module Text.Numeral.Language.WO
     , bounds
     ) where
 
+
 --------------------------------------------------------------------------------
 -- Imports
 --------------------------------------------------------------------------------
-
-{-
-Sources:
-  http://en.wikipedia.org/wiki/Wolof_language#Numerals
-  http://www.sf.airnet.ne.jp/~ts/language/number/wolof.html
--}
 
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )

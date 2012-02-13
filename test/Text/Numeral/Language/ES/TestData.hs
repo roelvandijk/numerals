@@ -36,6 +36,13 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+-- Sources:
+--   http://www.sf.airnet.ne.jp/~ts/language/number/spanish.html
+--   http://spanish.about.com/cs/forbeginners/a/cardinalnum_beg.htm
+--   http://www.learn-spanish-help.com/count-in-spanish.html
+--   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
+--   http://en.wiktionary.org/wiki/Appendix:Spanish_numerals
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "neuter"

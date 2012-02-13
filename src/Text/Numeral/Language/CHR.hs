@@ -48,15 +48,10 @@ import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 
+
 --------------------------------------------------------------------------------
 -- CHR
 --------------------------------------------------------------------------------
-
-{-
-Sources:
-  http://en.wikipedia.org/wiki/Cherokee_language
-  http://www.languagesandnumbers.com/how-to-count-in-cherokee/en/chr/
--}
 
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry

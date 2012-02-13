@@ -33,6 +33,12 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.informalmusic.com/latinsoc/latnum.html
+  http://www.sf.airnet.ne.jp/~ts/language/number/latin.html
+-}
+
 cardinals ∷ (Num i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"

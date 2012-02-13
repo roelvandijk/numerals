@@ -66,11 +66,6 @@ import "this" Text.Numeral.Entry
 -- ZH
 --------------------------------------------------------------------------------
 
-{-
-Sources:
-  http://www.sf.airnet.ne.jp/~ts/language/number/mandarin.html
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1    = Just "zh"

@@ -35,6 +35,13 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+{-
+Sources:
+  http://www.sf.airnet.ne.jp/~ts/language/number/french.html
+  http://www.french-linguistics.co.uk/tutorials/numbers/
+  http://www.parisbypod.com/2007/10/23/french-ordinal-numbers/
+-}
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "masculine"

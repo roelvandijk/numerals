@@ -52,12 +52,6 @@ import "this" Text.Numeral.Entry
 -- HE
 --------------------------------------------------------------------------------
 
-{-
-Sources:
-  E-mail by Yitzchak Gale.
-  http://www.hebrew4christians.com/Grammar/Unit_Eight/Cardinal_Numbers/cardinal_numbers.html
--}
-
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
 entry = emptyEntry
     { entIso639_1       = Just "he"

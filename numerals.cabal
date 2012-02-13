@@ -107,8 +107,8 @@ library
                , containers-unicode-symbols >= 0.3     && < 0.4
                , numerals-base              >= 0.4     && < 0.5
 
-  exposed-modules:
-                   Text.Numeral.Language.AF
+  exposed-modules: Text.Numeral.Entry
+                 , Text.Numeral.Language.AF
                  , Text.Numeral.Language.AMP
                  , Text.Numeral.Language.BG
                  , Text.Numeral.Language.CHN

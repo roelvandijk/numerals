@@ -21,6 +21,8 @@ import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
 import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Grammar as G
 
+import "this" Text.Numeral.Entry
+
 import qualified "this" Text.Numeral.Language.AF  as AF
 import qualified "this" Text.Numeral.Language.AMP as AMP
 import qualified "this" Text.Numeral.Language.BG  as BG

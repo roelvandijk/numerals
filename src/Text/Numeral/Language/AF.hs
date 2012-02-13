@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.AF
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
     , ordinal
       -- * Structure
     , struct
@@ -44,7 +46,7 @@ import qualified "numerals-base" Text.Numeral.BigNum as BN
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
-
+import "this" Text.Numeral.Entry
 
 --------------------------------------------------------------------------------
 -- AF
@@ -55,6 +57,23 @@ Sources:
   http://www.languagesandnumbers.com/how-to-count-in-afrikaans/en/afr/
   http://mylanguages.org/afrikaans_numbers.php
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "af"
+    , entIso639_2    = ["afr"]
+    , entIso639_3    = Just "afr"
+    , entNativeNames = ["Afrikaans"]
+    , entEnglishName = Just "Afrikaans"
+    , entCardinal    = Just Conversion
+                            { toNumeral   = cardinal
+                            , toStructure = struct
+                            }
+    , entOrdinal     = Just Conversion
+                            { toNumeral   = ordinal
+                            , toStructure = struct
+                            }
+    }
 
 cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct

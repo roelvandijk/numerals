@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.CHR
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -44,7 +46,7 @@ import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
-
+import "this" Text.Numeral.Entry
 
 --------------------------------------------------------------------------------
 -- CHR
@@ -55,6 +57,18 @@ Sources:
   http://en.wikipedia.org/wiki/Cherokee_language
   http://www.languagesandnumbers.com/how-to-count-in-cherokee/en/chr/
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_2    = ["chr"]
+    , entIso639_3    = Just "chr"
+    , entNativeNames = let n = "ᏣᎳᎩ ᎦᏬᏂᎯᏍᏗ" in [n, transliterate n]
+    , entEnglishName = Just "Cherokee"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct

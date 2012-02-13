@@ -5,6 +5,7 @@ Changelog for numerals
 0.4
 ---
 
+- Added language entries for all supported languages.
 - Support API changes in `numerals-base` (inflection).
 - Updated languages.
   + Fixed bug in Turkish (TR).

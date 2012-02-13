@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.LA
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -45,6 +47,7 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -56,6 +59,19 @@ Sources:
   http://www.informalmusic.com/latinsoc/latnum.html
   http://www.sf.airnet.ne.jp/~ts/language/number/latin.html
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "la"
+    , entIso639_2    = ["lat"]
+    , entIso639_3    = Just "lat"
+    , entNativeNames = ["Latine"]
+    , entEnglishName = Just "Latin"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct

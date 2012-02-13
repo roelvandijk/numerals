@@ -17,7 +17,7 @@
 -}
 
 module Text.Numeral.Language.EN.TestData
-    ( uk_cardinals, uk_ordinals
+    ( gb_cardinals, gb_ordinals
     , us_cardinals, us_ordinals
     ) where
 
@@ -249,8 +249,8 @@ en_ordinals =
   , (100, "one hundreth")
   ]
 
-uk_cardinals ∷ (Num i, IsString s) ⇒ TestData i s
-uk_cardinals =
+gb_cardinals ∷ (Num i, IsString s) ⇒ TestData i s
+gb_cardinals =
   [ ( "default"
     , defaultInflection
     , en_cardinals
@@ -281,8 +281,8 @@ uk_cardinals =
     )
   ]
 
-uk_ordinals ∷ (Num i, IsString s) ⇒ TestData i s
-uk_ordinals =
+gb_ordinals ∷ (Num i, IsString s) ⇒ TestData i s
+gb_ordinals =
   [ ( "default"
     , defaultInflection
     , en_ordinals

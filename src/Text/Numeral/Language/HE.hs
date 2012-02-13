@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.HE
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -43,6 +45,7 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -54,6 +57,19 @@ Sources:
   E-mail by Yitzchak Gale.
   http://www.hebrew4christians.com/Grammar/Unit_Eight/Cardinal_Numbers/cardinal_numbers.html
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1       = Just "he"
+    , entIso639_2       = ["heb"]
+    , entIso639_3       = Just "heb"
+    , entNativeNames    = ["עִבְרִית"]
+    , entEnglishName    = Just "Modern Hebrew"
+    , entCardinal       = Just Conversion
+                          { toNumeral   = cardinal
+                          , toStructure = struct
+                          }
+    }
 
 cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct

@@ -18,8 +18,10 @@
 -}
 
 module Text.Numeral.Language.ES
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -45,6 +47,7 @@ import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Entry
 
 
 -------------------------------------------------------------------------------
@@ -57,6 +60,19 @@ import           "numerals-base" Text.Numeral.Misc ( dec )
 --   http://www.learn-spanish-help.com/count-in-spanish.html
 --   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
 --   http://en.wiktionary.org/wiki/Appendix:Spanish_numerals
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "es"
+    , entIso639_2    = ["spa"]
+    , entIso639_3    = Just "spa"
+    , entNativeNames = ["Español"]
+    , entEnglishName = Just "Spanish"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ ( G.Feminine i, G.Masculine i
            , Integral α, E.Scale α

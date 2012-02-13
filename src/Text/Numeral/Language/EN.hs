@@ -17,10 +17,13 @@
 -}
 
 module Text.Numeral.Language.EN
-    ( -- * Conversions
-      uk_cardinal
-    , uk_ordinal
-    , ukPelletier_cardinal
+    ( -- * Language entries
+      gb_entry
+    , us_entry
+      -- * Conversions
+    , gb_cardinal
+    , gb_ordinal
+    , gbPelletier_cardinal
     , us_cardinal
     , us_ordinal
       -- * Structure
@@ -40,7 +43,7 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( (+), (-), subtract, negate, (^), error, Integral )
+import "base" Prelude       ( (+), (-), div, subtract, negate, (^), error, Integral )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Prelude.Unicode ( ℤ, (⋅) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
@@ -49,21 +52,56 @@ import qualified "numerals-base" Text.Numeral.BigNum as BN
 import qualified "numerals-base" Text.Numeral.Exp    as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
-
+import "this" Text.Numeral.Entry
 
 --------------------------------------------------------------------------------
 -- EN
 --------------------------------------------------------------------------------
 
-uk_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
-uk_cardinal inf = render (cardinalRepr uk_add) inf ∘ shortScaleStruct
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "en"
+    , entIso639_2    = ["eng"]
+    , entIso639_3    = Just "eng"
+    , entNativeNames = ["English"]
+    , entEnglishName = Just "English"
+    }
 
-uk_ordinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
-uk_ordinal inf = render (ordinalRepr uk_add) inf ∘ shortScaleStruct
+gb_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+gb_entry = entry
+    { entVariant  = Just "en-GB"
+    , entCardinal = Just Conversion
+                    { toNumeral   = gb_cardinal
+                    , toStructure = shortScaleStruct
+                    }
+    , entOrdinal  = Just Conversion
+                    { toNumeral   = gb_ordinal
+                    , toStructure = shortScaleStruct
+                    }
+    }
 
-ukPelletier_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s)
+us_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+us_entry = entry
+    { entVariant  = Just "en-US"
+    , entCardinal = Just Conversion
+                    { toNumeral   = us_cardinal
+                    , toStructure = shortScaleStruct
+                    }
+    , entOrdinal  = Just Conversion
+                    { toNumeral   = us_ordinal
+                    , toStructure = shortScaleStruct
+                    }
+    }
+
+gb_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+gb_cardinal inf = render (cardinalRepr gb_add) inf ∘ shortScaleStruct
+
+gb_ordinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+gb_ordinal inf = render (ordinalRepr gb_add) inf ∘ shortScaleStruct
+
+gbPelletier_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s)
                      ⇒ i → α → Maybe s
-ukPelletier_cardinal inf = render (cardinalRepr uk_add) { reprScale = pelletierRepr } inf
+gbPelletier_cardinal inf = render (cardinalRepr gb_add) { reprScale = pelletierRepr } inf
                          ∘ pelletierScaleStruct
   where
     pelletierRepr = BN.pelletierRepr (\_ _ → "illion")
@@ -117,6 +155,7 @@ eval (Add x y)     = eval x + eval y
 eval (Mul x y)     = eval x ⋅ eval y
 eval (Sub x y)     = subtract (eval x) (eval y)
 eval (Neg x)       = negate (eval x)
+eval (Frac n d)    = eval n `div` eval d
 eval (Scale b o r) = 10 ^ (eval r ⋅ b + o)
 eval (Dual x)      = eval x
 eval (Plural x)    = eval x
@@ -124,12 +163,12 @@ eval (Inflection _ x) = eval x
 eval Unknown       = error "eval: unknown"
 
 
-uk_add ∷ (IsString s) ⇒ Exp i → Exp i → Ctx (Exp i) → s
-((_ `Mul` Lit 10) `uk_add` _) _ = "-"
-((_ `Mul` _     ) `uk_add` x) _
+gb_add ∷ (IsString s) ⇒ Exp i → Exp i → Ctx (Exp i) → s
+((_ `Mul` Lit 10) `gb_add` _) _ = "-"
+((_ `Mul` _     ) `gb_add` x) _
     | eval x < (100 ∷ ℤ)        = " and "
     | otherwise                 = " "
-(_                `uk_add` _) _ = ""
+(_                `gb_add` _) _ = ""
 
 us_add ∷ (IsString s) ⇒ Exp i → Exp i → Ctx (Exp i) → s
 ((_ `Mul` Lit 10) `us_add` _) _ = "-"

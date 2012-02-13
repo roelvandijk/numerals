@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.IT
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
     , ordinal
       -- * Structure
     , struct
@@ -47,7 +49,7 @@ import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
-
+import "this" Text.Numeral.Entry
 
 --------------------------------------------------------------------------------
 -- IT
@@ -58,6 +60,23 @@ import           "numerals-base" Text.Numeral.Misc ( dec )
 --   http://www.orbilat.com/Languages/Italian/Grammar/Italian-Numerals.html
 --   http://italian.about.com/library/weekly/aa042600a.htm
 --   http://www.suite101.com/content/how-to-count-in-italian-a146487
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1       = Just "it"
+    , entIso639_2       = ["ita"]
+    , entIso639_3       = Just "ita"
+    , entNativeNames    = ["Italiano"]
+    , entEnglishName    = Just "Italian"
+    , entCardinal       = Just Conversion
+                          { toNumeral   = cardinal
+                          , toStructure = struct
+                          }
+    , entOrdinal        = Just Conversion
+                          { toNumeral   = ordinal
+                          , toStructure = struct
+                          }
+    }
 
 cardinal ∷ ( G.Masculine i, G.Feminine i
            , Integral α, E.Scale α

@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.GV
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -40,6 +42,7 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import "this" Text.Numeral.Entry
 
 
 -------------------------------------------------------------------------------
@@ -52,6 +55,19 @@ Sources:
   http://www.gaelg.iofm.net/LESSONS/P/P19.html
   http://www.gaelg.iofm.net/LESSONS/mona/Lessons.pdf
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "gv"
+    , entIso639_2    = ["glv"]
+    , entIso639_3    = Just "glv"
+    , entNativeNames = ["Gaelg"]
+    , entEnglishName = Just "Manx"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct

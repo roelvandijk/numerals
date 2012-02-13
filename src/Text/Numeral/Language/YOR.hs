@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.YOR
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -43,6 +45,7 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -61,6 +64,19 @@ It may also be the case that numbers have multiple possible deriviations.
 318 = 400 - (20*4) - 2
 525 = (200*3) - (20*4) + 5
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "yo"
+    , entIso639_2    = ["yor"]
+    , entIso639_3    = Just "yor"
+    , entNativeNames = ["èdè Yorùbá"]
+    , entEnglishName = Just "Yoruba"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct

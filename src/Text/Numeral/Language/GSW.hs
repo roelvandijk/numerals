@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.GSW
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -42,6 +44,7 @@ import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Language.DE ( struct )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -52,6 +55,18 @@ import "this" Text.Numeral.Language.DE ( struct )
 Sources:
   http://www.languagesandnumbers.com/how-to-count-in-swiss-german/en/gsw-che/
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_2    = ["gse"]
+    , entIso639_3    = Just "gse"
+    , entNativeNames = ["Schwyzerdütsch"]
+    , entEnglishName = Just "Swiss German"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct

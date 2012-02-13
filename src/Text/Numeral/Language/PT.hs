@@ -18,8 +18,10 @@
 -}
 
 module Text.Numeral.Language.PT
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
     , ordinal
       -- * Structure
     , cardinal_struct
@@ -51,14 +53,33 @@ import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import           "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Entry
 
 
 -------------------------------------------------------------------------------
+-- PT
 -------------------------------------------------------------------------------
 
 -- Sources:
 --   http://www.sonia-portuguese.com/text/numerals.htm
 --   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "pt"
+    , entIso639_2    = ["por"]
+    , entIso639_3    = Just "por"
+    , entNativeNames = ["Português"]
+    , entEnglishName = Just "Portuguese"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = cardinal_struct
+                       }
+    , entOrdinal     = Just Conversion
+                       { toNumeral   = ordinal
+                       , toStructure = ordinal_struct
+                       }
+    }
 
 cardinal ∷ ( G.Feminine i, G.Masculine i
            , Integral α, E.Scale α

@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.MG
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -43,6 +45,7 @@ import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Entry
 
 
 -------------------------------------------------------------------------------
@@ -54,6 +57,18 @@ Sources:
   http://en.wikipedia.org/wiki/Malagasy_language
   http://www.sf.airnet.ne.jp/~ts/language/number/malagasy.html
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "mg"
+    , entIso639_2    = ["mlg"]
+    , entIso639_3    = Just "mlg"
+    , entEnglishName = Just "Malagasy"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct

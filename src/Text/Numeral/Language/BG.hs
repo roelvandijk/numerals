@@ -18,8 +18,10 @@
 -}
 
 module Text.Numeral.Language.BG
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -46,7 +48,7 @@ import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
-
+import "this" Text.Numeral.Entry
 
 --------------------------------------------------------------------------------
 -- BG
@@ -58,6 +60,19 @@ Sources:
   http://en.wikipedia.org/wiki/Bulgarian_grammar#Numbers
   http://bg.wikipedia.org/wiki/Имена_на_числата
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "bg"
+    , entIso639_2    = ["bul"]
+    , entIso639_3    = Just "bul"
+    , entNativeNames = ["Български език"]
+    , entEnglishName = Just "Bulgarian"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ ( G.Neuter i, G.Feminine i, G.Masculine i
            , Integral α, E.Scale α, Monoid s, IsString s

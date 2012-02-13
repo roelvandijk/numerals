@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.FUR
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -44,11 +46,24 @@ import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
 -- FUR
 --------------------------------------------------------------------------------
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_2    = ["fur"]
+    , entIso639_3    = Just "fur"
+    , entNativeNames = ["Furlan", "marilenghe"]
+    , entEnglishName = Just "Friulan"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ ( G.Masculine i, G.Feminine i
            , Integral α, E.Scale α

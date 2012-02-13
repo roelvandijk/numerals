@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.RU
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -44,6 +46,7 @@ import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -57,6 +60,19 @@ Sources:
   http://learningrussian.net/games_verbs_grammar3.php
   http://www.waytorussia.net/WhatIsRussia/Russian/Part1a.html
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "ru"
+    , entIso639_2    = ["rus"]
+    , entIso639_3    = Just "rus"
+    , entNativeNames = ["Русский язык"]
+    , entEnglishName = Just "Russian"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct

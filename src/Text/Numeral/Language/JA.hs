@@ -17,8 +17,13 @@
 -}
 
 module Text.Numeral.Language.JA
-    ( -- * Conversions
-      kanji_cardinal
+    ( -- * Language entry
+      kanji_entry
+    , daiji_entry
+    , on'yomi_entry
+    , preferred_entry
+      -- * Conversions
+    , kanji_cardinal
     , daiji_cardinal
     , on'yomi_cardinal
     , preferred_cardinal
@@ -47,6 +52,7 @@ import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc  ( dec )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -58,6 +64,15 @@ Sources:
   http://en.wikipedia.org/wiki/Japanese_numerals
   http://www.guidetojapanese.org/numbers.html
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1       = Just "ja"
+    , entIso639_2       = ["jpn"]
+    , entIso639_3       = Just "jpn"
+    , entNativeNames    = ["日本語"]
+    , entEnglishName    = Just "Japanese"
+    }
 
 struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β) ⇒ α → β
 struct = pos
@@ -81,6 +96,15 @@ daiji_bounds = let x = dec 4 - 1 in (negate x, x)
 --------------------------------------------------------------------------------
 -- Kanji
 --------------------------------------------------------------------------------
+
+kanji_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+kanji_entry = entry
+    { entVariant  = Just "kanji"
+    , entCardinal = Just Conversion
+                    { toNumeral   = kanji_cardinal
+                    , toStructure = struct
+                    }
+    }
 
 kanji_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 kanji_cardinal inf = kanji_cardinal_repr inf ∘ struct
@@ -131,6 +155,15 @@ kanji_cardinal_repr = render defaultRepr
 --------------------------------------------------------------------------------
 -- Daiji
 --------------------------------------------------------------------------------
+
+daiji_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+daiji_entry = entry
+    { entVariant  = Just "daiji"
+    , entCardinal = Just Conversion
+                    { toNumeral   = daiji_cardinal
+                    , toStructure = struct
+                    }
+    }
 
 daiji_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
 daiji_cardinal inf = daiji_cardinal_repr inf ∘ struct
@@ -216,6 +249,15 @@ generic_repr four seven = defaultRepr
 -- On'yomi
 --------------------------------------------------------------------------------
 
+on'yomi_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+on'yomi_entry = entry
+    { entVariant  = Just "on'yomi"
+    , entCardinal = Just Conversion
+                    { toNumeral   = on'yomi_cardinal
+                    , toStructure = struct
+                    }
+    }
+
 on'yomi_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
                  ⇒ i → α → Maybe s
 on'yomi_cardinal inf = on'yomi_cardinal_repr inf ∘ struct
@@ -227,6 +269,15 @@ on'yomi_cardinal_repr = render (generic_repr "shi" "shichi")
 --------------------------------------------------------------------------------
 -- Preferred reading
 --------------------------------------------------------------------------------
+
+preferred_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+preferred_entry = entry
+    { entVariant  = Just "preferred"
+    , entCardinal = Just Conversion
+                    { toNumeral   = preferred_cardinal
+                    , toStructure = struct
+                    }
+    }
 
 preferred_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
                    ⇒ i → α → Maybe s

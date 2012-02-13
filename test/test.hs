@@ -133,9 +133,9 @@ tests =
     , mkTests "ordinal"  DE.ordinal  (DE.ordinals  ∷ TestData ℤ String)
     ]
   , testGroup "EN"
-    [ testGroup "UK"
-      [ mkTests "cardinal" EN.uk_cardinal (EN.uk_cardinals ∷ TestData ℤ String)
-      , mkTests "ordinal"  EN.uk_ordinal  (EN.uk_ordinals  ∷ TestData ℤ String)
+    [ testGroup "GB"
+      [ mkTests "cardinal" EN.gb_cardinal (EN.gb_cardinals ∷ TestData ℤ String)
+      , mkTests "ordinal"  EN.gb_ordinal  (EN.gb_ordinals  ∷ TestData ℤ String)
       ]
     , testGroup "US"
       [ mkTests "cardinal" EN.us_cardinal (EN.us_cardinals ∷ TestData ℤ String)

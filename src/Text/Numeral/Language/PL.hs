@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.PL
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -45,6 +47,7 @@ import qualified "numerals-base" Text.Numeral.BigNum as BN
 import qualified "numerals-base" Text.Numeral.Exp    as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Entry
 
 
 -------------------------------------------------------------------------------
@@ -54,6 +57,19 @@ import           "numerals-base" Text.Numeral.Misc ( dec )
 -- Sources:
 --   Krzysztof Skrzętnicki
 --   http://www.polishforums.com/archives/2009/general-language-17/numbers-polish-language-6722/
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "pl"
+    , entIso639_2    = ["pol"]
+    , entIso639_3    = Just "pol"
+    , entNativeNames = ["język polski"]
+    , entEnglishName = Just "Polish"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 -- | liczebniki główne
 cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s)

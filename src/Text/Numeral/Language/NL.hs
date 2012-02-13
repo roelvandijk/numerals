@@ -18,8 +18,10 @@
 -}
 
 module Text.Numeral.Language.NL
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
     , ordinal
     , partitive
     , multiplicative
@@ -52,11 +54,37 @@ import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
 -- NL
 --------------------------------------------------------------------------------
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1       = Just "nl"
+    , entIso639_2       = ["dut"]
+    , entIso639_3       = Just "nld"
+    , entNativeNames    = ["Nederlands"]
+    , entEnglishName    = Just "Dutch"
+    , entCardinal       = Just Conversion
+                          { toNumeral   = cardinal
+                          , toStructure = struct
+                          }
+    , entOrdinal        = Just Conversion
+                          { toNumeral   = ordinal
+                          , toStructure = struct
+                          }
+    , entPartitive      = Just Conversion
+                          { toNumeral   = partitive
+                          , toStructure = \(n, d) → E.frac (struct n) (struct d)
+                          }
+    , entMultiplicative = Just Conversion
+                          { toNumeral   = multiplicative
+                          , toStructure = struct
+                          }
+    }
 
 cardinal ∷ (G.Plural i, G.Dative i, Integral α, E.Scale α, Monoid s, IsString s)
          ⇒ i → α → Maybe s

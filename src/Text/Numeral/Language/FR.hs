@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.FR
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
     , ordinal
       -- * Structure
     , cardinalStruct
@@ -48,6 +50,7 @@ import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -60,6 +63,23 @@ Sources:
   http://www.french-linguistics.co.uk/tutorials/numbers/
   http://www.parisbypod.com/2007/10/23/french-ordinal-numbers/
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "fr"
+    , entIso639_2    = ["fre"]
+    , entIso639_3    = Just "fra"
+    , entNativeNames = ["Français"]
+    , entEnglishName = Just "French"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = cardinalStruct
+                       }
+    , entOrdinal     = Just Conversion
+                       { toNumeral   = ordinal
+                       , toStructure = ordinalStruct
+                       }
+    }
 
 cardinal ∷ ( G.Feminine i
            , Integral α, E.Scale α

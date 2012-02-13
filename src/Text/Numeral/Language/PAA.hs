@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.PAA
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -40,6 +42,7 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -53,6 +56,17 @@ Need new Exp constructor to express
 
 Probably also need a constructor to express "4 obj" as opposed to just "4".
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_2    = ["paa"]
+    , entIso639_3    = Just "hui"
+    , entEnglishName = Just "Huli"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = cardinalRepr ∘ struct

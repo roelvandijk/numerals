@@ -17,8 +17,10 @@
 -}
 
 module Text.Numeral.Language.NO
-    ( -- * Conversions
-      cardinal
+    ( -- * Language entry
+      entry
+      -- * Conversions
+    , cardinal
       -- * Structure
     , struct
       -- * Bounds
@@ -41,7 +43,7 @@ import qualified "numerals-base" Text.Numeral.BigNum as BN
 import qualified "numerals-base" Text.Numeral.Exp    as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
-
+import "this" Text.Numeral.Entry
 
 -------------------------------------------------------------------------------
 -- NO
@@ -50,6 +52,19 @@ import           "numerals-base" Text.Numeral.Misc ( dec )
 -- Sources:
 --   http://en.wikibooks.org/wiki/Norwegian_Numbers
 --   http://www.sf.airnet.ne.jp/~ts/language/number/norwegian.html
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "nb"
+    , entIso639_2    = ["nob"]
+    , entIso639_3    = Just "nob"
+    , entNativeNames = ["Bokmål"]
+    , entEnglishName = Just "Norwegian Bokmål"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    }
 
 cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s)
          ⇒ i → α → Maybe s

@@ -19,8 +19,14 @@
 -}
 
 module Text.Numeral.Language.ZH
-    ( -- * Conversions
-      trad_cardinal
+    ( -- * Language entries
+      trad_entry
+    , simpl_entry
+    , finance_trad_entry
+    , finance_simpl_entry
+    , pinyin_entry
+      -- * Conversions
+    , trad_cardinal
     , simpl_cardinal
     , finance_trad_cardinal
     , finance_simpl_cardinal
@@ -53,6 +59,7 @@ import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.Exp as E
 import           "numerals-base" Text.Numeral.Grammar ( Inflection )
 import           "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -63,6 +70,15 @@ import           "numerals-base" Text.Numeral.Misc ( dec )
 Sources:
   http://www.sf.airnet.ne.jp/~ts/language/number/mandarin.html
 -}
+
+entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry = emptyEntry
+    { entIso639_1    = Just "zh"
+    , entIso639_2    = ["chi", "zho"]
+    , entIso639_3    = Just "cmn"
+    , entNativeNames = ["官話"]
+    , entEnglishName = Just "Chinese"
+    }
 
 flipIfR ∷ Side → (α → α → α) → (α → α → α)
 flipIfR L = id
@@ -112,6 +128,15 @@ cardinalRepr = defaultRepr
 --------------------------------------------------------------------------------
 -- Traditional Characters
 --------------------------------------------------------------------------------
+
+trad_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+trad_entry = entry
+    { entVariant  = Just "traditional"
+    , entCardinal = Just Conversion
+                    { toNumeral   = trad_cardinal
+                    , toStructure = struct
+                    }
+    }
 
 trad_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
               ⇒ i → α → Maybe s
@@ -164,6 +189,15 @@ trad_syms =
 -- Simplified Characters
 --------------------------------------------------------------------------------
 
+simpl_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+simpl_entry = entry
+    { entVariant  = Just "simplified"
+    , entCardinal = Just Conversion
+                    { toNumeral   = simpl_cardinal
+                    , toStructure = struct
+                    }
+    }
+
 simpl_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
                ⇒ i → α → Maybe s
 simpl_cardinal inf = simpl_cardinalRepr inf ∘ struct
@@ -190,6 +224,15 @@ simpl_syms =
 --------------------------------------------------------------------------------
 -- Financial Characters (Traditional)
 --------------------------------------------------------------------------------
+
+finance_trad_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+finance_trad_entry = entry
+    { entVariant  = Just "finance traditional"
+    , entCardinal = Just Conversion
+                    { toNumeral   = finance_trad_cardinal
+                    , toStructure = struct
+                    }
+    }
 
 finance_trad_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
                       ⇒ i → α → Maybe s
@@ -227,6 +270,15 @@ finance_trad_syms =
 -- Financial Characters (Simplified)
 --------------------------------------------------------------------------------
 
+finance_simpl_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+finance_simpl_entry = entry
+    { entVariant  = Just "finance simplified"
+    , entCardinal = Just Conversion
+                    { toNumeral   = finance_simpl_cardinal
+                    , toStructure = struct
+                    }
+    }
+
 finance_simpl_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
                        ⇒ i → α → Maybe s
 finance_simpl_cardinal inf = finance_simpl_cardinalRepr inf ∘ struct
@@ -254,6 +306,15 @@ finance_simpl_cardinalRepr =
 --------------------------------------------------------------------------------
 -- Pinyin
 --------------------------------------------------------------------------------
+
+pinyin_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+pinyin_entry = entry
+    { entVariant  = Just "pinyin"
+    , entCardinal = Just Conversion
+                    { toNumeral   = pinyin_cardinal
+                    , toStructure = struct
+                    }
+    }
 
 pinyin_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
                 ⇒ i → α → Maybe s

@@ -96,14 +96,14 @@ us_entry = entry
     }
 
 gb_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
-gb_cardinal inf = render (cardinalRepr gb_add) inf ∘ shortScaleStruct
+gb_cardinal inf = render (cardinalRepr "minus " gb_add) inf ∘ shortScaleStruct
 
 gb_ordinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 gb_ordinal inf = render (ordinalRepr gb_add) inf ∘ shortScaleStruct
 
 gbPelletier_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s)
                      ⇒ i → α → Maybe s
-gbPelletier_cardinal inf = render (cardinalRepr gb_add) { reprScale = pelletierRepr } inf
+gbPelletier_cardinal inf = render (cardinalRepr "minus " gb_add) { reprScale = pelletierRepr } inf
                          ∘ pelletierScaleStruct
   where
     pelletierRepr = BN.pelletierRepr (\_ _ → "illion")
@@ -111,7 +111,7 @@ gbPelletier_cardinal inf = render (cardinalRepr gb_add) { reprScale = pelletierR
                                      []
 
 us_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
-us_cardinal inf = render (cardinalRepr us_add) inf ∘ shortScaleStruct
+us_cardinal inf = render (cardinalRepr "negative " us_add) inf ∘ shortScaleStruct
 
 us_ordinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
 us_ordinal inf = render (ordinalRepr us_add) inf ∘ shortScaleStruct
@@ -140,12 +140,13 @@ rule = findRule (   0, lit       )
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 30003 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ (Exp i → Exp i → Ctx (Exp i) → s) → Repr i s
+genericRepr ∷ (Monoid s, IsString s)
+            ⇒ (Exp i → Exp i → Ctx (Exp i) → s) -- ^ Add representation.
+            → Repr i s
 genericRepr f =
     defaultRepr
     { reprAdd   = Just f
     , reprMul   = Just (⊞)
-    , reprNeg   = Just $ \_ _ → "minus "
     }
     where
       (_ ⊞ Lit 10) _ = ""
@@ -177,40 +178,45 @@ us_add ∷ (IsString s) ⇒ Exp i → Exp i → Ctx (Exp i) → s
 ((_ `Mul` _     ) `us_add` _) _ = " "
 (_                `us_add` _) _ = ""
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp i → Exp i → Ctx (Exp i) → s) → Repr i s
-cardinalRepr f = (genericRepr f)
-                 { reprValue = \_ n → M.lookup n syms
-                 , reprScale = BN.scaleRepr (\_ _ → "illion") []
-                 }
-    where
-      syms =
-          M.fromList
-          [ (0, const "zero")
-          , (1, const "one")
-          , (2, ten   "two"   "two"  "twen")
-          , (3, ten   "three" "thir" "thir")
-          , (4, ten   "four"  "four" "for")
-          , (5, ten   "five"  "fif"  "fif")
-          , (6, const "six")
-          , (7, const "seven")
-          , (8, ten   "eight" "eigh" "eigh")
-          , (9, const "nine")
-          , (10, \c → case c of
-                        CtxAdd _ (Lit _) _ → "teen"
-                        CtxMul R _       _ → "ty"
-                        _                  → "ten"
-            )
-          , (11,   const "eleven")
-          , (12,   const "twelve")
-          , (100,  const "hundred")
-          , (1000, const "thousand")
-          ]
+cardinalRepr ∷ (Monoid s, IsString s)
+             ⇒ s -- ^ Negative number prefix.
+             → (Exp i → Exp i → Ctx (Exp i) → s)
+             → Repr i s
+cardinalRepr neg f =
+    (genericRepr f)
+    { reprValue = \_ n → M.lookup n syms
+    , reprScale = BN.scaleRepr (\_ _ → "illion") []
+    , reprNeg   = Just $ \_ _ → neg
+    }
+  where
+    syms =
+        M.fromList
+        [ (0, const "zero")
+        , (1, const "one")
+        , (2, ten   "two"   "two"  "twen")
+        , (3, ten   "three" "thir" "thir")
+        , (4, ten   "four"  "four" "for")
+        , (5, ten   "five"  "fif"  "fif")
+        , (6, const "six")
+        , (7, const "seven")
+        , (8, ten   "eight" "eigh" "eigh")
+        , (9, const "nine")
+        , (10, \c → case c of
+                      CtxAdd _ (Lit _) _ → "teen"
+                      CtxMul R _       _ → "ty"
+                      _                  → "ten"
+          )
+        , (11,   const "eleven")
+        , (12,   const "twelve")
+        , (100,  const "hundred")
+        , (1000, const "thousand")
+        ]
 
-      ten ∷ s → s → s → Ctx (Exp i) → s
-      ten n a m = \c → case c of
-                         CtxAdd _ (Lit 10) _ → a
-                         CtxMul _ (Lit 10) _ → m
-                         _                   → n
+    ten ∷ s → s → s → Ctx (Exp i) → s
+    ten n a m = \c → case c of
+                       CtxAdd _ (Lit 10) _ → a
+                       CtxMul _ (Lit 10) _ → m
+                       _                   → n
 
 ordinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp i → Exp i → Ctx (Exp i) → s) → Repr i s
 ordinalRepr f = (genericRepr f)

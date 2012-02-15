@@ -254,7 +254,8 @@ gb_cardinals =
   [ ( "default"
     , defaultInflection
     , en_cardinals
-      ⊕ [ (101, "one hundred and one")
+      ⊕ [ (-1, "minus one")
+        , (101, "one hundred and one")
         , (110, "one hundred and ten")
         , (111, "one hundred and eleven")
         , (120, "one hundred and twenty")
@@ -318,7 +319,8 @@ us_cardinals =
   [ ( "default"
     , defaultInflection
     , en_cardinals
-      ⊕ [ (101, "one hundred one")
+      ⊕ [ (-1, "negative one")
+        , (101, "one hundred one")
         , (110, "one hundred ten")
         , (111, "one hundred eleven")
         , (120, "one hundred twenty")

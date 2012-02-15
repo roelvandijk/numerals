@@ -93,10 +93,16 @@ cardinalRepr = render defaultRepr
                                []
                }
     where
-      (Lit 20          ⊞ _) _ = "e"
-      (Lit 100         ⊞ _) _ = " e "
-      (Mul _ (Lit 100) ⊞ _) _ = " e "
-      (_               ⊞ _) _ = ""
+      (         Lit   20  ⊞ _                        ) _ = "e"
+      (         Lit  100  ⊞ _                        ) _ = " e "
+      (         Lit 1000  ⊞ (        Lit 100 `Add` _)) _ = " "
+      (         Lit 1000  ⊞ (_ `Mul` Lit 100 `Add` _)) _ = " "
+      (         Lit 1000  ⊞ _                        ) _ = " e "
+      ((_ `Mul` Lit  100) ⊞ _                        ) _ = " e "
+      ((_ `Mul` Lit 1000) ⊞ (        Lit 100 `Add` _)) _ = " "
+      ((_ `Mul` Lit 1000) ⊞ (_ `Mul` Lit 100 `Add` _)) _ = " "
+      ((_ `Mul` Lit 1000) ⊞ _                        ) _ = " e "
+      (_                  ⊞ _                        ) _ = ""
 
       (_ ⊡ Lit 1000) _ = " "
       (_ ⊡ Scale {}) _ = " "
@@ -109,62 +115,50 @@ cardinalRepr = render defaultRepr
                        _ | G.isFeminine  inf → "une"
                          | otherwise         → "un"
             )
-          , (2, \c → case c of
-                       CtxAdd _ (Lit  10) _ → "do"
-                       CtxMul _ (Lit 100) _ → "dus"
-                       _ | G.isFeminine inf → "dôs"
-                         | otherwise        → "doi"
+          , (2, add10 "do"
+                $ \c → case c of
+                         CtxMul _ (Lit 100) _ → "dus"
+                         _ | G.isFeminine inf → "dôs"
+                           | otherwise        → "doi"
             )
-          , (3, \c → case c of
-                       CtxAdd _ (Lit  10) _ → "tre"
-                       CtxMul _ (Lit  10) _ → "tr"
-                       CtxMul _ (Lit 100) _ → "tres"
-                       _                    → "trê"
+          , (3, add10 "tre"
+                $ mul10 "tr"
+                  $ \c → case c of
+                           CtxMul _ (Lit 100) _ → "tres"
+                           _                    → "trê"
             )
-          , (4, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "cutuar"
-                       CtxMul _ (Lit 10) _ → "cuar"
-                       _                   → "cuatri"
-            )
-          , (5, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "cuin"
-                       CtxMul _ (Lit 10) _ → "cincu"
-                       _                   → "cinc"
-            )
-          , (6, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "se"
-                       CtxMul _ (Lit 10) _ → "sess"
-                       _                   → "sîs"
-            )
-          , (7, \c → case c of
-                       CtxMul _ (Lit 10) _ → "set"
-                       _                   → "siet"
-            )
-          , (8, \c → case c of
-                       CtxMul _ (Lit 10) _ → "ot"
-                       _                   → "vot"
-            )
-          , (9, \c → case c of
-                       CtxMul _ (Lit 10) _ → "nov"
-                       _                   → "nûf"
-            )
+          , (4, add10 "cutuar" $ mul10 "cuar"  $ const "cuatri")
+          , (5, add10 "cuin"   $ mul10 "cincu" $ const "cinc")
+          , (6, add10 "se"     $ mul10 "sess"  $ const "sîs")
+          , (7,                  mul10 "set"   $ const "siet")
+          , (8,                  mul10 "ot"    $ const "vot")
+          , (9,                  mul10 "nov"   $ const "nûf")
           , (10, \c → case c of
-                        CtxAdd R _       _ → "dis"
+                        CtxAdd R (Lit n) _
+                            | n ≤ 7        → "dis"
                         CtxAdd L _       _ → "dise"
                         CtxMul _ (Lit 3) _ → "ente"
-                        CtxMul _ (Lit _) _ → "ante"
+                        CtxMul _ (Lit n) _
+                            | n ≤ 9        → "ante"
                         _                  → "dîs"
             )
-          , (20, \c → case c of
-                        _ → "vincj"
-            )
+          , (20, const "vincj")
           , (100, \c → case c of
                          CtxMul _ (Lit n) _
                              | n ≤ 3     → "inte"
                              | otherwise → "cent"
                          _               → "cent"
             )
-          , (1000, \c → case c of
-                          _ → "mil"
-            )
+          , (1000, const "mil")
           ]
+
+      add10 ∷ s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
+      add10 a o = \c → case c of
+                         CtxAdd _ (Lit 10) _ → a
+                         _ → o c
+
+      mul10 ∷ s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
+      mul10 m o = \c → case c of
+                         CtxMul _ (Lit 10) _ → m
+                         _ → o c
+

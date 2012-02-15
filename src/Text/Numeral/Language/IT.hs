@@ -24,6 +24,7 @@ module Text.Numeral.Language.IT
     , ordinal
       -- * Structure
     , struct
+    , rule
       -- * Bounds
     , bounds
     ) where
@@ -37,6 +38,7 @@ import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
+import "base" Data.Ord      ( Ord )
 import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
@@ -87,22 +89,26 @@ ordinal ∷ ( G.Masculine i, G.Feminine i
         ⇒ i → α → Maybe s
 ordinal inf = ordinalRepr inf ∘ struct
 
+rule ∷ ( Integral α, Ord α
+       , E.Unknown β, E.Lit β, E.Add β, E.Mul β
+       )
+     ⇒ Rule α β
+rule = findRule (   0, lit         )
+              [ (  11, add   10 L  )
+              , (  17, add   10 R  )
+              , (  20, lit         )
+              , (  21, add   20 R  )
+              , (  30, mul   10 R L)
+              , ( 100, step  100   10 R L)
+              , (1000, step 1000 1000 R L)
+              ]
+                (dec 6 - 1)
+
 struct ∷ ( Integral α, E.Scale α
          , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
          )
        ⇒ α → β
 struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
-    where
-      rule = findRule (   0, lit         )
-                    [ (  11, add   10 L  )
-                    , (  17, add   10 R  )
-                    , (  20, lit         )
-                    , (  21, add   20 R  )
-                    , (  30, mul   10 R L)
-                    , ( 100, step  100   10 R L)
-                    , (1000, step 1000 1000 R L)
-                    ]
-                      (dec 6 - 1)
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)

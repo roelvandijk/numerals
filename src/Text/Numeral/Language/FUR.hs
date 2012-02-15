@@ -46,7 +46,8 @@ import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import "this" Text.Numeral.Entry
+import qualified "this" Text.Numeral.Language.IT as IT ( rule )
+import           "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
@@ -76,18 +77,7 @@ struct ∷ ( Integral α, E.Scale α
          , E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β
          )
        ⇒ α → β
-struct = fix $ rule `combine` pelletierScale1 R L BN.rule
-    where
-      rule = findRule (   0, lit         )
-                    [ (  11, add   10 L  )
-                    , (  17, add   10 R  )
-                    , (  20, lit         )
-                    , (  21, add   20 R  )
-                    , (  30, mul   10 R L)
-                    , ( 100, step  100   10 R L)
-                    , (1000, step 1000 1000 R L)
-                    ]
-                      (dec 6 - 1)
+struct = fix $ IT.rule `combine` pelletierScale1 R L BN.rule
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 12 - 1 in (negate x, x)

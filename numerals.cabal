@@ -133,6 +133,7 @@ library
                  , Text.Numeral.Language.IT
                  , Text.Numeral.Language.JA
                  , Text.Numeral.Language.LA
+                 , Text.Numeral.Language.LLD
                  , Text.Numeral.Language.MG
                  , Text.Numeral.Language.NL
                  , Text.Numeral.Language.NO
@@ -182,6 +183,7 @@ test-suite test-numerals
                , Text.Numeral.Language.IT.TestData
                , Text.Numeral.Language.JA.TestData
                , Text.Numeral.Language.LA.TestData
+               , Text.Numeral.Language.LLD.TestData
                , Text.Numeral.Language.MG.TestData
                , Text.Numeral.Language.NL.TestData
                , Text.Numeral.Language.NO.TestData

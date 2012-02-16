@@ -41,6 +41,7 @@ import qualified "this" Text.Numeral.Language.HE  as HE
 import qualified "this" Text.Numeral.Language.IT  as IT
 import qualified "this" Text.Numeral.Language.JA  as JA
 import qualified "this" Text.Numeral.Language.LA  as LA
+import qualified "this" Text.Numeral.Language.LLD as LLD
 import qualified "this" Text.Numeral.Language.MG  as MG
 import qualified "this" Text.Numeral.Language.NL  as NL
 import qualified "this" Text.Numeral.Language.NO  as NO

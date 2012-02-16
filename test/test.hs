@@ -76,6 +76,8 @@ import qualified "this" Text.Numeral.Language.JA           as JA
 import qualified "this" Text.Numeral.Language.JA.TestData  as JA
 import qualified "this" Text.Numeral.Language.LA           as LA
 import qualified "this" Text.Numeral.Language.LA.TestData  as LA
+import qualified "this" Text.Numeral.Language.LLD          as LLD
+import qualified "this" Text.Numeral.Language.LLD.TestData as LLD
 import qualified "this" Text.Numeral.Language.MG           as MG
 import qualified "this" Text.Numeral.Language.MG.TestData  as MG
 import qualified "this" Text.Numeral.Language.NL           as NL
@@ -166,8 +168,9 @@ tests =
     , testGroup "daiji"
       [mkTests "cardinal" JA.daiji_cardinal (JA.daiji_cardinals ∷ TestData ℤ String)]
     ]
-  , testGroup "LA"  [mkTests "cardinal" LA.cardinal (LA.cardinals ∷ TestData ℤ String)]
-  , testGroup "MG"  [mkTests "cardinal" MG.cardinal (MG.cardinals ∷ TestData ℤ String)]
+  , testGroup "LA"  [mkTests "cardinal" LA.cardinal  (LA.cardinals  ∷ TestData ℤ String)]
+  , testGroup "LLD" [mkTests "cardinal" LLD.cardinal (LLD.cardinals ∷ TestData ℤ String)]
+  , testGroup "MG"  [mkTests "cardinal" MG.cardinal  (MG.cardinals  ∷ TestData ℤ String)]
   , testGroup "NL"
     [ mkTests "cardinal"       NL.cardinal  (NL.cardinals  ∷ TestData ℤ String)
     , mkTests "ordinal"        NL.ordinal   (NL.ordinals   ∷ TestData ℤ String)

@@ -46,8 +46,9 @@ import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "this" Text.Numeral.Language.IT as IT ( rule )
 import           "this" Text.Numeral.Entry
+import qualified "this" Text.Numeral.Language.IT as IT ( rule )
+import           "this" Text.Numeral.Render.Utils ( addCtx, mulCtx )
 
 
 --------------------------------------------------------------------------------
@@ -115,24 +116,20 @@ cardinalRepr = render defaultRepr
                        _ | G.isFeminine  inf → "une"
                          | otherwise         → "un"
             )
-          , (2, add10 "do"
+          , (2, addCtx 10 "do" $ mulCtx 100 "dus"
                 $ \c → case c of
-                         CtxMul _ (Lit 100) _ → "dus"
                          _ | G.isFeminine inf → "dôs"
                            | otherwise        → "doi"
             )
-          , (3, add10 "tre"
-                $ mul10 "tr"
-                  $ \c → case c of
-                           CtxMul _ (Lit 100) _ → "tres"
-                           _                    → "trê"
+          , (3, addCtx 10  "tre"  $ mulCtx 10 "tr"
+              $ mulCtx 100 "tres" $ const     "trê"
             )
-          , (4, add10 "cutuar" $ mul10 "cuar"  $ const "cuatri")
-          , (5, add10 "cuin"   $ mul10 "cincu" $ const "cinc")
-          , (6, add10 "se"     $ mul10 "sess"  $ const "sîs")
-          , (7,                  mul10 "set"   $ const "siet")
-          , (8,                  mul10 "ot"    $ const "vot")
-          , (9,                  mul10 "nov"   $ const "nûf")
+          , (4, addCtx 10 "cutuar" $ mulCtx 10 "cuar"  $ const "cuatri")
+          , (5, addCtx 10 "cuin"   $ mulCtx 10 "cincu" $ const "cinc")
+          , (6, addCtx 10 "se"     $ mulCtx 10 "sess"  $ const "sîs")
+          , (7,                      mulCtx 10 "set"   $ const "siet")
+          , (8,                      mulCtx 10 "ot"    $ const "vot")
+          , (9,                      mulCtx 10 "nov"   $ const "nûf")
           , (10, \c → case c of
                         CtxAdd R (Lit n) _
                             | n ≤ 7        → "dis"
@@ -151,14 +148,3 @@ cardinalRepr = render defaultRepr
             )
           , (1000, const "mil")
           ]
-
-      add10 ∷ s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
-      add10 a o = \c → case c of
-                         CtxAdd _ (Lit 10) _ → a
-                         _ → o c
-
-      mul10 ∷ s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
-      mul10 m o = \c → case c of
-                         CtxMul _ (Lit 10) _ → m
-                         _ → o c
-

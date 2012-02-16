@@ -42,15 +42,15 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Bool.Unicode     ( (∧), (∨) )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡), (≢) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
-import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import "this" Text.Numeral.Language.FUR ( struct )
 import "this" Text.Numeral.Entry
+import "this" Text.Numeral.Language.FUR ( struct )
+import "this" Text.Numeral.Render.Utils ( addCtx, mulCtx )
 
 
 --------------------------------------------------------------------------------
@@ -134,13 +134,3 @@ cardinalRepr = render defaultRepr
           , (100, mulCtx 6 "çent" $ const "cent")
           , (1000, const "mile")
           ]
-
-      addCtx ∷ ℤ → s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
-      addCtx x a o ctx = case ctx of
-                           CtxAdd _ (Lit y) _ | x ≡ y → a
-                           _ → o ctx
-
-      mulCtx ∷ ℤ → s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
-      mulCtx x m o ctx = case ctx of
-                           CtxMul _ (Lit y) _ | x ≡ y → m
-                           _ → o ctx

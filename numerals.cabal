@@ -150,6 +150,7 @@ library
                  , Text.Numeral.Language.WO
                  , Text.Numeral.Language.YOR
                  , Text.Numeral.Language.ZH
+  other-modules: Text.Numeral.Render.Utils
 
 
 -------------------------------------------------------------------------------

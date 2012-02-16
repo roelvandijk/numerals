@@ -33,7 +33,7 @@ module Text.Numeral.Language.LLD
 --------------------------------------------------------------------------------
 
 import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( ($), const, fix )
+import "base" Data.Function ( ($), const )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
@@ -42,18 +42,19 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Bool.Unicode     ( (∧), (∨) )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡), (≢) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
+import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.BigNum  as BN
 import qualified "numerals-base" Text.Numeral.Exp     as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec )
-import qualified "this" Text.Numeral.Language.IT as IT ( rule )
-import           "this" Text.Numeral.Entry
+import "this" Text.Numeral.Language.FUR ( struct )
+import "this" Text.Numeral.Entry
 
 
 --------------------------------------------------------------------------------
--- FUR
+-- LLD
 --------------------------------------------------------------------------------
 
 entry ∷ (Monoid s, IsString s) ⇒ Entry s
@@ -73,12 +74,6 @@ cardinal ∷ ( G.Masculine i, G.Feminine i
            )
          ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
-
-struct ∷ ( Integral α, E.Scale α
-         , E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β
-         )
-       ⇒ α → β
-struct = fix $ IT.rule `combine` pelletierScale1 R L BN.rule
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 12 - 1 in (negate x, x)
@@ -107,47 +102,23 @@ cardinalRepr = render defaultRepr
       syms inf =
           M.fromList
           [ (0, const "zero")
-          , (1, add10 "un"
+          , (1, addCtx 10 "un"
                 $ \c → case c of
                          _ | G.isFeminine inf → "una"
                            | otherwise        → "un"
             )
-          , (2, add10 "do"
+          , (2, addCtx 10 "do"
                 $ \c → case c of
                          _ | G.isFeminine inf → "does"
                            | otherwise        → "doi"
             )
-          , (3, add10 "tre"
-                $ mul10 "tr"
-                $ \c → case c of
-                         _ → "trei"
-            )
-          , (4, add10 "cator"
-                $ mul10 "car"
-                $ \c → case c of
-                         _ → "cater"
-            )
-          , (5, add10 "chin"
-                $ mul10 "cinc"
-                $ \c → case c of
-                         _ → "cinch"
-            )
-          , (6, add10 "sei"
-                $ mul10 "sess"
-                $ \c → case c of
-                         _ → "sies"
-            )
-          , (7, \c → case c of
-                       _ → "set"
-            )
-          , (8, add10 "dot"
-                $ \c → case c of
-                         _ → "ot"
-            )
-          , (9, mul10 "non"
-                $ \c → case c of
-                         _ → "nuef"
-            )
+          , (3, addCtx 10 "tre"   $ mulCtx 10 "tr"   $ const "trei")
+          , (4, addCtx 10 "cator" $ mulCtx 10 "car"  $ const "cater")
+          , (5, addCtx 10 "chin"  $ mulCtx 10 "cinc" $ const "cinch")
+          , (6, addCtx 10 "sei"   $ mulCtx 10 "sess" $ const "sies")
+          , (7, const "set")
+          , (8, addCtx 10 "dot" $ const "ot")
+          , (9, mulCtx 10 "non" $ const "nuef")
           , (10, \c → case c of
                         CtxAdd _ (Lit n) _
                             | n ≤ 6 → "desc"
@@ -159,24 +130,17 @@ cardinalRepr = render defaultRepr
                         CtxMul _ (Lit _) _ → "anta"
                         _ → "diesc"
             )
-          , (20, \c → case c of
-                        _ → "vint"
-            )
-          , (100, \c → case c of
-                         CtxMul _ (Lit 6) _ → "çent"
-                         _ → "cent"
-            )
-          , (1000, \c → case c of
-                          _ → "mile"
-            )
+          , (20, const "vint")
+          , (100, mulCtx 6 "çent" $ const "cent")
+          , (1000, const "mile")
           ]
 
-      add10 ∷ s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
-      add10 a o = \c → case c of
-                         CtxAdd _ (Lit 10) _ → a
-                         _ → o c
+      addCtx ∷ ℤ → s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
+      addCtx x a o ctx = case ctx of
+                           CtxAdd _ (Lit y) _ | x ≡ y → a
+                           _ → o ctx
 
-      mul10 ∷ s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
-      mul10 m o = \c → case c of
-                         CtxMul _ (Lit 10) _ → m
-                         _ → o c
+      mulCtx ∷ ℤ → s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
+      mulCtx x m o ctx = case ctx of
+                           CtxMul _ (Lit y) _ | x ≡ y → m
+                           _ → o ctx

@@ -23,6 +23,7 @@ import qualified "this" Text.Numeral.Language.DE  as DE
 import qualified "this" Text.Numeral.Language.EN  as EN
 import qualified "this" Text.Numeral.Language.EO  as EO
 import qualified "this" Text.Numeral.Language.ES  as ES
+import qualified "this" Text.Numeral.Language.FI  as FI
 import qualified "this" Text.Numeral.Language.FR  as FR
 import qualified "this" Text.Numeral.Language.FUR as FUR
 import qualified "this" Text.Numeral.Language.GSW as GSW
@@ -66,6 +67,7 @@ entries =
   , EN.us_entry
   , EO.entry
   , ES.entry
+  , FI.entry
   , FR.entry
   , FUR.entry
   , GSW.entry

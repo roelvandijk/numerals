@@ -25,7 +25,9 @@ module Text.Numeral.Language.SV.TestData (cardinals) where
 
 import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
+import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals-base" Text.Numeral.Grammar ( neuter, common )
 import "numerals-base" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -33,6 +35,11 @@ import "this" Text.Numeral.Test ( TestData )
 --------------------------------------------------------------------------------
 -- Test data
 --------------------------------------------------------------------------------
+
+-- Sources:
+--   http://en.wikipedia.org/wiki/Swedish_grammar#Numerals
+--   http://publications.europa.eu/code/sv/sv-4100600sv.htm
+--   http://www.lysator.liu.se/language/Languages/Swedish/Grammar.html#numbers
 
 -- Rules for writing large words seem hard to come by online.
 -- http://publications.europa.eu/code/sv/sv-4100600sv.htm provides
@@ -51,8 +58,8 @@ import "this" Text.Numeral.Test ( TestData )
 
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
-  [ ( "default"
-    , defaultInflection
+  [ ( "neuter"
+    , neuter defaultInflection
       -- Rule 2 (one word)
     , [ (0, "noll")
       , (1, "ett")
@@ -176,9 +183,10 @@ cardinals =
       , (dec 4, "tio tusen")
       , (dec 5, "etthundra tusen")
       , (dec 6, "en miljon")
-      , (dec 6, "två miljoner")
+      , (2 ⋅ dec 6, "två miljoner")
+      , (10 ⋅ dec 6, "tio miljoner")
       , (dec 8, "etthundra miljoner")
-      , (2*dec 8, "tvåhundra miljoner")
+      , (2 ⋅ dec 8, "tvåhundra miljoner")
       , (dec 9, "en miljard")
       , (dec 12, "en biljon")
       , (dec 15, "en biljard")
@@ -196,9 +204,15 @@ cardinals =
       , (302145568, "trehundratvå miljoner etthundrafyrtiofem tusen femhundrasextioåtta")
       , (1000100, "en miljon etthundra")
       , (1305100, "en miljon trehundrafem tusen etthundra")
-      , (300000102, "trehundra miljoner etthundratvå"
-      , (300500000, "trehundra miljoner femhundra tusen"
+      , (300000102, "trehundra miljoner etthundratvå")
+      , (300500000, "trehundra miljoner femhundra tusen")
       , (25003000000, "tjugofem miljarder tre miljoner")
+      ]
+    )
+  , ( "common"
+    , common defaultInflection
+    , [ (1, "en")
+      , (21, "tjugoen")
       ]
     )
   ]

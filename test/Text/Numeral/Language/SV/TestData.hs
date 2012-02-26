@@ -16,7 +16,11 @@
 [@English name@]    Swedish
 -}
 
-module Text.Numeral.Language.SV.TestData (cardinals) where
+module Text.Numeral.Language.SV.TestData
+    ( cardinals
+    , ordinals
+    , partitives
+    ) where
 
 
 --------------------------------------------------------------------------------
@@ -180,7 +184,9 @@ cardinals =
       , (1000, "ett tusen")
       , (3000, "tre tusen")
       , (5000, "fem tusen")
-      , (dec 4, "tio tusen")
+      , (10000, "tio tusen")
+      , (20000, "tjugo tusen")
+      , (50000, "femtio tusen")
       , (dec 5, "etthundra tusen")
       , (dec 6, "en miljon")
       , (2 ⋅ dec 6, "två miljoner")
@@ -213,6 +219,79 @@ cardinals =
     , common defaultInflection
     , [ (1, "en")
       , (21, "tjugoen")
+      ]
+    )
+  ]
+
+ordinals ∷ (Integral i, IsString s) ⇒ TestData i s
+ordinals =
+  [ ( "neuter"
+    , neuter defaultInflection
+    , [ (0, "nollte")
+      , (1, "första")
+      , (2, "andra")
+      , (3, "tredje")
+      , (4, "fjärde")
+      , (5, "femte")
+      , (6, "sjätte")
+      , (7, "sjunde")
+      , (8, "åttonde")
+      , (9, "nionde")
+      , (10, "tionde")
+      , (11, "elfte")
+      , (12, "tolfte")
+      , (13, "trettonde")
+      , (14, "fjortonde")
+      , (15, "femtonde")
+      , (16, "sextonde")
+      , (17, "sjuttonde")
+      , (18, "artonde")
+      , (19, "nittonde")
+      , (20, "tjugonde")
+      , (30, "trettionde")
+      , (40, "fyrtionde")
+      , (50, "femtionde")
+      , (60, "sextionde")
+      , (70, "sjuttionde")
+      , (80, "åttionde")
+      , (90, "nittionde")
+      , (100, "hundrade")
+      , (200, "två hundrade")
+      , (500, "fem hundrade")
+      , (1000, "tusende")
+      , (2000, "två tusende")
+      , (5000, "fem tusende")
+      , (10000, "tio tusende")
+      , (20000, "tjugo tusende")
+      , (50000, "femtio tusende")
+      , (dec 6, "miljonte")
+      ]
+    )
+  ]
+
+partitives ∷ (Integral i, IsString s) ⇒ TestData (i, i) s
+partitives =
+  [ ( "default"
+    , defaultInflection
+    , [ ((1, 2), "en halv")
+      , ((1, 3), "en tredjedel")
+      , ((3, 4), "tre fjärdedelar")
+      , ((2, 5), "två femtedelar")
+      , ((5, 6), "fem sjättedelar")
+      , ((4, 7), "fyra sjundedelar")
+      , ((1, 8), "en åttondel")
+      , ((8, 9), "åtta niondelar")
+      , ((1, 10), "en tiondel")
+      , ((1, 11), "en elftedel")
+      , ((1, 12), "en tolftedel")
+      , ((1, 13), "en trettondel")
+      , ((1, 14), "en fjortondel")
+      , ((1, 15), "en femtondel")
+      , ((1, 16), "en sextondel")
+      , ((1, 17), "en sjuttondel")
+      , ((1, 18), "en artondel")
+      , ((1, 19), "en nittondel")
+      , ((1, 20), "en tjugondel")
       ]
     )
   ]

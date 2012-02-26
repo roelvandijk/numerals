@@ -192,7 +192,10 @@ tests =
                     ]
   , testGroup "RU"  [mkTests "cardinal" RU.cardinal  (RU.cardinals  ∷ TestData ℤ String)]
   , testGroup "SCO" [mkTests "cardinal" SCO.cardinal (SCO.cardinals ∷ TestData ℤ String)]
-  , testGroup "SV"  [mkTests "cardinal" SV.cardinal  (SV.cardinals  ∷ TestData ℤ String)]
+  , testGroup "SV"
+    [ mkTests "cardinal" SV.cardinal  (SV.cardinals ∷ TestData ℤ String)
+    , mkTests "ordinal"  SV.ordinal   (SV.ordinals  ∷ TestData ℤ String)
+    ]
   , testGroup "TR"  [mkTests "cardinal" TR.cardinal  (TR.cardinals  ∷ TestData ℤ String)]
   , testGroup "WO"  [mkTests "cardinal" WO.cardinal  (WO.cardinals  ∷ TestData ℤ String)]
   , testGroup "YOR" [mkTests "cardinal" YOR.cardinal (YOR.cardinals ∷ TestData ℤ String)]

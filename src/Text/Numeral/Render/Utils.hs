@@ -6,6 +6,7 @@
 module Text.Numeral.Render.Utils
     ( addCtx
     , mulCtx
+    , outsideCtx
     ) where
 
 --------------------------------------------------------------------------------
@@ -33,3 +34,8 @@ mulCtx val match other ctx =
       CtxMul _ (Lit n) _ | val ≡ n → match
       _ → other ctx
 
+outsideCtx ∷ Side → s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
+outsideCtx side match other ctx =
+    if isOutside side ctx
+    then match
+    else other ctx

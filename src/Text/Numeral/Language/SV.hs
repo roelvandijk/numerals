@@ -22,6 +22,7 @@ module Text.Numeral.Language.SV
       entry
       -- * Conversions
     , cardinal
+    , ordinal
       -- * Structure
     , struct
       -- * Bounds
@@ -38,9 +39,8 @@ import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
-import "base" Prelude       ( Integral, (-), div, negate, even )
+import "base" Prelude       ( Num, Integral, (-), div, negate, even )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "numerals-base" Text.Numeral
 import qualified "numerals-base" Text.Numeral.BigNum as BN
@@ -48,7 +48,7 @@ import qualified "numerals-base" Text.Numeral.Exp    as E
 import qualified "numerals-base" Text.Numeral.Grammar as G
 import           "numerals-base" Text.Numeral.Misc ( dec, intLog )
 import "this" Text.Numeral.Entry
-
+import "this" Text.Numeral.Render.Utils ( addCtx, mulCtx, outsideCtx )
 
 -------------------------------------------------------------------------------
 -- SV
@@ -65,6 +65,10 @@ entry = emptyEntry
                        { toNumeral   = cardinal
                        , toStructure = struct
                        }
+    , entOrdinal     = Just Conversion
+                       { toNumeral   = ordinal
+                       , toStructure = struct
+                       }
     }
 
 cardinal ∷ ( G.Common i, G.Neuter i
@@ -73,6 +77,13 @@ cardinal ∷ ( G.Common i, G.Neuter i
            )
          ⇒ i → α → Maybe s
 cardinal inf = cardinalRepr inf ∘ struct
+
+ordinal ∷ ( G.Common i, G.Neuter i
+          , Integral α, E.Scale α
+          , Monoid s, IsString s
+          )
+        ⇒ i → α → Maybe s
+ordinal inf = ordinalRepr inf ∘ struct
 
 struct ∷ ( Integral α, E.Scale α
          , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
@@ -113,7 +124,10 @@ cardinalRepr ∷ (G.Common i, G.Neuter i, Monoid s, IsString s)
              ⇒ i → Exp i → Maybe s
 cardinalRepr = render defaultRepr
                { reprValue = \ctx n → M.lookup n (syms ctx)
-               , reprScale = pelletierRepr
+               , reprScale = BN.pelletierRepr
+                               (BN.quantityName "iljon"  "iljoner")
+                               (BN.quantityName "iljard" "iljarder")
+                               bigNumSyms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
                , reprNeg   = Just $ \_ _   → "minus "
@@ -138,13 +152,13 @@ cardinalRepr = render defaultRepr
                          | otherwise      → "?"
             )
           , (2, const "två")
-          , (3, ten   "tre"  "tret" "tret")
-          , (4, ten   "fyra" "fjor" "fyr")
+          , (3, addCtx 10 "tret" $ mulCtx 10 "tret" $ const "tre")
+          , (4, addCtx 10 "fjor" $ mulCtx 10 "fyr"  $ const "fyra")
           , (5, const "fem")
           , (6, const "sex")
-          , (7, ten   "sju"  "sjut" "sjut")
-          , (8, ten   "åtta" "ar"   "åt")
-          , (9, ten   "nio"  "nit"  "nit")
+          , (7, addCtx 10 "sjut" $ mulCtx 10 "sjut" $ const "sju")
+          , (8, addCtx 10 "ar"   $ mulCtx 10 "åt"   $ const "åtta")
+          , (9, addCtx 10 "nit"  $ mulCtx 10 "nit"  $ const "nio")
           , (10, \c → case c of
                         CtxAdd {} → "ton"
                         _         → "tio"
@@ -156,18 +170,63 @@ cardinalRepr = render defaultRepr
           , (1000, const "tusen")
           ]
 
-      ten n a m = \c → case c of
-                         CtxAdd _ (Lit 10) _ → a
-                         CtxMul _ (Lit 10) _ → m
-                         _                   → n
+ordinalRepr ∷ (G.Common i, G.Neuter i, Monoid s, IsString s)
+            ⇒ i → Exp i → Maybe s
+ordinalRepr = render defaultRepr
+              { reprValue = \ctx n → M.lookup n (syms ctx)
+              , reprScale = BN.pelletierRepr
+                               (BN.ordQuantityName "iljon" "iljonte" "iljoner" "iljonte")
+                               (BN.quantityName "iljard" "iljarder")
+                               bigNumSyms
+              , reprAdd   = Just (⊞)
+              , reprMul   = Just (⊡)
+              , reprNeg   = Just $ \_ _   → "minus "
+              }
+    where
+      (Inflection _ _ ⊞ _) _ = " "
+      (_ ⊞ _) _ = ""
 
-pelletierRepr ∷ (IsString s, Monoid s)
-              ⇒ i → ℤ → ℤ → (Exp i) → Ctx (Exp i) → Maybe s
-pelletierRepr =
-    BN.pelletierRepr
-      (BN.quantityName "iljon"  "iljoner")
-      (BN.quantityName "iljard" "iljarder")
-      [ (4, BN.forms "kvadr" "kvattuor" "kvattuor" "kvadra"  "kvadri")
-      , (5, BN.forms "kvint" "kvin"     "kvinkva"  "kvinkva" "kvin")
-      , (8, BN.forms "okt"   "okto"     "okto"     "okto"    "oktin")
-      ]
+      (_ ⊡ Lit  100) CtxEmpty = " "
+      (_ ⊡ Lit 1000) CtxEmpty = " "
+      (_ ⊡ Scale{})  _ = " "
+      (_ ⊡ _) _ = ""
+
+      syms ctx =
+          M.fromList
+          [ (0, outsideCtx R "nollte" $ const "noll")
+          , (1, outsideCtx R "första"
+                $ \c → case c of
+                         CtxMul _ (Lit 1000) CtxEmpty → "ett"
+                         CtxMul _ (Lit 1000) _ → "et"
+                         _ | G.isCommon ctx → "en"
+                           | G.isNeuter ctx → "ett"
+                           | otherwise      → "?"
+            )
+          , (2, outsideCtx R "andra"   $ const "två")
+          , (3, outsideCtx R "tredje"  $ addCtx 10 "tret" $ mulCtx 10 "tret" $ const "tre")
+          , (4, outsideCtx R "fjärde"  $ addCtx 10 "fjor" $ mulCtx 10 "fyr"  $ const "fyra")
+          , (5, outsideCtx R "femte"   $ const "fem")
+          , (6, outsideCtx R "sjätte"  $ const "sex")
+          , (7, outsideCtx R "sjunde"  $ addCtx 10 "sjut" $ mulCtx 10 "sjut" $ const "sju")
+          , (8, outsideCtx R "åttonde" $ addCtx 10 "ar"   $ mulCtx 10 "åt"   $ const "åtta")
+          , (9, outsideCtx R "nionde"  $ addCtx 10 "nit"  $ mulCtx 10 "nit"  $ const "nio")
+          , (10, \c → case c of
+                        CtxAdd {}
+                          | isOutside R c → "tonde"
+                          | otherwise     → "ton"
+                        _ | isOutside R c → "tionde"
+                          | otherwise     → "tio"
+            )
+          , (11, outsideCtx R "elfte"    $ const "elva")
+          , (12, outsideCtx R "tolfte"   $ const "tolv")
+          , (20, outsideCtx R "tjugonde" $ const "tjugo")
+          , (100, outsideCtx R "hundrade" $ const "hundra")
+          , (1000, outsideCtx R "tusende" $ const "tusen")
+          ]
+
+bigNumSyms ∷ (Num α, IsString s) ⇒ [(α, Ctx (Exp i) → s)]
+bigNumSyms =
+    [ (4, BN.forms "kvadr" "kvattuor" "kvattuor" "kvadra"  "kvadri")
+    , (5, BN.forms "kvint" "kvin"     "kvinkva"  "kvinkva" "kvin")
+    , (8, BN.forms "okt"   "okto"     "okto"     "okto"    "oktin")
+    ]

@@ -34,10 +34,26 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
+-- Rules for writing large words seem hard to come by online.
+-- http://publications.europa.eu/code/sv/sv-4100600sv.htm provides
+-- some guidelines:
+--
+-- Rule 1: Even hundreds, thousands, and so on, are generally written
+-- as two words: två tusen, fyra hundra, sex miljoner
+--
+-- Rule 2: Numbers smaller than one hundred are always written as one
+-- word, as are other number under one million: fyrtiosju,
+-- niotusenfemhundrasexton
+--
+-- Rule 3: Numbers larger than one million should be written so that
+-- the words tusen, miljon, miljard, and so on always stand on their
+-- own: tjugofem miljarder tre miljoner
+
 cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
 cardinals =
   [ ( "default"
     , defaultInflection
+      -- Rule 2 (one word)
     , [ (0, "noll")
       , (1, "ett")
       , (2, "två")
@@ -138,31 +154,51 @@ cardinals =
       , (97, "nittiosju")
       , (98, "nittioåtta")
       , (99, "nittionio")
-      , (100, "hundra")
-      , (200, "tvåhundra")
-      , (300, "trehundra")
-      , (500, "femhundra")
-      , (600, "sexhundra")
-      , (800, "åttahundra")
-      , (1000, "tusen")
-      , (3000, "tretusen")
+      , (549, "femhundrafyrtionio")
+        -- "ettusen" is a special spelling case where "ett tusen"
+        -- written as one word becomes ettusen, dropping one 't'.
+      , (1349, "ettusentrehundrafyrtionio")
       , (3502, "tretusenfemhundratvå")
-      , (5000, "femtusen")
-      , (dec 4, "tiotusen")
-      , (dec 5, "hundratusen")
-      , (dec 6, "miljon")
-      , (dec 9, "miljard")
-      , (dec 12, "biljon")
-      , (dec 15, "biljard")
-      , (dec 18, "triljon")
-      , (dec 24, "kvadriljon")
-      , (dec 30, "kvintiljon")
-      , (dec 36, "sextiljon")
-      , (dec 42, "septiljon")
-      , (dec 48, "oktiljon")
-      , (dec 54, "noniljon")
-      , (dec 60, "deciljon")
-      , (dec 66, "undeciljon")
+      , (9516, "niotusenfemhundrasexton")
+      , (30934, "trettiotusenniohundratrettiofyra")
+      , (837132, "åttahundratrettiosjutusenetthundratrettiotvå")
+      , (999999, "niohundranittioniotusenniohundranittionio")
+        -- Rule 1 (even hundreds and so on)
+      , (100, "ett hundra")
+      , (200, "två hundra")
+      , (300, "tre hundra")
+      , (500, "fem hundra")
+      , (600, "sex hundra")
+      , (800, "åtta hundra")
+      , (1000, "ett tusen")
+      , (3000, "tre tusen")
+      , (5000, "fem tusen")
+      , (dec 4, "tio tusen")
+      , (dec 5, "etthundra tusen")
+      , (dec 6, "en miljon")
+      , (dec 6, "två miljoner")
+      , (dec 8, "etthundra miljoner")
+      , (2*dec 8, "tvåhundra miljoner")
+      , (dec 9, "en miljard")
+      , (dec 12, "en biljon")
+      , (dec 15, "en biljard")
+      , (dec 18, "en triljon")
+      , (dec 24, "en kvadriljon")
+      , (dec 30, "en kvintiljon")
+      , (dec 36, "en sextiljon")
+      , (dec 42, "en septiljon")
+      , (dec 48, "en oktiljon")
+      , (dec 54, "en noniljon")
+      , (dec 60, "en deciljon")
+      , (dec 66, "en undeciljon")
+        -- Rule 3: Numbers larger than one million split up on tusen, miljon, etc
+      , (37149204, "trettiosju miljoner etthundrafyrtionio tusen tvåhundrafyra")
+      , (302145568, "trehundratvå miljoner etthundrafyrtiofem tusen femhundrasextioåtta")
+      , (1000100, "en miljon etthundra")
+      , (1305100, "en miljon trehundrafem tusen etthundra")
+      , (300000102, "trehundra miljoner etthundratvå"
+      , (300500000, "trehundra miljoner femhundra tusen"
+      , (25003000000, "tjugofem miljarder tre miljoner")
       ]
     )
   ]

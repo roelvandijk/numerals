@@ -191,7 +191,7 @@ cardinals =
       , (523758, "beş yüz yirmi üç bin yedi yüz elli sekiz")
       , (dec 6, "bir milyon")
       , (123456789, "yüz yirmi üç milyon dört yüz elli altı bin yedi yüz seksen dokuz")
-      , (dec 9, "bir bilyon")
+      , (dec 9, "bir milyar")
       , (dec 12, "bir trilyon")
       , (dec 15, "bir katrilyon")
       , (dec 18, "bir kentilyon")

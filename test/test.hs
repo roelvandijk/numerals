@@ -69,6 +69,8 @@ import qualified "this" Text.Numeral.Language.GV           as GV
 import qualified "this" Text.Numeral.Language.GV.TestData  as GV
 import qualified "this" Text.Numeral.Language.HE           as HE
 import qualified "this" Text.Numeral.Language.HE.TestData  as HE
+import qualified "this" Text.Numeral.Language.HOP          as HOP
+import qualified "this" Text.Numeral.Language.HOP.TestData as HOP
 import qualified "this" Text.Numeral.Language.HR.TestData  as HR
 import qualified "this" Text.Numeral.Language.HU.TestData  as HU
 import qualified "this" Text.Numeral.Language.IT           as IT
@@ -159,6 +161,7 @@ tests =
   , testGroup "GSW" [mkTests "cardinal" GSW.cardinal (GSW.cardinals ∷ TestData ℤ String)]
   , testGroup "GV"  [mkTests "cardinal" GV.cardinal  (GV.cardinals  ∷ TestData ℤ String)]
   , testGroup "HE"  [mkTests "cardinal" HE.cardinal  (HE.cardinals  ∷ TestData ℤ String)]
+  , testGroup "HOP" [mkTests "cardinal" HOP.cardinal (HOP.cardinals ∷ TestData ℤ String)]
   , testGroup "IT"
     [ mkTests "cardinal" IT.cardinal (IT.cardinals ∷ TestData ℤ String)
     , mkTests "ordinal"  IT.ordinal  (IT.ordinals  ∷ TestData ℤ String)

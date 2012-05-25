@@ -128,6 +128,7 @@ library
                  , Text.Numeral.Language.GSW
                  , Text.Numeral.Language.GV
                  , Text.Numeral.Language.HE
+                 , Text.Numeral.Language.HOP
               -- , Text.Numeral.Language.HR
               -- , Text.Numeral.Language.HU
                  , Text.Numeral.Language.IT

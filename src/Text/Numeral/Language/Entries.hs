@@ -29,6 +29,7 @@ import qualified "this" Text.Numeral.Language.FUR as FUR
 import qualified "this" Text.Numeral.Language.GSW as GSW
 import qualified "this" Text.Numeral.Language.GV  as GV
 import qualified "this" Text.Numeral.Language.HE  as HE
+import qualified "this" Text.Numeral.Language.HOP as HOP
 import qualified "this" Text.Numeral.Language.IT  as IT
 import qualified "this" Text.Numeral.Language.JA  as JA
 import qualified "this" Text.Numeral.Language.LA  as LA
@@ -73,6 +74,7 @@ entries =
   , GSW.entry
   , GV.entry
   , HE.entry
+  , HOP.entry
   , IT.entry
   , JA.kanji_entry
   , JA.daiji_entry

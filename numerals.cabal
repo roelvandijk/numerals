@@ -5,7 +5,7 @@ build-type:    Simple
 stability:     experimental
 author:        Roel van Dijk <vandijk.roel@gmail.com>, Bas van Dijk <v.dijk.bas@gmail.com>
 maintainer:    Roel van Dijk <vandijk.roel@gmail.com>
-copyright:     2009–2012 Roel van Dijk, Bas van Dijk
+copyright:     2009–2014 Roel van Dijk, Bas van Dijk
 license:       BSD3
 license-file:  LICENSE
 homepage:      https://github.com/roelvandijk/numerals
@@ -141,6 +141,7 @@ library
                  , Text.Numeral.Language.NQM
                  , Text.Numeral.Language.OJ
               -- , Text.Numeral.Language.PAA
+                 , Text.Numeral.Language.PDC
                  , Text.Numeral.Language.PL
                  , Text.Numeral.Language.PT
               -- , Text.Numeral.Language.RO
@@ -192,6 +193,7 @@ test-suite test-numerals
                , Text.Numeral.Language.NQM.TestData
                , Text.Numeral.Language.OJ.TestData
             -- , Text.Numeral.Language.PAA.TestData
+               , Text.Numeral.Language.PDC.TestData
                , Text.Numeral.Language.PL.TestData
                , Text.Numeral.Language.PT.TestData
                , Text.Numeral.Language.RO.TestData

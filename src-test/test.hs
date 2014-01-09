@@ -93,6 +93,8 @@ import qualified "this" Text.Numeral.Language.OJ           as OJ
 import qualified "this" Text.Numeral.Language.OJ.TestData  as OJ
 -- import qualified "this" Text.Numeral.Language.PAA          as PAA
 -- import qualified "this" Text.Numeral.Language.PAA.TestData as PAA
+import qualified "this" Text.Numeral.Language.PDC          as PDC
+import qualified "this" Text.Numeral.Language.PDC.TestData as PDC
 import qualified "this" Text.Numeral.Language.PL           as PL
 import qualified "this" Text.Numeral.Language.PL.TestData  as PL
 import qualified "this" Text.Numeral.Language.PT           as PT
@@ -189,6 +191,7 @@ tests =
   , testGroup "NQM" [mkTests "cardinal" NQM.cardinal (NQM.cardinals ∷ TestData ℤ String)]
   , testGroup "OJ"  [mkTests "cardinal" OJ.cardinal  (OJ.cardinals  ∷ TestData ℤ String)]
   -- , testGroup "PAA" [mkTests "cardinal" PAA.cardinal (PAA.cardinals ∷ TestData ℤ String)]
+  , testGroup "PDC" [mkTests "cardinal" PDC.cardinal (PDC.cardinals ∷ TestData ℤ String)]
   , testGroup "PL"  [mkTests "cardinal" PL.cardinal  (PL.cardinals  ∷ TestData ℤ String)]
   , testGroup "PT"  [ mkTests "cardinal" PT.cardinal (PT.cardinals  ∷ TestData ℤ String)
                     , mkTests "ordinal"  PT.ordinal  (PT.ordinals   ∷ TestData ℤ String)

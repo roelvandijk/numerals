@@ -39,6 +39,7 @@ import qualified "this" Text.Numeral.Language.NO  as NO
 import qualified "this" Text.Numeral.Language.NQM as NQM
 import qualified "this" Text.Numeral.Language.OJ  as OJ
 -- import qualified "this" Text.Numeral.Language.PAA as PAA
+import qualified "this" Text.Numeral.Language.PDC as PDC
 import qualified "this" Text.Numeral.Language.PL  as PL
 import qualified "this" Text.Numeral.Language.PT  as PT
 import qualified "this" Text.Numeral.Language.RU  as RU
@@ -87,6 +88,7 @@ entries =
   , NQM.entry
   , OJ.entry
 --, PAA.entry
+  , PDC.entry
   , PL.entry
   , PT.entry
   , RU.entry

@@ -26,6 +26,7 @@ Changelog for numerals
   + Afrikaans (AF) cardinals & ordinals.
   + Czech (CS) cardinals.
   + Friulan (FUR) cardinals.
+  + Pennsylvania German (PDC) cardinals.
 - Added numerical bounds to all language modules. All numbers within the bounds
   can be converted by the cardinal & ordinal functions.
 

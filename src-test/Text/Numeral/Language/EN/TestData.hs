@@ -29,7 +29,7 @@ module Text.Numeral.Language.EN.TestData
 import "base" Data.String ( IsString )
 import "base" Prelude     ( Num )
 import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
-import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 

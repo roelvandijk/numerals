@@ -48,10 +48,10 @@ import "base" Prelude       ( Num, Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "numerals-base" Text.Numeral
-import qualified "numerals-base" Text.Numeral.Exp as E
-import           "numerals-base" Text.Numeral.Grammar ( Inflection )
-import           "numerals-base" Text.Numeral.Misc  ( dec )
+import           "this" Text.Numeral
+import qualified "this" Text.Numeral.Exp as E
+import           "this" Text.Numeral.Grammar ( Inflection )
+import           "this" Text.Numeral.Misc  ( dec )
 import "this" Text.Numeral.Entry
 
 

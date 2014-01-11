@@ -24,7 +24,7 @@ module Text.Numeral.Language.CLM.TestData (cardinals) where
 
 import "base" Data.String ( IsString )
 import "base" Prelude     ( Num )
-import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 --------------------------------------------------------------------------------

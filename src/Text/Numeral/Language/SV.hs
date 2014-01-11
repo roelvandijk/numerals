@@ -42,11 +42,11 @@ import "base" Data.String   ( IsString )
 import "base" Prelude       ( Num, Integral, (-), div, negate, even )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "numerals-base" Text.Numeral
-import qualified "numerals-base" Text.Numeral.BigNum as BN
-import qualified "numerals-base" Text.Numeral.Exp    as E
-import qualified "numerals-base" Text.Numeral.Grammar as G
-import           "numerals-base" Text.Numeral.Misc ( dec, intLog )
+import           "this" Text.Numeral
+import qualified "this" Text.Numeral.BigNum as BN
+import qualified "this" Text.Numeral.Exp    as E
+import qualified "this" Text.Numeral.Grammar as G
+import           "this" Text.Numeral.Misc ( dec, intLog )
 import "this" Text.Numeral.Entry
 import "this" Text.Numeral.Render.Utils ( addCtx, mulCtx, outsideCtx )
 

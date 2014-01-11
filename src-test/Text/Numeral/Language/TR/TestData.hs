@@ -25,8 +25,8 @@ module Text.Numeral.Language.TR.TestData (cardinals) where
 
 import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
-import "numerals-base" Text.Numeral.Grammar.Reified ( defaultInflection )
-import "numerals-base" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
 

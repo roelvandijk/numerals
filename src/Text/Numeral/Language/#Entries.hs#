@@ -1,0 +1,59 @@
+{-# LANGUAGE NoImplicitPrelude
+           , PackageImports
+           , UnicodeSyntax
+  #-}
+
+module Text.Numeral.Language.Entries ( entries ) where
+
+
+--------------------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------------------
+
+import "base" Data.Monoid ( Monoid )
+import "base" Data.String ( IsString )
+import "this" Text.Numeral.Entry ( Entry(..) )
+import qualified "this" Text.Numeral.Language.AF  as AF
+import qualified "this" Text.Numeral.Language.AMP as AMP
+import qualified "this" Text.Numeral.Language.BG  as BG
+import qualified "this" Text.Numeral.Language.CHN as CHN
+import qualified "this" Text.Numeral.Language.CHR as CHR
+import qualified "this" Text.Numeral.Language.CS  as CS
+import qualified "this" Text.Numeral.Language.DE  as DE
+import qualified "this" Text.Numeral.Language.EN  as EN
+import qualified "this" Text.Numeral.Language.EO  as EO
+import qualified "this" Text.Numeral.Language.ES  as ES
+import qualified "this" Text.Numeral.Language.FI  as FI
+import qualified "this" Text.Numeral.Language.FR  as FR
+import qualified "this" Text.Numeral.Language.FUR as FUR
+import qualified "this" Text.Numeral.Language.GSW as GSW
+import qualified "this" Text.Numeral.Language.GV  as GV
+import qualified "this" Text.Numeral.Language.HE  as HE
+
+  , IT.entry
+  , JA.kanji_entry
+  , JA.daiji_entry
+  , JA.on'yomi_entry
+  , JA.preferred_entry
+  , LA.entry
+  , LLD.entry
+  , MG.entry
+  , NL.entry
+  , NO.entry
+  , NQM.entry
+  , OJ.entry
+--, PAA.entry
+  , PL.entry
+  , PT.entry
+  , RU.entry
+  , SCO.entry
+  , SV.entry
+  , TR.entry
+  , WO.entry
+  , YOR.entry
+  , ZH.trad_entry
+  , ZH.simpl_entry
+  , ZH.finance_trad_entry
+  , ZH.finance_simpl_entry
+  , ZH.pinyin_entry
+  ]

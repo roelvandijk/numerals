@@ -16,8 +16,8 @@ module Text.Numeral.Entry
 import "base" Data.Maybe  ( Maybe(Nothing) )
 import "base" Data.String ( String )
 import "base-unicode-symbols" Prelude.Unicode ( ℤ )
-import "numerals-base" Text.Numeral.Exp.Reified ( Exp )
-import "numerals-base" Text.Numeral.Grammar.Reified ( Inflection )
+import "this" Text.Numeral.Exp.Reified ( Exp )
+import "this" Text.Numeral.Grammar.Reified ( Inflection )
 
 
 --------------------------------------------------------------------------------

@@ -15,7 +15,7 @@ module Text.Numeral.Render.Utils
 
 import "base-unicode-symbols" Data.Eq.Unicode ( (≡) )
 import "base-unicode-symbols" Prelude.Unicode ( ℤ )
-import "numerals-base" Text.Numeral
+import "this" Text.Numeral
 
 
 --------------------------------------------------------------------------------

@@ -30,6 +30,15 @@ Changelog for numerals
   + Klallam (CLM) cardinals.
 - Added numerical bounds to all language modules. All numbers within the bounds
   can be converted by the cardinal & ordinal functions.
+- Merged numerals-base into numerals.
+  + Added inflection (case, gender and number).
+  + Added fractions to the numeral expression language.
+  + Renamed `Text.Numeral.Exp` to `Text.Numeral.Exp.Reified`.
+  + Renamed `Text.Numeral.Exp.Classes` to `Text.Numeral.Exp`.
+  + Fast integral logarithm (if GHC ≥ 7.2.1).
+  + Render combining functions now have access to the expressions being
+    combined.
+  + BigNum postfix names are now a function of their context.
 
 
 0.3.0.1

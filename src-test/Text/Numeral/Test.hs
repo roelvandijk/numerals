@@ -2,6 +2,6 @@
 
 module Text.Numeral.Test ( TestData ) where
 
-import "numerals-base" Text.Numeral.Grammar.Reified ( Inflection )
+import "this" Text.Numeral.Grammar.Reified ( Inflection )
 
 type TestData n s = [(s, Inflection, [(n, s)])]

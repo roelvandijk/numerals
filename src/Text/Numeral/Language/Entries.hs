@@ -18,6 +18,7 @@ import qualified "this" Text.Numeral.Language.AMP as AMP
 import qualified "this" Text.Numeral.Language.BG  as BG
 import qualified "this" Text.Numeral.Language.CHN as CHN
 import qualified "this" Text.Numeral.Language.CHR as CHR
+import qualified "this" Text.Numeral.Language.CLM as CLM
 import qualified "this" Text.Numeral.Language.CS  as CS
 import qualified "this" Text.Numeral.Language.DE  as DE
 import qualified "this" Text.Numeral.Language.EN  as EN
@@ -63,6 +64,7 @@ entries =
   , BG.entry
   , CHN.entry
   , CHR.entry
+  , CLM.entry
   , CS.entry
   , DE.entry
   , EN.gb_entry

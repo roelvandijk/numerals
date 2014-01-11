@@ -44,6 +44,8 @@ import qualified "this" Text.Numeral.Language.CHN          as CHN
 import qualified "this" Text.Numeral.Language.CHN.TestData as CHN
 import qualified "this" Text.Numeral.Language.CHR          as CHR
 import qualified "this" Text.Numeral.Language.CHR.TestData as CHR
+import qualified "this" Text.Numeral.Language.CLM          as CLM
+import qualified "this" Text.Numeral.Language.CLM.TestData as CLM
 import qualified "this" Text.Numeral.Language.CS           as CS
 import qualified "this" Text.Numeral.Language.CS.TestData  as CS
 import qualified "this" Text.Numeral.Language.CY.TestData  as CY
@@ -134,6 +136,7 @@ tests =
   , testGroup "BG"  [mkTests "cardinal" BG.cardinal  (BG.cardinals  ∷ TestData ℤ String)]
   , testGroup "CHN" [mkTests "cardinal" CHN.cardinal (CHN.cardinals ∷ TestData ℤ String)]
   , testGroup "CHR" [mkTests "cardinal" CHR.cardinal (CHR.cardinals ∷ TestData ℤ String)]
+  , testGroup "CLM" [mkTests "cardinal" CLM.cardinal (CLM.cardinals ∷ TestData ℤ String)]
   , testGroup "CS"  [mkTests "cardinal" CS.cardinal  (CS.cardinals  ∷ TestData ℤ String)]
   , testGroup "DE"
     [ mkTests "cardinal" DE.cardinal (DE.cardinals ∷ TestData ℤ String)

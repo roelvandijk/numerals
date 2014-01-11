@@ -27,6 +27,7 @@ Changelog for numerals
   + Czech (CS) cardinals.
   + Friulan (FUR) cardinals.
   + Pennsylvania German (PDC) cardinals.
+  + Klallam (CLM) cardinals.
 - Added numerical bounds to all language modules. All numbers within the bounds
   can be converted by the cardinal & ordinal functions.
 

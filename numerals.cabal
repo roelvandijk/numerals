@@ -114,6 +114,7 @@ library
                  , Text.Numeral.Language.BG
                  , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.CHR
+                 , Text.Numeral.Language.CLM
                  , Text.Numeral.Language.CS
               -- , Text.Numeral.Language.CY
               -- , Text.Numeral.Language.DA
@@ -167,6 +168,7 @@ test-suite test-numerals
                , Text.Numeral.Language.BG.TestData
                , Text.Numeral.Language.CHN.TestData
                , Text.Numeral.Language.CHR.TestData
+               , Text.Numeral.Language.CLM.TestData
                , Text.Numeral.Language.CS.TestData
                , Text.Numeral.Language.CY.TestData
                , Text.Numeral.Language.DA.TestData

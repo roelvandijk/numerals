@@ -20,8 +20,7 @@ description:
   functions directly convert cardinal numbers to a string-like
   representation of their spoken form. The 'ordinal' functions do the
   same but for ordinal numbers. The 'struct' functions convert numbers
-  to a polymorphic representation of their grammatical structure. All
-  language modules are implemented using the @numerals-base@ package.
+  to a polymorphic representation of their grammatical structure.
   .
   The use of this package is best understood with some
   examples. Because the results of conversion are polymorphic we need

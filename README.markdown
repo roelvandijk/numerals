@@ -47,11 +47,6 @@ The `struct` functions convert numbers to a polymorphic representation
 of their grammatical structure. They are found in every language
 module.
 
-### Implementation
-
-All language modules are implemented using the
-[numerals-base](https://github.com/roelvandijk/numerals-base) package.
-
 ### Examples
 
 The use of this package is best understood with some examples. Because

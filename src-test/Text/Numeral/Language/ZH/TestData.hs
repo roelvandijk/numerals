@@ -33,8 +33,8 @@ module Text.Numeral.Language.ZH.TestData
 
 import "base" Prelude     ( Integral )
 import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
-import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
-import "this" Text.Numeral.Misc ( dec )
+import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 import "text" Data.Text ( Text )
 

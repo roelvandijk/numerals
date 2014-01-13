@@ -26,6 +26,9 @@ import "base-unicode-symbols" Data.Eq.Unicode       ( (≡), (≢) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Prelude.Unicode       ( ℤ, (⋅) )
 import "HUnit" Test.HUnit ( Assertion, assertFailure, assertBool )
+import           "numerals" Text.Numeral.Grammar
+import qualified "numerals" Text.Numeral.Grammar.Reified as GR
+import           "numerals" Text.Numeral.Misc ( dec, intLog )
 import "QuickCheck" Test.QuickCheck.Modifiers
     ( Positive(Positive), NonNegative(NonNegative) )
 import "test-framework" Test.Framework ( defaultMainWithOpts
@@ -35,94 +38,92 @@ import "test-framework" Test.Framework ( defaultMainWithOpts
                                        )
 import "test-framework-hunit" Test.Framework.Providers.HUnit ( testCase )
 import "test-framework-quickcheck2" Test.Framework.Providers.QuickCheck2 ( testProperty )
-import           "this" Text.Numeral.Grammar
-import qualified "this" Text.Numeral.Grammar.Reified as GR
-import           "this" Text.Numeral.Misc ( dec, intLog )
 import           "this" Text.Numeral.Test ( TestData )
 import "text" Data.Text ( Text )
 import qualified "text" Data.Text as T ( unpack )
 
-import qualified "this" Text.Numeral.Language.AF           as AF
-import qualified "this" Text.Numeral.Language.AF.TestData  as AF
-import qualified "this" Text.Numeral.Language.AMP          as AMP
+import qualified "numerals" Text.Numeral.Language.AF  as AF
+import qualified "numerals" Text.Numeral.Language.AMP as AMP
+import qualified "numerals" Text.Numeral.Language.BG  as BG
+import qualified "numerals" Text.Numeral.Language.CHN as CHN
+import qualified "numerals" Text.Numeral.Language.CHR as CHR
+import qualified "numerals" Text.Numeral.Language.CLM as CLM
+import qualified "numerals" Text.Numeral.Language.CS  as CS
+import qualified "numerals" Text.Numeral.Language.DE  as DE
+import qualified "numerals" Text.Numeral.Language.EN  as EN
+import qualified "numerals" Text.Numeral.Language.EO  as EO
+import qualified "numerals" Text.Numeral.Language.ES  as ES
+import qualified "numerals" Text.Numeral.Language.FI  as FI
+import qualified "numerals" Text.Numeral.Language.FR  as FR
+import qualified "numerals" Text.Numeral.Language.FUR as FUR
+import qualified "numerals" Text.Numeral.Language.GSW as GSW
+import qualified "numerals" Text.Numeral.Language.GV  as GV
+import qualified "numerals" Text.Numeral.Language.HE  as HE
+import qualified "numerals" Text.Numeral.Language.HOP as HOP
+import qualified "numerals" Text.Numeral.Language.IT  as IT
+import qualified "numerals" Text.Numeral.Language.JA  as JA
+import qualified "numerals" Text.Numeral.Language.LA  as LA
+import qualified "numerals" Text.Numeral.Language.LLD as LLD
+import qualified "numerals" Text.Numeral.Language.MG  as MG
+import qualified "numerals" Text.Numeral.Language.NL  as NL
+import qualified "numerals" Text.Numeral.Language.NO  as NO
+import qualified "numerals" Text.Numeral.Language.NQM as NQM
+import qualified "numerals" Text.Numeral.Language.OJ  as OJ
+-- import qualified "numerals" Text.Numeral.Language.PAA as PAA
+import qualified "numerals" Text.Numeral.Language.PDC as PDC
+import qualified "numerals" Text.Numeral.Language.PL  as PL
+import qualified "numerals" Text.Numeral.Language.PT  as PT
+import qualified "numerals" Text.Numeral.Language.RU  as RU
+import qualified "numerals" Text.Numeral.Language.SCO as SCO
+import qualified "numerals" Text.Numeral.Language.SV  as SV
+import qualified "numerals" Text.Numeral.Language.TR  as TR
+import qualified "numerals" Text.Numeral.Language.WO  as WO
+import qualified "numerals" Text.Numeral.Language.YOR as YOR
+import qualified "numerals" Text.Numeral.Language.ZH  as ZH
+
 import qualified "this" Text.Numeral.Language.AMP.TestData as AMP
-import qualified "this" Text.Numeral.Language.BG           as BG
+import qualified "this" Text.Numeral.Language.AF.TestData  as AF
 import qualified "this" Text.Numeral.Language.BG.TestData  as BG
-import qualified "this" Text.Numeral.Language.CHN          as CHN
 import qualified "this" Text.Numeral.Language.CHN.TestData as CHN
-import qualified "this" Text.Numeral.Language.CHR          as CHR
 import qualified "this" Text.Numeral.Language.CHR.TestData as CHR
-import qualified "this" Text.Numeral.Language.CLM          as CLM
 import qualified "this" Text.Numeral.Language.CLM.TestData as CLM
-import qualified "this" Text.Numeral.Language.CS           as CS
 import qualified "this" Text.Numeral.Language.CS.TestData  as CS
-import qualified "this" Text.Numeral.Language.CY.TestData  as CY
-import qualified "this" Text.Numeral.Language.DA.TestData  as DA
-import qualified "this" Text.Numeral.Language.DE           as DE
+-- import qualified "this" Text.Numeral.Language.CY.TestData  as CY
+-- import qualified "this" Text.Numeral.Language.DA.TestData  as DA
 import qualified "this" Text.Numeral.Language.DE.TestData  as DE
-import qualified "this" Text.Numeral.Language.EN           as EN
 import qualified "this" Text.Numeral.Language.EN.TestData  as EN
-import qualified "this" Text.Numeral.Language.EO           as EO
 import qualified "this" Text.Numeral.Language.EO.TestData  as EO
-import qualified "this" Text.Numeral.Language.ES           as ES
 import qualified "this" Text.Numeral.Language.ES.TestData  as ES
-import qualified "this" Text.Numeral.Language.ET.TestData  as ET
-import qualified "this" Text.Numeral.Language.FI           as FI
+-- import qualified "this" Text.Numeral.Language.ET.TestData  as ET
 import qualified "this" Text.Numeral.Language.FI.TestData  as FI
-import qualified "this" Text.Numeral.Language.FR           as FR
 import qualified "this" Text.Numeral.Language.FR.TestData  as FR
-import qualified "this" Text.Numeral.Language.FUR          as FUR
 import qualified "this" Text.Numeral.Language.FUR.TestData as FUR
-import qualified "this" Text.Numeral.Language.GSW          as GSW
 import qualified "this" Text.Numeral.Language.GSW.TestData as GSW
-import qualified "this" Text.Numeral.Language.GV           as GV
 import qualified "this" Text.Numeral.Language.GV.TestData  as GV
-import qualified "this" Text.Numeral.Language.HE           as HE
 import qualified "this" Text.Numeral.Language.HE.TestData  as HE
-import qualified "this" Text.Numeral.Language.HOP          as HOP
 import qualified "this" Text.Numeral.Language.HOP.TestData as HOP
-import qualified "this" Text.Numeral.Language.HR.TestData  as HR
-import qualified "this" Text.Numeral.Language.HU.TestData  as HU
-import qualified "this" Text.Numeral.Language.IT           as IT
+-- import qualified "this" Text.Numeral.Language.HR.TestData  as HR
+-- import qualified "this" Text.Numeral.Language.HU.TestData  as HU
 import qualified "this" Text.Numeral.Language.IT.TestData  as IT
-import qualified "this" Text.Numeral.Language.JA           as JA
 import qualified "this" Text.Numeral.Language.JA.TestData  as JA
-import qualified "this" Text.Numeral.Language.LA           as LA
 import qualified "this" Text.Numeral.Language.LA.TestData  as LA
-import qualified "this" Text.Numeral.Language.LLD          as LLD
 import qualified "this" Text.Numeral.Language.LLD.TestData as LLD
-import qualified "this" Text.Numeral.Language.MG           as MG
 import qualified "this" Text.Numeral.Language.MG.TestData  as MG
-import qualified "this" Text.Numeral.Language.NL           as NL
 import qualified "this" Text.Numeral.Language.NL.TestData  as NL
-import qualified "this" Text.Numeral.Language.NO           as NO
 import qualified "this" Text.Numeral.Language.NO.TestData  as NO
-import qualified "this" Text.Numeral.Language.NQM          as NQM
 import qualified "this" Text.Numeral.Language.NQM.TestData as NQM
-import qualified "this" Text.Numeral.Language.OJ           as OJ
 import qualified "this" Text.Numeral.Language.OJ.TestData  as OJ
--- import qualified "this" Text.Numeral.Language.PAA          as PAA
 -- import qualified "this" Text.Numeral.Language.PAA.TestData as PAA
-import qualified "this" Text.Numeral.Language.PDC          as PDC
 import qualified "this" Text.Numeral.Language.PDC.TestData as PDC
-import qualified "this" Text.Numeral.Language.PL           as PL
 import qualified "this" Text.Numeral.Language.PL.TestData  as PL
-import qualified "this" Text.Numeral.Language.PT           as PT
 import qualified "this" Text.Numeral.Language.PT.TestData  as PT
-import qualified "this" Text.Numeral.Language.RO.TestData  as RO
-import qualified "this" Text.Numeral.Language.RU           as RU
+-- import qualified "this" Text.Numeral.Language.RO.TestData  as RO
 import qualified "this" Text.Numeral.Language.RU.TestData  as RU
-import qualified "this" Text.Numeral.Language.SCO          as SCO
 import qualified "this" Text.Numeral.Language.SCO.TestData as SCO
-import qualified "this" Text.Numeral.Language.SV           as SV
 import qualified "this" Text.Numeral.Language.SV.TestData  as SV
-import qualified "this" Text.Numeral.Language.TR           as TR
 import qualified "this" Text.Numeral.Language.TR.TestData  as TR
-import qualified "this" Text.Numeral.Language.WO           as WO
 import qualified "this" Text.Numeral.Language.WO.TestData  as WO
-import qualified "this" Text.Numeral.Language.YOR          as YOR
 import qualified "this" Text.Numeral.Language.YOR.TestData as YOR
-import qualified "this" Text.Numeral.Language.ZH           as ZH
 import qualified "this" Text.Numeral.Language.ZH.TestData  as ZH
 
 

@@ -24,7 +24,7 @@ module Text.Numeral.Language.GSW.TestData (cardinals) where
 --------------------------------------------------------------------------------
 
 import "base" Prelude     ( Integral )
-import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 

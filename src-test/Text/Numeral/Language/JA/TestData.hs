@@ -28,8 +28,8 @@ module Text.Numeral.Language.JA.TestData
 --------------------------------------------------------------------------------
 
 import "base" Prelude     ( Num, Integral )
-import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
-import "this" Text.Numeral.Misc ( dec )
+import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
 

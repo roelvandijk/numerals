@@ -24,7 +24,7 @@ module Text.Numeral.Language.SCO.TestData (cardinals) where
 --------------------------------------------------------------------------------
 
 import "base" Prelude     ( Num )
-import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 

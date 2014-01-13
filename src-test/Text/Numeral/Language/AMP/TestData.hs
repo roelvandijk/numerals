@@ -23,7 +23,7 @@ module Text.Numeral.Language.AMP.TestData (cardinals) where
 --------------------------------------------------------------------------------
 
 import "base" Prelude     ( Num )
-import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 

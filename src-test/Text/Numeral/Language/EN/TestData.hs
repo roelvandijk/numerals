@@ -28,7 +28,7 @@ module Text.Numeral.Language.EN.TestData
 
 import "base" Prelude     ( Num )
 import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
-import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 import "text" Data.Text ( Text )
 

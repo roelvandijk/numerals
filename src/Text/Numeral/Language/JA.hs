@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        ja
@@ -42,8 +41,6 @@ module Text.Numeral.Language.JA
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.List     ( map )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Num, Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
@@ -53,13 +50,14 @@ import qualified "this" Text.Numeral.Exp as E
 import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc  ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- JA
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1       = Just "ja"
     , entIso639_2       = ["jpn"]
@@ -92,7 +90,7 @@ daiji_bounds = let x = dec 4 - 1 in (negate x, x)
 -- Kanji
 --------------------------------------------------------------------------------
 
-kanji_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+kanji_entry ∷ Entry
 kanji_entry = entry
     { entVariant  = Just "kanji"
     , entCardinal = Just Conversion
@@ -101,10 +99,10 @@ kanji_entry = entry
                     }
     }
 
-kanji_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+kanji_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 kanji_cardinal inf = kanji_cardinal_repr inf ∘ struct
 
-kanji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+kanji_cardinal_repr ∷ i → Exp i → Maybe Text
 kanji_cardinal_repr = render defaultRepr
                       { reprValue = \_ n → M.lookup n syms
                       , reprAdd   = Just $ \_ _ _ → ""
@@ -151,7 +149,7 @@ kanji_cardinal_repr = render defaultRepr
 -- Daiji
 --------------------------------------------------------------------------------
 
-daiji_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+daiji_entry ∷ Entry
 daiji_entry = entry
     { entVariant  = Just "daiji"
     , entCardinal = Just Conversion
@@ -160,10 +158,10 @@ daiji_entry = entry
                     }
     }
 
-daiji_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+daiji_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 daiji_cardinal inf = daiji_cardinal_repr inf ∘ struct
 
-daiji_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+daiji_cardinal_repr ∷ i → Exp i → Maybe Text
 daiji_cardinal_repr = render defaultRepr
                       { reprValue = \_ n → M.lookup n syms
                       , reprAdd   = Just $ \_ _ _ → ""
@@ -194,7 +192,7 @@ daiji_cardinal_repr = render defaultRepr
 -- Generic reading
 --------------------------------------------------------------------------------
 
-generic_repr ∷ (Monoid s, IsString s) ⇒ s → s → Repr i s
+generic_repr ∷ Text → Text → Repr i
 generic_repr four seven = defaultRepr
                           { reprValue = \_ n → M.lookup n syms
                           , reprAdd   = Just $ \_ _ _ → " "
@@ -244,7 +242,7 @@ generic_repr four seven = defaultRepr
 -- On'yomi
 --------------------------------------------------------------------------------
 
-on'yomi_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+on'yomi_entry ∷ Entry
 on'yomi_entry = entry
     { entVariant  = Just "on'yomi"
     , entCardinal = Just Conversion
@@ -253,11 +251,10 @@ on'yomi_entry = entry
                     }
     }
 
-on'yomi_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
-                 ⇒ i → α → Maybe s
+on'yomi_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 on'yomi_cardinal inf = on'yomi_cardinal_repr inf ∘ struct
 
-on'yomi_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+on'yomi_cardinal_repr ∷ i → Exp i → Maybe Text
 on'yomi_cardinal_repr = render (generic_repr "shi" "shichi")
 
 
@@ -265,7 +262,7 @@ on'yomi_cardinal_repr = render (generic_repr "shi" "shichi")
 -- Preferred reading
 --------------------------------------------------------------------------------
 
-preferred_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+preferred_entry ∷ Entry
 preferred_entry = entry
     { entVariant  = Just "preferred"
     , entCardinal = Just Conversion
@@ -274,9 +271,8 @@ preferred_entry = entry
                     }
     }
 
-preferred_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
-                   ⇒ i → α → Maybe s
+preferred_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 preferred_cardinal inf = preferred_cardinal_repr inf ∘ struct
 
-preferred_cardinal_repr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+preferred_cardinal_repr ∷ i → Exp i → Maybe Text
 preferred_cardinal_repr = render (generic_repr "yon" "nana")

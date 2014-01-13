@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        zh
@@ -31,12 +31,12 @@ module Text.Numeral.Language.ZH.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
 import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ Sources:
 
 -- | Cardinal numbers that are written the same using either
 -- traditional or simplified characters.
-trad_simpl_cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
+trad_simpl_cardinals ∷ (Integral i) ⇒ [(i, Text)]
 trad_simpl_cardinals =
   [ (0, "零")
   , (1, "一")
@@ -142,7 +142,7 @@ trad_simpl_cardinals =
   , (dec 44, "一載")
   ]
 
-trad_cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+trad_cardinals ∷ (Integral i) ⇒ TestData i
 trad_cardinals =
   [ ( "default"
     , defaultInflection
@@ -164,7 +164,7 @@ trad_cardinals =
     )
   ]
 
-simpl_cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+simpl_cardinals ∷ (Integral i) ⇒ TestData i
 simpl_cardinals =
   [ ( "default"
     , defaultInflection
@@ -180,7 +180,7 @@ simpl_cardinals =
     )
   ]
 
-finance_trad_cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+finance_trad_cardinals ∷ (Integral i) ⇒ TestData i
 finance_trad_cardinals =
   [ ( "default"
     , defaultInflection
@@ -203,7 +203,7 @@ finance_trad_cardinals =
     )
   ]
 
-finance_simpl_cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+finance_simpl_cardinals ∷ (Integral i) ⇒ TestData i
 finance_simpl_cardinals =
   [ ( "default"
     , defaultInflection
@@ -226,7 +226,7 @@ finance_simpl_cardinals =
     )
   ]
 
-pinyin_cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+pinyin_cardinals ∷ (Integral i) ⇒ TestData i
 pinyin_cardinals =
   [ ( "default"
     , defaultInflection

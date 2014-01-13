@@ -1,9 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , ScopedTypeVariables
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        nl
@@ -41,9 +40,7 @@ import "base" Data.Bool     ( Bool, otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Functor  ( fmap )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Bool.Unicode     ( (∧), (∨) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
@@ -56,13 +53,14 @@ import qualified "this" Text.Numeral.Exp     as E
 import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- NL
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1       = Just "nl"
     , entIso639_2       = ["dut"]
@@ -87,19 +85,16 @@ entry = emptyEntry
                           }
     }
 
-cardinal ∷ (G.Plural i, G.Dative i, Integral α, E.Scale α, Monoid s, IsString s)
-         ⇒ i → α → Maybe s
+cardinal ∷ (G.Plural i, G.Dative i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
-ordinal ∷ (Integral α, E.Scale α, Monoid s, IsString s)
-        ⇒ i → α → Maybe s
+ordinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
 ordinal inf = ordinalRepr "eerste" inf ∘ struct
 
 partitive ∷ ( G.Singular i, G.Plural i, G.NoCase i, G.Dative i
             , Integral α, E.Scale α
-            , Monoid s, IsString s
             )
-          ⇒ i → (α, α) → Maybe s
+          ⇒ i → (α, α) → Maybe Text
 partitive inf (n, d) = do
   n' ← cardinal (G.noCase $ G.singular inf) n
   d' ← ordinalRepr "éénde" inf $ struct d
@@ -107,9 +102,8 @@ partitive inf (n, d) = do
 
 multiplicative ∷ ( G.Singular i, G.Plural i, G.NoCase i, G.Dative i
                  , Integral α, E.Scale α
-                 , Monoid s, IsString s
                  )
-               ⇒ i → α → Maybe s
+               ⇒ i → α → Maybe Text
 multiplicative inf = fmap (⊕ "maal") ∘ cardinal (G.noCase $ G.singular inf)
 
 struct ∷ ( Integral α, E.Scale α
@@ -130,7 +124,7 @@ struct = pos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
+genericRepr ∷ Repr i
 genericRepr = defaultRepr
                { reprAdd   = Just (⊞)
                , reprMul   = Just $ \_ _ _ → ""
@@ -143,8 +137,7 @@ genericRepr = defaultRepr
                     | otherwise  = ""
       (_     ⊞ _) _              = ""
 
-cardinalRepr ∷ ∀ i s. (G.Plural i, G.Dative i, Monoid s, IsString s)
-             ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ ∀ i. (G.Plural i, G.Dative i) ⇒ i → Exp i → Maybe Text
 cardinalRepr = render genericRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = BN.pelletierRepr (\i c → if doPlural i c then "iljoenen" else "iljoen")
@@ -217,7 +210,7 @@ cardinalRepr = render genericRepr
                     | pluralForm ctx  → p
                     | otherwise       → n
 
-ordinalRepr ∷ (Monoid s, IsString s) ⇒ s → i → Exp i → Maybe s
+ordinalRepr ∷ Text → i → Exp i → Maybe Text
 ordinalRepr one =
     render genericRepr
            { reprValue = \_ n → M.lookup n syms

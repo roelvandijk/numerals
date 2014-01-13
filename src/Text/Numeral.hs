@@ -35,7 +35,7 @@ import "this" Text.Numeral.Rules
 
 The general idea behind this package is to take a number, convert that
 number to an abstract representation of its spoken form and finally
-render that representation to a string-like value.
+render that representation to a 'Text' value.
 
 -}
 
@@ -60,14 +60,13 @@ the type classes that make up the numeral expression language.
 {- $render
 
 Finally, the "Text.Numeral.Render" module is responsible for
-converting the numeral expression language to a string-like
-value. This happens via the 'render' function. Render is parametrised
-with a 'Repr' value and with an 'Inflection'. The 'Repr' contains all
-the knowledge on how to convert the abstract expression to a concrete
-string-like value. The 'Inflection' is used for languages where number
+converting the numeral expression language to a 'Text' value. This
+happens via the 'render' function. Render is parametrised with a
+'Repr' value and with an 'Inflection'. The 'Repr' contains all the
+knowledge on how to convert the abstract expression to a concrete
+'Text' value. The 'Inflection' is used for languages where number
 words change based on a number of grammatical categories such as case,
 gender or number. The expression itself is passed as a concrete 'Exp'
-value. The only constrained on the final value is that it is a
-'Monoid'.
+value.
 
 -}

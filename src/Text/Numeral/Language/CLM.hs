@@ -33,8 +33,6 @@ module Text.Numeral.Language.CLM
 
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
@@ -42,13 +40,14 @@ import           "this" Text.Numeral
 import qualified "this" Text.Numeral.Exp as E
 import           "this" Text.Numeral.Grammar ( Inflection )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- CLM
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_3    = Just "clm"
     , entNativeNames = ["nəxʷsƛ̕ay̕əmúcən"]
@@ -59,7 +58,7 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β
@@ -78,7 +77,7 @@ struct = fix
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = (1, 1000)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \_ n → M.lookup n syms
                , reprAdd   = Just $ \_ _ _ → " ʔiʔ "

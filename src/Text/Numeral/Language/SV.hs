@@ -1,9 +1,8 @@
-{-# LANGUAGE FlexibleContexts
-           , NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        sv
@@ -37,8 +36,6 @@ module Text.Numeral.Language.SV
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Num, Integral, (-), div, negate, even )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
@@ -49,12 +46,14 @@ import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec, intLog )
 import "this" Text.Numeral.Entry
 import "this" Text.Numeral.Render.Utils ( addCtx, mulCtx, outsideCtx )
+import "text" Data.Text ( Text )
+
 
 -------------------------------------------------------------------------------
 -- SV
 -------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1    = Just "sv"
     , entIso639_2    = ["swe"]
@@ -71,18 +70,12 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ ( G.Common i, G.Neuter i
-           , Integral α, E.Scale α
-           , Monoid s, IsString s
-           )
-         ⇒ i → α → Maybe s
+cardinal ∷ (G.Common i, G.Neuter i, Integral α, E.Scale α)
+         ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
-ordinal ∷ ( G.Common i, G.Neuter i
-          , Integral α, E.Scale α
-          , Monoid s, IsString s
-          )
-        ⇒ i → α → Maybe s
+ordinal ∷ (G.Common i, G.Neuter i, Integral α, E.Scale α)
+        ⇒ i → α → Maybe Text
 ordinal inf = ordinalRepr inf ∘ struct
 
 struct ∷ ( Integral α, E.Scale α
@@ -120,8 +113,7 @@ pelletierScale1_sv =
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-cardinalRepr ∷ (G.Common i, G.Neuter i, Monoid s, IsString s)
-             ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ (G.Common i, G.Neuter i) ⇒ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \ctx n → M.lookup n (syms ctx)
                , reprScale = BN.pelletierRepr
@@ -170,8 +162,7 @@ cardinalRepr = render defaultRepr
           , (1000, const "tusen")
           ]
 
-ordinalRepr ∷ (G.Common i, G.Neuter i, Monoid s, IsString s)
-            ⇒ i → Exp i → Maybe s
+ordinalRepr ∷ (G.Common i, G.Neuter i) ⇒ i → Exp i → Maybe Text
 ordinalRepr = render defaultRepr
               { reprValue = \ctx n → M.lookup n (syms ctx)
               , reprScale = BN.pelletierRepr
@@ -224,7 +215,7 @@ ordinalRepr = render defaultRepr
           , (1000, outsideCtx R "tusende" $ const "tusen")
           ]
 
-bigNumSyms ∷ (Num α, IsString s) ⇒ [(α, Ctx (Exp i) → s)]
+bigNumSyms ∷ (Num α) ⇒ [(α, Ctx (Exp i) → Text)]
 bigNumSyms =
     [ (4, BN.forms "kvadr" "kvattuor" "kvattuor" "kvadra"  "kvadri")
     , (5, BN.forms "kvint" "kvin"     "kvinkva"  "kvinkva" "kvin")

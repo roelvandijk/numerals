@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        -
@@ -34,8 +33,6 @@ module Text.Numeral.Language.GSW
 
 import "base" Data.Function ( ($), const )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
@@ -45,13 +42,14 @@ import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Language.DE ( struct )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- GSW
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_2    = ["gse"]
     , entIso639_3    = Just "gse"
@@ -63,13 +61,13 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 6 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
+genericRepr ∷ Repr i
 genericRepr = defaultRepr
               { reprAdd   = Just (⊞)
               , reprMul   = Just $ \_ _ _ → ""
@@ -79,7 +77,7 @@ genericRepr = defaultRepr
       (Lit 100 ⊞ Lit 1)            _ = "und"
       (_       ⊞ _ )               _ = ""
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ i → Exp i → Maybe Text
 cardinalRepr = render genericRepr
                { reprValue = \_ n → M.lookup n syms }
     where

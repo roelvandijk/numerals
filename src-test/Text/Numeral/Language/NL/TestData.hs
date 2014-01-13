@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        nl
@@ -28,7 +28,6 @@ module Text.Numeral.Language.NL.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
 import "this" Text.Numeral.Grammar
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
@@ -40,7 +39,7 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+cardinals ∷ (Integral i) ⇒ TestData i
 cardinals =
   [ ( "singular"
     , singular defaultInflection
@@ -229,7 +228,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i, IsString s) ⇒ TestData i s
+ordinals ∷ (Integral i) ⇒ TestData i
 ordinals =
   [ ( "default"
     , defaultInflection
@@ -337,7 +336,7 @@ ordinals =
     )
   ]
 
-partitives ∷ (Integral i, IsString s) ⇒ TestData (i, i) s
+partitives ∷ (Integral i) ⇒ TestData (i, i)
 partitives =
   [ ("singular", singular defaultInflection, testData)
   , ("ignored plural", plural defaultInflection, testData)
@@ -366,7 +365,7 @@ partitives =
       , ((-3, -5), "min drie min vijfde")
       ]
 
-multiplicatives ∷ (Integral i, IsString s) ⇒ TestData i s
+multiplicatives ∷ (Integral i) ⇒ TestData i
 multiplicatives =
   [ ("singular", singular defaultInflection, testData)
   , ("ignored plural", plural defaultInflection, testData)

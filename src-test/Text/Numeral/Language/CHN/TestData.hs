@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        -
@@ -23,7 +23,6 @@ module Text.Numeral.Language.CHN.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Num )
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
@@ -32,7 +31,7 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Num i, IsString s) ⇒ TestData i s
+cardinals ∷ (Num i) ⇒ TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

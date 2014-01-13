@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        es
@@ -23,7 +23,6 @@ module Text.Numeral.Language.ES.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Num, (+), Integral )
 import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "this" Text.Numeral.Misc ( dec )
@@ -43,7 +42,7 @@ import "this" Text.Numeral.Test ( TestData )
 --   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
 --   http://en.wiktionary.org/wiki/Appendix:Spanish_numerals
 
-cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+cardinals ∷ (Integral i) ⇒ TestData i
 cardinals =
   [ ( "neuter"
     , neuter defaultInflection

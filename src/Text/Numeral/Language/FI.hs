@@ -1,9 +1,8 @@
-{-# LANGUAGE FlexibleContexts
-           , NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        fi
@@ -37,8 +36,6 @@ module Text.Numeral.Language.FI
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), fix, flip )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Num, Integral, (-), negate, divMod )
 import "base-unicode-symbols" Data.Bool.Unicode     ( (∧) )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
@@ -51,13 +48,14 @@ import qualified "this" Text.Numeral.Exp     as E
 import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 -------------------------------------------------------------------------------
 -- FI
 -------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1    = Just "fi"
     , entIso639_2    = ["fin"]
@@ -98,9 +96,8 @@ cardinal ∷ ( G.Singular i, G.Plural i
            , G.SuperEssive i
            , G.Translative i
            , Integral α, E.Scale α
-           , Monoid s, IsString s
            )
-         ⇒ i → α → Maybe s
+         ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 ordinal ∷ ( G.Singular i, G.Plural i
@@ -127,9 +124,8 @@ ordinal ∷ ( G.Singular i, G.Plural i
           , G.SuperEssive i
           , G.Translative i
           , Integral α, E.Scale α
-          , Monoid s, IsString s
           )
-        ⇒ i → α → Maybe s
+        ⇒ i → α → Maybe Text
 ordinal inf = ordinalRepr inf ∘ struct
 
 struct ∷ ( Integral α, E.Scale α
@@ -177,8 +173,7 @@ fi_mul val =
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 15 - 1 in (negate x, x)
 
-cardinalRepr ∷ ( Monoid s, IsString s
-               , G.Singular i, G.Plural i
+cardinalRepr ∷ ( G.Singular i, G.Plural i
                , G.Abessive i
                , G.Accusative i
                , G.Comitative i
@@ -202,7 +197,7 @@ cardinalRepr ∷ ( Monoid s, IsString s
                , G.SuperEssive i
                , G.Translative i
                )
-             ⇒ i → Exp i → Maybe s
+             ⇒ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = BN.pelletierRepr
@@ -528,8 +523,7 @@ cardinalRepr = render defaultRepr
             )
           ]
 
-ordinalRepr ∷ ( Monoid s, IsString s
-              , G.Singular i, G.Plural i
+ordinalRepr ∷ ( G.Singular i, G.Plural i
               , G.Abessive i
               , G.Accusative i
               , G.Comitative i
@@ -553,7 +547,7 @@ ordinalRepr ∷ ( Monoid s, IsString s
               , G.SuperEssive i
               , G.Translative i
               )
-             ⇒ i → Exp i → Maybe s
+             ⇒ i → Exp i → Maybe Text
 ordinalRepr = render defaultRepr
               { reprValue = \inf n → M.lookup n (syms inf)
               , reprScale = BN.pelletierRepr
@@ -916,12 +910,11 @@ infForms ∷ ( G.Singular i, G.Plural i
            , G.Sublative i
            , G.SuperEssive i
            , G.Translative i
-           , IsString s
            )
          ⇒ i → Ctx (Exp i)
-         → s → s → s → s → s → s → s → s → s → s
-         → s → s → s → s → s → s → s → s → s → s
-         → s → s → s → s → s → s → s → s → s → s → s
+         → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text
+         → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text
+         → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text
 infForms inf _
          s_nom s_acc s_gen s_ptv s_ess s_transl
          s_ine s_ela s_ill s_ade s_abl s_all s_abe

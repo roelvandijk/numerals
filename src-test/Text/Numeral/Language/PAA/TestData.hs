@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        -
@@ -23,8 +23,7 @@ module Text.Numeral.Language.PAA.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
-import "base" Prelude     ( Num )
+import "base" Prelude ( Num )
 
 
 --------------------------------------------------------------------------------

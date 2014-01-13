@@ -1,9 +1,8 @@
-{-# LANGUAGE FlexibleContexts
-           , NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        pt
@@ -37,9 +36,7 @@ module Text.Numeral.Language.PT
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
@@ -54,13 +51,14 @@ import qualified "this" Text.Numeral.Exp     as E
 import           "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 -------------------------------------------------------------------------------
 -- PT
 -------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1    = Just "pt"
     , entIso639_2    = ["por"]
@@ -77,18 +75,12 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ ( G.Feminine i, G.Masculine i
-           , Integral α, E.Scale α
-           , Monoid s, IsString s
-           )
-         ⇒ i → α → Maybe s
+cardinal ∷ (G.Feminine i, G.Masculine i, Integral α, E.Scale α)
+         ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ cardinal_struct
 
-ordinal ∷ ( G.Feminine i, G.Masculine i, G.Singular i
-          , Integral α, E.Scale α
-          , Monoid s, IsString s
-          )
-         ⇒ i → α → Maybe s
+ordinal ∷ (G.Feminine i, G.Masculine i, G.Singular i, Integral α, E.Scale α)
+         ⇒ i → α → Maybe Text
 ordinal inf = ordinalRepr inf ∘ ordinal_struct
 
 cardinal_struct ∷ ( Integral α, E.Scale α
@@ -108,10 +100,10 @@ cardinal_struct = pos $ fix $ rule `combine` shortScale1_pt
                       (dec 6 - 1)
 
 ordinal_struct ∷ ( Integral α, E.Scale α
-         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
-         , E.Inflection β, G.Masculine (E.Inf β)
-         )
-       ⇒ α → β
+                 , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
+                 , E.Inflection β, G.Masculine (E.Inf β)
+                 )
+                 ⇒ α → β
 ordinal_struct = pos $ fix $ rule `combine` shortScale1_pt
     where
       rule = findRule (   0, lit       )
@@ -137,7 +129,7 @@ shortScale1_pt = mulScale1_es 3 3 R L BN.rule
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-cardinalRepr ∷ (G.Feminine i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ (G.Feminine i) ⇒ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = shortScaleRepr
@@ -223,8 +215,7 @@ cardinalRepr = render defaultRepr
           , (1000, const "mil")
           ]
 
-ordinalRepr ∷ (G.Feminine i, G.Singular i, Monoid s, IsString s)
-            ⇒ i → Exp i → Maybe s
+ordinalRepr ∷ (G.Feminine i, G.Singular i) ⇒ i → Exp i → Maybe Text
 ordinalRepr = render defaultRepr
               { reprValue = \inf n → M.lookup n (syms inf)
               , reprScale = shortScaleRepr
@@ -311,8 +302,7 @@ ordinalRepr = render defaultRepr
                            then "o"
                            else "os"
 
-shortScaleRepr ∷ (IsString s, Monoid s)
-               ⇒ i → ℤ → ℤ → Exp i → Ctx (Exp i) → Maybe s
+shortScaleRepr ∷ i → ℤ → ℤ → Exp i → Ctx (Exp i) → Maybe Text
 shortScaleRepr =
     BN.scaleRepr (BN.quantityName "ilhão" "ilhões")
                  [(4, BN.forms "quatr" "quator" "quator" "quatra" "quatri")]

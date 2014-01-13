@@ -22,7 +22,6 @@ module Text.Numeral.Language.CLM.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Num )
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
@@ -31,7 +30,7 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Num i, IsString s) ⇒ TestData i s
+cardinals ∷ (Num i) ⇒ TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

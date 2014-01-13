@@ -28,12 +28,12 @@ import "base" Data.Eq       ( Eq )
 import "base" Data.Function ( ($) )
 import "base" Data.Functor  ( (<$>) )
 import "base" Data.Maybe    ( Maybe(Nothing, Just) )
-import "base" Data.Monoid   ( Monoid )
 import "base" Prelude       ( (+) )
 import "base" Text.Show     ( Show )
 import "base-unicode-symbols" Data.Eq.Unicode     ( (≡) )
 import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
 import "base-unicode-symbols" Prelude.Unicode     ( ℤ )
+import "text"                 Data.Text ( Text )
 import "this"                 Text.Numeral.Exp.Reified ( Exp(..), Side(L, R) )
 
 
@@ -41,13 +41,12 @@ import "this"                 Text.Numeral.Exp.Reified ( Exp(..), Side(L, R) )
 -- Rendering numerals
 -------------------------------------------------------------------------------
 
--- | Renders an expression to a string-like value according to a
--- certain representation and inflection.
-render ∷ (Monoid s)
-       ⇒ Repr i s -- ^ Representation.
-       → i        -- ^ Initial inflection.
-       → Exp i    -- ^ The expression to render.
-       → Maybe s
+-- | Renders an expression to a 'Text' value according to a certain
+-- representation and inflection.
+render ∷ Repr i -- ^ Representation.
+       → i      -- ^ Initial inflection.
+       → Exp i  -- ^ The expression to render.
+       → Maybe Text
 render (Repr {..}) = go CtxEmpty
     where
       go _   _   Unknown = reprUnknown
@@ -89,62 +88,62 @@ render (Repr {..}) = go CtxEmpty
 -- | A representation for numerals.
 --
 -- A 'Repr' contains all the information on how to render an
--- 'Exp'ression to a string-like value.
-data Repr i s =
+-- 'Exp'ression to a 'Text' value.
+data Repr i =
     Repr
     { -- | Representation for unknown values.
-      reprUnknown ∷ Maybe s
+      reprUnknown ∷ Maybe Text
       -- | Renders a literal value. Not necessarily defined for every
       -- value.
-    , reprValue ∷ i → ℤ → Maybe (Ctx (Exp i) → s)
+    , reprValue ∷ i → ℤ → Maybe (Ctx (Exp i) → Text)
       -- | Renders a negation. This concerns the negation itself, not
       -- the thing being negated.
-    , reprNeg ∷ Maybe (Exp i → Ctx (Exp i) → s)
+    , reprNeg ∷ Maybe (Exp i → Ctx (Exp i) → Text)
       -- | Renders an addition. This concerns the addition itself, not
       -- the things being added. For example: In \"one hundred and
       -- eighty\" this function would be responsible for rendering the
       -- \"and\".
-    , reprAdd ∷ Maybe (Exp i → Exp i → Ctx (Exp i) → s)
+    , reprAdd ∷ Maybe (Exp i → Exp i → Ctx (Exp i) → Text)
       -- | Renders a multiplication. This concerns the multiplication
       -- itself, not the things being multiplied.
-    , reprMul ∷ Maybe (Exp i → Exp i → Ctx (Exp i) → s)
+    , reprMul ∷ Maybe (Exp i → Exp i → Ctx (Exp i) → Text)
       -- | Renders a subtraction. This concerns the subtraction
       -- itself, not the things being subtracted.
-    , reprSub ∷ Maybe (Exp i → Exp i → Ctx (Exp i) → s)
+    , reprSub ∷ Maybe (Exp i → Exp i → Ctx (Exp i) → Text)
       -- | Renders a fraction. This concerns the fraction itself, not
       -- the numerator or the denominator.
-    , reprFrac ∷ Maybe (Exp i → Exp i → Ctx (Exp i) → s)
+    , reprFrac ∷ Maybe (Exp i → Exp i → Ctx (Exp i) → Text)
       -- | Renders a step in a scale of large values.
-    , reprScale ∷ ScaleRepr i s
+    , reprScale ∷ ScaleRepr i
       -- | Combines a negation and the thing being negated. For
       -- example: this would combine \"minus\" and \"three\" into
       -- \"minus three\".
-    , reprNegCombine ∷ Maybe (s → s → Exp i → s)
+    , reprNegCombine ∷ Maybe (Text → Text → Exp i → Text)
       -- | Combines an addition and the things being added.
-    , reprAddCombine ∷ Maybe (s → s → Exp i → s → Exp i → s)
+    , reprAddCombine ∷ Maybe (Text → Text → Exp i → Text → Exp i → Text)
       -- | Combines a multiplication and the things being multiplied.
-    , reprMulCombine ∷ Maybe (s → s → Exp i → s → Exp i → s)
+    , reprMulCombine ∷ Maybe (Text → Text → Exp i → Text → Exp i → Text)
       -- | Combines a subtraction and the things being subtracted.
-    , reprSubCombine ∷ Maybe (s → s → Exp i → s → Exp i → s)
+    , reprSubCombine ∷ Maybe (Text → Text → Exp i → Text → Exp i → Text)
       -- | Combines a fraction and the numerator and denominator.
-    , reprFracCombine ∷ Maybe (s → s → Exp i → s → Exp i → s)
+    , reprFracCombine ∷ Maybe (Text → Text → Exp i → Text → Exp i → Text)
     }
 
 -- | Function that renders the representation of a step in a scale of
 -- large values. The value represented by the step is 10 ^ (rank *
 -- base + offset).
-type ScaleRepr i s = i
-                   → ℤ -- ^ Base.
-                   → ℤ -- ^ Offset.
-                   → Exp i -- ^ Rank.
-                   → Ctx (Exp i) -- ^ Rank context.
-                   → Maybe s
+type ScaleRepr i = i
+                 → ℤ -- ^ Base.
+                 → ℤ -- ^ Offset.
+                 → Exp i -- ^ Rank.
+                 → Ctx (Exp i) -- ^ Rank context.
+                 → Maybe Text
 
 -- | The default representation.
 --
 -- Only the combining functions are defined. The rest are either
 -- 'Nothing' or always produce 'Nothing'.
-defaultRepr ∷ (Monoid s) ⇒ Repr inf s
+defaultRepr ∷ Repr inf
 defaultRepr =
     Repr { reprUnknown = Nothing
          , reprValue   = \_ _ → Nothing

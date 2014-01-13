@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        -
@@ -23,7 +23,6 @@ module Text.Numeral.Language.FUR.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
 import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "this" Text.Numeral.Grammar
@@ -38,7 +37,7 @@ import "this" Text.Numeral.Test ( TestData )
 
 -- Sources:
 --   http://www.languagesandnumbers.com/how-to-count-in-friulian/en/fur/
-cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+cardinals ∷ (Integral i) ⇒ TestData i
 cardinals =
   [ ( "masculine"
     , masculine defaultInflection

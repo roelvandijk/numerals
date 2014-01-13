@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        -
@@ -35,8 +34,6 @@ module Text.Numeral.Language.LLD
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Bool.Unicode     ( (∧), (∨) )
@@ -51,13 +48,14 @@ import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "this" Text.Numeral.Language.FUR ( struct )
 import "this" Text.Numeral.Render.Utils ( addCtx, mulCtx )
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- LLD
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_3    = Just "lld"
     , entNativeNames = ["Ladin"]
@@ -68,17 +66,14 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ ( G.Masculine i, G.Feminine i
-           , Integral α, E.Scale α
-           , Monoid s, IsString s
-           )
-         ⇒ i → α → Maybe s
+cardinal ∷ (G.Masculine i, G.Feminine i, Integral α, E.Scale α)
+         ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 12 - 1 in (negate x, x)
 
-cardinalRepr ∷ (G.Feminine i, G.Masculine i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ (G.Feminine i, G.Masculine i) ⇒ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprAdd   = Just (⊞)

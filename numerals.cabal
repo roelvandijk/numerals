@@ -22,30 +22,26 @@ description:
   same but for ordinal numbers. The 'struct' functions convert numbers
   to a polymorphic representation of their grammatical structure.
   .
-  The use of this package is best understood with some
-  examples. Because the results of conversion are polymorphic we need
-  to choose a specific type. For these examples we'll use simple
-  strings. But any type that has instances for 'Monoid' and 'IsString'
-  will work. First some English number names, both British and US
-  variants:
+  The use of this package is best understood with some examples. First
+  some English number names, both British and US variants:
   .
   >>> import qualified Text.Numeral.Language.EN as EN
-  >>> EN.uk_cardinal defaultInflection 123 :: Maybe String
+  >>> EN.uk_cardinal defaultInflection 123 :: Maybe Text
   Just "one hundred and twenty-three"
-  >>> EN.us_cardinal defaultInflection (10^50 + 42) :: Maybe String
+  >>> EN.us_cardinal defaultInflection (10^50 + 42) :: Maybe Text
   Just "one hundred quindecillion forty-two"
   .
   French, which contains some traces of a base 20 system:
   .
   >>> import qualified Text.Numeral.Language.FR as FR
-  >>> FR.cardinal defaultInflection (-99) :: Maybe String
+  >>> FR.cardinal defaultInflection (-99) :: Maybe Text
   Just "moins quatre-vingt-dix-neuf"
   .
   Conversions can fail. Alamblak, a language spoken by a few people in
   Papua New Guinea, has no representation for negative numbers:
   .
   >>> import qualified Text.Numeral.Language.AMP as AMP
-  >>> AMP.cardinal defaultInflection (-3) :: Maybe String
+  >>> AMP.cardinal defaultInflection (-3) :: Maybe Text
   Nothing
   .
   Some languages have multiple scripts and methods for writing number
@@ -55,17 +51,17 @@ description:
   Traditional Chinese characters:
   .
   >>> import qualified Text.Numeral.Language.ZH as ZH
-  >>> ZH.trad_cardinal defaultInflection 123456 :: Maybe String
+  >>> ZH.trad_cardinal defaultInflection 123456 :: Maybe Text
   Just "十二萬三千四百五十六"
   .
   Simplified characters for use in financial contexts:
   .
-  >>> ZH.finance_simpl_cardinal defaultInflection 123456 :: Maybe String
+  >>> ZH.finance_simpl_cardinal defaultInflection 123456 :: Maybe Text
   Just "拾贰万参仟肆伯伍拾陆"
   .
   Transcribed using Pinyin:
   .
-  >>> ZH.pinyin_cardinal defaultInflection 123456 :: Maybe String
+  >>> ZH.pinyin_cardinal defaultInflection 123456 :: Maybe Text
   Just "shíèrwàn sānqiān sìbǎi wǔshí liù"
   .
   Using the 'struct' functions you can see the grammatical structure
@@ -81,7 +77,7 @@ description:
   .
   Compare with:
   .
-  >>> NL.cardinal defaultInflection 123 :: Maybe String
+  >>> NL.cardinal defaultInflection 123 :: Maybe Text
   Just "honderddrieëntwintig"
   .
   100 (honderd) + (3 (drie) + (ën) 2 (twin) * 10 (tig))
@@ -105,6 +101,7 @@ library
                , containers                 >= 0.4     && < 0.6
                , containers-unicode-symbols >= 0.3     && < 0.4
                , fingertree                 >= 0.0.1   && < 0.2
+               , text                       >= 0.11    && < 1.2
 
   if impl(ghc >= 7.2.1)
     build-depends: integer-gmp >= 0.3 && < 0.6
@@ -231,6 +228,7 @@ test-suite test-numerals
                , test-framework             >= 0.3.3   && < 0.9
                , test-framework-hunit       >= 0.2.6   && < 0.4
                , test-framework-quickcheck2 >= 0.2.12  && < 0.4
+               , text                       >= 0.11    && < 1.2
 
   if impl(ghc >= 7.2.1)
     build-depends: integer-gmp >= 0.3 && < 0.6

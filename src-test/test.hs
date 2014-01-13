@@ -1,8 +1,9 @@
-{-# LANGUAGE NoImplicitPrelude
-           , PackageImports
-           , ScopedTypeVariables
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
+
 
 module Main where
 
@@ -38,6 +39,8 @@ import           "this" Text.Numeral.Grammar
 import qualified "this" Text.Numeral.Grammar.Reified as GR
 import           "this" Text.Numeral.Misc ( dec, intLog )
 import           "this" Text.Numeral.Test ( TestData )
+import "text" Data.Text ( Text )
+import qualified "text" Data.Text as T ( unpack )
 
 import qualified "this" Text.Numeral.Language.AF           as AF
 import qualified "this" Text.Numeral.Language.AF.TestData  as AF
@@ -168,96 +171,96 @@ tests =
       ]
     ]
   , testGroup "AF"
-    [ mkTests "cardinal" AF.cardinal (AF.cardinals ∷ TestData ℤ String)
-    , mkTests "ordinal"  AF.ordinal  (AF.ordinals  ∷ TestData ℤ String)
+    [ mkTests "cardinal" AF.cardinal (AF.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  AF.ordinal  (AF.ordinals  ∷ TestData ℤ)
     ]
-  , testGroup "AMP" [mkTests "cardinal" AMP.cardinal (AMP.cardinals ∷ TestData ℤ String)]
-  , testGroup "BG"  [mkTests "cardinal" BG.cardinal  (BG.cardinals  ∷ TestData ℤ String)]
-  , testGroup "CHN" [mkTests "cardinal" CHN.cardinal (CHN.cardinals ∷ TestData ℤ String)]
-  , testGroup "CHR" [mkTests "cardinal" CHR.cardinal (CHR.cardinals ∷ TestData ℤ String)]
-  , testGroup "CLM" [mkTests "cardinal" CLM.cardinal (CLM.cardinals ∷ TestData ℤ String)]
-  , testGroup "CS"  [mkTests "cardinal" CS.cardinal  (CS.cardinals  ∷ TestData ℤ String)]
+  , testGroup "AMP" [mkTests "cardinal" AMP.cardinal (AMP.cardinals ∷ TestData ℤ)]
+  , testGroup "BG"  [mkTests "cardinal" BG.cardinal  (BG.cardinals  ∷ TestData ℤ)]
+  , testGroup "CHN" [mkTests "cardinal" CHN.cardinal (CHN.cardinals ∷ TestData ℤ)]
+  , testGroup "CHR" [mkTests "cardinal" CHR.cardinal (CHR.cardinals ∷ TestData ℤ)]
+  , testGroup "CLM" [mkTests "cardinal" CLM.cardinal (CLM.cardinals ∷ TestData ℤ)]
+  , testGroup "CS"  [mkTests "cardinal" CS.cardinal  (CS.cardinals  ∷ TestData ℤ)]
   , testGroup "DE"
-    [ mkTests "cardinal" DE.cardinal (DE.cardinals ∷ TestData ℤ String)
-    , mkTests "ordinal"  DE.ordinal  (DE.ordinals  ∷ TestData ℤ String)
+    [ mkTests "cardinal" DE.cardinal (DE.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  DE.ordinal  (DE.ordinals  ∷ TestData ℤ)
     ]
   , testGroup "EN"
     [ testGroup "GB"
-      [ mkTests "cardinal" EN.gb_cardinal (EN.gb_cardinals ∷ TestData ℤ String)
-      , mkTests "ordinal"  EN.gb_ordinal  (EN.gb_ordinals  ∷ TestData ℤ String)
+      [ mkTests "cardinal" EN.gb_cardinal (EN.gb_cardinals ∷ TestData ℤ)
+      , mkTests "ordinal"  EN.gb_ordinal  (EN.gb_ordinals  ∷ TestData ℤ)
       ]
     , testGroup "US"
-      [ mkTests "cardinal" EN.us_cardinal (EN.us_cardinals ∷ TestData ℤ String)
-      , mkTests "ordinal"  EN.us_ordinal  (EN.us_ordinals  ∷ TestData ℤ String)
+      [ mkTests "cardinal" EN.us_cardinal (EN.us_cardinals ∷ TestData ℤ)
+      , mkTests "ordinal"  EN.us_ordinal  (EN.us_ordinals  ∷ TestData ℤ)
       ]
     ]
-  , testGroup "EO"  [mkTests "cardinal" EO.cardinal (EO.cardinals ∷ TestData ℤ String)]
-  , testGroup "ES"  [mkTests "cardinal" ES.cardinal (ES.cardinals ∷ TestData ℤ String)]
+  , testGroup "EO"  [mkTests "cardinal" EO.cardinal (EO.cardinals ∷ TestData ℤ)]
+  , testGroup "ES"  [mkTests "cardinal" ES.cardinal (ES.cardinals ∷ TestData ℤ)]
   , testGroup "FI"
-    [ mkTests "cardinal" FI.cardinal (FI.cardinals ∷ TestData ℤ String)
-    , mkTests "ordinal"  FI.ordinal  (FI.ordinals ∷ TestData ℤ String)
+    [ mkTests "cardinal" FI.cardinal (FI.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  FI.ordinal  (FI.ordinals ∷ TestData ℤ)
     ]
   , testGroup "FR"
-    [ mkTests "cardinal" FR.cardinal (FR.cardinals ∷ TestData ℤ String)
-    , mkTests "ordinal"  FR.ordinal  (FR.ordinals  ∷ TestData ℤ String)
+    [ mkTests "cardinal" FR.cardinal (FR.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  FR.ordinal  (FR.ordinals  ∷ TestData ℤ)
     ]
-  , testGroup "FUR" [mkTests "cardinal" FUR.cardinal (FUR.cardinals ∷ TestData ℤ String)]
-  , testGroup "GSW" [mkTests "cardinal" GSW.cardinal (GSW.cardinals ∷ TestData ℤ String)]
-  , testGroup "GV"  [mkTests "cardinal" GV.cardinal  (GV.cardinals  ∷ TestData ℤ String)]
-  , testGroup "HE"  [mkTests "cardinal" HE.cardinal  (HE.cardinals  ∷ TestData ℤ String)]
-  , testGroup "HOP" [mkTests "cardinal" HOP.cardinal (HOP.cardinals ∷ TestData ℤ String)]
+  , testGroup "FUR" [mkTests "cardinal" FUR.cardinal (FUR.cardinals ∷ TestData ℤ)]
+  , testGroup "GSW" [mkTests "cardinal" GSW.cardinal (GSW.cardinals ∷ TestData ℤ)]
+  , testGroup "GV"  [mkTests "cardinal" GV.cardinal  (GV.cardinals  ∷ TestData ℤ)]
+  , testGroup "HE"  [mkTests "cardinal" HE.cardinal  (HE.cardinals  ∷ TestData ℤ)]
+  , testGroup "HOP" [mkTests "cardinal" HOP.cardinal (HOP.cardinals ∷ TestData ℤ)]
   , testGroup "IT"
-    [ mkTests "cardinal" IT.cardinal (IT.cardinals ∷ TestData ℤ String)
-    , mkTests "ordinal"  IT.ordinal  (IT.ordinals  ∷ TestData ℤ String)
+    [ mkTests "cardinal" IT.cardinal (IT.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  IT.ordinal  (IT.ordinals  ∷ TestData ℤ)
     ]
   , testGroup "JA"
     [ testGroup "preferred"
       [mkTests "cardinal" JA.preferred_cardinal
-                          (JA.preferred_cardinals ∷ TestData ℤ String)
+                          (JA.preferred_cardinals ∷ TestData ℤ)
       ]
     , testGroup "kanji"
-      [mkTests "cardinal" JA.kanji_cardinal (JA.kanji_cardinals ∷ TestData ℤ String)]
+      [mkTests "cardinal" JA.kanji_cardinal (JA.kanji_cardinals ∷ TestData ℤ)]
     , testGroup "daiji"
-      [mkTests "cardinal" JA.daiji_cardinal (JA.daiji_cardinals ∷ TestData ℤ String)]
+      [mkTests "cardinal" JA.daiji_cardinal (JA.daiji_cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "LA"  [mkTests "cardinal" LA.cardinal  (LA.cardinals  ∷ TestData ℤ String)]
-  , testGroup "LLD" [mkTests "cardinal" LLD.cardinal (LLD.cardinals ∷ TestData ℤ String)]
-  , testGroup "MG"  [mkTests "cardinal" MG.cardinal  (MG.cardinals  ∷ TestData ℤ String)]
+  , testGroup "LA"  [mkTests "cardinal" LA.cardinal  (LA.cardinals  ∷ TestData ℤ)]
+  , testGroup "LLD" [mkTests "cardinal" LLD.cardinal (LLD.cardinals ∷ TestData ℤ)]
+  , testGroup "MG"  [mkTests "cardinal" MG.cardinal  (MG.cardinals  ∷ TestData ℤ)]
   , testGroup "NL"
-    [ mkTests "cardinal"       NL.cardinal  (NL.cardinals  ∷ TestData ℤ String)
-    , mkTests "ordinal"        NL.ordinal   (NL.ordinals   ∷ TestData ℤ String)
-    , mkTests "partitive"      NL.partitive (NL.partitives ∷ TestData (ℤ, ℤ) String)
-    , mkTests "multiplicative" NL.multiplicative (NL.multiplicatives ∷ TestData ℤ String)
+    [ mkTests "cardinal"       NL.cardinal  (NL.cardinals  ∷ TestData ℤ)
+    , mkTests "ordinal"        NL.ordinal   (NL.ordinals   ∷ TestData ℤ)
+    , mkTests "partitive"      NL.partitive (NL.partitives ∷ TestData (ℤ, ℤ))
+    , mkTests "multiplicative" NL.multiplicative (NL.multiplicatives ∷ TestData ℤ)
     ]
-  , testGroup "NO"  [mkTests "cardinal" NO.cardinal  (NO.cardinals  ∷ TestData ℤ String)]
-  , testGroup "NQM" [mkTests "cardinal" NQM.cardinal (NQM.cardinals ∷ TestData ℤ String)]
-  , testGroup "OJ"  [mkTests "cardinal" OJ.cardinal  (OJ.cardinals  ∷ TestData ℤ String)]
-  -- , testGroup "PAA" [mkTests "cardinal" PAA.cardinal (PAA.cardinals ∷ TestData ℤ String)]
-  , testGroup "PDC" [mkTests "cardinal" PDC.cardinal (PDC.cardinals ∷ TestData ℤ String)]
-  , testGroup "PL"  [mkTests "cardinal" PL.cardinal  (PL.cardinals  ∷ TestData ℤ String)]
-  , testGroup "PT"  [ mkTests "cardinal" PT.cardinal (PT.cardinals  ∷ TestData ℤ String)
-                    , mkTests "ordinal"  PT.ordinal  (PT.ordinals   ∷ TestData ℤ String)
+  , testGroup "NO"  [mkTests "cardinal" NO.cardinal  (NO.cardinals  ∷ TestData ℤ)]
+  , testGroup "NQM" [mkTests "cardinal" NQM.cardinal (NQM.cardinals ∷ TestData ℤ)]
+  , testGroup "OJ"  [mkTests "cardinal" OJ.cardinal  (OJ.cardinals  ∷ TestData ℤ)]
+  -- , testGroup "PAA" [mkTests "cardinal" PAA.cardinal (PAA.cardinals ∷ TestData ℤ)]
+  , testGroup "PDC" [mkTests "cardinal" PDC.cardinal (PDC.cardinals ∷ TestData ℤ)]
+  , testGroup "PL"  [mkTests "cardinal" PL.cardinal  (PL.cardinals  ∷ TestData ℤ)]
+  , testGroup "PT"  [ mkTests "cardinal" PT.cardinal (PT.cardinals  ∷ TestData ℤ)
+                    , mkTests "ordinal"  PT.ordinal  (PT.ordinals   ∷ TestData ℤ)
                     ]
-  , testGroup "RU"  [mkTests "cardinal" RU.cardinal  (RU.cardinals  ∷ TestData ℤ String)]
-  , testGroup "SCO" [mkTests "cardinal" SCO.cardinal (SCO.cardinals ∷ TestData ℤ String)]
+  , testGroup "RU"  [mkTests "cardinal" RU.cardinal  (RU.cardinals  ∷ TestData ℤ)]
+  , testGroup "SCO" [mkTests "cardinal" SCO.cardinal (SCO.cardinals ∷ TestData ℤ)]
   , testGroup "SV"
-    [ mkTests "cardinal" SV.cardinal  (SV.cardinals ∷ TestData ℤ String)
-    , mkTests "ordinal"  SV.ordinal   (SV.ordinals  ∷ TestData ℤ String)
+    [ mkTests "cardinal" SV.cardinal  (SV.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  SV.ordinal   (SV.ordinals  ∷ TestData ℤ)
     ]
-  , testGroup "TR"  [mkTests "cardinal" TR.cardinal  (TR.cardinals  ∷ TestData ℤ String)]
-  , testGroup "WO"  [mkTests "cardinal" WO.cardinal  (WO.cardinals  ∷ TestData ℤ String)]
-  , testGroup "YOR" [mkTests "cardinal" YOR.cardinal (YOR.cardinals ∷ TestData ℤ String)]
+  , testGroup "TR"  [mkTests "cardinal" TR.cardinal  (TR.cardinals  ∷ TestData ℤ)]
+  , testGroup "WO"  [mkTests "cardinal" WO.cardinal  (WO.cardinals  ∷ TestData ℤ)]
+  , testGroup "YOR" [mkTests "cardinal" YOR.cardinal (YOR.cardinals ∷ TestData ℤ)]
   , testGroup "ZH"
     [ testGroup "characters (traditional)"
-      [mkTests "cardinal" ZH.trad_cardinal (ZH.trad_cardinals ∷ TestData ℤ String)]
+      [mkTests "cardinal" ZH.trad_cardinal (ZH.trad_cardinals ∷ TestData ℤ)]
     , testGroup "characters (simplified)"
-      [mkTests "cardinal" ZH.simpl_cardinal (ZH.simpl_cardinals ∷ TestData ℤ String)]
+      [mkTests "cardinal" ZH.simpl_cardinal (ZH.simpl_cardinals ∷ TestData ℤ)]
     , testGroup "financial characters (traditional)"
-      [mkTests "cardinal" ZH.finance_trad_cardinal (ZH.finance_trad_cardinals ∷ TestData ℤ String)]
+      [mkTests "cardinal" ZH.finance_trad_cardinal (ZH.finance_trad_cardinals ∷ TestData ℤ)]
     , testGroup "financial characters (simplified)"
-      [mkTests "cardinal" ZH.finance_simpl_cardinal (ZH.finance_simpl_cardinals ∷ TestData ℤ String)]
+      [mkTests "cardinal" ZH.finance_simpl_cardinal (ZH.finance_simpl_cardinals ∷ TestData ℤ)]
     , testGroup "pinyin"
-      [mkTests "cardinal" ZH.pinyin_cardinal (ZH.pinyin_cardinals ∷ TestData ℤ String)]
+      [mkTests "cardinal" ZH.pinyin_cardinal (ZH.pinyin_cardinals ∷ TestData ℤ)]
     ]
   ]
 
@@ -268,7 +271,7 @@ tests =
 
 {-
 -- TODO: this takes way to long for large values (10 ^ 60000 - 1)
-testBounds ∷ String → (ℤ → Maybe String) → (ℤ, ℤ) → Test
+testBounds ∷ Text → (ℤ → Maybe Text) → (ℤ, ℤ) → Test
 testBounds name conversion bounds@(lo, hi) =
       testGroup name
                 [ testCase "lower bound" $ assertBool "conversion error" $ checkConv lo
@@ -295,22 +298,22 @@ intLog_mul (Positive x) (Positive y) = intLog (dec x ⋅ dec y) ≡ intLog (dec 
 mkTests ∷ ∀ α
         . (Show α)
         ⇒ String
-        → (GR.Inflection → α → Maybe String)
-        → TestData α String
+        → (GR.Inflection → α → Maybe Text)
+        → TestData α
         → Test
 mkTests name f = testGroup name ∘ map perInflection
     where
-      perInflection ∷ (String, GR.Inflection, [(α, String)]) → Test
+      perInflection ∷ (String, GR.Inflection, [(α, Text)]) → Test
       perInflection (infName, inf, xs) = testGroup infName $ map (perValue inf) xs
 
-      perValue ∷ GR.Inflection → (α, String) → Test
+      perValue ∷ GR.Inflection → (α, Text) → Test
       perValue inf (n, s) = testCase (show n) $ testConversion f inf n s
 
 testConversion ∷ (Show α)
-               ⇒ (GR.Inflection → α → Maybe String)
+               ⇒ (GR.Inflection → α → Maybe Text)
                → GR.Inflection
                → α
-               → String
+               → Text
                → Assertion
 testConversion f inf n s =
   let r = f inf n
@@ -318,5 +321,5 @@ testConversion f inf n s =
         $ assertFailure
         $ printf "Expected %s = \"%s\" but got \"%s\""
                  (show n)
-                 s
-                 (fromMaybe "no result" r)
+                 (T.unpack s)
+                 (T.unpack $ fromMaybe "no result" r)

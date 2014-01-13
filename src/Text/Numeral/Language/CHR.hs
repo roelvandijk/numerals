@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        -
@@ -34,11 +33,9 @@ module Text.Numeral.Language.CHR
 -- Imports
 --------------------------------------------------------------------------------
 
+import "base" Data.Char     ( Char )
 import "base" Data.Function ( ($), const, fix )
-import "base" Data.List     ( concatMap )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), String )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
@@ -47,13 +44,15 @@ import qualified "this" Text.Numeral.Exp as E
 import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
+import qualified "text" Data.Text as T ( concatMap, singleton )
 
 
 --------------------------------------------------------------------------------
 -- CHR
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_2    = ["chr"]
     , entIso639_3    = Just "chr"
@@ -65,7 +64,7 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β
@@ -82,7 +81,7 @@ struct = checkPos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = (0, dec 6 - 1)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \_ n → M.lookup n syms
                , reprAdd   = Just (⊞)
@@ -152,9 +151,10 @@ cardinalRepr = render defaultRepr
 
 -- | Transliterates a string written in the Cherokee syllabary to the
 -- latin alphabet.
-transliterate ∷ String → String
-transliterate xs = concatMap f xs
+transliterate ∷ Text → Text
+transliterate xs = T.concatMap f xs
     where
+      f ∷ Char → Text
       f 'Ꭰ' = "a"
       f 'Ꭱ' = "e"
       f 'Ꭲ' = "i"
@@ -240,5 +240,5 @@ transliterate xs = concatMap f xs
       f 'Ᏺ' = "yo"
       f 'Ᏻ' = "yu"
       f 'Ᏼ' = "yv"
-      f c   = [c]
+      f c   = T.singleton c
 

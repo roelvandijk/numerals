@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        -
@@ -35,8 +34,6 @@ module Text.Numeral.Language.FUR
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
@@ -49,13 +46,14 @@ import           "this" Text.Numeral.Misc ( dec )
 import           "this" Text.Numeral.Entry
 import qualified "this" Text.Numeral.Language.IT as IT ( rule )
 import           "this" Text.Numeral.Render.Utils ( addCtx, mulCtx )
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- FUR
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_2    = ["fur"]
     , entIso639_3    = Just "fur"
@@ -67,11 +65,8 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ ( G.Masculine i, G.Feminine i
-           , Integral α, E.Scale α
-           , Monoid s, IsString s
-           )
-         ⇒ i → α → Maybe s
+cardinal ∷ (G.Masculine i, G.Feminine i, Integral α, E.Scale α)
+         ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ ( Integral α, E.Scale α
@@ -83,7 +78,7 @@ struct = fix $ IT.rule `combine` pelletierScale1 R L BN.rule
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 12 - 1 in (negate x, x)
 
-cardinalRepr ∷ (G.Feminine i, G.Masculine i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ (G.Feminine i, G.Masculine i) ⇒ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprAdd   = Just (⊞)

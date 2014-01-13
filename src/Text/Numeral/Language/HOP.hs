@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        -
@@ -34,8 +33,6 @@ module Text.Numeral.Language.HOP
 
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
@@ -45,13 +42,14 @@ import           "this" Text.Numeral
 import qualified "this" Text.Numeral.Exp     as E
 import "this" Text.Numeral.Entry
 import "this" Text.Numeral.Render.Utils ( mulCtx )
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- HOP
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_3    = Just "hop"
     , entNativeNames = ["Hopilàvayi"]
@@ -62,10 +60,7 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ ( Integral α, E.Scale α
-           , Monoid s, IsString s
-           )
-         ⇒ i → α → Maybe s
+cardinal ∷ (Integral α, E.Scale α)⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ ( Integral α
@@ -84,7 +79,7 @@ struct = fix
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = (1, 100)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprAdd   = Just (⊞)

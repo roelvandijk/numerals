@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        de
@@ -25,7 +25,6 @@ module Text.Numeral.Language.DE.TestData (cardinals, ordinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
 import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
@@ -43,7 +42,7 @@ Sources:
   http://german.about.com/library/blzahlen.htm
 -}
 
-cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+cardinals ∷ (Integral i) ⇒ TestData i
 cardinals =
   [ ( "default"
     , defaultInflection
@@ -341,7 +340,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i, IsString s) ⇒ TestData i s
+ordinals ∷ (Integral i) ⇒ TestData i
 ordinals =
   [ ( "default"
     , defaultInflection

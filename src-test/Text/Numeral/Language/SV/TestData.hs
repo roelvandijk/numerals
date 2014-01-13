@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        sv
@@ -27,7 +27,6 @@ module Text.Numeral.Language.SV.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
 import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
@@ -60,7 +59,7 @@ import "this" Text.Numeral.Test ( TestData )
 -- the words tusen, miljon, miljard, and so on always stand on their
 -- own: tjugofem miljarder tre miljoner
 
-cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+cardinals ∷ (Integral i) ⇒ TestData i
 cardinals =
   [ ( "neuter"
     , neuter defaultInflection
@@ -223,7 +222,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i, IsString s) ⇒ TestData i s
+ordinals ∷ (Integral i) ⇒ TestData i
 ordinals =
   [ ( "neuter"
     , neuter defaultInflection
@@ -269,7 +268,7 @@ ordinals =
     )
   ]
 
-partitives ∷ (Integral i, IsString s) ⇒ TestData (i, i) s
+partitives ∷ (Integral i) ⇒ TestData (i, i)
 partitives =
   [ ( "default"
     , defaultInflection

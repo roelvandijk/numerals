@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        bg
@@ -23,7 +23,6 @@ module Text.Numeral.Language.BG.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral, (+) )
 import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "this" Text.Numeral.Grammar
@@ -43,7 +42,7 @@ Sources:
   http://bg.wikipedia.org/wiki/Имена_на_числата
 -}
 
-cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+cardinals ∷ (Integral i) ⇒ TestData i
 cardinals =
   [ ( "neuter"
     , neuter defaultInflection

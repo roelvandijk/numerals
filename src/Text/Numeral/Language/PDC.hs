@@ -4,6 +4,10 @@
 {-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
+[@ISO639-1@]        -
+
+[@ISO639-2@]        -
+
 [@ISO639-3@]        pdc
 
 [@Native name@]     Pennsilfaanisch Deitsch
@@ -30,8 +34,6 @@ module Text.Numeral.Language.PDC
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Nothing, Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
@@ -42,13 +44,14 @@ import qualified "this" Text.Numeral.Exp    as E
 import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 -------------------------------------------------------------------------------
 -- PDC
 -------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1    = Nothing
     , entIso639_2    = []
@@ -62,7 +65,7 @@ entry = emptyEntry
     , entOrdinal     = Nothing
     }
 
-cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ ( Integral α, E.Scale α
@@ -83,7 +86,7 @@ struct = pos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = (0, dec 9 - 1)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
+genericRepr ∷ Repr i
 genericRepr = defaultRepr
               { reprAdd   = Just (⊞)
               , reprMul   = Just (⊡)
@@ -99,7 +102,7 @@ genericRepr = defaultRepr
       (_ ⊡ _)      _ = " "
 
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ i → Exp i → Maybe Text
 cardinalRepr = render genericRepr
                { reprValue = \_ n → M.lookup n syms
                , reprScale = BN.pelletierRepr (BN.quantityName "illyon"  "illyon")

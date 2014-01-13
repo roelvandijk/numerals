@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        it
@@ -37,9 +36,7 @@ module Text.Numeral.Language.IT
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( Ord )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
@@ -52,13 +49,14 @@ import qualified "this" Text.Numeral.Exp     as E
 import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- IT
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1       = Just "it"
     , entIso639_2       = ["ita"]
@@ -75,18 +73,12 @@ entry = emptyEntry
                           }
     }
 
-cardinal ∷ ( G.Masculine i, G.Feminine i
-           , Integral α, E.Scale α
-           , Monoid s, IsString s
-           )
-         ⇒ i → α → Maybe s
+cardinal ∷ (G.Masculine i, G.Feminine i, Integral α, E.Scale α)
+         ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
-ordinal ∷ ( G.Masculine i, G.Feminine i
-          , Integral α, E.Scale α
-          , Monoid s, IsString s
-          )
-        ⇒ i → α → Maybe s
+ordinal ∷ (G.Masculine i, G.Feminine i, Integral α, E.Scale α)
+        ⇒ i → α → Maybe Text
 ordinal inf = ordinalRepr inf ∘ struct
 
 rule ∷ ( Integral α, Ord α
@@ -113,7 +105,7 @@ struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
+genericRepr ∷ Repr i
 genericRepr = defaultRepr
               { reprAdd   = Just (⊞)
               , reprMul   = Just (⊡)
@@ -130,7 +122,7 @@ genericRepr = defaultRepr
       (_     ⊡ Scale _ _ _) _ = " "
       (_     ⊡ _          ) _ = ""
 
-cardinalRepr ∷ (G.Feminine i, G.Masculine i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ (G.Feminine i, G.Masculine i) ⇒ i → Exp i → Maybe Text
 cardinalRepr = render genericRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = BN.pelletierRepr
@@ -194,7 +186,7 @@ cardinalRepr = render genericRepr
                         CtxMul _ (Lit 10) _ → m
                         _                   → n
 
-ordinalRepr ∷ (G.Feminine i, Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+ordinalRepr ∷ (G.Feminine i) ⇒ i → Exp i → Maybe Text
 ordinalRepr = render genericRepr
               { reprValue = \inf n → M.lookup n (syms inf)
               , reprScale = BN.pelletierRepr
@@ -272,7 +264,7 @@ ordinalRepr = render genericRepr
                   CtxMul _ (Lit 10) _  → m
                   _                    → n
 
-bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx (Exp i) → s)]
+bigNumSyms ∷ [(ℤ, Ctx (Exp i) → Text)]
 bigNumSyms =
   [ (6, BN.forms "sest" "sex"    "ses"    "sexa"   "ses")
   , (7, BN.forms "sett" "septen" "septem" "septua" "septin")

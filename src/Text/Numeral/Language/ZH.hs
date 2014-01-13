@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        zh
@@ -45,9 +44,7 @@ module Text.Numeral.Language.ZH
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( id, const, fix, flip, ($) )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Num, Integral, fromIntegral, (-), div, divMod, negate )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
@@ -60,13 +57,14 @@ import qualified "this" Text.Numeral.Exp as E
 import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- ZH
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1    = Just "zh"
     , entIso639_2    = ["chi", "zho"]
@@ -113,7 +111,7 @@ struct = pos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 48 - 1 in (negate x, x)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
+cardinalRepr ∷ Repr i
 cardinalRepr = defaultRepr
                { reprAdd = Just $ \_ _ _ → ""
                , reprMul = Just $ \_ _ _ → ""
@@ -124,7 +122,7 @@ cardinalRepr = defaultRepr
 -- Traditional Characters
 --------------------------------------------------------------------------------
 
-trad_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+trad_entry ∷ Entry
 trad_entry = entry
     { entVariant  = Just "traditional"
     , entCardinal = Just Conversion
@@ -133,18 +131,17 @@ trad_entry = entry
                     }
     }
 
-trad_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
-              ⇒ i → α → Maybe s
+trad_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 trad_cardinal inf = trad_cardinalRepr inf ∘ struct
 
-trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+trad_cardinalRepr ∷ i → Exp i → Maybe Text
 trad_cardinalRepr =
     render cardinalRepr
            { reprValue = \_ n → M.lookup n trad_syms
            , reprNeg = Just $ \_ _ → "負"
            }
 
-trad_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
+trad_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
 trad_syms =
     M.fromList
     [ (0, \c → case c of
@@ -184,7 +181,7 @@ trad_syms =
 -- Simplified Characters
 --------------------------------------------------------------------------------
 
-simpl_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+simpl_entry ∷ Entry
 simpl_entry = entry
     { entVariant  = Just "simplified"
     , entCardinal = Just Conversion
@@ -193,18 +190,17 @@ simpl_entry = entry
                     }
     }
 
-simpl_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
-               ⇒ i → α → Maybe s
+simpl_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 simpl_cardinal inf = simpl_cardinalRepr inf ∘ struct
 
-simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+simpl_cardinalRepr ∷ i → Exp i → Maybe Text
 simpl_cardinalRepr =
     render cardinalRepr
            { reprValue = \_ n → M.lookup n (simpl_syms ∪ trad_syms)
            , reprNeg = Just $ \_ _ → "负"
            }
 
-simpl_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
+simpl_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
 simpl_syms =
     M.fromList
     [ (2, \c → case c of
@@ -220,7 +216,7 @@ simpl_syms =
 -- Financial Characters (Traditional)
 --------------------------------------------------------------------------------
 
-finance_trad_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+finance_trad_entry ∷ Entry
 finance_trad_entry = entry
     { entVariant  = Just "finance traditional"
     , entCardinal = Just Conversion
@@ -229,18 +225,17 @@ finance_trad_entry = entry
                     }
     }
 
-finance_trad_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
-                      ⇒ i → α → Maybe s
+finance_trad_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 finance_trad_cardinal inf = finance_trad_cardinalRepr inf ∘ struct
 
-finance_trad_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+finance_trad_cardinalRepr ∷ i → Exp i → Maybe Text
 finance_trad_cardinalRepr =
     render cardinalRepr
            { reprValue = \_ n → M.lookup n (finance_trad_syms ∪ trad_syms)
            , reprNeg = Just $ \_ _ → "負"
            }
 
-finance_trad_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
+finance_trad_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
 finance_trad_syms =
     M.fromList
     [ (0, const "零")
@@ -265,7 +260,7 @@ finance_trad_syms =
 -- Financial Characters (Simplified)
 --------------------------------------------------------------------------------
 
-finance_simpl_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+finance_simpl_entry ∷ Entry
 finance_simpl_entry = entry
     { entVariant  = Just "finance simplified"
     , entCardinal = Just Conversion
@@ -274,11 +269,10 @@ finance_simpl_entry = entry
                     }
     }
 
-finance_simpl_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
-                       ⇒ i → α → Maybe s
+finance_simpl_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 finance_simpl_cardinal inf = finance_simpl_cardinalRepr inf ∘ struct
 
-finance_simpl_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+finance_simpl_cardinalRepr ∷ i → Exp i → Maybe Text
 finance_simpl_cardinalRepr =
     render cardinalRepr
            { reprValue = \_ n → M.lookup n ( finance_simpl_syms
@@ -288,7 +282,7 @@ finance_simpl_cardinalRepr =
            , reprNeg = Just $ \_ _ → "负"
            }
   where
-    finance_simpl_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
+    finance_simpl_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
     finance_simpl_syms =
         M.fromList
         [ (2, const "贰")
@@ -302,7 +296,7 @@ finance_simpl_cardinalRepr =
 -- Pinyin
 --------------------------------------------------------------------------------
 
-pinyin_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+pinyin_entry ∷ Entry
 pinyin_entry = entry
     { entVariant  = Just "pinyin"
     , entCardinal = Just Conversion
@@ -311,11 +305,10 @@ pinyin_entry = entry
                     }
     }
 
-pinyin_cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s)
-                ⇒ i → α → Maybe s
+pinyin_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
 pinyin_cardinal inf = pinyin_cardinalRepr inf ∘ struct
 
-pinyin_cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+pinyin_cardinalRepr ∷ i → Exp i → Maybe Text
 pinyin_cardinalRepr =
     render cardinalRepr
            { reprValue = \_ n → M.lookup n pinyin_syms
@@ -326,7 +319,7 @@ pinyin_cardinalRepr =
     (Lit 10 ⊞ _) _ = ""
     (_      ⊞ _) _ = " "
 
-    pinyin_syms ∷ (Integral α, IsString s) ⇒ M.Map α (Ctx (Exp i) → s)
+    pinyin_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
     pinyin_syms =
         M.fromList
         [ (0, const "líng")

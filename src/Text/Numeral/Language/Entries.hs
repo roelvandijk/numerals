@@ -1,7 +1,6 @@
-{-# LANGUAGE NoImplicitPrelude
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 module Text.Numeral.Language.Entries ( entries ) where
 
@@ -10,8 +9,6 @@ module Text.Numeral.Language.Entries ( entries ) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Monoid ( Monoid )
-import "base" Data.String ( IsString )
 import "this" Text.Numeral.Entry ( Entry(..) )
 import qualified "this" Text.Numeral.Language.AF  as AF
 import qualified "this" Text.Numeral.Language.AMP as AMP
@@ -56,7 +53,7 @@ import qualified "this" Text.Numeral.Language.ZH  as ZH
 -- Language entries
 --------------------------------------------------------------------------------
 
-entries ∷ (Monoid s, IsString s) ⇒ [Entry s]
+entries ∷ [Entry]
 entries =
   [ AF.entry
   , AF.entry

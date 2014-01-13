@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        fr
@@ -23,7 +23,6 @@ module Text.Numeral.Language.FR.TestData (cardinals, ordinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
 import "this" Text.Numeral.Grammar
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
@@ -42,7 +41,7 @@ Sources:
   http://www.parisbypod.com/2007/10/23/french-ordinal-numbers/
 -}
 
-cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+cardinals ∷ (Integral i) ⇒ TestData i
 cardinals =
   [ ( "masculine"
     , masculine defaultInflection
@@ -245,7 +244,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i, IsString s) ⇒ TestData i s
+ordinals ∷ (Integral i) ⇒ TestData i
 ordinals =
   [ ( "masculine"
     , masculine defaultInflection

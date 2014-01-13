@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        tr
@@ -35,8 +34,6 @@ module Text.Numeral.Language.TR
 import "base" Data.Bool           ( otherwise )
 import "base" Data.Function       ( ($), const, fix )
 import "base" Data.Maybe          ( Maybe(Just) )
-import "base" Data.Monoid         ( Monoid )
-import "base" Data.String         ( IsString )
 import "base" Prelude             ( Integral, (-), divMod, negate )
 import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
@@ -49,13 +46,14 @@ import qualified "this" Text.Numeral.Exp    as E
 import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- TR
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1    = Just "tr"
     , entIso639_2    = ["tur"]
@@ -68,7 +66,7 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ (Integral α, E.Scale α, E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β)
@@ -93,7 +91,7 @@ addToTens f n = let (m, r) = n `divMod` 10
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \_ n → M.lookup n syms
                , reprScale = scaleRepr
@@ -129,8 +127,7 @@ cardinalRepr = render defaultRepr
           , (1000, const "bin")
           ]
 
-scaleRepr ∷ (IsString s, Monoid s)
-          ⇒ i → ℤ → ℤ → Exp i → Ctx (Exp i) → Maybe s
+scaleRepr ∷ i → ℤ → ℤ → Exp i → Ctx (Exp i) → Maybe Text
 scaleRepr = BN.scaleRepr
               (\_ _ → "ilyon")
               [ (1, BN.forms "m"     "an"     "an"     ""       "")

@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        en
@@ -26,11 +26,11 @@ module Text.Numeral.Language.EN.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Num )
 import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ import "this" Text.Numeral.Test ( TestData )
 
 -- Sources: http://en.wikipedia.org/wiki/List_of_numbers
 
-en_cardinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+en_cardinals ∷ (Num i) ⇒ [(i, Text)]
 en_cardinals =
   [ (0, "zero")
   , (1, "one")
@@ -144,7 +144,7 @@ en_cardinals =
   , (100, "one hundred")
   ]
 
-en_ordinals ∷ (Num i, IsString s) ⇒ [(i, s)]
+en_ordinals ∷ (Num i) ⇒ [(i, Text)]
 en_ordinals =
   [ (0, "zeroth")
   , (1, "first")
@@ -249,7 +249,7 @@ en_ordinals =
   , (100, "one hundreth")
   ]
 
-gb_cardinals ∷ (Num i, IsString s) ⇒ TestData i s
+gb_cardinals ∷ (Num i) ⇒ TestData i
 gb_cardinals =
   [ ( "default"
     , defaultInflection
@@ -282,7 +282,7 @@ gb_cardinals =
     )
   ]
 
-gb_ordinals ∷ (Num i, IsString s) ⇒ TestData i s
+gb_ordinals ∷ (Num i) ⇒ TestData i
 gb_ordinals =
   [ ( "default"
     , defaultInflection
@@ -314,7 +314,7 @@ gb_ordinals =
     )
   ]
 
-us_cardinals ∷ (Num i, IsString s) ⇒ TestData i s
+us_cardinals ∷ (Num i) ⇒ TestData i
 us_cardinals =
   [ ( "default"
     , defaultInflection
@@ -347,7 +347,7 @@ us_cardinals =
     )
   ]
 
-us_ordinals ∷ (Num i, IsString s) ⇒ TestData i s
+us_ordinals ∷ (Num i) ⇒ TestData i
 us_ordinals =
   [ ( "default"
     , defaultInflection

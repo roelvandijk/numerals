@@ -17,7 +17,6 @@ module Text.Numeral.Language.PDC.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Integral )
 import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
@@ -33,7 +32,7 @@ Sources:
   http://www.languagesandnumbers.com/how-to-count-in-pennsylvania-german/en/pdc/
 -}
 
-cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+cardinals ∷ (Integral i) ⇒ TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

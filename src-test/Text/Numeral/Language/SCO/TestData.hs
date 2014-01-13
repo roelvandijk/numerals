@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        -
@@ -23,7 +23,6 @@ module Text.Numeral.Language.SCO.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.String ( IsString )
 import "base" Prelude     ( Num )
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
@@ -38,7 +37,7 @@ Sources:
   http://www.sf.airnet.ne.jp/~ts/language/number/scots.html
 -}
 
-cardinals ∷ (Num i, IsString s) ⇒ TestData i s
+cardinals ∷ (Num i) ⇒ TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

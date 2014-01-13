@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        de
@@ -38,8 +38,6 @@ module Text.Numeral.Language.DE
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
@@ -52,13 +50,14 @@ import qualified "this" Text.Numeral.Exp    as E
 import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 -------------------------------------------------------------------------------
 -- DE
 -------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1    = Just "de"
     , entIso639_2    = ["ger", "deu"]
@@ -75,10 +74,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+cardinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
-ordinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+ordinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 ordinal inf = ordinalRepr inf ∘ struct
 
 struct ∷ ( Integral α, E.Scale α
@@ -99,7 +98,7 @@ struct = pos
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s) ⇒ Repr i s
+genericRepr ∷ Repr i
 genericRepr = defaultRepr
               { reprAdd   = Just (⊞)
               , reprMul   = Just (⊡)
@@ -113,7 +112,7 @@ genericRepr = defaultRepr
       (_ ⊡ _)           _ = ""
 
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ i → Exp i → Maybe Text
 cardinalRepr = render genericRepr
                { reprValue = \_ n → M.lookup n syms
                , reprScale = BN.pelletierRepr (BN.quantityName "illion"   "illionen")
@@ -162,7 +161,7 @@ cardinalRepr = render genericRepr
           , (1000, const "tausend")
           ]
 
-ordinalRepr ∷ (Monoid s, IsString s) ⇒ i → Exp i → Maybe s
+ordinalRepr ∷ i → Exp i → Maybe Text
 ordinalRepr = render genericRepr
               { reprValue = \_ n → M.lookup n syms
               , reprScale = BN.pelletierRepr (BN.ordQuantityName "illion" "illionste"
@@ -224,7 +223,7 @@ ordinalRepr = render genericRepr
           , (1000, \c → if isOutside R c then "tausendste" else "tausend")
           ]
 
-bigNumSyms ∷ (IsString s) ⇒ [(ℤ, Ctx (Exp i) → s)]
+bigNumSyms ∷ [(ℤ, Ctx (Exp i) → Text)]
 bigNumSyms =
     [ (8, BN.forms "okt" "okto" "okto" "okto" "oktin")
     , (10, \c → case c of

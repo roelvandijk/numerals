@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        pt
@@ -25,8 +25,6 @@ module Text.Numeral.Language.PT.TestData (cardinals, ordinals) where
 
 import "base" Control.Arrow ( second )
 import "base" Data.List     ( map )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
@@ -34,7 +32,8 @@ import "base-unicode-symbols" Prelude.Unicode       ( (⋅) )
 import "this" Text.Numeral.Grammar
 import "this" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "this" Text.Numeral.Misc ( dec )
-import "this"          Text.Numeral.Test ( TestData )
+import "this" Text.Numeral.Test ( TestData )
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
@@ -45,7 +44,7 @@ import "this"          Text.Numeral.Test ( TestData )
 --   http://www.sonia-portuguese.com/text/numerals.htm
 --   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
 
-base_cardinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
+base_cardinals ∷ (Integral i) ⇒ [(i, Text)]
 base_cardinals =
   [ (0, "zero")
   , (3, "três")
@@ -162,7 +161,7 @@ base_cardinals =
   , (dec 100, "dez duotrigintilhões")
   ]
 
-cardinals ∷ (Integral i, IsString s) ⇒ TestData i s
+cardinals ∷ (Integral i) ⇒ TestData i
 cardinals =
   [ ( "masculine"
     , masculine defaultInflection
@@ -255,7 +254,7 @@ cardinals =
 -- These are the base forms of the ordinals, stripped of their
 -- ending. Append "o", "os", "a" or "as" to form combinations of
 -- masculine, feminine, singular and plural ordinals.
-base_ordinals ∷ (Integral i, IsString s) ⇒ [(i, s)]
+base_ordinals ∷ (Integral i) ⇒ [(i, Text)]
 base_ordinals =
   [ (1, "primeir")
   , (2, "segund")
@@ -291,7 +290,7 @@ base_ordinals =
   , (1000, "milésim")
   ]
 
-ordinals ∷ (Integral i, IsString s, Monoid s) ⇒ TestData i s
+ordinals ∷ (Integral i) ⇒ TestData i
 ordinals = map (\(n, f, e) → ( n
                              , f defaultInflection
                              , map (second (⊕ e)) base_ordinals)

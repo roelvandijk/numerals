@@ -1,8 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 {-|
 [@ISO639-1@]        en
@@ -41,9 +41,7 @@ module Text.Numeral.Language.EN
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
 import "base" Data.Ord      ( (<) )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( (+), (-), div, subtract, negate, (^), error, Integral )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Prelude.Unicode ( ℤ, (⋅) )
@@ -54,13 +52,14 @@ import qualified "this" Text.Numeral.Exp    as E
 import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- EN
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1    = Just "en"
     , entIso639_2    = ["eng"]
@@ -69,7 +68,7 @@ entry = emptyEntry
     , entEnglishName = Just "English"
     }
 
-gb_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+gb_entry ∷ Entry
 gb_entry = entry
     { entVariant  = Just "en-GB"
     , entCardinal = Just Conversion
@@ -82,7 +81,7 @@ gb_entry = entry
                     }
     }
 
-us_entry ∷ (Monoid s, IsString s) ⇒ Entry s
+us_entry ∷ Entry
 us_entry = entry
     { entVariant  = Just "en-US"
     , entCardinal = Just Conversion
@@ -95,14 +94,14 @@ us_entry = entry
                     }
     }
 
-gb_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+gb_cardinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 gb_cardinal inf = render (cardinalRepr "minus " gb_add) inf ∘ shortScaleStruct
 
-gb_ordinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+gb_ordinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 gb_ordinal inf = render (ordinalRepr gb_add) inf ∘ shortScaleStruct
 
-gbPelletier_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s)
-                     ⇒ i → α → Maybe s
+gbPelletier_cardinal ∷ (Inflection i, Integral α, E.Scale α)
+                     ⇒ i → α → Maybe Text
 gbPelletier_cardinal inf = render (cardinalRepr "minus " gb_add) { reprScale = pelletierRepr } inf
                          ∘ pelletierScaleStruct
   where
@@ -110,10 +109,10 @@ gbPelletier_cardinal inf = render (cardinalRepr "minus " gb_add) { reprScale = p
                                      (\_ _ → "illiard")
                                      []
 
-us_cardinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+us_cardinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 us_cardinal inf = render (cardinalRepr "negative " us_add) inf ∘ shortScaleStruct
 
-us_ordinal ∷ (Inflection i, Integral α, E.Scale α, Monoid s, IsString s) ⇒ i → α → Maybe s
+us_ordinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
 us_ordinal inf = render (ordinalRepr us_add) inf ∘ shortScaleStruct
 
 shortScaleStruct ∷ ( Integral α, E.Scale α
@@ -140,9 +139,8 @@ rule = findRule (   0, lit       )
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 30003 - 1 in (negate x, x)
 
-genericRepr ∷ (Monoid s, IsString s)
-            ⇒ (Exp i → Exp i → Ctx (Exp i) → s) -- ^ Add representation.
-            → Repr i s
+genericRepr ∷ (Exp i → Exp i → Ctx (Exp i) → Text) -- ^ Add representation.
+            → Repr i
 genericRepr f =
     defaultRepr
     { reprAdd   = Just f
@@ -166,22 +164,21 @@ eval (Inflection _ x) = eval x
 eval Unknown       = error "eval: unknown"
 
 
-gb_add ∷ (IsString s) ⇒ Exp i → Exp i → Ctx (Exp i) → s
+gb_add ∷ Exp i → Exp i → Ctx (Exp i) → Text
 ((_ `Mul` Lit 10) `gb_add` _) _ = "-"
 ((_ `Mul` _     ) `gb_add` x) _
     | eval x < (100 ∷ ℤ)        = " and "
     | otherwise                 = " "
 (_                `gb_add` _) _ = ""
 
-us_add ∷ (IsString s) ⇒ Exp i → Exp i → Ctx (Exp i) → s
+us_add ∷ Exp i → Exp i → Ctx (Exp i) → Text
 ((_ `Mul` Lit 10) `us_add` _) _ = "-"
 ((_ `Mul` _     ) `us_add` _) _ = " "
 (_                `us_add` _) _ = ""
 
-cardinalRepr ∷ (Monoid s, IsString s)
-             ⇒ s -- ^ Negative number prefix.
-             → (Exp i → Exp i → Ctx (Exp i) → s)
-             → Repr i s
+cardinalRepr ∷ Text -- ^ Negative number prefix.
+             → (Exp i → Exp i → Ctx (Exp i) → Text)
+             → Repr i
 cardinalRepr neg f =
     (genericRepr f)
     { reprValue = \_ n → M.lookup n syms
@@ -218,7 +215,7 @@ cardinalRepr neg f =
                        CtxMul _ (Lit 10) _ → m
                        _                   → n
 
-ordinalRepr ∷ (Monoid s, IsString s) ⇒ (Exp i → Exp i → Ctx (Exp i) → s) → Repr i s
+ordinalRepr ∷ (Exp i → Exp i → Ctx (Exp i) → Text) → Repr i
 ordinalRepr f = (genericRepr f)
                 { reprValue = \_ n → M.lookup n syms
                 , reprScale = BN.scaleRepr (BN.ordQuantityName "illion" "illionth"

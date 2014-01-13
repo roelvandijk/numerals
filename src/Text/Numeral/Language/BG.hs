@@ -1,9 +1,8 @@
-{-# LANGUAGE FlexibleContexts
-           , NoImplicitPrelude
-           , OverloadedStrings
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 {-|
 [@ISO639-1@]        bg
@@ -36,8 +35,6 @@ module Text.Numeral.Language.BG
 import "base" Data.Bool     ( otherwise )
 import "base" Data.Function ( ($), const, fix )
 import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Monoid   ( Monoid )
-import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
 import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
@@ -49,13 +46,14 @@ import qualified "this" Text.Numeral.Exp     as E
 import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
+import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------
 -- BG
 --------------------------------------------------------------------------------
 
-entry ∷ (Monoid s, IsString s) ⇒ Entry s
+entry ∷ Entry
 entry = emptyEntry
     { entIso639_1    = Just "bg"
     , entIso639_2    = ["bul"]
@@ -68,10 +66,8 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ ( G.Neuter i, G.Feminine i, G.Masculine i
-           , Integral α, E.Scale α, Monoid s, IsString s
-           )
-         ⇒ i → α → Maybe s
+cardinal ∷ (G.Neuter i, G.Feminine i, G.Masculine i, Integral α, E.Scale α)
+         ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ ( Integral α, E.Scale α
@@ -105,10 +101,7 @@ shortScale1_bg = mulScale_ bgMul 3 3 R L rule
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 48 - 1 in (negate x, x)
 
-cardinalRepr ∷ ( G.Neuter i, G.Feminine i, G.Masculine i
-               , Monoid s, IsString s
-               )
-             ⇒ i → Exp i → Maybe s
+cardinalRepr ∷ (G.Neuter i, G.Feminine i, G.Masculine i) ⇒ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = shortScaleRepr
@@ -169,8 +162,7 @@ cardinalRepr = render defaultRepr
             )
           ]
 
-shortScaleRepr ∷ (IsString s, Monoid s)
-               ⇒ i → ℤ → ℤ → (Exp i) → Ctx (Exp i) → Maybe s
+shortScaleRepr ∷ i → ℤ → ℤ → (Exp i) → Ctx (Exp i) → Maybe Text
 shortScaleRepr inf b o e
     = case e of
         Lit 2 → BN.scaleRepr (BN.quantityName "илиард" "илиарда") syms inf b o e

@@ -1,0 +1,207 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
+
+{-|
+[@ISO639-1@]        -
+
+[@ISO639-2@]        -
+
+[@ISO639-3@]        kea
+
+[@Native name@]     Kriolu
+
+[@English name@]    Cape Verdean Creole
+-}
+module Text.Numeral.Language.KEA.TestData (cardinals) where
+
+
+--------------------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------------------
+
+import "base" Prelude ( Num )
+import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "this" Text.Numeral.Test ( TestData )
+
+
+--------------------------------------------------------------------------------
+-- Test data
+--------------------------------------------------------------------------------
+
+{-
+Sources:
+  http://www.languagesandnumbers.com/how-to-count-in-cape-verdean-creole/en/kea/
+-}
+
+cardinals ∷ (Num i) ⇒ TestData i
+cardinals =
+  [ ( "default"
+    , defaultInflection
+    , [ (0, "zéru")
+      , (1, "um")
+      , (2, "dós")
+      , (3, "trés")
+      , (4, "kuátu")
+      , (5, "sinku")
+      , (6, "sax")
+      , (7, "séti")
+      , (8, "oitu")
+      , (9, "nóvi")
+      , (10, "dés")
+      , (11, "ónzi")
+      , (12, "duzi")
+      , (13, "treizi")
+      , (14, "katorzi")
+      , (15, "kinzi")
+      , (16, "dizasax")
+      , (17, "dizaséti")
+      , (18, "dizoitu")
+      , (19, "dizanóvi")
+      , (20, "vinti")
+      , (21, "vinti-um")
+      , (22, "vinti-dós")
+      , (23, "vinti-trés")
+      , (24, "vinti-kuátu")
+      , (25, "vinti-sinku")
+      , (26, "vinti-sax")
+      , (27, "vinti-séti")
+      , (28, "vinti-oitu")
+      , (29, "vinti-nóvi")
+      , (30, "trinta")
+      , (31, "trinti-um")
+      , (32, "trinti-dós")
+      , (33, "trinti-trés")
+      , (34, "trinti-kuátu")
+      , (35, "trinti-sinku")
+      , (36, "trinti-sax")
+      , (37, "trinti-séti")
+      , (38, "trinti-oitu")
+      , (39, "trinti-nóvi")
+      , (40, "korénta")
+      , (41, "korénti-um")
+      , (42, "korénti-dós")
+      , (43, "korénti-trés")
+      , (44, "korénti-kuátu")
+      , (45, "korénti-sinku")
+      , (46, "korénti-sax")
+      , (47, "korénti-séti")
+      , (48, "korénti-oitu")
+      , (49, "korénti-nóvi")
+      , (50, "sunkuénta")
+      , (51, "sunkuénti-um")
+      , (52, "sunkuénti-dós")
+      , (53, "sunkuénti-trés")
+      , (54, "sunkuénti-kuátu")
+      , (55, "sunkuénti-sinku")
+      , (56, "sunkuénti-sax")
+      , (57, "sunkuénti-séti")
+      , (58, "sunkuénti-oitu")
+      , (59, "sunkuénti-nóvi")
+      , (60, "sasénta")
+      , (61, "sasénti-um")
+      , (62, "sasénti-dós")
+      , (63, "sasénti-trés")
+      , (64, "sasénti-kuátu")
+      , (65, "sasénti-sinku")
+      , (66, "sasénti-sax")
+      , (67, "sasénti-séti")
+      , (68, "sasénti-oitu")
+      , (69, "sasénti-nóvi")
+      , (70, "saténta")
+      , (71, "saténti-um")
+      , (72, "saténti-dós")
+      , (73, "saténti-trés")
+      , (74, "saténti-kuátu")
+      , (75, "saténti-sinku")
+      , (76, "saténti-sax")
+      , (77, "saténti-séti")
+      , (78, "saténti-oitu")
+      , (79, "saténti-nóvi")
+      , (80, "oiténta")
+      , (81, "oiténti-um")
+      , (82, "oiténti-dós")
+      , (83, "oiténti-trés")
+      , (84, "oiténti-kuátu")
+      , (85, "oiténti-sinku")
+      , (86, "oiténti-sax")
+      , (87, "oiténti-séti")
+      , (88, "oiténti-oitu")
+      , (89, "oiténti-nóvi")
+      , (90, "novénta")
+      , (91, "novénti-um")
+      , (92, "novénti-dós")
+      , (93, "novénti-trés")
+      , (94, "novénti-kuátu")
+      , (95, "novénti-sinku")
+      , (96, "novénti-sax")
+      , (97, "novénti-séti")
+      , (98, "novénti-oitu")
+      , (99, "novénti-nóvi")
+      , (100, "sem")
+      , (101, "senti-um")
+      , (102, "senti-dós")
+      , (103, "senti-trés")
+      , (104, "senti-kuátu")
+      , (105, "senti-sinku")
+      , (106, "senti-sax")
+      , (107, "senti-séti")
+      , (108, "senti-oitu")
+      , (109, "senti-nóvi")
+      , (110, "senti-dés")
+      , (123, "senti-vinti-trés")
+      , (200, "duzéntus")
+      , (300, "trezéntus")
+      , (321, "trezéntus-i-vinti-um")
+      , (400, "kuátuséntus")
+      , (500, "kinhéntus")
+      , (600, "saiséntus")
+      , (700, "sétuséntus")
+      , (800, "oituséntus")
+      , (900, "nóviséntus")
+      , (909, "nóviséntus-i-nóvi")
+      , (990, "nóviséntus-i-novénta")
+      , (999, "nóviséntus-i-novénti-nóvi")
+      , (1000, "mil")
+      , (1001, "um mili--um")
+      , (1008, "um mili--oitu")
+      , (1234, "um mili-duzéntus-i-trinti-kuátu")
+      , (2000, "dós mil")
+      , (3000, "trés mil")
+      , (4000, "kuátu mil")
+      , (4321, "kuátu mili-trezéntus-i-vinti-um")
+      , (5000, "sinku mil")
+      , (6000, "sax mil")
+      , (7000, "séti mil")
+      , (8000, "oitu mil")
+      , (9000, "nóvi mil")
+      , (10000, "dés mil")
+      , (12345, "duzi mili-trezéntus-i-korénti-sinku")
+      , (20000, "vinti mil")
+      , (30000, "trinta mil")
+      , (40000, "korénta mil")
+      , (50000, "sunkuénta mil")
+      , (54321, "sunkuénti-kuátu mili-trezéntus-i-vinti-um")
+      , (60000, "sasénta mil")
+      , (70000, "saténta mil")
+      , (80000, "oiténta mil")
+      , (90000, "novénta mil")
+      , (100000, "um sem mil")
+      , (123456, "senti-vinti-trés mili-kuátuséntus-i-sunkuénti-sax")
+      , (200000, "duzéntus mil")
+      , (300000, "trezéntus mil")
+      , (400000, "kuátuséntus mil")
+      , (500000, "kinhéntus mil")
+      , (600000, "saiséntus mil")
+      , (654321, "saiséntus-i-sunkuénti-kuátu mili-trezéntus-i-vinti-um")
+      , (700000, "sétuséntus mil")
+      , (800000, "oituséntus mil")
+      , (900000, "nóviséntus mil")
+      , (1000000, "um miliom")
+      , (1234567, "um miliom duzéntus-i-trinti-kuátu mili-kinhéntus-i-sasénti-séti")
+      , (7654321, "séti miliom saiséntus-i-sunkuénti-kuátu mili-trezéntus-i-vinti-um")
+      , (1000000000, "um biliom")
+      ]
+    )
+  ]

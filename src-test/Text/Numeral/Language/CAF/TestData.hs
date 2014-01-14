@@ -1,0 +1,256 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
+
+{-|
+[@ISO639-1@]        -
+
+[@ISO639-2@]        -
+
+[@ISO639-3@]        caf
+
+[@Native name@]     Dakeł (ᑕᗸᒡ)
+
+[@English name@]    Southern Carrier
+-}
+module Text.Numeral.Language.CAF.TestData
+  ( cardinals
+  , syllabic_cardinals
+  ) where
+
+
+--------------------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------------------
+
+import "base" Prelude ( Num )
+import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "this" Text.Numeral.Test ( TestData )
+
+
+--------------------------------------------------------------------------------
+-- Test data
+--------------------------------------------------------------------------------
+
+{-
+Sources:
+  http://www.languagesandnumbers.com/how-to-count-in-carrier/en/caf/
+-}
+
+cardinals ∷ (Num i) ⇒ TestData i
+cardinals =
+  [ ( "default"
+    , defaultInflection
+    , [ (1, "lhuk’i")
+      , (2, "nankoh")
+      , (3, "tak’ih")
+      , (4, "dink’ih")
+      , (5, "skwunlai")
+      , (6, "lhk’uttak’ih")
+      , (7, "lhtak’alt’i")
+      , (8, "lhk’utdink’ih")
+      , (9, "lhuk’i hooloh")
+      , (10, "lanezyi")
+      , (11, "lanezyi ’o’un lhuk’i")
+      , (12, "lanezyi ’o’un nankoh")
+      , (13, "lanezyi ’o’un tak’ih")
+      , (14, "lanezyi ’o’un dink’ih")
+      , (15, "lanezyi ’o’un skwunlai")
+      , (16, "lanezyi ’o’un lhk’uttak’ih")
+      , (17, "lanezyi ’o’un lhtak’alt’i")
+      , (18, "lanezyi ’o’un lhk’utdink’ih")
+      , (19, "lanezyi ’o’un lhuk’i hooloh")
+      , (20, "nat lanezyi")
+      , (21, "nat lanezyi ’o’un lhuk’i")
+      , (22, "nat lanezyi ’o’un nankoh")
+      , (23, "nat lanezyi ’o’un tak’ih")
+      , (24, "nat lanezyi ’o’un dink’ih")
+      , (25, "nat lanezyi ’o’un skwunlai")
+      , (26, "nat lanezyi ’o’un lhk’uttak’ih")
+      , (27, "nat lanezyi ’o’un lhtak’alt’i")
+      , (28, "nat lanezyi ’o’un lhk’utdink’ih")
+      , (29, "nat lanezyi ’o’un lhuk’i hooloh")
+      , (30, "tat lanezyi")
+      , (31, "tat lanezyi ’o’un lhuk’i")
+      , (32, "tat lanezyi ’o’un nankoh")
+      , (33, "tat lanezyi ’o’un tak’ih")
+      , (34, "tat lanezyi ’o’un dink’ih")
+      , (35, "tat lanezyi ’o’un skwunlai")
+      , (36, "tat lanezyi ’o’un lhk’uttak’ih")
+      , (37, "tat lanezyi ’o’un lhtak’alt’i")
+      , (38, "tat lanezyi ’o’un lhk’utdink’ih")
+      , (39, "tat lanezyi ’o’un lhuk’i hooloh")
+      , (40, "dit lanezyi")
+      , (41, "dit lanezyi ’o’un lhuk’i")
+      , (42, "dit lanezyi ’o’un nankoh")
+      , (43, "dit lanezyi ’o’un tak’ih")
+      , (44, "dit lanezyi ’o’un dink’ih")
+      , (45, "dit lanezyi ’o’un skwunlai")
+      , (46, "dit lanezyi ’o’un lhk’uttak’ih")
+      , (47, "dit lanezyi ’o’un lhtak’alt’i")
+      , (48, "dit lanezyi ’o’un lhk’utdink’ih")
+      , (49, "dit lanezyi ’o’un lhuk’i hooloh")
+      , (50, "skwunlat lanezyi")
+      , (51, "skwunlat lanezyi ’o’un lhuk’i")
+      , (52, "skwunlat lanezyi ’o’un nankoh")
+      , (53, "skwunlat lanezyi ’o’un tak’ih")
+      , (54, "skwunlat lanezyi ’o’un dink’ih")
+      , (55, "skwunlat lanezyi ’o’un skwunlai")
+      , (56, "skwunlat lanezyi ’o’un lhk’uttak’ih")
+      , (57, "skwunlat lanezyi ’o’un lhtak’alt’i")
+      , (58, "skwunlat lanezyi ’o’un lhk’utdink’ih")
+      , (59, "skwunlat lanezyi ’o’un lhuk’i hooloh")
+      , (60, "lhk’utat lanezyi")
+      , (61, "lhk’utat lanezyi ’o’un lhuk’i")
+      , (62, "lhk’utat lanezyi ’o’un nankoh")
+      , (63, "lhk’utat lanezyi ’o’un tak’ih")
+      , (64, "lhk’utat lanezyi ’o’un dink’ih")
+      , (65, "lhk’utat lanezyi ’o’un skwunlai")
+      , (66, "lhk’utat lanezyi ’o’un lhk’uttak’ih")
+      , (67, "lhk’utat lanezyi ’o’un lhtak’alt’i")
+      , (68, "lhk’utat lanezyi ’o’un lhk’utdink’ih")
+      , (69, "lhk’utat lanezyi ’o’un lhuk’i hooloh")
+      , (70, "lhtak’alt’it lanezyi")
+      , (71, "lhtak’alt’it lanezyi ’o’un lhuk’i")
+      , (72, "lhtak’alt’it lanezyi ’o’un nankoh")
+      , (73, "lhtak’alt’it lanezyi ’o’un tak’ih")
+      , (74, "lhtak’alt’it lanezyi ’o’un dink’ih")
+      , (75, "lhtak’alt’it lanezyi ’o’un skwunlai")
+      , (76, "lhtak’alt’it lanezyi ’o’un lhk’uttak’ih")
+      , (77, "lhtak’alt’it lanezyi ’o’un lhtak’alt’i")
+      , (78, "lhtak’alt’it lanezyi ’o’un lhk’utdink’ih")
+      , (79, "lhtak’alt’it lanezyi ’o’un lhuk’i hooloh")
+      , (80, "lhk’udit lanezyi")
+      , (81, "lhk’udit lanezyi ’o’un lhuk’i")
+      , (82, "lhk’udit lanezyi ’o’un nankoh")
+      , (83, "lhk’udit lanezyi ’o’un tak’ih")
+      , (84, "lhk’udit lanezyi ’o’un dink’ih")
+      , (85, "lhk’udit lanezyi ’o’un skwunlai")
+      , (86, "lhk’udit lanezyi ’o’un lhk’uttak’ih")
+      , (87, "lhk’udit lanezyi ’o’un lhtak’alt’i")
+      , (88, "lhk’udit lanezyi ’o’un lhk’utdink’ih")
+      , (89, "lhk’udit lanezyi ’o’un lhuk’i hooloh")
+      , (90, "lhuk’i hooloh lanezyi")
+      , (91, "lhuk’i hooloh lanezyi ’o’un lhuk’i")
+      , (92, "lhuk’i hooloh lanezyi ’o’un nankoh")
+      , (93, "lhuk’i hooloh lanezyi ’o’un tak’ih")
+      , (94, "lhuk’i hooloh lanezyi ’o’un dink’ih")
+      , (95, "lhuk’i hooloh lanezyi ’o’un skwunlai")
+      , (96, "lhuk’i hooloh lanezyi ’o’un lhk’uttak’ih")
+      , (97, "lhuk’i hooloh lanezyi ’o’un lhtak’alt’i")
+      , (98, "lhuk’i hooloh lanezyi ’o’un lhk’utdink’ih")
+      , (99, "lhuk’i hooloh lanezyi ’o’un lhuk’i hooloh")
+      , (100, "lhk’ut’lanezyi")
+      ]
+    )
+  ]
+
+-- Using Carrier sylllabics
+syllabic_cardinals ∷ (Num i) ⇒ TestData i
+syllabic_cardinals =
+  [ ( "default"
+    , defaultInflection
+    , [ (1, "ᘰᗿ")
+      , (2, "ᘇᐣᗶᑋ")
+      , (3, "ᗡᗿᑋ")
+      , (4, "ᑔᐣᗿᑋ")
+      , (5, "ᔆᐠᗒᐣᘧᐉ")
+      , (6, "ᒡᗽᐪᗡᗿᑋ")
+      , (7, "ᒡᗡᘀᑊᗦ")
+      , (8, "ᒡᗽᐪᑔᐣᗿᑋ")
+      , (9, "ᘰᗿ ᐯᘣᑋ")
+      , (10, "ᘧᘅᙆᘒ")
+      , (11, "ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ")
+      , (12, "ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘇᐣᗶᑋ")
+      , (13, "ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᗡᗿᑋ")
+      , (14, "ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᑔᐣᗿᑋ")
+      , (15, "ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᔆᐠᗒᐣᘧᐉ")
+      , (16, "ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᗡᗿᑋ")
+      , (17, "ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗡᘀᑊᗦ")
+      , (18, "ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᑔᐣᗿᑋ")
+      , (19, "ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ ᐯᘣᑋ")
+      , (20, "ᘇᐪ ᘧᘅᙆᘒ")
+      , (21, "ᘇᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ")
+      , (22, "ᘇᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘇᐣᗶᑋ")
+      , (23, "ᘇᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᗡᗿᑋ")
+      , (24, "ᘇᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᑔᐣᗿᑋ")
+      , (25, "ᘇᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᔆᐠᗒᐣᘧᐉ")
+      , (26, "ᘇᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᗡᗿᑋ")
+      , (27, "ᘇᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗡᘀᑊᗦ")
+      , (28, "ᘇᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᑔᐣᗿᑋ")
+      , (29, "ᘇᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ ᐯᘣᑋ")
+      , (30, "ᗡᐪ ᘧᘅᙆᘒ")
+      , (31, "ᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ")
+      , (32, "ᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘇᐣᗶᑋ")
+      , (33, "ᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᗡᗿᑋ")
+      , (34, "ᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᑔᐣᗿᑋ")
+      , (35, "ᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᔆᐠᗒᐣᘧᐉ")
+      , (36, "ᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᗡᗿᑋ")
+      , (37, "ᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗡᘀᑊᗦ")
+      , (38, "ᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᑔᐣᗿᑋ")
+      , (39, "ᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ ᐯᘣᑋ")
+      , (40, "ᑔᐪ ᘧᘅᙆᘒ")
+      , (41, "ᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ")
+      , (42, "ᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘇᐣᗶᑋ")
+      , (43, "ᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᗡᗿᑋ")
+      , (44, "ᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᑔᐣᗿᑋ")
+      , (45, "ᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᔆᐠᗒᐣᘧᐉ")
+      , (46, "ᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᗡᗿᑋ")
+      , (47, "ᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗡᘀᑊᗦ")
+      , (48, "ᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᑔᐣᗿᑋ")
+      , (49, "ᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ ᐯᘣᑋ")
+      , (50, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ")
+      , (51, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ")
+      , (52, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘇᐣᗶᑋ")
+      , (53, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᗡᗿᑋ")
+      , (54, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᑔᐣᗿᑋ")
+      , (55, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᔆᐠᗒᐣᘧᐉ")
+      , (56, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᗡᗿᑋ")
+      , (57, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗡᘀᑊᗦ")
+      , (58, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᑔᐣᗿᑋ")
+      , (59, "ᔆᐠᗒᐣᘧᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ ᐯᘣᑋ")
+      , (60, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ")
+      , (61, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ")
+      , (62, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘇᐣᗶᑋ")
+      , (63, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᗡᗿᑋ")
+      , (64, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᑔᐣᗿᑋ")
+      , (65, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᔆᐠᗒᐣᘧᐉ")
+      , (66, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᗡᗿᑋ")
+      , (67, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗡᘀᑊᗦ")
+      , (68, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᑔᐣᗿᑋ")
+      , (69, "ᒡᗽᗡᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ ᐯᘣᑋ")
+      , (70, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ")
+      , (71, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ")
+      , (72, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘇᐣᗶᑋ")
+      , (73, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᗡᗿᑋ")
+      , (74, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᑔᐣᗿᑋ")
+      , (75, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᔆᐠᗒᐣᘧᐉ")
+      , (76, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᗡᗿᑋ")
+      , (77, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗡᘀᑊᗦ")
+      , (78, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᑔᐣᗿᑋ")
+      , (79, "ᒡᗡᘀᑊᗦᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ ᐯᘣᑋ")
+      , (80, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ")
+      , (81, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ")
+      , (82, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘇᐣᗶᑋ")
+      , (83, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᗡᗿᑋ")
+      , (84, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᑔᐣᗿᑋ")
+      , (85, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᔆᐠᗒᐣᘧᐉ")
+      , (86, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᗡᗿᑋ")
+      , (87, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗡᘀᑊᗦ")
+      , (88, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᑔᐣᗿᑋ")
+      , (89, "ᒡᗽᑔᐪ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ ᐯᘣᑋ")
+      , (90, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ")
+      , (91, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ")
+      , (92, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘇᐣᗶᑋ")
+      , (93, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᗡᗿᑋ")
+      , (94, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᑔᐣᗿᑋ")
+      , (95, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᔆᐠᗒᐣᘧᐉ")
+      , (96, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᗡᗿᑋ")
+      , (97, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗡᘀᑊᗦ")
+      , (98, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᒡᗽᐪᑔᐣᗿᑋ")
+      , (99, "ᘰᗿ ᐯᘣᑋ ᘧᘅᙆᘒ ᐧᐃᐧᐅᐣ ᘰᗿ ᐯᘣᑋ")
+      , (100, "ᒡᗽᐪᐧᘧᘅᙆᘒ")
+      ]
+    )
+  ]

@@ -6,7 +6,16 @@ Changelog for numerals
 ---
 
 - Added language entries for all supported languages.
-- Support API changes in `numerals-base` (inflection).
+- Merged numerals-base into numerals.
+  + Added inflection (case, gender and number).
+  + Added fractions to the numeral expression language.
+  + Renamed `Text.Numeral.Exp` to `Text.Numeral.Exp.Reified`.
+  + Renamed `Text.Numeral.Exp.Classes` to `Text.Numeral.Exp`.
+  + Fast integral logarithm (if GHC ≥ 7.2.1).
+  + Render combining functions now have access to the expressions being
+    combined.
+  + BigNum postfix names are now a function of their context.
+- Changed the result of conversions to `Text` instead of a polymorphic `s`.
 - Updated languages.
   + Fixed bug in Turkish (TR).
   + Fixed bug in Norwegian (NO).
@@ -30,15 +39,7 @@ Changelog for numerals
   + Klallam (CLM) cardinals.
 - Added numerical bounds to all language modules. All numbers within the bounds
   can be converted by the cardinal & ordinal functions.
-- Merged numerals-base into numerals.
-  + Added inflection (case, gender and number).
-  + Added fractions to the numeral expression language.
-  + Renamed `Text.Numeral.Exp` to `Text.Numeral.Exp.Reified`.
-  + Renamed `Text.Numeral.Exp.Classes` to `Text.Numeral.Exp`.
-  + Fast integral logarithm (if GHC ≥ 7.2.1).
-  + Render combining functions now have access to the expressions being
-    combined.
-  + BigNum postfix names are now a function of their context.
+- Added tests for the test data itself (checks for duplicate entries).
 
 
 0.3.0.1

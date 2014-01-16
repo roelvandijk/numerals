@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds   #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -19,6 +20,8 @@
 module Text.Numeral.Language.FI
     ( -- * Language entry
       entry
+      -- * Inflection
+    , Inflection
       -- * Conversions
     , cardinal
     , ordinal
@@ -72,59 +75,38 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ ( G.Singular i, G.Plural i
-           , G.Abessive i
-           , G.Accusative i
-           , G.Comitative i
-           , G.Delative i
-           , G.Distributive i
-           , G.DistributiveTemporal i
-           , G.Essive i
-           , G.Genitive i
-           , G.Instructive i
-           , G.Lative i
-           , G.LocativeInessive i
-           , G.LocativeElative i
-           , G.LocativeIllative i
-           , G.LocativeAdessive i
-           , G.LocativeAblative i
-           , G.LocativeAllative i
-           , G.Multiplicative i
-           , G.Nominative i
-           , G.Partitive i
-           , G.Sublative i
-           , G.SuperEssive i
-           , G.Translative i
-           , Integral α, E.Scale α
-           )
+type Inflection i =
+  ( G.Singular i
+  , G.Plural i
+  , G.Abessive i
+  , G.Accusative i
+  , G.Comitative i
+  , G.Delative i
+  , G.Distributive i
+  , G.DistributiveTemporal i
+  , G.Essive i
+  , G.Genitive i
+  , G.Instructive i
+  , G.Lative i
+  , G.LocativeInessive i
+  , G.LocativeElative i
+  , G.LocativeIllative i
+  , G.LocativeAdessive i
+  , G.LocativeAblative i
+  , G.LocativeAllative i
+  , G.Multiplicative i
+  , G.Nominative i
+  , G.Partitive i
+  , G.Sublative i
+  , G.SuperEssive i
+  , G.Translative i
+  )
+
+cardinal ∷ (Inflection i, Integral α, E.Scale α)
          ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
-ordinal ∷ ( G.Singular i, G.Plural i
-          , G.Abessive i
-          , G.Accusative i
-          , G.Comitative i
-          , G.Delative i
-          , G.Distributive i
-          , G.DistributiveTemporal i
-          , G.Essive i
-          , G.Genitive i
-          , G.Instructive i
-          , G.Lative i
-          , G.LocativeInessive i
-          , G.LocativeElative i
-          , G.LocativeIllative i
-          , G.LocativeAdessive i
-          , G.LocativeAblative i
-          , G.LocativeAllative i
-          , G.Multiplicative i
-          , G.Nominative i
-          , G.Partitive i
-          , G.Sublative i
-          , G.SuperEssive i
-          , G.Translative i
-          , Integral α, E.Scale α
-          )
+ordinal ∷ (Inflection i, Integral α, E.Scale α)
         ⇒ i → α → Maybe Text
 ordinal inf = ordinalRepr inf ∘ struct
 
@@ -173,31 +155,7 @@ fi_mul val =
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 15 - 1 in (negate x, x)
 
-cardinalRepr ∷ ( G.Singular i, G.Plural i
-               , G.Abessive i
-               , G.Accusative i
-               , G.Comitative i
-               , G.Delative i
-               , G.Distributive i
-               , G.DistributiveTemporal i
-               , G.Essive i
-               , G.Genitive i
-               , G.Instructive i
-               , G.Lative i
-               , G.LocativeInessive i
-               , G.LocativeElative i
-               , G.LocativeIllative i
-               , G.LocativeAdessive i
-               , G.LocativeAblative i
-               , G.LocativeAllative i
-               , G.Multiplicative i
-               , G.Nominative i
-               , G.Partitive i
-               , G.Sublative i
-               , G.SuperEssive i
-               , G.Translative i
-               )
-             ⇒ i → Exp i → Maybe Text
+cardinalRepr ∷ (Inflection i) ⇒ i → Exp i → Maybe Text
 cardinalRepr = render defaultRepr
                { reprValue = \inf n → M.lookup n (syms inf)
                , reprScale = BN.pelletierRepr
@@ -523,31 +481,7 @@ cardinalRepr = render defaultRepr
             )
           ]
 
-ordinalRepr ∷ ( G.Singular i, G.Plural i
-              , G.Abessive i
-              , G.Accusative i
-              , G.Comitative i
-              , G.Delative i
-              , G.Distributive i
-              , G.DistributiveTemporal i
-              , G.Essive i
-              , G.Genitive i
-              , G.Instructive i
-              , G.Lative i
-              , G.LocativeInessive i
-              , G.LocativeElative i
-              , G.LocativeIllative i
-              , G.LocativeAdessive i
-              , G.LocativeAblative i
-              , G.LocativeAllative i
-              , G.Multiplicative i
-              , G.Nominative i
-              , G.Partitive i
-              , G.Sublative i
-              , G.SuperEssive i
-              , G.Translative i
-              )
-             ⇒ i → Exp i → Maybe Text
+ordinalRepr ∷ (Inflection i) ⇒ i → Exp i → Maybe Text
 ordinalRepr = render defaultRepr
               { reprValue = \inf n → M.lookup n (syms inf)
               , reprScale = BN.pelletierRepr
@@ -887,30 +821,7 @@ ordinalRepr = render defaultRepr
             )
           ]
 
-infForms ∷ ( G.Singular i, G.Plural i
-           , G.Abessive i
-           , G.Accusative i
-           , G.Comitative i
-           , G.Delative i
-           , G.Distributive i
-           , G.DistributiveTemporal i
-           , G.Essive i
-           , G.Genitive i
-           , G.Instructive i
-           , G.Lative i
-           , G.LocativeInessive i
-           , G.LocativeElative i
-           , G.LocativeIllative i
-           , G.LocativeAdessive i
-           , G.LocativeAblative i
-           , G.LocativeAllative i
-           , G.Multiplicative i
-           , G.Nominative i
-           , G.Partitive i
-           , G.Sublative i
-           , G.SuperEssive i
-           , G.Translative i
-           )
+infForms ∷ (Inflection i)
          ⇒ i → Ctx (Exp i)
          → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text
          → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text

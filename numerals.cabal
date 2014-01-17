@@ -1,6 +1,6 @@
 name:          numerals
 version:       0.4
-cabal-version: >= 1.8
+cabal-version: >= 1.9.2
 build-type:    Simple
 stability:     experimental
 author:        Roel van Dijk <vandijk.roel@gmail.com>, Bas van Dijk <v.dijk.bas@gmail.com>
@@ -251,3 +251,15 @@ test-suite test-numerals
 
   if impl(ghc >= 7.2.1)
     build-depends: integer-gmp >= 0.3 && < 0.6
+
+-------------------------------------------------------------------------------
+
+benchmark bench-numerals
+  type: exitcode-stdio-1.0
+  main-is: bench.hs
+  hs-source-dirs: src-bench
+
+  build-depends: base                 >= 3.0.3.1 && < 4.7
+               , base-unicode-symbols >= 0.2.2   && < 0.3
+               , criterion            >= 0.8     && < 0.9
+               , numerals

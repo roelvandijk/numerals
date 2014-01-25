@@ -179,9 +179,11 @@ test-suite test-numerals
                , Text.Numeral.Language.BM.TestData
                , Text.Numeral.Language.CA.TestData
                , Text.Numeral.Language.CAF.TestData
+               , Text.Numeral.Language.CAR.TestData
                , Text.Numeral.Language.CBK.TestData
                , Text.Numeral.Language.CHN.TestData
                , Text.Numeral.Language.CHR.TestData
+               , Text.Numeral.Language.CKU.TestData
                , Text.Numeral.Language.CLM.TestData
                , Text.Numeral.Language.CO.TestData
                , Text.Numeral.Language.COD.TestData
@@ -197,6 +199,7 @@ test-suite test-numerals
                , Text.Numeral.Language.FI.TestData
                , Text.Numeral.Language.FO.TestData
                , Text.Numeral.Language.FR.TestData
+               , Text.Numeral.Language.FRA_JER.TestData
                , Text.Numeral.Language.FUR.TestData
                , Text.Numeral.Language.GCF_MTQ.TestData
                , Text.Numeral.Language.GIL.TestData
@@ -207,14 +210,25 @@ test-suite test-numerals
                , Text.Numeral.Language.HE.TestData
                , Text.Numeral.Language.HOP.TestData
                , Text.Numeral.Language.HR.TestData
+               , Text.Numeral.Language.HT.TestData
                , Text.Numeral.Language.HU.TestData
+               , Text.Numeral.Language.HUP.TestData
+               , Text.Numeral.Language.HUR.TestData
                , Text.Numeral.Language.HY.TestData
+               , Text.Numeral.Language.ID.TestData
+               , Text.Numeral.Language.IG.TestData
+               , Text.Numeral.Language.INH.TestData
                , Text.Numeral.Language.IT.TestData
+               , Text.Numeral.Language.IZH.TestData
                , Text.Numeral.Language.JA.TestData
                , Text.Numeral.Language.KAP.TestData
                , Text.Numeral.Language.KEA.TestData
+               , Text.Numeral.Language.KLB.TestData
+               , Text.Numeral.Language.KRL.TestData
                , Text.Numeral.Language.LA.TestData
                , Text.Numeral.Language.LLD.TestData
+               , Text.Numeral.Language.LN.TestData
+               , Text.Numeral.Language.LV.TestData
                , Text.Numeral.Language.MG.TestData
                , Text.Numeral.Language.MOH.TestData
                , Text.Numeral.Language.NL.TestData
@@ -226,17 +240,21 @@ test-suite test-numerals
                , Text.Numeral.Language.PL.TestData
                , Text.Numeral.Language.PT.TestData
                , Text.Numeral.Language.RMN_DZA.TestData
+               , Text.Numeral.Language.RMY_KAL.TestData
                , Text.Numeral.Language.RO.TestData
                , Text.Numeral.Language.RU.TestData
                , Text.Numeral.Language.SCO.TestData
+               , Text.Numeral.Language.SMN.TestData
                , Text.Numeral.Language.SV.TestData
                , Text.Numeral.Language.TAR.TestData
                , Text.Numeral.Language.TR.TestData
                , Text.Numeral.Language.WO.TestData
                , Text.Numeral.Language.YOR.TestData
+               , Text.Numeral.Language.ZAI.TestData
                , Text.Numeral.Language.ZAQ.TestData
                , Text.Numeral.Language.ZH.TestData
                , Text.Numeral.Language.ZPC.TestData
+               , Text.Numeral.Language.ZPL.TestData
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
 
   build-depends: base                       >= 3.0.3.1 && < 4.7

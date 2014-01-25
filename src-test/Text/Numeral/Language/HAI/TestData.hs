@@ -159,7 +159,7 @@ cardinals =
       , (321, "lagwa uu tláahl wáak lagwa uu tléihl lagwa uu sgwáansang wáak sgwáansang")
       , (400, "lagwa uu tlaalee sdáng")
       , (500, "lagwa uu tlaalee sdáng wáak lagwa uu tléihl")
-      , (600, "lagwa uu tlaalee tléihl")
+      , (600, "lagwa uu tlaalee hlgúnahl")
       , (700, "lagwa uu tlaalee wáak lagwa uu tléihl")
       , (800, "lagwa uu tlaalee sdáansaangaa")
       , (900, "lagwa uu tlaalee sdáansaangaa wáak lagwa uu tléihl")

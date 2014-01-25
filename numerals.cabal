@@ -141,6 +141,7 @@ library
                  , Text.Numeral.Language.LA
                  , Text.Numeral.Language.LLD
                  , Text.Numeral.Language.MG
+                 , Text.Numeral.Language.NEN
                  , Text.Numeral.Language.NL
                  , Text.Numeral.Language.NO
                  , Text.Numeral.Language.NQM

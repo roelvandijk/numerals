@@ -67,6 +67,7 @@ import qualified "numerals" Text.Numeral.Language.JA  as JA
 import qualified "numerals" Text.Numeral.Language.LA  as LA
 import qualified "numerals" Text.Numeral.Language.LLD as LLD
 import qualified "numerals" Text.Numeral.Language.MG  as MG
+import qualified "numerals" Text.Numeral.Language.NEN as NEN
 import qualified "numerals" Text.Numeral.Language.NL  as NL
 import qualified "numerals" Text.Numeral.Language.NO  as NO
 import qualified "numerals" Text.Numeral.Language.NQM as NQM
@@ -598,6 +599,7 @@ tests =
   , testGroup "NEN"
     [ testGroup "unique data"
       [testUnique "cardinal" (NEN.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" NEN.cardinal (NEN.cardinals ∷ TestData ℤ)
     ]
   , testGroup "NL"
     [ testGroup "unique data"

@@ -14,13 +14,14 @@ category:      Natural Language Processing, Numerical, Text
 synopsis:      Convert numbers to number words
 description:
   Convert numbers to number words in a number of languages. Each
-  language has its own module. The module name is based on one of the
-  ISO 639 Alpha codes. Each module contains one or more 'cardinal' and
-  'ordinal' functions and a 'struct' function. The 'cardinal'
-  functions directly convert cardinal numbers to a string-like
-  representation of their spoken form. The 'ordinal' functions do the
-  same but for ordinal numbers. The 'struct' functions convert numbers
-  to a polymorphic representation of their grammatical structure.
+  language has its own module. The module name is based on the ISO
+  639-3 code for that language. Each module contains one or more
+  'cardinal' and 'ordinal' functions and a 'struct' function. The
+  'cardinal' functions directly convert cardinal numbers to a
+  string-like representation of their spoken form. The 'ordinal'
+  functions do the same but for ordinal numbers. The 'struct'
+  functions convert numbers to a polymorphic representation of their
+  grammatical structure.
   .
   The use of this package is best understood with some examples. First
   some English number names, both British and US variants:

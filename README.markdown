@@ -1,13 +1,13 @@
 Numerals
 ========
 
-Convert numbers to numerals (number words) in a number of
-languages. Each language has its own module. The module name is based
-on one of the ISO 639 Alpha codes. Each module contains one or more
-functions to convert numerical values to numerals. Several types of
-numerals are supported. But not every type is supported by every
-language. Some because they do not occur in that language. Others
-because they are not yet defined in this package.
+Convert numbers to number words in a number of languages. Each
+language has its own module. The module name is based on the ISO 639-3
+code for that language. Each module contains one or more functions to
+convert numerical values to numerals. Several types of numerals are
+supported. But not every type is supported by every language. Some
+because they do not occur in that language. Others because they are
+not yet defined in this package.
 
 - Cardinal numerals
 

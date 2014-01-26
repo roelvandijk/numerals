@@ -44,146 +44,154 @@ import           "this" Text.Numeral.Test ( TestData )
 import "text" Data.Text ( Text )
 import qualified "text" Data.Text as T ( unpack )
 
-import qualified "numerals" Text.Numeral.Language.AF  as AF
+import qualified "numerals" Text.Numeral.Language.AFR as AFR
 import qualified "numerals" Text.Numeral.Language.AMP as AMP
-import qualified "numerals" Text.Numeral.Language.BG  as BG
+import qualified "numerals" Text.Numeral.Language.BUL as BUL
+import qualified "numerals" Text.Numeral.Language.CES as CES
 import qualified "numerals" Text.Numeral.Language.CHN as CHN
 import qualified "numerals" Text.Numeral.Language.CHR as CHR
 import qualified "numerals" Text.Numeral.Language.CLM as CLM
-import qualified "numerals" Text.Numeral.Language.CS  as CS
-import qualified "numerals" Text.Numeral.Language.DE  as DE
-import qualified "numerals" Text.Numeral.Language.EN  as EN
-import qualified "numerals" Text.Numeral.Language.EO  as EO
-import qualified "numerals" Text.Numeral.Language.ES  as ES
-import qualified "numerals" Text.Numeral.Language.FI  as FI
-import qualified "numerals" Text.Numeral.Language.FR  as FR
+import qualified "numerals" Text.Numeral.Language.DEU as DEU
+import qualified "numerals" Text.Numeral.Language.ENG as ENG
+import qualified "numerals" Text.Numeral.Language.EPO as EPO
+import qualified "numerals" Text.Numeral.Language.FIN as FIN
+import qualified "numerals" Text.Numeral.Language.FRA as FRA
 import qualified "numerals" Text.Numeral.Language.FUR as FUR
+import qualified "numerals" Text.Numeral.Language.GLV as GLV
 import qualified "numerals" Text.Numeral.Language.GSW as GSW
-import qualified "numerals" Text.Numeral.Language.GV  as GV
-import qualified "numerals" Text.Numeral.Language.HE  as HE
+import qualified "numerals" Text.Numeral.Language.HEB as HEB
 import qualified "numerals" Text.Numeral.Language.HOP as HOP
-import qualified "numerals" Text.Numeral.Language.IT  as IT
-import qualified "numerals" Text.Numeral.Language.JA  as JA
-import qualified "numerals" Text.Numeral.Language.LA  as LA
+import qualified "numerals" Text.Numeral.Language.ITA as ITA
+import qualified "numerals" Text.Numeral.Language.JPN as JPN
+import qualified "numerals" Text.Numeral.Language.LAT as LAT
 import qualified "numerals" Text.Numeral.Language.LLD as LLD
-import qualified "numerals" Text.Numeral.Language.MG  as MG
+import qualified "numerals" Text.Numeral.Language.MLG as MLG
 import qualified "numerals" Text.Numeral.Language.NEN as NEN
-import qualified "numerals" Text.Numeral.Language.NL  as NL
-import qualified "numerals" Text.Numeral.Language.NO  as NO
+import qualified "numerals" Text.Numeral.Language.NLD as NLD
+import qualified "numerals" Text.Numeral.Language.NOB as NOB
 import qualified "numerals" Text.Numeral.Language.NQM as NQM
-import qualified "numerals" Text.Numeral.Language.OJ  as OJ
+import qualified "numerals" Text.Numeral.Language.OJI as OJI
 import qualified "numerals" Text.Numeral.Language.PDC as PDC
-import qualified "numerals" Text.Numeral.Language.PL  as PL
-import qualified "numerals" Text.Numeral.Language.PT  as PT
-import qualified "numerals" Text.Numeral.Language.RU  as RU
+import qualified "numerals" Text.Numeral.Language.POL as POL
+import qualified "numerals" Text.Numeral.Language.POR as POR
+import qualified "numerals" Text.Numeral.Language.RUS as RUS
 import qualified "numerals" Text.Numeral.Language.SCO as SCO
-import qualified "numerals" Text.Numeral.Language.SV  as SV
-import qualified "numerals" Text.Numeral.Language.TR  as TR
-import qualified "numerals" Text.Numeral.Language.WO  as WO
+import qualified "numerals" Text.Numeral.Language.SPA as SPA
+import qualified "numerals" Text.Numeral.Language.SWE as SWE
+import qualified "numerals" Text.Numeral.Language.TUR as TUR
+import qualified "numerals" Text.Numeral.Language.WOL as WOL
 import qualified "numerals" Text.Numeral.Language.YOR as YOR
-import qualified "numerals" Text.Numeral.Language.ZH  as ZH
+import qualified "numerals" Text.Numeral.Language.ZHO as ZHO
 
 import qualified "this" Text.Numeral.Language.ACH.TestData as ACH
 import qualified "this" Text.Numeral.Language.ADY.TestData as ADY
-import qualified "this" Text.Numeral.Language.AF.TestData  as AF
+import qualified "this" Text.Numeral.Language.AFR.TestData as AFR
 import qualified "this" Text.Numeral.Language.AMP.TestData as AMP
 import qualified "this" Text.Numeral.Language.ARI.TestData as ARI
 import qualified "this" Text.Numeral.Language.ARN.TestData as ARN
 import qualified "this" Text.Numeral.Language.AST.TestData as AST
-import qualified "this" Text.Numeral.Language.AZ.TestData  as AZ
-import qualified "this" Text.Numeral.Language.BA.TestData  as BA
-import qualified "this" Text.Numeral.Language.BG.TestData  as BG
-import qualified "this" Text.Numeral.Language.BM.TestData  as BM
-import qualified "this" Text.Numeral.Language.CA.TestData  as CA
+import qualified "this" Text.Numeral.Language.AZE.TestData as AZE
+import qualified "this" Text.Numeral.Language.BAK.TestData as BAK
+import qualified "this" Text.Numeral.Language.BAM.TestData as BAM
+import qualified "this" Text.Numeral.Language.BUL.TestData as BUL
 import qualified "this" Text.Numeral.Language.CAF.TestData as CAF
 import qualified "this" Text.Numeral.Language.CAR.TestData as CAR
+import qualified "this" Text.Numeral.Language.CAT.TestData as CAT
 import qualified "this" Text.Numeral.Language.CBK.TestData as CBK
+import qualified "this" Text.Numeral.Language.CES.TestData as CES
 import qualified "this" Text.Numeral.Language.CHN.TestData as CHN
 import qualified "this" Text.Numeral.Language.CHR.TestData as CHR
 import qualified "this" Text.Numeral.Language.CKU.TestData as CKU
 import qualified "this" Text.Numeral.Language.CLM.TestData as CLM
-import qualified "this" Text.Numeral.Language.CO.TestData  as CO
 import qualified "this" Text.Numeral.Language.COD.TestData as COD
 import qualified "this" Text.Numeral.Language.COO.TestData as COO
+import qualified "this" Text.Numeral.Language.COS.TestData as COS
 import qualified "this" Text.Numeral.Language.CRG.TestData as CRG
-import qualified "this" Text.Numeral.Language.CS.TestData  as CS
-import qualified "this" Text.Numeral.Language.CY.TestData  as CY
-import qualified "this" Text.Numeral.Language.DE.TestData  as DE
+import qualified "this" Text.Numeral.Language.CYM.TestData as CYM
+import qualified "this" Text.Numeral.Language.DEU.TestData as DEU
 import qualified "this" Text.Numeral.Language.DJK.TestData as DJK
+import qualified "this" Text.Numeral.Language.EKK.TestData as EKK
 import qualified "this" Text.Numeral.Language.EMI.TestData as EMI
-import qualified "this" Text.Numeral.Language.EN.TestData  as EN
-import qualified "this" Text.Numeral.Language.EO.TestData  as EO
-import qualified "this" Text.Numeral.Language.ES.TestData  as ES
-import qualified "this" Text.Numeral.Language.ET.TestData  as ET
-import qualified "this" Text.Numeral.Language.FI.TestData  as FI
-import qualified "this" Text.Numeral.Language.FO.TestData  as FO
-import qualified "this" Text.Numeral.Language.FR.TestData  as FR
+import qualified "this" Text.Numeral.Language.ENG.TestData as ENG
+import qualified "this" Text.Numeral.Language.EPO.TestData as EPO
+import qualified "this" Text.Numeral.Language.FAO.TestData as FAO
+import qualified "this" Text.Numeral.Language.FIN.TestData as FIN
+import qualified "this" Text.Numeral.Language.FRA.TestData as FRA
 import qualified "this" Text.Numeral.Language.FRA_JER.TestData as FRA_JER
+import qualified "this" Text.Numeral.Language.FRR.TestData as FRR
 import qualified "this" Text.Numeral.Language.FUR.TestData as FUR
 import qualified "this" Text.Numeral.Language.GCF_MTQ.TestData as GCF_MTQ
 import qualified "this" Text.Numeral.Language.GIL.TestData as GIL
-import qualified "this" Text.Numeral.Language.GL.TestData  as GL
+import qualified "this" Text.Numeral.Language.GLG.TestData as GLG
+import qualified "this" Text.Numeral.Language.GLV.TestData as GLV
 import qualified "this" Text.Numeral.Language.GSW.TestData as GSW
-import qualified "this" Text.Numeral.Language.GV.TestData  as GV
 import qualified "this" Text.Numeral.Language.HAI.TestData as HAI
-import qualified "this" Text.Numeral.Language.HE.TestData  as HE
+import qualified "this" Text.Numeral.Language.HAT.TestData as HAT
+import qualified "this" Text.Numeral.Language.HEB.TestData as HEB
 import qualified "this" Text.Numeral.Language.HOP.TestData as HOP
-import qualified "this" Text.Numeral.Language.HR.TestData  as HR
-import qualified "this" Text.Numeral.Language.HT.TestData  as HT
-import qualified "this" Text.Numeral.Language.HU.TestData  as HU
+import qualified "this" Text.Numeral.Language.HRV.TestData as HRV
+import qualified "this" Text.Numeral.Language.HUN.TestData as HUN
 import qualified "this" Text.Numeral.Language.HUP.TestData as HUP
 import qualified "this" Text.Numeral.Language.HUR.TestData as HUR
-import qualified "this" Text.Numeral.Language.HY.TestData  as HY
-import qualified "this" Text.Numeral.Language.ID.TestData  as ID
-import qualified "this" Text.Numeral.Language.IG.TestData  as IG
+import qualified "this" Text.Numeral.Language.HYE.TestData as HYE
+import qualified "this" Text.Numeral.Language.IBO.TestData as IBO
+import qualified "this" Text.Numeral.Language.IND.TestData as IND
 import qualified "this" Text.Numeral.Language.INH.TestData as INH
-import qualified "this" Text.Numeral.Language.IT.TestData  as IT
+import qualified "this" Text.Numeral.Language.ITA.TestData as ITA
 import qualified "this" Text.Numeral.Language.IZH.TestData as IZH
-import qualified "this" Text.Numeral.Language.JA.TestData  as JA
+import qualified "this" Text.Numeral.Language.JPN.TestData as JPN
 import qualified "this" Text.Numeral.Language.KAP.TestData as KAP
 import qualified "this" Text.Numeral.Language.KEA.TestData as KEA
 import qualified "this" Text.Numeral.Language.KLB.TestData as KLB
+import qualified "this" Text.Numeral.Language.KMR.TestData as KMR
 import qualified "this" Text.Numeral.Language.KRL.TestData as KRL
-import qualified "this" Text.Numeral.Language.LA.TestData  as LA
-import qualified "this" Text.Numeral.Language.LB.TestData  as LB
+import qualified "this" Text.Numeral.Language.LAT.TestData as LAT
+import qualified "this" Text.Numeral.Language.LAV.TestData as LAV
+import qualified "this" Text.Numeral.Language.LIN.TestData as LIN
+import qualified "this" Text.Numeral.Language.LIT.TestData as LIT
 import qualified "this" Text.Numeral.Language.LIV.TestData as LIV
 import qualified "this" Text.Numeral.Language.LLD.TestData as LLD
 import qualified "this" Text.Numeral.Language.LMO.TestData as LMO
-import qualified "this" Text.Numeral.Language.LN.TestData  as LN
-import qualified "this" Text.Numeral.Language.LT.TestData  as LT
-import qualified "this" Text.Numeral.Language.LV.TestData  as LV
-import qualified "this" Text.Numeral.Language.MG.TestData  as MG
+import qualified "this" Text.Numeral.Language.LTZ.TestData as LTZ
 import qualified "this" Text.Numeral.Language.MIC.TestData as MIC
 import qualified "this" Text.Numeral.Language.MIN.TestData as MIN
+import qualified "this" Text.Numeral.Language.MLG.TestData as MLG
 import qualified "this" Text.Numeral.Language.MNK.TestData as MNK
 import qualified "this" Text.Numeral.Language.MOH.TestData as MOH
+import qualified "this" Text.Numeral.Language.NAV.TestData as NAV
 import qualified "this" Text.Numeral.Language.NEE.TestData as NEE
 import qualified "this" Text.Numeral.Language.NEN.TestData as NEN
-import qualified "this" Text.Numeral.Language.NL.TestData  as NL
-import qualified "this" Text.Numeral.Language.NO.TestData  as NO
+import qualified "this" Text.Numeral.Language.NLD.TestData as NLD
+import qualified "this" Text.Numeral.Language.NOB.TestData as NOB
 import qualified "this" Text.Numeral.Language.NQM.TestData as NQM
-import qualified "this" Text.Numeral.Language.NV.TestData  as NV
-import qualified "this" Text.Numeral.Language.OJ.TestData  as OJ
+import qualified "this" Text.Numeral.Language.OCI.TestData as OCI
+import qualified "this" Text.Numeral.Language.OJI.TestData as OJI
+import qualified "this" Text.Numeral.Language.ONE.TestData as ONE
+import qualified "this" Text.Numeral.Language.ORM.TestData as ORM
 import qualified "this" Text.Numeral.Language.PAA.TestData as PAA
 import qualified "this" Text.Numeral.Language.PDC.TestData as PDC
-import qualified "this" Text.Numeral.Language.PL.TestData  as PL
-import qualified "this" Text.Numeral.Language.PT.TestData  as PT
+import qualified "this" Text.Numeral.Language.POL.TestData as POL
+import qualified "this" Text.Numeral.Language.POR.TestData as POR
 import qualified "this" Text.Numeral.Language.RMN_DZA.TestData as RMN_DZA
 import qualified "this" Text.Numeral.Language.RMY_KAL.TestData as RMY_KAL
-import qualified "this" Text.Numeral.Language.RO.TestData  as RO
-import qualified "this" Text.Numeral.Language.RU.TestData  as RU
+import qualified "this" Text.Numeral.Language.RON.TestData as RON
+import qualified "this" Text.Numeral.Language.RUS.TestData as RUS
 import qualified "this" Text.Numeral.Language.SCO.TestData as SCO
+import qualified "this" Text.Numeral.Language.SME.TestData as SME
 import qualified "this" Text.Numeral.Language.SMN.TestData as SMN
-import qualified "this" Text.Numeral.Language.SV.TestData  as SV
+import qualified "this" Text.Numeral.Language.SPA.TestData as SPA
+import qualified "this" Text.Numeral.Language.SQI.TestData as SQI
+import qualified "this" Text.Numeral.Language.SWE.TestData as SWE
 import qualified "this" Text.Numeral.Language.TAR.TestData as TAR
-import qualified "this" Text.Numeral.Language.TR.TestData  as TR
+import qualified "this" Text.Numeral.Language.TGS.TestData as TGS
+import qualified "this" Text.Numeral.Language.TUR.TestData as TUR
 import qualified "this" Text.Numeral.Language.WMW.TestData as WMW
-import qualified "this" Text.Numeral.Language.WO.TestData  as WO
+import qualified "this" Text.Numeral.Language.WOL.TestData as WOL
 import qualified "this" Text.Numeral.Language.XPQ.TestData as XPQ
 import qualified "this" Text.Numeral.Language.YOR.TestData as YOR
 import qualified "this" Text.Numeral.Language.ZAI.TestData as ZAI
 import qualified "this" Text.Numeral.Language.ZAQ.TestData as ZAQ
-import qualified "this" Text.Numeral.Language.ZH.TestData  as ZH
+import qualified "this" Text.Numeral.Language.ZHO.TestData as ZHO
 import qualified "this" Text.Numeral.Language.ZPC.TestData as ZPC
 import qualified "this" Text.Numeral.Language.ZPL.TestData as ZPL
 
@@ -242,11 +250,11 @@ tests =
     ]
   , testGroup "AF"
     [ testGroup "unique data"
-      [ testUnique "cardinal" (AF.cardinals ∷ TestData ℤ)
-      , testUnique "ordinal"  (AF.ordinals  ∷ TestData ℤ)
+      [ testUnique "cardinal" (AFR.cardinals ∷ TestData ℤ)
+      , testUnique "ordinal"  (AFR.ordinals  ∷ TestData ℤ)
       ]
-    , mkTests "cardinal" AF.cardinal (AF.cardinals ∷ TestData ℤ)
-    , mkTests "ordinal"  AF.ordinal  (AF.ordinals  ∷ TestData ℤ)
+    , mkTests "cardinal" AFR.cardinal (AFR.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  AFR.ordinal  (AFR.ordinals  ∷ TestData ℤ)
     ]
   , testGroup "AMP"
     [ testGroup "unique data"
@@ -265,26 +273,26 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (AST.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "AZ"
+  , testGroup "AZE"
     [ testGroup "unique data"
-      [testUnique "cardinal" (AZ.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (AZE.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "BA"
+  , testGroup "BAK"
     [ testGroup "unique data"
-      [testUnique "cardinal" (BA.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (BAK.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "BG"
+  , testGroup "BUL"
     [ testGroup "unique data"
-      [testUnique "cardinal" (BG.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" BG.cardinal (BG.cardinals ∷ TestData ℤ)
+      [testUnique "cardinal" (BUL.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" BUL.cardinal (BUL.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "BM"
+  , testGroup "BAM"
     [ testGroup "unique data"
-      [testUnique "cardinal" (BM.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (BAM.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "CA"
+  , testGroup "CAT"
     [ testGroup "unique data"
-      [testUnique "cardinal" (CA.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (CAT.cardinals ∷ TestData ℤ)]
     ]
   , testGroup "CAF"
     [ testGroup "unique data"
@@ -319,9 +327,9 @@ tests =
       [testUnique "cardinal" (CLM.cardinals ∷ TestData ℤ)]
     , mkTests "cardinal" CLM.cardinal (CLM.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "CO"
+  , testGroup "COS"
     [ testGroup "unique data"
-      [testUnique "cardinal" (CO.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (COS.cardinals ∷ TestData ℤ)]
     ]
   , testGroup "COD"
     [ testGroup "unique data"
@@ -335,22 +343,22 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (CRG.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "CS"
+  , testGroup "CES"
     [ testGroup "unique data"
-      [testUnique "cardinal" (CS.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" CS.cardinal (CS.cardinals ∷ TestData ℤ)
+      [testUnique "cardinal" (CES.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" CES.cardinal (CES.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "CY"
+  , testGroup "CYM"
     [ testGroup "unique data"
-      [testUnique "cardinal" (CY.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (CYM.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "DE"
+  , testGroup "DEU"
     [ testGroup "unique data"
-      [ testUnique "cardinal" (DE.cardinals ∷ TestData ℤ)
-      , testUnique "ordinal"  (DE.ordinals  ∷ TestData ℤ)
+      [ testUnique "cardinal" (DEU.cardinals ∷ TestData ℤ)
+      , testUnique "ordinal"  (DEU.ordinals  ∷ TestData ℤ)
       ]
-    , mkTests "cardinal" DE.cardinal (DE.cardinals ∷ TestData ℤ)
-    , mkTests "ordinal"  DE.ordinal  (DE.ordinals  ∷ TestData ℤ)
+    , mkTests "cardinal" DEU.cardinal (DEU.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  DEU.ordinal  (DEU.ordinals  ∷ TestData ℤ)
     ]
   , testGroup "DJK"
     [ testGroup "unique data"
@@ -360,57 +368,65 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (EMI.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "EN"
+  , testGroup "ENG"
     [ testGroup "GB"
       [ testGroup "unique data"
-        [ testUnique "cardinal" (EN.gb_cardinals ∷ TestData ℤ)
-        , testUnique "ordinal"  (EN.gb_ordinals  ∷ TestData ℤ)
+        [ testUnique "cardinal" (ENG.gb_cardinals ∷ TestData ℤ)
+        , testUnique "ordinal"  (ENG.gb_ordinals  ∷ TestData ℤ)
         ]
-      , mkTests "cardinal" EN.gb_cardinal (EN.gb_cardinals ∷ TestData ℤ)
-      , mkTests "ordinal"  EN.gb_ordinal  (EN.gb_ordinals  ∷ TestData ℤ)
+      , mkTests "cardinal" ENG.gb_cardinal (ENG.gb_cardinals ∷ TestData ℤ)
+      , mkTests "ordinal"  ENG.gb_ordinal  (ENG.gb_ordinals  ∷ TestData ℤ)
       ]
     , testGroup "US"
       [ testGroup "unique data"
-        [ testUnique "cardinal" (EN.us_cardinals ∷ TestData ℤ)
-        , testUnique "ordinal"  (EN.us_ordinals  ∷ TestData ℤ)
+        [ testUnique "cardinal" (ENG.us_cardinals ∷ TestData ℤ)
+        , testUnique "ordinal"  (ENG.us_ordinals  ∷ TestData ℤ)
         ]
-      , mkTests "cardinal" EN.us_cardinal (EN.us_cardinals ∷ TestData ℤ)
-      , mkTests "ordinal"  EN.us_ordinal  (EN.us_ordinals  ∷ TestData ℤ)
+      , mkTests "cardinal" ENG.us_cardinal (ENG.us_cardinals ∷ TestData ℤ)
+      , mkTests "ordinal"  ENG.us_ordinal  (ENG.us_ordinals  ∷ TestData ℤ)
       ]
     ]
-  , testGroup "EO"
+  , testGroup "EPO"
     [ testGroup "unique data"
-      [testUnique "cardinal" (EO.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" EO.cardinal (EO.cardinals ∷ TestData ℤ)
+      [testUnique "cardinal" (EPO.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" EPO.cardinal (EPO.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "ES"
+  , testGroup "SPA"
     [ testGroup "unique data"
-      [testUnique "cardinal" (ES.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" ES.cardinal (ES.cardinals ∷ TestData ℤ)
+      [testUnique "cardinal" (SPA.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" SPA.cardinal (SPA.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "ET"
+  , testGroup "SQI"
     [ testGroup "unique data"
-      [testUnique "cardinal" (ET.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (SQI.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "FI"
+  , testGroup "EKK"
     [ testGroup "unique data"
-      [ testUnique "cardinal" (FI.cardinals ∷ TestData ℤ)
-      , testUnique "ordinal"  (FI.ordinals  ∷ TestData ℤ)
+      [testUnique "cardinal" (EKK.cardinals ∷ TestData ℤ)]
+    ]
+  , testGroup "FIN"
+    [ testGroup "unique data"
+      [ testUnique "cardinal" (FIN.cardinals ∷ TestData ℤ)
+      , testUnique "ordinal"  (FIN.ordinals  ∷ TestData ℤ)
       ]
-    , mkTests "cardinal" FI.cardinal (FI.cardinals ∷ TestData ℤ)
-    , mkTests "ordinal"  FI.ordinal  (FI.ordinals ∷ TestData ℤ)
+    , mkTests "cardinal" FIN.cardinal (FIN.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  FIN.ordinal  (FIN.ordinals ∷ TestData ℤ)
     ]
-  , testGroup "FO"
+  , testGroup "FAO"
     [ testGroup "unique data"
-      [testUnique "cardinal" (FO.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (FAO.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "FR"
+  , testGroup "FRA"
     [ testGroup "unique data"
-      [ testUnique "cardinal" (FR.cardinals ∷ TestData ℤ)
-      , testUnique "ordinal"  (FR.ordinals  ∷ TestData ℤ)
+      [ testUnique "cardinal" (FRA.cardinals ∷ TestData ℤ)
+      , testUnique "ordinal"  (FRA.ordinals  ∷ TestData ℤ)
       ]
-    , mkTests "cardinal" FR.cardinal (FR.cardinals ∷ TestData ℤ)
-    , mkTests "ordinal"  FR.ordinal  (FR.ordinals  ∷ TestData ℤ)
+    , mkTests "cardinal" FRA.cardinal (FRA.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  FRA.ordinal  (FRA.ordinals  ∷ TestData ℤ)
+    ]
+  , testGroup "FRR"
+    [ testGroup "unique data"
+      [testUnique "cardinal" (FRR.cardinals ∷ TestData ℤ)]
     ]
   , testGroup "FRA_JER"
     [ testGroup "unique data"
@@ -429,45 +445,45 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (GIL.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "GL"
+  , testGroup "GLG"
     [ testGroup "unique data"
-      [testUnique "cardinal" (GL.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (GLG.cardinals ∷ TestData ℤ)]
     ]
   , testGroup "GSW"
     [ testGroup "unique data"
       [testUnique "cardinal" (GSW.cardinals ∷ TestData ℤ)]
     , mkTests "cardinal" GSW.cardinal (GSW.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "GV"
+  , testGroup "GLV"
     [ testGroup "unique data"
-      [testUnique "cardinal" (GV.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" GV.cardinal  (GV.cardinals  ∷ TestData ℤ)
+      [testUnique "cardinal" (GLV.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" GLV.cardinal  (GLV.cardinals  ∷ TestData ℤ)
     ]
   , testGroup "HAI"
     [ testGroup "unique data"
       [testUnique "cardinal" (HAI.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "HE"
+  , testGroup "HEB"
     [ testGroup "unique data"
-      [testUnique "cardinal" (HE.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" HE.cardinal  (HE.cardinals  ∷ TestData ℤ)
+      [testUnique "cardinal" (HEB.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" HEB.cardinal  (HEB.cardinals  ∷ TestData ℤ)
     ]
   , testGroup "HOP"
     [ testGroup "unique data"
       [testUnique "cardinal" (HOP.cardinals ∷ TestData ℤ)]
     , mkTests "cardinal" HOP.cardinal (HOP.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "HR"
+  , testGroup "HRV"
     [ testGroup "unique data"
-      [testUnique "cardinal" (HR.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (HRV.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "HT"
+  , testGroup "HAT"
     [ testGroup "unique data"
-      [testUnique "cardinal" (HT.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (HAT.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "HU"
+  , testGroup "HUN"
     [ testGroup "unique data"
-      [testUnique "cardinal" (HU.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (HUN.cardinals ∷ TestData ℤ)]
     ]
   , testGroup "HUP"
     [ testGroup "unique data"
@@ -477,48 +493,48 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (HUR.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "HY"
+  , testGroup "HYE"
     [ testGroup "unique data"
-      [testUnique "cardinal" (HY.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (HYE.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "ID"
+  , testGroup "IND"
     [ testGroup "unique data"
-      [testUnique "cardinal" (ID.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (IND.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "IG"
+  , testGroup "IBO"
     [ testGroup "unique data"
-      [testUnique "cardinal" (IG.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (IBO.cardinals ∷ TestData ℤ)]
     ]
   , testGroup "INH"
     [ testGroup "unique data"
       [testUnique "cardinal" (INH.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "IT"
+  , testGroup "ITA"
     [ testGroup "unique data"
-      [testUnique "cardinal" (IT.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" IT.cardinal (IT.cardinals ∷ TestData ℤ)
-    , mkTests "ordinal"  IT.ordinal  (IT.ordinals  ∷ TestData ℤ)
+      [testUnique "cardinal" (ITA.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" ITA.cardinal (ITA.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  ITA.ordinal  (ITA.ordinals  ∷ TestData ℤ)
     ]
   , testGroup "IZH"
     [ testGroup "unique data"
       [testUnique "cardinal" (IZH.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "JA"
+  , testGroup "JPN"
     [ testGroup "preferred"
       [ testGroup "unique data"
-        [testUnique "cardinal" (JA.preferred_cardinals ∷ TestData ℤ)]
-      , mkTests "cardinal" JA.preferred_cardinal
-                          (JA.preferred_cardinals ∷ TestData ℤ)
+        [testUnique "cardinal" (JPN.preferred_cardinals ∷ TestData ℤ)]
+      , mkTests "cardinal" JPN.preferred_cardinal
+                          (JPN.preferred_cardinals ∷ TestData ℤ)
       ]
     , testGroup "kanji"
       [ testGroup "unique data"
-        [testUnique "cardinal" (JA.kanji_cardinals ∷ TestData ℤ)]
-      , mkTests "cardinal" JA.kanji_cardinal (JA.kanji_cardinals ∷ TestData ℤ)
+        [testUnique "cardinal" (JPN.kanji_cardinals ∷ TestData ℤ)]
+      , mkTests "cardinal" JPN.kanji_cardinal (JPN.kanji_cardinals ∷ TestData ℤ)
       ]
     , testGroup "daiji"
       [ testGroup "unique data"
-        [testUnique "cardinal" (JA.daiji_cardinals ∷ TestData ℤ)]
-      , mkTests "cardinal" JA.daiji_cardinal (JA.daiji_cardinals ∷ TestData ℤ)
+        [testUnique "cardinal" (JPN.daiji_cardinals ∷ TestData ℤ)]
+      , mkTests "cardinal" JPN.daiji_cardinal (JPN.daiji_cardinals ∷ TestData ℤ)
       ]
     ]
   , testGroup "KAP"
@@ -533,18 +549,22 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (KLB.cardinals ∷ TestData ℤ)]
     ]
+  , testGroup "KMR"
+    [ testGroup "unique data"
+      [testUnique "cardinal" (KMR.cardinals ∷ TestData ℤ)]
+    ]
   , testGroup "KRL"
     [ testGroup "unique data"
       [testUnique "cardinal" (KRL.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "LA"
+  , testGroup "LAT"
     [ testGroup "unique data"
-      [testUnique "cardinal" (LA.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" LA.cardinal (LA.cardinals ∷ TestData ℤ)
+      [testUnique "cardinal" (LAT.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" LAT.cardinal (LAT.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "LB"
+  , testGroup "LTZ"
     [ testGroup "unique data"
-      [testUnique "cardinal" (LB.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (LTZ.cardinals ∷ TestData ℤ)]
     ]
   , testGroup "LIV"
     [ testGroup "unique data"
@@ -559,22 +579,22 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (LMO.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "LN"
+  , testGroup "LIN"
     [ testGroup "unique data"
-      [testUnique "cardinal" (LN.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (LIN.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "LT"
+  , testGroup "LIT"
     [ testGroup "unique data"
-      [testUnique "cardinal" (LT.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (LIT.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "LV"
+  , testGroup "LAV"
     [ testGroup "unique data"
-      [testUnique "cardinal" (LV.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (LAV.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "MG"
+  , testGroup "MLG"
     [ testGroup "unique data"
-      [testUnique "cardinal" (MG.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" MG.cardinal (MG.cardinals  ∷ TestData ℤ)
+      [testUnique "cardinal" (MLG.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" MLG.cardinal (MLG.cardinals  ∷ TestData ℤ)
     ]
   , testGroup "MIC"
     [ testGroup "unique data"
@@ -601,36 +621,48 @@ tests =
       [testUnique "cardinal" (NEN.cardinals ∷ TestData ℤ)]
     , mkTests "cardinal" NEN.cardinal (NEN.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "NL"
+  , testGroup "NLD"
     [ testGroup "unique data"
-      [ testUnique "cardinal"       (NL.cardinals       ∷ TestData ℤ)
-      , testUnique "ordinal"        (NL.ordinals        ∷ TestData ℤ)
-      , testUnique "partitive"      (NL.partitives      ∷ TestData (ℤ, ℤ))
-      , testUnique "multiplicative" (NL.multiplicatives ∷ TestData ℤ)
+      [ testUnique "cardinal"       (NLD.cardinals       ∷ TestData ℤ)
+      , testUnique "ordinal"        (NLD.ordinals        ∷ TestData ℤ)
+      , testUnique "partitive"      (NLD.partitives      ∷ TestData (ℤ, ℤ))
+      , testUnique "multiplicative" (NLD.multiplicatives ∷ TestData ℤ)
       ]
-    , mkTests "cardinal"       NL.cardinal  (NL.cardinals  ∷ TestData ℤ)
-    , mkTests "ordinal"        NL.ordinal   (NL.ordinals   ∷ TestData ℤ)
-    , mkTests "partitive"      NL.partitive (NL.partitives ∷ TestData (ℤ, ℤ))
-    , mkTests "multiplicative" NL.multiplicative (NL.multiplicatives ∷ TestData ℤ)
+    , mkTests "cardinal"       NLD.cardinal  (NLD.cardinals  ∷ TestData ℤ)
+    , mkTests "ordinal"        NLD.ordinal   (NLD.ordinals   ∷ TestData ℤ)
+    , mkTests "partitive"      NLD.partitive (NLD.partitives ∷ TestData (ℤ, ℤ))
+    , mkTests "multiplicative" NLD.multiplicative (NLD.multiplicatives ∷ TestData ℤ)
     ]
-  , testGroup "NO"
+  , testGroup "NOB"
     [ testGroup "unique data"
-      [testUnique "cardinal" (NO.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" NO.cardinal  (NO.cardinals  ∷ TestData ℤ)
+      [testUnique "cardinal" (NOB.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" NOB.cardinal (NOB.cardinals  ∷ TestData ℤ)
     ]
   , testGroup "NQM"
     [ testGroup "unique data"
       [testUnique "cardinal" (NQM.cardinals ∷ TestData ℤ)]
     , mkTests "cardinal" NQM.cardinal (NQM.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "NV"
+  , testGroup "NAV"
     [ testGroup "unique data"
-      [testUnique "cardinal" (NV.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (NAV.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "OJ"
+  , testGroup "OCI"
     [ testGroup "unique data"
-      [testUnique "cardinal" (OJ.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" OJ.cardinal  (OJ.cardinals  ∷ TestData ℤ)
+      [testUnique "cardinal" (OCI.cardinals ∷ TestData ℤ)]
+    ]
+  , testGroup "OJI"
+    [ testGroup "unique data"
+      [testUnique "cardinal" (OJI.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" OJI.cardinal (OJI.cardinals  ∷ TestData ℤ)
+    ]
+  , testGroup "ONE"
+    [ testGroup "unique data"
+      [testUnique "cardinal" (ONE.cardinals ∷ TestData ℤ)]
+    ]
+  , testGroup "ORM"
+    [ testGroup "unique data"
+      [testUnique "cardinal" (ORM.cardinals ∷ TestData ℤ)]
     ]
   , testGroup "PAA"
     [ testGroup "unique data"
@@ -641,16 +673,16 @@ tests =
       [testUnique "cardinal" (PDC.cardinals ∷ TestData ℤ)]
     , mkTests "cardinal" PDC.cardinal (PDC.cardinals ∷ TestData ℤ)
     ]
-  , testGroup "PL"
+  , testGroup "POL"
     [ testGroup "unique data"
-      [testUnique "cardinal" (PL.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" PL.cardinal  (PL.cardinals  ∷ TestData ℤ)
+      [testUnique "cardinal" (POL.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" POL.cardinal (POL.cardinals  ∷ TestData ℤ)
     ]
-  , testGroup "PT"
+  , testGroup "POR"
     [ testGroup "unique data"
-      [testUnique "cardinal" (PT.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" PT.cardinal (PT.cardinals  ∷ TestData ℤ)
-    , mkTests "ordinal"  PT.ordinal  (PT.ordinals   ∷ TestData ℤ)
+      [testUnique "cardinal" (POR.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" POR.cardinal (POR.cardinals  ∷ TestData ℤ)
+    , mkTests "ordinal"  POR.ordinal  (POR.ordinals   ∷ TestData ℤ)
     ]
   , testGroup "RMN_DZA"
     [ testGroup "unique data"
@@ -660,49 +692,57 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (RMY_KAL.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "RO"
+  , testGroup "RON"
     [ testGroup "unique data"
-      [testUnique "cardinal" (RO.cardinals ∷ TestData ℤ)]
+      [testUnique "cardinal" (RON.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "RU"
+  , testGroup "RUS"
     [ testGroup "unique data"
-      [testUnique "cardinal" (RU.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" RU.cardinal  (RU.cardinals  ∷ TestData ℤ)
+      [testUnique "cardinal" (RUS.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" RUS.cardinal (RUS.cardinals  ∷ TestData ℤ)
     ]
   , testGroup "SCO"
     [ testGroup "unique data"
       [testUnique "cardinal" (SCO.cardinals ∷ TestData ℤ)]
     , mkTests "cardinal" SCO.cardinal (SCO.cardinals ∷ TestData ℤ)
     ]
+  , testGroup "SME"
+    [ testGroup "unique data"
+      [testUnique "cardinal" (SME.cardinals ∷ TestData ℤ)]
+    ]
   , testGroup "SMN"
     [ testGroup "unique data"
       [testUnique "cardinal" (SMN.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "SV"
+  , testGroup "SWE"
     [ testGroup "unique data"
-      [ testUnique "cardinal" (SV.cardinals ∷ TestData ℤ)
-      , testUnique "ordinal"  (SV.ordinals  ∷ TestData ℤ)
+      [ testUnique "cardinal" (SWE.cardinals ∷ TestData ℤ)
+      , testUnique "ordinal"  (SWE.ordinals  ∷ TestData ℤ)
       ]
-    , mkTests "cardinal" SV.cardinal (SV.cardinals ∷ TestData ℤ)
-    , mkTests "ordinal"  SV.ordinal  (SV.ordinals  ∷ TestData ℤ)
+    , mkTests "cardinal" SWE.cardinal (SWE.cardinals ∷ TestData ℤ)
+    , mkTests "ordinal"  SWE.ordinal  (SWE.ordinals  ∷ TestData ℤ)
     ]
   , testGroup "TAR"
     [ testGroup "unique data"
       [testUnique "cardinal" (TAR.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "TR"
+  , testGroup "TGS"
     [ testGroup "unique data"
-      [testUnique "cardinal" (TR.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" TR.cardinal (TR.cardinals ∷ TestData ℤ)
+      [testUnique "cardinal" (TGS.cardinals ∷ TestData ℤ)]
+    ]
+  , testGroup "TUR"
+    [ testGroup "unique data"
+      [testUnique "cardinal" (TUR.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" TUR.cardinal (TUR.cardinals ∷ TestData ℤ)
     ]
   , testGroup "WMW"
     [ testGroup "unique data"
       [testUnique "cardinal" (WMW.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "WO"
+  , testGroup "WOL"
     [ testGroup "unique data"
-      [testUnique "cardinal" (WO.cardinals ∷ TestData ℤ)]
-    , mkTests "cardinal" WO.cardinal (WO.cardinals ∷ TestData ℤ)
+      [testUnique "cardinal" (WOL.cardinals ∷ TestData ℤ)]
+    , mkTests "cardinal" WOL.cardinal (WOL.cardinals ∷ TestData ℤ)
     ]
   , testGroup "XPQ"
     [ testGroup "unique data"
@@ -721,31 +761,31 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (ZAQ.cardinals ∷ TestData ℤ)]
     ]
-  , testGroup "ZH"
+  , testGroup "ZHO"
     [ testGroup "characters (traditional)"
       [ testGroup "unique data"
-        [testUnique "cardinal" (ZH.trad_cardinals ∷ TestData ℤ)]
-      , mkTests "cardinal" ZH.trad_cardinal (ZH.trad_cardinals ∷ TestData ℤ)
+        [testUnique "cardinal" (ZHO.trad_cardinals ∷ TestData ℤ)]
+      , mkTests "cardinal" ZHO.trad_cardinal (ZHO.trad_cardinals ∷ TestData ℤ)
       ]
     , testGroup "characters (simplified)"
       [ testGroup "unique data"
-        [testUnique "cardinal" (ZH.simpl_cardinals ∷ TestData ℤ)]
-      , mkTests "cardinal" ZH.simpl_cardinal (ZH.simpl_cardinals ∷ TestData ℤ)
+        [testUnique "cardinal" (ZHO.simpl_cardinals ∷ TestData ℤ)]
+      , mkTests "cardinal" ZHO.simpl_cardinal (ZHO.simpl_cardinals ∷ TestData ℤ)
       ]
     , testGroup "financial characters (traditional)"
       [ testGroup "unique data"
-        [testUnique "cardinal" (ZH.finance_trad_cardinals ∷ TestData ℤ)]
-      , mkTests "cardinal" ZH.finance_trad_cardinal (ZH.finance_trad_cardinals ∷ TestData ℤ)
+        [testUnique "cardinal" (ZHO.finance_trad_cardinals ∷ TestData ℤ)]
+      , mkTests "cardinal" ZHO.finance_trad_cardinal (ZHO.finance_trad_cardinals ∷ TestData ℤ)
       ]
     , testGroup "financial characters (simplified)"
       [ testGroup "unique data"
-        [testUnique "cardinal" (ZH.finance_simpl_cardinals ∷ TestData ℤ)]
-      , mkTests "cardinal" ZH.finance_simpl_cardinal (ZH.finance_simpl_cardinals ∷ TestData ℤ)
+        [testUnique "cardinal" (ZHO.finance_simpl_cardinals ∷ TestData ℤ)]
+      , mkTests "cardinal" ZHO.finance_simpl_cardinal (ZHO.finance_simpl_cardinals ∷ TestData ℤ)
       ]
     , testGroup "pinyin"
       [ testGroup "unique data"
-        [testUnique "cardinal" (ZH.pinyin_cardinals ∷ TestData ℤ)]
-      , mkTests "cardinal" ZH.pinyin_cardinal (ZH.pinyin_cardinals ∷ TestData ℤ)
+        [testUnique "cardinal" (ZHO.pinyin_cardinals ∷ TestData ℤ)]
+      , mkTests "cardinal" ZHO.pinyin_cardinal (ZHO.pinyin_cardinals ∷ TestData ℤ)
       ]
     ]
   , testGroup "ZPC"

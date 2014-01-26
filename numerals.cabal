@@ -118,44 +118,44 @@ library
                  , Text.Numeral.Rules
 
                  , Text.Numeral.Language.Entries
-                 , Text.Numeral.Language.AF
+                 , Text.Numeral.Language.AFR
                  , Text.Numeral.Language.AMP
-                 , Text.Numeral.Language.BG
+                 , Text.Numeral.Language.BUL
+                 , Text.Numeral.Language.CES
                  , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.CHR
                  , Text.Numeral.Language.CLM
-                 , Text.Numeral.Language.CS
-                 , Text.Numeral.Language.DE
-                 , Text.Numeral.Language.EN
-                 , Text.Numeral.Language.EO
-                 , Text.Numeral.Language.ES
-                 , Text.Numeral.Language.FI
-                 , Text.Numeral.Language.FR
+                 , Text.Numeral.Language.DEU
+                 , Text.Numeral.Language.ENG
+                 , Text.Numeral.Language.EPO
+                 , Text.Numeral.Language.FIN
+                 , Text.Numeral.Language.FRA
                  , Text.Numeral.Language.FUR
+                 , Text.Numeral.Language.GLV
                  , Text.Numeral.Language.GSW
-                 , Text.Numeral.Language.GV
-                 , Text.Numeral.Language.HE
+                 , Text.Numeral.Language.HEB
                  , Text.Numeral.Language.HOP
-                 , Text.Numeral.Language.IT
-                 , Text.Numeral.Language.JA
-                 , Text.Numeral.Language.LA
+                 , Text.Numeral.Language.ITA
+                 , Text.Numeral.Language.JPN
+                 , Text.Numeral.Language.LAT
                  , Text.Numeral.Language.LLD
-                 , Text.Numeral.Language.MG
+                 , Text.Numeral.Language.MLG
                  , Text.Numeral.Language.NEN
-                 , Text.Numeral.Language.NL
-                 , Text.Numeral.Language.NO
+                 , Text.Numeral.Language.NLD
+                 , Text.Numeral.Language.NOB
                  , Text.Numeral.Language.NQM
-                 , Text.Numeral.Language.OJ
+                 , Text.Numeral.Language.OJI
                  , Text.Numeral.Language.PDC
-                 , Text.Numeral.Language.PL
-                 , Text.Numeral.Language.PT
-                 , Text.Numeral.Language.RU
+                 , Text.Numeral.Language.POL
+                 , Text.Numeral.Language.POR
+                 , Text.Numeral.Language.RUS
                  , Text.Numeral.Language.SCO
-                 , Text.Numeral.Language.SV
-                 , Text.Numeral.Language.TR
-                 , Text.Numeral.Language.WO
+                 , Text.Numeral.Language.SPA
+                 , Text.Numeral.Language.SWE
+                 , Text.Numeral.Language.TUR
+                 , Text.Numeral.Language.WOL
                  , Text.Numeral.Language.YOR
-                 , Text.Numeral.Language.ZH
+                 , Text.Numeral.Language.ZHO
   other-modules: Text.Numeral.Render.Utils
 
 
@@ -170,105 +170,112 @@ test-suite test-numerals
 
                , Text.Numeral.Language.ACH.TestData
                , Text.Numeral.Language.ADY.TestData
-               , Text.Numeral.Language.AF.TestData
+               , Text.Numeral.Language.AFR.TestData
                , Text.Numeral.Language.AMP.TestData
                , Text.Numeral.Language.ARI.TestData
                , Text.Numeral.Language.ARN.TestData
                , Text.Numeral.Language.AST.TestData
-               , Text.Numeral.Language.AZ.TestData
-               , Text.Numeral.Language.BA.TestData
-               , Text.Numeral.Language.BG.TestData
-               , Text.Numeral.Language.BM.TestData
-               , Text.Numeral.Language.CA.TestData
+               , Text.Numeral.Language.AZE.TestData
+               , Text.Numeral.Language.BAK.TestData
+               , Text.Numeral.Language.BAM.TestData
+               , Text.Numeral.Language.BUL.TestData
                , Text.Numeral.Language.CAF.TestData
                , Text.Numeral.Language.CAR.TestData
+               , Text.Numeral.Language.CAT.TestData
                , Text.Numeral.Language.CBK.TestData
+               , Text.Numeral.Language.CES.TestData
                , Text.Numeral.Language.CHN.TestData
                , Text.Numeral.Language.CHR.TestData
                , Text.Numeral.Language.CKU.TestData
                , Text.Numeral.Language.CLM.TestData
-               , Text.Numeral.Language.CO.TestData
                , Text.Numeral.Language.COD.TestData
                , Text.Numeral.Language.COO.TestData
+               , Text.Numeral.Language.COS.TestData
                , Text.Numeral.Language.CRG.TestData
-               , Text.Numeral.Language.CS.TestData
-               , Text.Numeral.Language.CY.TestData
-               , Text.Numeral.Language.DE.TestData
+               , Text.Numeral.Language.CYM.TestData
+               , Text.Numeral.Language.DEU.TestData
                , Text.Numeral.Language.DJK.TestData
+               , Text.Numeral.Language.EKK.TestData
                , Text.Numeral.Language.EMI.TestData
-               , Text.Numeral.Language.EN.TestData
-               , Text.Numeral.Language.EO.TestData
-               , Text.Numeral.Language.ES.TestData
-               , Text.Numeral.Language.ET.TestData
-               , Text.Numeral.Language.FI.TestData
-               , Text.Numeral.Language.FO.TestData
-               , Text.Numeral.Language.FR.TestData
+               , Text.Numeral.Language.ENG.TestData
+               , Text.Numeral.Language.EPO.TestData
+               , Text.Numeral.Language.FAO.TestData
+               , Text.Numeral.Language.FIN.TestData
+               , Text.Numeral.Language.FRA.TestData
                , Text.Numeral.Language.FRA_JER.TestData
+               , Text.Numeral.Language.FRR.TestData
                , Text.Numeral.Language.FUR.TestData
                , Text.Numeral.Language.GCF_MTQ.TestData
                , Text.Numeral.Language.GIL.TestData
-               , Text.Numeral.Language.GL.TestData
+               , Text.Numeral.Language.GLG.TestData
+               , Text.Numeral.Language.GLV.TestData
                , Text.Numeral.Language.GSW.TestData
-               , Text.Numeral.Language.GV.TestData
                , Text.Numeral.Language.HAI.TestData
-               , Text.Numeral.Language.HE.TestData
+               , Text.Numeral.Language.HAT.TestData
+               , Text.Numeral.Language.HEB.TestData
                , Text.Numeral.Language.HOP.TestData
-               , Text.Numeral.Language.HR.TestData
-               , Text.Numeral.Language.HT.TestData
-               , Text.Numeral.Language.HU.TestData
+               , Text.Numeral.Language.HRV.TestData
+               , Text.Numeral.Language.HUN.TestData
                , Text.Numeral.Language.HUP.TestData
                , Text.Numeral.Language.HUR.TestData
-               , Text.Numeral.Language.HY.TestData
-               , Text.Numeral.Language.ID.TestData
-               , Text.Numeral.Language.IG.TestData
+               , Text.Numeral.Language.HYE.TestData
+               , Text.Numeral.Language.IBO.TestData
+               , Text.Numeral.Language.IND.TestData
                , Text.Numeral.Language.INH.TestData
-               , Text.Numeral.Language.IT.TestData
+               , Text.Numeral.Language.ITA.TestData
                , Text.Numeral.Language.IZH.TestData
-               , Text.Numeral.Language.JA.TestData
+               , Text.Numeral.Language.JPN.TestData
                , Text.Numeral.Language.KAP.TestData
                , Text.Numeral.Language.KEA.TestData
                , Text.Numeral.Language.KLB.TestData
+               , Text.Numeral.Language.KMR.TestData
                , Text.Numeral.Language.KRL.TestData
-               , Text.Numeral.Language.LA.TestData
-               , Text.Numeral.Language.LB.TestData
+               , Text.Numeral.Language.LAT.TestData
+               , Text.Numeral.Language.LAV.TestData
+               , Text.Numeral.Language.LIN.TestData
+               , Text.Numeral.Language.LIT.TestData
                , Text.Numeral.Language.LIV.TestData
                , Text.Numeral.Language.LLD.TestData
                , Text.Numeral.Language.LMO.TestData
-               , Text.Numeral.Language.LN.TestData
-               , Text.Numeral.Language.LT.TestData
-               , Text.Numeral.Language.LV.TestData
-               , Text.Numeral.Language.MG.TestData
+               , Text.Numeral.Language.LTZ.TestData
                , Text.Numeral.Language.MIC.TestData
                , Text.Numeral.Language.MIN.TestData
+               , Text.Numeral.Language.MLG.TestData
                , Text.Numeral.Language.MNK.TestData
                , Text.Numeral.Language.MOH.TestData
+               , Text.Numeral.Language.NAV.TestData
                , Text.Numeral.Language.NEE.TestData
                , Text.Numeral.Language.NEN.TestData
-               , Text.Numeral.Language.NL.TestData
-               , Text.Numeral.Language.NO.TestData
+               , Text.Numeral.Language.NLD.TestData
+               , Text.Numeral.Language.NOB.TestData
                , Text.Numeral.Language.NQM.TestData
-               , Text.Numeral.Language.NV.TestData
-               , Text.Numeral.Language.OJ.TestData
+               , Text.Numeral.Language.OCI.TestData
+               , Text.Numeral.Language.OJI.TestData
+               , Text.Numeral.Language.ONE.TestData
+               , Text.Numeral.Language.ORM.TestData
                , Text.Numeral.Language.PAA.TestData
                , Text.Numeral.Language.PDC.TestData
-               , Text.Numeral.Language.PL.TestData
-               , Text.Numeral.Language.PT.TestData
+               , Text.Numeral.Language.POL.TestData
+               , Text.Numeral.Language.POR.TestData
                , Text.Numeral.Language.RMN_DZA.TestData
                , Text.Numeral.Language.RMY_KAL.TestData
-               , Text.Numeral.Language.RO.TestData
-               , Text.Numeral.Language.RU.TestData
+               , Text.Numeral.Language.RON.TestData
+               , Text.Numeral.Language.RUS.TestData
                , Text.Numeral.Language.SCO.TestData
+               , Text.Numeral.Language.SME.TestData
                , Text.Numeral.Language.SMN.TestData
-               , Text.Numeral.Language.SV.TestData
+               , Text.Numeral.Language.SPA.TestData
+               , Text.Numeral.Language.SWE.TestData
                , Text.Numeral.Language.TAR.TestData
-               , Text.Numeral.Language.TR.TestData
+               , Text.Numeral.Language.TGS.TestData
+               , Text.Numeral.Language.TUR.TestData
                , Text.Numeral.Language.WMW.TestData
-               , Text.Numeral.Language.WO.TestData
+               , Text.Numeral.Language.WOL.TestData
                , Text.Numeral.Language.XPQ.TestData
                , Text.Numeral.Language.YOR.TestData
                , Text.Numeral.Language.ZAI.TestData
                , Text.Numeral.Language.ZAQ.TestData
-               , Text.Numeral.Language.ZH.TestData
+               , Text.Numeral.Language.ZHO.TestData
                , Text.Numeral.Language.ZPC.TestData
                , Text.Numeral.Language.ZPL.TestData
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N

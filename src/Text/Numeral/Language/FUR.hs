@@ -44,7 +44,7 @@ import qualified "this" Text.Numeral.Exp     as E
 import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import           "this" Text.Numeral.Entry
-import qualified "this" Text.Numeral.Language.IT as IT ( rule )
+import qualified "this" Text.Numeral.Language.ITA as ITA ( rule )
 import           "this" Text.Numeral.Render.Utils ( addCtx, mulCtx )
 import "text" Data.Text ( Text )
 
@@ -73,7 +73,7 @@ struct ∷ ( Integral α, E.Scale α
          , E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β
          )
        ⇒ α → β
-struct = fix $ IT.rule `combine` pelletierScale1 R L BN.rule
+struct = fix $ ITA.rule `combine` pelletierScale1 R L BN.rule
 
 bounds ∷ (Integral α) ⇒ (α, α)
 bounds = let x = dec 12 - 1 in (negate x, x)

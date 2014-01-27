@@ -37,8 +37,6 @@ data Inflection = Inflection { iCase   ∷ Maybe Case
                              , iNumber ∷ Maybe Number
                              } deriving (Show, Eq)
 
-instance G.Inflection Inflection
-
 defaultInflection ∷ Inflection
 defaultInflection = Inflection Nothing Nothing Nothing
 

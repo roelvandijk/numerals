@@ -47,7 +47,6 @@ import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.Exp as E
-import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc  ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
@@ -99,7 +98,7 @@ kanji_entry = entry
                     }
     }
 
-kanji_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
+kanji_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
 kanji_cardinal inf = kanji_cardinal_repr inf ∘ struct
 
 kanji_cardinal_repr ∷ i → Exp i → Maybe Text
@@ -158,7 +157,7 @@ daiji_entry = entry
                     }
     }
 
-daiji_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
+daiji_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
 daiji_cardinal inf = daiji_cardinal_repr inf ∘ struct
 
 daiji_cardinal_repr ∷ i → Exp i → Maybe Text
@@ -251,7 +250,7 @@ on'yomi_entry = entry
                     }
     }
 
-on'yomi_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
+on'yomi_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
 on'yomi_cardinal inf = on'yomi_cardinal_repr inf ∘ struct
 
 on'yomi_cardinal_repr ∷ i → Exp i → Maybe Text
@@ -271,7 +270,7 @@ preferred_entry = entry
                     }
     }
 
-preferred_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
+preferred_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
 preferred_cardinal inf = preferred_cardinal_repr inf ∘ struct
 
 preferred_cardinal_repr ∷ i → Exp i → Maybe Text

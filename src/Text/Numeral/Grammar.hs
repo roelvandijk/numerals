@@ -1,14 +1,11 @@
-{-# LANGUAGE NoImplicitPrelude
-           , UnicodeSyntax
-           , PackageImports
-  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE UnicodeSyntax     #-}
+{-# LANGUAGE PackageImports    #-}
 
 module Text.Numeral.Grammar
-    ( -- * Inflection
-      Inflection
-      -- * Grammatical categories
+    ( -- * Grammatical categories
       -- ** Case
-    , NoCase               (noCase,               hasNoCase)
+      NoCase               (noCase,               hasNoCase)
     , Ablative             (ablative,             isAblative)
     , Abessive             (abessive,             isAbessive)
     , Accusative           (accusative,           isAccusative)
@@ -61,37 +58,29 @@ import "base" Data.Bool ( Bool )
 
 
 --------------------------------------------------------------------------------
--- Inflection
---------------------------------------------------------------------------------
-
--- | Base class for various kinds of inflections.
-class Inflection α
-
-
---------------------------------------------------------------------------------
 -- Case
 --------------------------------------------------------------------------------
 
-class Inflection α ⇒ NoCase α where
+class NoCase α where
     noCase ∷ α → α
     hasNoCase ∷ α → Bool
 
 -- | The ablative case (abbreviated abl) indicates movement from
 -- something, or cause.
-class Inflection α ⇒ Ablative α where
+class Ablative α where
     ablative ∷ α → α
     isAblative ∷ α → Bool
 
 -- | In linguistics, abessive (abbreviated abe or abess), caritive and privative
 -- (abbreviated priv) are names for a grammatical case expressing the lack or
 -- absence of the marked noun.
-class Inflection α ⇒ Abessive α where
+class Abessive α where
     abessive ∷ α → α
     isAbessive ∷ α → Bool
 
 -- | The accusative case (abbreviated acc) indicates the direct object
 -- of a verb.
-class Inflection α ⇒ Accusative α where
+class Accusative α where
     accusative ∷ α → α
     isAccusative ∷ α → Bool
 
@@ -101,13 +90,13 @@ class Inflection α ⇒ Accusative α where
 -- company with" or "together with" (other uses of "with," e.g. with the meaning
 -- of "using," "by means of" (I cut bread with a knife) would correspond to the
 -- instrumental case or related cases).
-class Inflection α ⇒ Comitative α where
+class Comitative α where
     comitative ∷ α → α
     isComitative ∷ α → Bool
 
 -- | The dative case (abbreviated dat, or sometimes d when it is a
 -- core argument) indicates the indirect object of a verb.
-class Inflection α ⇒ Dative α where
+class Dative α where
     dative ∷ α → α
     isDative ∷ α → Bool
 
@@ -116,25 +105,25 @@ class Inflection α ⇒ Dative α where
 -- from the surface of something (e.g. "off the table"), but it is used in
 -- several other meanings (e.g. "about people"), some of them related to the
 -- original (e.g. "from the post office").
-class Inflection α ⇒ Delative α where
+class Delative α where
     delative ∷ α → α
     isDelative ∷ α → Bool
 
 -- | The distributive case (abbreviated distr) is used on nouns for the meanings
 -- of per or each.
-class Inflection α ⇒ Distributive α where
+class Distributive α where
     distributive ∷ α → α
     isDistributive ∷ α → Bool
 
 -- | The distributive-temporal case specifies when something is done.
-class Inflection α ⇒ DistributiveTemporal α where
+class DistributiveTemporal α where
     distributiveTemporal ∷ α → α
     isDistributiveTemporal ∷ α → Bool
 
 -- | The essive or similaris case (abbreviated ess) carries the meaning of a
 -- temporary location or state of being, often equivalent to the English "as a
 -- (child)".
-class Inflection α ⇒ Essive α where
+class Essive α where
     essive ∷ α → α
     isEssive ∷ α → Bool
 
@@ -142,13 +131,13 @@ class Inflection α ⇒ Essive α where
 -- case or second case), which roughly corresponds to English's
 -- possessive case and preposition of, indicates the possessor of
 -- another noun.
-class Inflection α ⇒ Genitive α where
+class Genitive α where
     genitive ∷ α → α
     isGenitive ∷ α → Bool
 
 -- | The instrumental case (abbreviated ins or instr; also called the
 -- eighth case) indicates an object used in performing an action.
-class Inflection α ⇒ Instrumental α where
+class Instrumental α where
     instrumental ∷ α → α
     isInstrumental ∷ α → Bool
 
@@ -156,7 +145,7 @@ class Inflection α ⇒ Instrumental α where
 -- basic meaning of "by means of". It is a comparatively rarely used case,
 -- though it is found in some commonly used expressions, such as omin silmin →
 -- "with one's own eyes".
-class Inflection α ⇒ Instructive α where
+class Instructive α where
     instructive ∷ α → α
     isInstructive ∷ α → Bool
 
@@ -165,24 +154,24 @@ class Inflection α ⇒ Instructive α where
 -- belongs to the group of the general local cases together with the locative
 -- and separative case. The term derives from the Latin lat-, the participle
 -- stem of ferre, "to bring".
-class Inflection α ⇒ Lative α where
+class Lative α where
     lative ∷ α → α
     isLative ∷ α → Bool
 
 -- | The locative case (abbreviated loc) indicates a location.
-class Inflection α ⇒ Locative α where
+class Locative α where
     locative ∷ α → α
     isLocative ∷ α → Bool
 
 -- | The multiplicative case is a grammatical case used for marking a number of
 -- something ("three times").
-class Inflection α ⇒ Multiplicative α where
+class Multiplicative α where
     multiplicative ∷ α → α
     isMultiplicative ∷ α → Bool
 
 -- | The nominative case (abbreviated nom) indicates the subject of a
 -- finite verb.
-class Inflection α ⇒ Nominative α where
+class Nominative α where
     nominative ∷ α → α
     isNominative ∷ α → Bool
 
@@ -190,14 +179,14 @@ class Inflection α ⇒ Nominative α where
 -- denotes "partialness", "without result", or "without specific
 -- identity". It is also used in contexts where a subgroup is selected
 -- from a larger group, or with numbers.
-class Inflection α ⇒ Partitive α where
+class Partitive α where
     partitive ∷ α → α
     isPartitive ∷ α → Bool
 
 -- | The Superessive case (abbreviated supe) is a grammatical declension
 -- indicating location on top of, or on the surface of something. Its name comes
 -- from Latin supersum, superesse: to be over and above.
-class Inflection α ⇒ SuperEssive α where
+class SuperEssive α where
     superEssive ∷ α → α
     isSuperEssive ∷ α → Bool
 
@@ -209,19 +198,19 @@ class Inflection α ⇒ SuperEssive α where
 -- Caucasian languages it denotes a movement towards the bottomsides or the area
 -- under an object. The sublative case is used in the Finnish, Tsez and
 -- Hungarian languages.
-class Inflection α ⇒ Sublative α where
+class Sublative α where
     sublative ∷ α → α
     isSublative ∷ α → Bool
 
 -- | The translative case (abbreviated transl) is a grammatical case that
 -- indicates a change in state of a noun, with the general sense of "becoming X"
 -- or "change to X".
-class Inflection α ⇒ Translative α where
+class Translative α where
     translative ∷ α → α
     isTranslative ∷ α → Bool
 
 -- | The vocative case indicates an addressee.
-class Inflection α ⇒ Vocative α where
+class Vocative α where
     vocative ∷ α → α
     isVocative ∷ α → Bool
 
@@ -278,23 +267,23 @@ class Locative α ⇒ LocativeAllative α where
 -- Gender
 --------------------------------------------------------------------------------
 
-class Inflection α ⇒ NoGender α where
+class NoGender α where
     noGender ∷ α → α
     hasNoGender ∷ α → Bool
 
-class Inflection α ⇒ Neuter α where
+class Neuter α where
     neuter ∷ α → α
     isNeuter ∷ α → Bool
 
-class Inflection α ⇒ Masculine α where
+class Masculine α where
     masculine ∷ α → α
     isMasculine ∷ α → Bool
 
-class Inflection α ⇒ Feminine α where
+class Feminine α where
     feminine ∷ α → α
     isFeminine ∷ α → Bool
 
-class Inflection α ⇒ Common α where
+class Common α where
     common ∷ α → α
     isCommon ∷ α → Bool
 
@@ -303,27 +292,27 @@ class Inflection α ⇒ Common α where
 -- Number
 --------------------------------------------------------------------------------
 
-class Inflection α ⇒ NoNumber α where
+class NoNumber α where
     noNumber ∷ α → α
     hasNoNumber ∷ α → Bool
 
-class Inflection α ⇒ Singular α where
+class Singular α where
     singular ∷ α → α
     isSingular ∷ α → Bool
 
-class Inflection α ⇒ Dual α where
+class Dual α where
     dual ∷ α → α
     isDual ∷ α → Bool
 
-class Inflection α ⇒ Trial α where
+class Trial α where
     trial ∷ α → α
     isTrial ∷ α → Bool
 
-class Inflection α ⇒ Paucal α where
+class Paucal α where
     paucal ∷ α → α
     isPaucal ∷ α → Bool
 
-class Inflection α ⇒ Plural α where
+class Plural α where
     plural ∷ α → α
     isPlural ∷ α → Bool
 

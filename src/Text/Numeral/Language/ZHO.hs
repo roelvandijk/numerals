@@ -54,7 +54,6 @@ import qualified "containers" Data.Map as M ( Map, fromList, lookup )
 import "containers-unicode-symbols" Data.Map.Unicode ( (∪) )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.Exp as E
-import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
@@ -131,7 +130,7 @@ trad_entry = entry
                     }
     }
 
-trad_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
+trad_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
 trad_cardinal inf = trad_cardinalRepr inf ∘ struct
 
 trad_cardinalRepr ∷ i → Exp i → Maybe Text
@@ -190,7 +189,7 @@ simpl_entry = entry
                     }
     }
 
-simpl_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
+simpl_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
 simpl_cardinal inf = simpl_cardinalRepr inf ∘ struct
 
 simpl_cardinalRepr ∷ i → Exp i → Maybe Text
@@ -225,7 +224,7 @@ finance_trad_entry = entry
                     }
     }
 
-finance_trad_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
+finance_trad_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
 finance_trad_cardinal inf = finance_trad_cardinalRepr inf ∘ struct
 
 finance_trad_cardinalRepr ∷ i → Exp i → Maybe Text
@@ -269,7 +268,7 @@ finance_simpl_entry = entry
                     }
     }
 
-finance_simpl_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
+finance_simpl_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
 finance_simpl_cardinal inf = finance_simpl_cardinalRepr inf ∘ struct
 
 finance_simpl_cardinalRepr ∷ i → Exp i → Maybe Text
@@ -305,7 +304,7 @@ pinyin_entry = entry
                     }
     }
 
-pinyin_cardinal ∷ (Inflection i, Integral α) ⇒ i → α → Maybe Text
+pinyin_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
 pinyin_cardinal inf = pinyin_cardinalRepr inf ∘ struct
 
 pinyin_cardinalRepr ∷ i → Exp i → Maybe Text

@@ -41,7 +41,6 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum as BN
 import qualified "this" Text.Numeral.Exp    as E
-import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
@@ -65,7 +64,7 @@ entry = emptyEntry
     , entOrdinal     = Nothing
     }
 
-cardinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
+cardinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
 cardinal inf = cardinalRepr inf ∘ struct
 
 struct ∷ ( Integral α, E.Scale α

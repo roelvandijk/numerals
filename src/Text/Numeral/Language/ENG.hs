@@ -49,7 +49,6 @@ import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum as BN
 import qualified "this" Text.Numeral.Exp    as E
-import           "this" Text.Numeral.Grammar ( Inflection )
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
@@ -94,13 +93,13 @@ us_entry = entry
                     }
     }
 
-gb_cardinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
+gb_cardinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
 gb_cardinal inf = render (cardinalRepr "minus " gb_add) inf ∘ shortScaleStruct
 
-gb_ordinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
+gb_ordinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
 gb_ordinal inf = render (ordinalRepr gb_add) inf ∘ shortScaleStruct
 
-gbPelletier_cardinal ∷ (Inflection i, Integral α, E.Scale α)
+gbPelletier_cardinal ∷ (Integral α, E.Scale α)
                      ⇒ i → α → Maybe Text
 gbPelletier_cardinal inf = render (cardinalRepr "minus " gb_add) { reprScale = pelletierRepr } inf
                          ∘ pelletierScaleStruct
@@ -109,10 +108,10 @@ gbPelletier_cardinal inf = render (cardinalRepr "minus " gb_add) { reprScale = p
                                      (\_ _ → "illiard")
                                      []
 
-us_cardinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
+us_cardinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
 us_cardinal inf = render (cardinalRepr "negative " us_add) inf ∘ shortScaleStruct
 
-us_ordinal ∷ (Inflection i, Integral α, E.Scale α) ⇒ i → α → Maybe Text
+us_ordinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
 us_ordinal inf = render (ordinalRepr us_add) inf ∘ shortScaleStruct
 
 shortScaleStruct ∷ ( Integral α, E.Scale α

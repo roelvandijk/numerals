@@ -41,7 +41,6 @@ import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.Exp as E
-import           "this" Text.Numeral.Grammar ( Inflection )
 import "this" Text.Numeral.Entry
 
 
@@ -68,7 +67,7 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Inflection i, Integral α, Monoid s, IsString s) ⇒ α → Maybe s
+cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
 cardinal = cardinalRepr ∘ struct
 
 struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β

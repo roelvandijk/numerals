@@ -157,8 +157,6 @@ eval (Sub x y)     = subtract (eval x) (eval y)
 eval (Neg x)       = negate (eval x)
 eval (Frac n d)    = eval n `div` eval d
 eval (Scale b o r) = 10 ^ (eval r ⋅ b + o)
-eval (Dual x)      = eval x
-eval (Plural x)    = eval x
 eval (Inflection _ x) = eval x
 eval Unknown       = error "eval: unknown"
 

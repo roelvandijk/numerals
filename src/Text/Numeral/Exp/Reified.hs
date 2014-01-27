@@ -1,9 +1,8 @@
-{-# LANGUAGE CPP
-           , NoImplicitPrelude
-           , PackageImports
-           , TypeFamilies
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE CPP               #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 module Text.Numeral.Exp.Reified ( Exp(..), showExp, Side(L, R) ) where
 
@@ -43,10 +42,6 @@ data Exp i
          | Frac (Exp i) (Exp i)
            -- | A step in a scale of large values.
          | Scale ℤ ℤ (Exp i)
-           -- | A dual form of an expression.
-         | Dual (Exp i)
-           -- | A plural form of an expression.
-         | Plural (Exp i)
            -- | A change of inflection.
          | Inflection (i → i) (Exp i)
 
@@ -63,8 +58,6 @@ showExp (Mul  x y) = "Mul ("  ++ showExp x ++ ") (" ++ showExp y ++ ")"
 showExp (Sub  x y) = "Sub ("  ++ showExp x ++ ") (" ++ showExp y ++ ")"
 showExp (Frac x y) = "Frac (" ++ showExp x ++ ") (" ++ showExp y ++ ")"
 showExp (Scale b o r) = "Scale " ++ show b ++ " " ++ show o ++ " (" ++ showExp r ++ ")"
-showExp (Dual   x) = "Dual ("   ++ showExp x ++ ")"
-showExp (Plural x) = "Plural (" ++ showExp x ++ ")"
 showExp (Inflection _ x) = "Inflection <func> (" ++ showExp x ++ ")"
 
 
@@ -87,10 +80,6 @@ instance E.Sub (Exp i) where sub = Sub
 instance E.Frac (Exp i) where frac = Frac
 -- | Precisely the 'Scale' constructor.
 instance E.Scale (Exp i) where scale = Scale
--- | Precisely the 'Dual' constructor.
-instance E.Dual (Exp i) where dual = Dual
--- | Precisely the 'Plural' constructor.
-instance E.Plural (Exp i) where plural = Plural
 -- | Precisely the 'Inflection' constructor.
 instance E.Inflection (Exp i) where
 #if __GLASGOW_HASKELL__ < 704

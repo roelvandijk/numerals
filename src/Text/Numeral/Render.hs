@@ -76,8 +76,6 @@ render (Repr {..}) = go CtxEmpty
                                  rfc ← reprFracCombine
                                  Just $ rfc (rf x y ctx) x' x y' y
       go ctx inf (Scale b o r) = reprScale inf b o r ctx
-      go ctx inf (Dual   x) = go (CtxDual   ctx) inf x
-      go ctx inf (Plural x) = go (CtxPlural ctx) inf x
       go ctx inf (Inflection f x) = go ctx (f inf) x
 
 
@@ -180,10 +178,6 @@ data Ctx α   -- | The empty context. Used for top level expressions.
            | CtxFrac Side α (Ctx α)
              -- | Scale context.
            | CtxScale (Ctx α)
-             -- | Dual context.
-           | CtxDual (Ctx α)
-             -- | Plural context.
-           | CtxPlural (Ctx α)
              deriving (Eq, Show)
 
 
@@ -198,8 +192,6 @@ posIndex c = go 0 c
       go acc (CtxSub  ss _ sc) = go (acc + if ss ≡ L then -1 else 1) sc
       go acc (CtxFrac fs _ fc) = go (acc + if fs ≡ L then -1 else 1) fc
       go acc (CtxScale  sc) = go acc sc
-      go acc (CtxDual   dc) = go acc dc
-      go acc (CtxPlural pc) = go acc pc
 
 -- | Checks whether a context is completely on the outside of an
 -- expression, either left or right.
@@ -226,5 +218,3 @@ isOutside s c = go c
       go (CtxFrac fs _ fc) | fs ≡ s    = go fc
                            | otherwise = False
       go (CtxScale  sc) = go sc
-      go (CtxDual   dc) = go dc
-      go (CtxPlural pc) = go pc

@@ -1,8 +1,7 @@
-{-# LANGUAGE NamedFieldPuns
-           , NoImplicitPrelude
-           , UnicodeSyntax
-           , PackageImports
-  #-}
+{-# LANGUAGE NamedFieldPuns    #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE UnicodeSyntax     #-}
+{-# LANGUAGE PackageImports    #-}
 
 module Text.Numeral.Grammar.Reified
     ( -- * Inflection

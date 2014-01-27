@@ -24,7 +24,6 @@ module Text.Numeral.Rules
   , lit, lit1
 
   , pos, checkPos
-  , dual, plural
   , inflection
 
   , add
@@ -176,20 +175,6 @@ checkPos ∷ (Ord α, Num α, E.Unknown β, E.Lit β) ⇒ Rule α β
 checkPos f n | n < 0     = E.unknown
              | n > 0     = f n
              | otherwise = E.lit 0
-
--- |
---
--- >>> (dual $ lit $ fix unknown) (3 :: Integer) :: Exp
--- Dual (Lit 3)
-dual ∷ (E.Dual β) ⇒ Rule α β
-dual = (∘) E.dual
-
--- |
---
--- >>> (plural $ lit $ fix unknown) (3 :: Integer) :: Exp
--- Plural (Lit 3)
-plural ∷ (E.Plural β) ⇒ Rule α β
-plural = (∘) E.plural
 
 -- | Changes the inflection of a subexpression.
 inflection ∷ (E.Inflection β) ⇒ (E.Inf β → E.Inf β) → Rule α β

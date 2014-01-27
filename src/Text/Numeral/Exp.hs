@@ -1,9 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude
-           , PackageImports
-           , TypeFamilies
-           , TypeSynonymInstances
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE NoImplicitPrelude    #-}
+{-# LANGUAGE PackageImports       #-}
+{-# LANGUAGE TypeFamilies         #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE UnicodeSyntax        #-}
 
 module Text.Numeral.Exp
     ( Unknown(unknown, isUnknown)
@@ -14,8 +13,6 @@ module Text.Numeral.Exp
     , Sub(sub)
     , Frac(frac)
     , Scale(scale)
-    , Dual(dual)
-    , Plural(plural)
     , Inflection(..)
     ) where
 
@@ -95,20 +92,6 @@ class Scale α where
           → ℤ -- ^ Offset.
           → α -- ^ Rank.
           → α
-
--- | A dual of a value.
---
--- This is used in some languages that express some values as the dual
--- of a smaller value. For instance, in Hebrew the number 20 is
--- expressed as the dual of 10.
-class Dual α where dual ∷ α → α
-
--- | A plural of a value.
---
--- This is used in some languages that express some values as the
--- plural of a smaller value. For instance, in Hebrew the numbers
--- [30,40..90] are expressed as the plurals of [3..9].
-class Plural α where plural ∷ α → α
 
 -- | A change of inflection.
 --

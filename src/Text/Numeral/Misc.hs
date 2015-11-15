@@ -1,9 +1,7 @@
-{-# LANGUAGE CPP
-           , MagicHash
-           , NoImplicitPrelude
-           , PackageImports
-           , UnicodeSyntax
-  #-}
+{-# LANGUAGE MagicHash         #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 module Text.Numeral.Misc where
 
@@ -12,16 +10,9 @@ module Text.Numeral.Misc where
 --------------------------------------------------------------------------------
 
 import "base" Prelude ( Integral, (^) )
-#if __GLASGOW_HASKELL__ >= 702
-import "base" Data.Function ( ($) )
-import "base" GHC.Exts      ( Int(I#) )
+import "base" Data.Function ( (.) )
 import "base" Prelude       ( fromIntegral, toInteger )
-import "integer-gmp" GHC.Integer.Logarithms ( integerLogBase# )
-#else
-import "base" Data.Bool ( otherwise )
-import "base" Data.Ord  ( (<) )
-import "base" Prelude   ( div, (+), ($!), error )
-#endif
+import "this" Math.NumberTheory.Logarithms ( integerLog10' )
 
 --------------------------------------------------------------------------------
 -- Misc
@@ -35,15 +26,4 @@ dec = (10 ^)
 -- result must be able to fit in an ordinary Int value. This means the
 -- maximum input value is 10 ^ (maxBound ∷ Int).
 intLog ∷ (Integral α) ⇒ α → α
--- GHC >= 7.2.x
-#if __GLASGOW_HASKELL__ >= 702
-intLog x = fromIntegral $ I# (integerLogBase# 10 (toInteger x))
-#else
-intLog x | x < 0 = error "intLog: undefined for negative numbers"
-         | otherwise = go x 0
-    where
-      go n acc = case n `div` 10 of
-                   0 → acc
-                   1 → acc + 1
-                   q → go q $! acc + 1
-#endif
+intLog = fromIntegral . integerLog10' . toInteger

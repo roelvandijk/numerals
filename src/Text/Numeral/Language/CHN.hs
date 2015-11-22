@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -31,13 +26,9 @@ module Text.Numeral.Language.CHN
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Integral )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
+import "this" Text.Numeral
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 
@@ -46,7 +37,7 @@ import "text" Data.Text ( Text )
 -- CHN
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_2    = ["chn"]
     , entIso639_3    = Just "chn"
@@ -58,10 +49,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = checkPos
        $ fix
        $ findRule (  0, lit           )
@@ -70,14 +61,14 @@ struct = checkPos
                 ]
                    100
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = (0, 100)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
-               , reprAdd   = Just $ \_ _ _ → " pe "
-               , reprMul   = Just $ \_ _ _ → " "
+               { reprValue = \_ n -> M.lookup n syms
+               , reprAdd   = Just $ \_ _ _ -> " pe "
+               , reprMul   = Just $ \_ _ _ -> " "
                }
     where
       syms =

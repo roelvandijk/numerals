@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        om
 
@@ -21,8 +16,7 @@ module Text.Numeral.Language.ORM.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude ( Num )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 
@@ -35,7 +29,7 @@ Sources:
   http://www.languagesandnumbers.com/how-to-count-in-oromo/en/orm/
 -}
 
-cardinals ∷ (Num i) ⇒ TestData i
+cardinals :: (Num i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

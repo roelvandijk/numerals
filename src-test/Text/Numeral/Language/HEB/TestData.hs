@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        he
 
@@ -25,8 +19,7 @@ module Text.Numeral.Language.HEB.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Grammar
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
@@ -42,7 +35,7 @@ Sources:
   http://www.hebrew4christians.com/Grammar/Unit_Eight/Cardinal_Numbers/cardinal_numbers.html
 -}
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "feminine"
     , feminine defaultInflection

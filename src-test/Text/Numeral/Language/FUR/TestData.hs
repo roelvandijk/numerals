@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -23,10 +17,8 @@ module Text.Numeral.Language.FUR.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "numerals" Text.Numeral.Grammar
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -37,7 +29,7 @@ import "this" Text.Numeral.Test ( TestData )
 
 -- Sources:
 --   http://www.languagesandnumbers.com/how-to-count-in-friulian/en/fur/
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "masculine"
     , masculine defaultInflection
@@ -180,20 +172,20 @@ cardinals =
       , (110010, "cent e dîs mil e dîs")
       , (123456, "cent e vincjetrê mil cuatricent e cincuantesîs")
       , (dec 6, "un milion")
-      , (2 ⋅ dec 6, "doi milions")
-      , (3 ⋅ dec 6, "trê milions")
-      , (10 ⋅ dec 6, "dîs milions")
+      , (2 * dec 6, "doi milions")
+      , (3 * dec 6, "trê milions")
+      , (10 * dec 6, "dîs milions")
       , (dec 9, "un miliart")
-      , (2 ⋅ dec 9, "doi miliarts")
-      , (3 ⋅ dec 9, "trê miliarts")
+      , (2 * dec 9, "doi miliarts")
+      , (3 * dec 9, "trê miliarts")
       ]
     )
   , ( "feminine"
     , feminine defaultInflection
     , [ (1, "une")
       , (2, "dôs")
-      , (2 ⋅ dec 6, "dôs milions")
-      , (2 ⋅ dec 9, "dôs miliarts")
+      , (2 * dec 6, "dôs milions")
+      , (2 * dec 9, "dôs miliarts")
       ]
     )
   ]

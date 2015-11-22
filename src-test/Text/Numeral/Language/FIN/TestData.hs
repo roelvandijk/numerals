@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        fi
 
@@ -30,9 +24,8 @@ module Text.Numeral.Language.FIN.TestData
 
 import "base" Data.Function ( ($) )
 import "base" Prelude     ( Integral, (+) )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "numerals" Text.Numeral.Grammar
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -48,7 +41,7 @@ import "this" Text.Numeral.Test ( TestData )
 --   http://mylanguages.org/finnish_numbers.php
 --   http://users.jyu.fi/~pamakine/kieli/suomi/numeraalit/numeroten.html
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "singular nominative"
     , singular $ nominative defaultInflection
@@ -183,16 +176,16 @@ cardinals =
       , (12000, "toistakaksituhatta")
       , (13000, "toistakolmetuhatta")
       , (dec 5, "satatuhatta")
-      , (2 ⋅ dec 5, "kaksisataatuhatta")
+      , (2 * dec 5, "kaksisataatuhatta")
       , (dec 6, "miljoona")
       , (dec 6 + 1, "miljoonayksi")
-      , (2 ⋅ dec 6, "kaksimiljoonaa")
+      , (2 * dec 6, "kaksimiljoonaa")
       , (32534756, "kolmekymmentäkaksimiljoonaaviisisataakolmekymmentäneljätuhattaseitsemänsataaviisikymmentäkuusi")
       , (dec 9, "miljardi")
-      , (2 ⋅ dec 9, "kaksimiljardia")
-      , (3 ⋅ dec 9, "kolmemiljardia")
+      , (2 * dec 9, "kaksimiljardia")
+      , (3 * dec 9, "kolmemiljardia")
       , (dec 12, "biljoona")
-      , (3 ⋅ dec 12, "kolmebiljoonaa")
+      , (3 * dec 12, "kolmebiljoonaa")
       ]
     )
   , ( "singular accusative"
@@ -988,7 +981,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i) ⇒ TestData i
+ordinals :: (Integral i) => TestData i
 ordinals =
   [ ( "singular nominative"
     , singular $ nominative defaultInflection
@@ -1806,7 +1799,7 @@ ordinals =
     )
   ]
 
-multiplicatives ∷ (Integral i) ⇒ TestData i
+multiplicatives :: (Integral i) => TestData i
 multiplicatives =
   [ ( "default"
     , defaultInflection
@@ -1817,7 +1810,7 @@ multiplicatives =
     )
   ]
 
-multipliers ∷ (Integral i) ⇒ TestData i
+multipliers :: (Integral i) => TestData i
 multipliers =
   [ ( "default"
     , defaultInflection

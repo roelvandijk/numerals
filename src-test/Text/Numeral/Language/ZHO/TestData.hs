@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        zh
 
@@ -31,9 +25,8 @@ module Text.Numeral.Language.ZHO.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Data.Monoid.Unicode ( (⊕) )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "base" Data.Monoid ( (<>) )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 import "text" Data.Text ( Text )
@@ -50,7 +43,7 @@ Sources:
 
 -- | Cardinal numbers that are written the same using either
 -- traditional or simplified characters.
-trad_simpl_cardinals ∷ (Integral i) ⇒ [(i, Text)]
+trad_simpl_cardinals :: (Integral i) => [(i, Text)]
 trad_simpl_cardinals =
   [ (0, "零")
   , (1, "一")
@@ -142,12 +135,12 @@ trad_simpl_cardinals =
   , (dec 44, "一載")
   ]
 
-trad_cardinals ∷ (Integral i) ⇒ TestData i
+trad_cardinals :: (Integral i) => TestData i
 trad_cardinals =
   [ ( "default"
     , defaultInflection
     , trad_simpl_cardinals
-      ⊕ [ (2000, "兩千")
+      <> [ (2000, "兩千")
         , (2008, "兩千〇八")
         , (2080, "兩千〇八十")
         , (2362, "兩千三百六十二")
@@ -164,12 +157,12 @@ trad_cardinals =
     )
   ]
 
-simpl_cardinals ∷ (Integral i) ⇒ TestData i
+simpl_cardinals :: (Integral i) => TestData i
 simpl_cardinals =
   [ ( "default"
     , defaultInflection
     , trad_simpl_cardinals
-      ⊕ [ (2000, "两千")
+      <> [ (2000, "两千")
         , (2008, "两千〇八")
         , (2080, "两千〇八十")
         , (2362, "两千三百六十二")
@@ -180,7 +173,7 @@ simpl_cardinals =
     )
   ]
 
-finance_trad_cardinals ∷ (Integral i) ⇒ TestData i
+finance_trad_cardinals :: (Integral i) => TestData i
 finance_trad_cardinals =
   [ ( "default"
     , defaultInflection
@@ -203,7 +196,7 @@ finance_trad_cardinals =
     )
   ]
 
-finance_simpl_cardinals ∷ (Integral i) ⇒ TestData i
+finance_simpl_cardinals :: (Integral i) => TestData i
 finance_simpl_cardinals =
   [ ( "default"
     , defaultInflection
@@ -226,7 +219,7 @@ finance_simpl_cardinals =
     )
   ]
 
-pinyin_cardinals ∷ (Integral i) ⇒ TestData i
+pinyin_cardinals :: (Integral i) => TestData i
 pinyin_cardinals =
   [ ( "default"
     , defaultInflection

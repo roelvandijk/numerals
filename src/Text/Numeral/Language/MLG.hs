@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        mg
 
@@ -31,16 +26,10 @@ module Text.Numeral.Language.MLG
 -- Imports
 -------------------------------------------------------------------------------
 
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.List     ( map )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Ord      ( (<) )
-import "base" Prelude       ( Integral, (-) )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
-import           "this" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral
+import "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 
@@ -49,7 +38,7 @@ import "text" Data.Text ( Text )
 -- MLG
 -------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "mg"
     , entIso639_2    = ["mlg"]
@@ -61,22 +50,22 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = checkPos
        $ fix
        $ findRule (0, lit)
-                  [(n, step n 10 L L) | n ← map dec [1..6]]
+                  [(n, step n 10 L L) | n <- map dec [1..6]]
                   (dec 7 - 1)
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = (0, dec 7 - 1)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
+               { reprValue = \_ n -> M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
                }
@@ -92,9 +81,9 @@ cardinalRepr = render defaultRepr
       syms =
           M.fromList
           [ (0, const "haotra")
-          , (1, \c → case c of
-                       CtxAdd {} → "iraika"
-                       _         → "iray"
+          , (1, \c -> case c of
+                       CtxAdd {} -> "iraika"
+                       _         -> "iray"
             )
           , (2, mulForms "roa"    "roa"   "roan")
           , (3, mulForms "telo"   "telo"  "telon")
@@ -104,14 +93,14 @@ cardinalRepr = render defaultRepr
           , (7, mulForms "fito"   "fito"  "fiton")
           , (8, mulForms "valo"   "valo"  "valon")
           , (9, mulForms "sivy"   "sivi"  "sivin")
-          , (10, \c → case c of
+          , (10, \c -> case c of
                         CtxMul _ (Lit n) _
-                            | n < 9 → "polo"
-                        _           → "folo"
+                            | n < 9 -> "polo"
+                        _           -> "folo"
             )
-          , (100, \c → case c of
-                         CtxMul {} → "jato"
-                         _         → "zato"
+          , (100, \c -> case c of
+                         CtxMul {} -> "jato"
+                         _         -> "zato"
             )
           , (1000, const "arivo")
           , (dec 4, const "alina")
@@ -119,7 +108,7 @@ cardinalRepr = render defaultRepr
           , (dec 6, const "tapitrisa")
           ]
 
-      mulForms o t h = \c → case c of
-                              CtxMul _ (Lit 10)  _ → t
-                              CtxMul _ (Lit 100) _ → h
-                              _                    → o
+      mulForms o t h = \c -> case c of
+                              CtxMul _ (Lit 10)  _ -> t
+                              CtxMul _ (Lit 100) _ -> h
+                              _                    -> o

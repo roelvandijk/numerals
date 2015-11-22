@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude
-           , PackageImports
-           , UnicodeSyntax
-  #-}
-
 module Text.Numeral.Render.Utils
     ( addCtx
     , mulCtx
@@ -13,8 +8,6 @@ module Text.Numeral.Render.Utils
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base-unicode-symbols" Data.Eq.Unicode ( (≡) )
-import "base-unicode-symbols" Prelude.Unicode ( ℤ )
 import "this" Text.Numeral
 
 
@@ -22,19 +15,19 @@ import "this" Text.Numeral
 -- Utility functions for rendering numerals
 --------------------------------------------------------------------------------
 
-addCtx ∷ ℤ → s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
+addCtx :: Integer -> s -> (Ctx Exp -> s) -> Ctx Exp -> s
 addCtx val match other ctx =
     case ctx of
-      CtxAdd _ (Lit n) _ | val ≡ n → match
-      _ → other ctx
+      CtxAdd _ (Lit n) _ | val == n -> match
+      _ -> other ctx
 
-mulCtx ∷ ℤ → s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
+mulCtx :: Integer -> s -> (Ctx Exp -> s) -> Ctx Exp -> s
 mulCtx val match other ctx =
     case ctx of
-      CtxMul _ (Lit n) _ | val ≡ n → match
-      _ → other ctx
+      CtxMul _ (Lit n) _ | val == n -> match
+      _ -> other ctx
 
-outsideCtx ∷ Side → s → (Ctx (Exp i) → s) → Ctx (Exp i) → s
+outsideCtx :: Side -> s -> (Ctx Exp -> s) -> Ctx Exp -> s
 outsideCtx side match other ctx =
     if isOutside side ctx
     then match

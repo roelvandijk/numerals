@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        yo
 
@@ -31,16 +26,10 @@ module Text.Numeral.Language.YOR
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Integral )
-import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
+import "base" Data.Function ( fix )
+import "base" Data.Monoid ( (<>) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
+import "this" Text.Numeral
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 
@@ -62,7 +51,7 @@ It may also be the case that numbers have multiple possible deriviations.
 525 = (200*3) - (20*4) + 5
 -}
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "yo"
     , entIso639_2    = ["yor"]
@@ -75,13 +64,13 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Sub β, E.Mul β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = checkPos
        $ fix
-       $ conditional (≡ -5) lit
+       $ conditional (== -5) lit
        $ findRule (   1, lit        )
                 [ (  11, add 10  L  )
                 , (  15, add 20  L  )
@@ -114,19 +103,19 @@ struct = checkPos
                 ]
                    1000
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = (1, 1000)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
+               { reprValue = \_ n -> M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprSub   = Just $ \_ _ _ → "dil"
+               , reprSub   = Just $ \_ _ _ -> "dil"
                }
     where
       (_     ⊞ Lit 10) _         = ""
-      (Lit n ⊞ _) _  | n ≡ -5    = ""
+      (Lit n ⊞ _) _  | n == -5   = ""
                      | otherwise = "lel"
       (_     ⊞ _) _              = ""
 
@@ -136,26 +125,26 @@ cardinalRepr = render defaultRepr
       syms =
           M.fromList
           [ (-5, const "med")
-          , ( 1, \c → case c of
-                        CtxAdd {} → "mokan"
-                        CtxSub {} → "mokan"
-                        _         → "ikan"
+          , ( 1, \c -> case c of
+                        CtxAdd {} -> "mokan"
+                        CtxSub {} -> "mokan"
+                        _         -> "ikan"
             )
           , ( 2, twentyForm "me" "go" "ji")
           , ( 3, twentyForm "me" "go" "ta")
           , ( 4, twentyForm "me" "go" "rin")
           , ( 5, twentyForm "ma" "go" "run")
-          , ( 6, const    $ "me"  ⊕   "fa")
-          , ( 7, const    $ "me"  ⊕   "je")
-          , ( 8, const    $ "me"  ⊕   "jo")
-          , ( 9, const    $ "me"  ⊕   "san")
-          , (10, \c → case c of
-                        CtxAdd {} → "la"
-                        _         → "mewa"
+          , ( 6, const    $ "me"  <>  "fa")
+          , ( 7, const    $ "me"  <>  "je")
+          , ( 8, const    $ "me"  <>  "jo")
+          , ( 9, const    $ "me"  <>  "san")
+          , (10, \c -> case c of
+                        CtxAdd {} -> "la"
+                        _         -> "mewa"
             )
-          , (20, \c → case c of
-                        CtxMul {} → "o"
-                        _         → "ogun"
+          , (20, \c -> case c of
+                        CtxMul {} -> "o"
+                        _         -> "ogun"
             )
           , (30, const "ogbon")
           , (50, const "adota")
@@ -164,7 +153,7 @@ cardinalRepr = render defaultRepr
           , (1000, const "egberun")
           ]
 
-      twentyForm c m s = \ctx → case ctx of
-                                  CtxMul _ (Lit 20) _ → m
-                                  _                   → c
-                                ⊕ s
+      twentyForm c m s = \ctx -> case ctx of
+                                   CtxMul _ (Lit 20) _ -> m
+                                   _                   -> c
+                                 <> s

@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -22,8 +17,7 @@ module Text.Numeral.Language.AMP.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Num )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 
@@ -36,7 +30,7 @@ Sources:
   http://www.sf.airnet.ne.jp/~ts/language/number/alamblak.html
 -}
 
-cardinals ∷ (Num i) ⇒ TestData i
+cardinals :: (Num i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

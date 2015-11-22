@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        gv
 
@@ -23,8 +17,7 @@ module Text.Numeral.Language.GLV.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 
@@ -39,7 +32,7 @@ Sources:
   http://www.gaelg.iofm.net/LESSONS/mona/Lessons.pdf
 -}
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

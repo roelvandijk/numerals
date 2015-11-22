@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        ja
 
@@ -28,7 +22,7 @@ module Text.Numeral.Language.JPN.TestData
 --------------------------------------------------------------------------------
 
 import "base" Prelude     ( Num, Integral )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -43,7 +37,7 @@ Sources:
   http://www.guidetojapanese.org/numbers.html
 -}
 
-preferred_cardinals ∷ (Num i) ⇒ TestData i
+preferred_cardinals :: (Num i) => TestData i
 preferred_cardinals =
   [ ( "default"
     , defaultInflection
@@ -157,7 +151,7 @@ preferred_cardinals =
     )
   ]
 
-kanji_cardinals ∷ (Integral i) ⇒ TestData i
+kanji_cardinals :: (Integral i) => TestData i
 kanji_cardinals =
   [ ( "default"
     , defaultInflection
@@ -197,7 +191,7 @@ kanji_cardinals =
     )
   ]
 
-daiji_cardinals ∷ (Integral i) ⇒ TestData i
+daiji_cardinals :: (Integral i) => TestData i
 daiji_cardinals =
   [ ( "default"
     , defaultInflection

@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -31,17 +26,10 @@ module Text.Numeral.Language.FUR
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Integral, (-), negate )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
-import qualified "containers" Data.Map as M ( fromList, lookup )
+import "base" Data.Function ( fix )
+import qualified "containers" Data.Map as M
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum  as BN
-import qualified "this" Text.Numeral.Exp     as E
-import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import           "this" Text.Numeral.Entry
 import qualified "this" Text.Numeral.Language.ITA as ITA ( rule )
@@ -53,7 +41,7 @@ import "text" Data.Text ( Text )
 -- FUR
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_2    = ["fur"]
     , entIso639_3    = Just "fur"
@@ -65,22 +53,18 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (G.Masculine i, G.Feminine i, Integral α, E.Scale α)
-         ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ ( Integral α, E.Scale α
-         , E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β
-         )
-       ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = fix $ ITA.rule `combine` pelletierScale1 R L BN.rule
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 12 - 1 in (negate x, x)
 
-cardinalRepr ∷ (G.Feminine i, G.Masculine i) ⇒ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \inf n → M.lookup n (syms inf)
+               { reprValue = \inf n -> M.lookup n (syms inf)
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
                , reprScale = BN.pelletierRepr
@@ -107,14 +91,14 @@ cardinalRepr = render defaultRepr
       syms inf =
           M.fromList
           [ (0, const "zero")
-          , (1, \c → case c of
-                       _ | G.isFeminine  inf → "une"
-                         | otherwise         → "un"
+          , (1, \c -> case c of
+                       _ | isFeminine  inf -> "une"
+                         | otherwise       -> "un"
             )
           , (2, addCtx 10 "do" $ mulCtx 100 "dus"
-                $ \c → case c of
-                         _ | G.isFeminine inf → "dôs"
-                           | otherwise        → "doi"
+                $ \c -> case c of
+                         _ | isFeminine inf -> "dôs"
+                           | otherwise      -> "doi"
             )
           , (3, addCtx 10  "tre"  $ mulCtx 10 "tr"
               $ mulCtx 100 "tres" $ const     "trê"
@@ -125,21 +109,21 @@ cardinalRepr = render defaultRepr
           , (7,                      mulCtx 10 "set"   $ const "siet")
           , (8,                      mulCtx 10 "ot"    $ const "vot")
           , (9,                      mulCtx 10 "nov"   $ const "nûf")
-          , (10, \c → case c of
+          , (10, \c -> case c of
                         CtxAdd R (Lit n) _
-                            | n ≤ 7        → "dis"
-                        CtxAdd L _       _ → "dise"
-                        CtxMul _ (Lit 3) _ → "ente"
+                            | n <= 7       -> "dis"
+                        CtxAdd L _       _ -> "dise"
+                        CtxMul _ (Lit 3) _ -> "ente"
                         CtxMul _ (Lit n) _
-                            | n ≤ 9        → "ante"
-                        _                  → "dîs"
+                            | n <= 9       -> "ante"
+                        _                  -> "dîs"
             )
           , (20, const "vincj")
-          , (100, \c → case c of
+          , (100, \c -> case c of
                          CtxMul _ (Lit n) _
-                             | n ≤ 3     → "inte"
-                             | otherwise → "cent"
-                         _               → "cent"
+                             | n <= 3    -> "inte"
+                             | otherwise -> "cent"
+                         _               -> "cent"
             )
           , (1000, const "mil")
           ]

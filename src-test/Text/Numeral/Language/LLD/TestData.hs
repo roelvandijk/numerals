@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -24,9 +18,8 @@ module Text.Numeral.Language.LLD.TestData (cardinals) where
 --------------------------------------------------------------------------------
 
 import "base" Prelude     ( Integral, (+) )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "numerals" Text.Numeral.Grammar
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -37,7 +30,7 @@ import "this" Text.Numeral.Test ( TestData )
 
 -- Sources:
 --   http://www.languagesandnumbers.com/how-to-count-in-ladin/en/lld/
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "masculine"
     , masculine defaultInflection
@@ -138,10 +131,10 @@ cardinals =
       , (12345, "dodescmiletreicentecarantecinch")
       , (dec 6, "un milion")
       , (dec 6 + 1, "un milioneun")
-      , (2 ⋅ dec 6, "doi milion")
+      , (2 * dec 6, "doi milion")
       , (123456789, "centevintetrei milionecatercentecincantesiesmilesetcenteotantenuef")
       , (dec 9, "un miliard")
-      , (2 ⋅ dec 9, "doi miliard")
+      , (2 * dec 9, "doi miliard")
       , (9876543210, "nuef miliardeotcentesetantesies milionecinchcentecarantetreimiledoicentediesc")
       , (9999999999, "nuef miliardenuefcentenonantenuef milionenuefcentenonantenuefmilenuefcentenonantenuef")
       ]

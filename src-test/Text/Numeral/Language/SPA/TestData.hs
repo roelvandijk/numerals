@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        es
 
@@ -24,10 +18,9 @@ module Text.Numeral.Language.SPA.TestData (cardinals) where
 --------------------------------------------------------------------------------
 
 import "base" Prelude     ( Num, (+), Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "numerals" Text.Numeral.Misc ( dec )
 import "numerals" Text.Numeral.Grammar
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 
@@ -42,7 +35,7 @@ import "this" Text.Numeral.Test ( TestData )
 --   http://www.donquijote.org/spanishlanguage/numbers/numbers1.asp
 --   http://en.wiktionary.org/wiki/Appendix:Spanish_numerals
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "neuter"
     , neuter defaultInflection
@@ -197,9 +190,9 @@ cardinals =
       , (999000, "novecientos noventa y nueve mil")
       , (dec 6, "un millón")
       , (dec 6 + 1, "un millón uno")
-      , (21 ⋅ dec 6 + 21, "veintiún millones veintiuno")
-      , (500 ⋅ dec 6, "quinientos millones")
-      , (521 ⋅ dec 6 + 1, "quinientos veintiún millones uno")
+      , (21 * dec 6 + 21, "veintiún millones veintiuno")
+      , (500 * dec 6, "quinientos millones")
+      , (521 * dec 6 + 1, "quinientos veintiún millones uno")
       , (dec 7, "diez millones")
       , (dec 8, "cien millones")
       , (dec 9, "mil millones")
@@ -253,7 +246,7 @@ cardinals =
       , (900, "novecientas")
       , (dec 6, "un millón")
       , (dec 6 + 1, "un millón una")
-      , (21 ⋅ dec 6 + 21, "veintiún millones veintiuna")
+      , (21 * dec 6 + 21, "veintiún millones veintiuna")
       ]
     )
   , ( "masculine"
@@ -274,7 +267,7 @@ cardinals =
       , (221, "doscientos veintiún")
       , (dec 6, "un millón")
       , (dec 6 + 1, "un millón un")
-      , (21 ⋅ dec 6 + 21, "veintiún millones veintiún")
+      , (21 * dec 6 + 21, "veintiún millones veintiún")
       ]
     )
   ]

@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        it
 
@@ -33,20 +28,10 @@ module Text.Numeral.Language.ITA
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Ord      ( Ord )
-import "base" Prelude       ( Integral, (-), negate )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Data.List.Unicode     ( (∈) )
-import "base-unicode-symbols" Data.Ord.Unicode      ( (≥) )
-import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum  as BN
-import qualified "this" Text.Numeral.Exp     as E
-import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
@@ -56,35 +41,30 @@ import "text" Data.Text ( Text )
 -- ITA
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
-    { entIso639_1       = Just "it"
-    , entIso639_2       = ["ita"]
-    , entIso639_3       = Just "ita"
-    , entNativeNames    = ["Italiano"]
-    , entEnglishName    = Just "Italian"
-    , entCardinal       = Just Conversion
-                          { toNumeral   = cardinal
-                          , toStructure = struct
-                          }
-    , entOrdinal        = Just Conversion
-                          { toNumeral   = ordinal
-                          , toStructure = struct
-                          }
+    { entIso639_1    = Just "it"
+    , entIso639_2    = ["ita"]
+    , entIso639_3    = Just "ita"
+    , entNativeNames = ["Italiano"]
+    , entEnglishName = Just "Italian"
+    , entCardinal    = Just Conversion
+                       { toNumeral   = cardinal
+                       , toStructure = struct
+                       }
+    , entOrdinal     = Just Conversion
+                       { toNumeral   = ordinal
+                       , toStructure = struct
+                       }
     }
 
-cardinal ∷ (G.Masculine i, G.Feminine i, Integral α, E.Scale α)
-         ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-ordinal ∷ (G.Masculine i, G.Feminine i, Integral α, E.Scale α)
-        ⇒ i → α → Maybe Text
-ordinal inf = ordinalRepr inf ∘ struct
+ordinal :: (Integral a) => Inflection -> a -> Maybe Text
+ordinal inf = ordinalRepr inf . struct
 
-rule ∷ ( Integral α, Ord α
-       , E.Unknown β, E.Lit β, E.Add β, E.Mul β
-       )
-     ⇒ Rule α β
+rule :: (Integral a) => Rule a
 rule = findRule (   0, lit         )
               [ (  11, add   10 L  )
               , (  17, add   10 R  )
@@ -96,20 +76,17 @@ rule = findRule (   0, lit         )
               ]
                 (dec 6 - 1)
 
-struct ∷ ( Integral α, E.Scale α
-         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
-         )
-       ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = pos $ fix $ rule `combine` pelletierScale R L BN.rule
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-genericRepr ∷ Repr i
+genericRepr :: Repr
 genericRepr = defaultRepr
               { reprAdd   = Just (⊞)
               , reprMul   = Just (⊡)
-              , reprNeg   = Just $ \_ _ → "meno "
+              , reprNeg   = Just $ \_ _ -> "meno "
               }
     where
       (Lit 10                ⊞ Lit 7) _ = "as"
@@ -118,13 +95,13 @@ genericRepr = defaultRepr
       (_                     ⊞ _    ) _ = ""
 
 
-      (Lit n ⊡ Lit 10) _ | n ≥ 4 = "an"
-      (_     ⊡ Scale _ _ _) _ = " "
-      (_     ⊡ _          ) _ = ""
+      (Lit n ⊡ Lit 10) _ | n >= 4 = "an"
+      (_     ⊡ Scale _ _ _) _     = " "
+      (_     ⊡ _          ) _     = ""
 
-cardinalRepr ∷ (G.Feminine i, G.Masculine i) ⇒ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render genericRepr
-               { reprValue = \inf n → M.lookup n (syms inf)
+               { reprValue = \inf n -> M.lookup n (syms inf)
                , reprScale = BN.pelletierRepr
                                (BN.quantityName "ilione"  "ilioni")
                                (BN.quantityName "iliardo" "iliardi")
@@ -134,17 +111,17 @@ cardinalRepr = render genericRepr
       syms inf =
           M.fromList
           [ (0, const "zero")
-          , (1, \c → case c of
-                       CtxAdd _ (Lit 10) _   → "un"
-                       _ | G.isFeminine  inf → "una"
-                         | G.isMasculine inf → "un"
-                         | otherwise         → "uno"
+          , (1, \c -> case c of
+                       CtxAdd _ (Lit 10) _ -> "un"
+                       _ | isFeminine  inf -> "una"
+                         | isMasculine inf -> "un"
+                         | otherwise       -> "uno"
             )
           , (2, forms "due" "do" "du")
-          , (3, \c → case c of
-                       CtxAdd R _        _ → "tré"
-                       CtxMul _ (Lit 10) _ → "tren"
-                       _                   → "tre"
+          , (3, \c -> case c of
+                       CtxAdd R _        _ -> "tré"
+                       CtxMul _ (Lit 10) _ -> "tren"
+                       _                   -> "tre"
             )
           , (4, forms "quattro" "quattor" "quar")
           , (5, forms "cinque"  "quin"    "cinqu")
@@ -152,43 +129,43 @@ cardinalRepr = render genericRepr
           , (7, forms "sette"   "sette"   "sett")
           , (8, forms "otto"    "otto"    "ott")
           , (9, forms "nove"    "nove"    "nov")
-          , (10, \c → case c of
-                        CtxAdd _ (Lit _) _ → "dici"
+          , (10, \c -> case c of
+                        CtxAdd _ (Lit _) _ -> "dici"
                         -- Last vowel removed because of a phonetic rule:
                         CtxMul _ (Lit _) (CtxAdd _ (Lit n) _)
-                            | n ∈ [1,8]    → "t"
-                        CtxMul R (Lit _) _ → "ta"
-                        _                  → "dieci"
+                            | n `elem` [1,8] -> "t"
+                        CtxMul R (Lit _) _   -> "ta"
+                        _                    -> "dieci"
             )
-          , (20, \c → case c of
+          , (20, \c -> case c of
                         CtxAdd _ (Lit n) _
-                            | n ∈ [1,8]   → "vent"
-                        _                 → "venti"
+                            | n `elem` [1,8] -> "vent"
+                        _                   -> "venti"
             )
           , ( 100
             , let f c = case c of
-                          CtxAdd _ (Lit 8)                      _  → "cent"
-                          CtxAdd _ (Lit 8 `Mul` Lit 10)         _  → "cent"
-                          CtxAdd _ (Lit 8 `Mul` Lit 10 `Add` _) _  → "cent"
-                          CtxMul _ (Lit _) c2 → f c2
-                          _ → "cento"
+                          CtxAdd _ (Lit 8)                      _  -> "cent"
+                          CtxAdd _ (Lit 8 `Mul` Lit 10)         _  -> "cent"
+                          CtxAdd _ (Lit 8 `Mul` Lit 10 `Add` _) _  -> "cent"
+                          CtxMul _ (Lit _) c2 -> f c2
+                          _ -> "cento"
               in f
             )
-          , (1000, \c → case c of
-                          CtxMul {} → "mila"
-                          _         → "mille"
+          , (1000, \c -> case c of
+                          CtxMul {} -> "mila"
+                          _         -> "mille"
             )
           ]
 
-      forms ∷ s → s → s → Ctx (Exp i) → s
+      forms :: s -> s -> s -> Ctx Exp -> s
       forms n a m c = case c of
-                        CtxAdd _ (Lit 10) _ → a
-                        CtxMul _ (Lit 10) _ → m
-                        _                   → n
+                        CtxAdd _ (Lit 10) _ -> a
+                        CtxMul _ (Lit 10) _ -> m
+                        _                   -> n
 
-ordinalRepr ∷ (G.Feminine i) ⇒ i → Exp i → Maybe Text
+ordinalRepr :: Inflection -> Exp -> Maybe Text
 ordinalRepr = render genericRepr
-              { reprValue = \inf n → M.lookup n (syms inf)
+              { reprValue = \inf n -> M.lookup n (syms inf)
               , reprScale = BN.pelletierRepr
                               ( BN.ordQuantityName "ilione" "ilionesimo"
                                                    "ilioni" "ilionesimo"
@@ -204,14 +181,14 @@ ordinalRepr = render genericRepr
           [ (0, const "zero")
           , (1, forms "prima" "primo" "unesimo" "uno" "un" "un")
           , (2, forms "seconda" "secondo" "duesimo" "due" "do" "due")
-          , (3, \c → case c of
+          , (3, \c -> case c of
                        CtxEmpty
-                         | G.isFeminine inf → "terza"
-                         | otherwise        → "terzo"
-                       _ | isOutside R c    → "treesimo"
-                       CtxAdd R _        _  → "tré"
-                       CtxMul _ (Lit 10) _  → "tren"
-                       _                    → "tre"
+                         | isFeminine inf  -> "terza"
+                         | otherwise       -> "terzo"
+                       _ | isOutside R c   -> "treesimo"
+                       CtxAdd R _        _ -> "tré"
+                       CtxMul _ (Lit 10) _ -> "tren"
+                       _                   -> "tre"
             )
           , (4, forms "quarta"  "quarto"  "quattresimo" "quattro" "quattor" "quar")
           , (5, forms "quinta"  "quinto"  "cinquesimo"  "cinque"  "quin"    "cinqu")
@@ -219,52 +196,52 @@ ordinalRepr = render genericRepr
           , (7, forms "settimo" "settimo" "settesimo"   "sette"   "sette"   "sett")
           , (8, forms "ottave"  "ottavo"  "ottesimo"    "otto"    "otto"    "ott")
           , (9, forms "nono"    "nono"    "novesimo"    "nove"    "nove"    "nov")
-          , (10, \c → case c of
-                        CtxAdd _ (Lit _) _ | isOutside R c → "dicesimo"
-                                           | otherwise     → "dici"
+          , (10, \c -> case c of
+                        CtxAdd _ (Lit _) _ | isOutside R c -> "dicesimo"
+                                           | otherwise     -> "dici"
                         -- Last vowel removed because of a phonetic rule:
                         CtxMul _ (Lit _) (CtxAdd _ (Lit n) _)
-                            | n ∈ [1,8]                    → "t"
-                        CtxMul R (Lit _) _ | isOutside R c → "tesimo"
-                                           | otherwise     → "ta"
-                        _                  | isOutside R c → "decimo"
-                                           | otherwise     → "dieci"
+                            | n `elem` [1,8]               -> "t"
+                        CtxMul R (Lit _) _ | isOutside R c -> "tesimo"
+                                           | otherwise     -> "ta"
+                        _                  | isOutside R c -> "decimo"
+                                           | otherwise     -> "dieci"
             )
-          , (20, \c → case c of
-                        _ | isOutside R c  → "ventesimo"
+          , (20, \c -> case c of
+                        _ | isOutside R c  -> "ventesimo"
                         CtxAdd _ (Lit n) _
-                          | n ∈ [1,8]      → "vent"
-                        _                  → "venti"
+                          | n `elem` [1,8] -> "vent"
+                        _                  -> "venti"
             )
           , ( 100
             , let f c = case c of
-                          _ | isOutside R c                        → "centesimo"
-                          CtxAdd _ (Lit 8)                      _  → "cent"
-                          CtxAdd _ (Lit 8 `Mul` Lit 10)         _  → "cent"
-                          CtxAdd _ (Lit 8 `Mul` Lit 10 `Add` _) _  → "cent"
-                          CtxMul _ (Lit _) c2                      → f c2
-                          _                                        → "cento"
+                          _ | isOutside R c                        -> "centesimo"
+                          CtxAdd _ (Lit 8)                      _  -> "cent"
+                          CtxAdd _ (Lit 8 `Mul` Lit 10)         _  -> "cent"
+                          CtxAdd _ (Lit 8 `Mul` Lit 10 `Add` _) _  -> "cent"
+                          CtxMul _ (Lit _) c2                      -> f c2
+                          _                                        -> "cento"
               in f
             )
-          , (1000, \c → case c of
-                          _ | isOutside R c → "millesimo"
-                          CtxMul {}         → "mila"
-                          _                 → "mille"
+          , (1000, \c -> case c of
+                          _ | isOutside R c -> "millesimo"
+                          CtxMul {}         -> "mila"
+                          _                 -> "mille"
             )
           ]
           where
-            forms ∷ s → s → s → s → s → s → Ctx (Exp i) → s
+            forms :: s -> s -> s -> s -> s -> s -> Ctx Exp -> s
             forms fo1 o1 o2 n a m c =
                 case c of
                   CtxEmpty
-                    | G.isFeminine inf → fo1
-                    | otherwise        → o1
-                  _ | isOutside R c    → o2
-                  CtxAdd _ (Lit 10) _  → a
-                  CtxMul _ (Lit 10) _  → m
-                  _                    → n
+                    | isFeminine inf  -> fo1
+                    | otherwise       -> o1
+                  _ | isOutside R c   -> o2
+                  CtxAdd _ (Lit 10) _ -> a
+                  CtxMul _ (Lit 10) _ -> m
+                  _                   -> n
 
-bigNumSyms ∷ [(ℤ, Ctx (Exp i) → Text)]
+bigNumSyms :: [(Integer, Ctx Exp -> Text)]
 bigNumSyms =
   [ (6, BN.forms "sest" "sex"    "ses"    "sexa"   "ses")
   , (7, BN.forms "sett" "septen" "septem" "septua" "septin")

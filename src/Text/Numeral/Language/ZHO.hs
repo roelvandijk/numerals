@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        zh
 
@@ -41,20 +36,11 @@ module Text.Numeral.Language.ZHO
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( id, const, fix, flip, ($) )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Ord      ( (<) )
-import "base" Prelude       ( Num, Integral, fromIntegral, (-), div, divMod, negate )
-import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
-import "base-unicode-symbols" Data.Ord.Unicode      ( (≥) )
-import qualified "containers" Data.Map as M ( Map, fromList, lookup )
-import "containers-unicode-symbols" Data.Map.Unicode ( (∪) )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
-import           "this" Text.Numeral.Misc ( dec )
+import "base" Data.Function ( fix )
+import "base" Data.Monoid ( (<>) )
+import qualified "containers" Data.Map as M
+import "this" Text.Numeral
+import "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 
@@ -63,7 +49,7 @@ import "text" Data.Text ( Text )
 -- ZHO
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "zh"
     , entIso639_2    = ["chi", "zho"]
@@ -72,48 +58,47 @@ entry = emptyEntry
     , entEnglishName = Just "Chinese"
     }
 
-flipIfR ∷ Side → (α → α → α) → (α → α → α)
+flipIfR :: Side -> (a -> a -> a) -> (a -> a -> a)
 flipIfR L = id
 flipIfR R = flip
 
-add0 ∷ (Integral α, E.Lit β, E.Add β) ⇒ α → Rule α β
-add0 val f n | n < val `div` 10 = E.lit 0 `E.add` f n
+add0 :: (Integral a) => a -> Rule a
+add0 val f n | n < val `div` 10 = Lit 0 `Add` f n
              | otherwise        = f n
 
-mulX ∷ (Integral α, E.Lit β, E.Add β, E.Mul β)
-     ⇒ α → Side → Side → Rule α β
+mulX :: (Integral a) => a -> Side -> Side -> Rule a
 mulX val aSide mSide =
-    \f n → let (m, a) = n `divMod` val
-               mval = if m ≡ 1
-                      then E.lit 1 ⊡ E.lit (fromIntegral val)
-                      else f m ⊡ E.lit (fromIntegral val)
-           in if a ≡ 0
+    \f n -> let (m, a) = n `divMod` val
+                mval = if m == 1
+                       then Lit 1 ⊡ Lit (fromIntegral val)
+                       else f m ⊡ Lit (fromIntegral val)
+           in if a == 0
               then mval
-              else (flipIfR aSide E.add) (add0 val f a) mval
+              else (flipIfR aSide Add) (add0 val f a) mval
   where
-     (⊡) = flipIfR mSide E.mul
+     (⊡) = flipIfR mSide Mul
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = pos
        $ fix
        $ findRule (0, lit)
-                  ( [(dec 1, step  (dec 1) (dec 1) R L)]
-                  ⊕ [(dec n, stepX (dec n) (dec 1) R L) | n ← [2,3]]
-                  ⊕ [(dec n, stepX (dec n) (dec 4) R L) | n ← [4,8..44]]
+                  (  [(dec 1, step  (dec 1) (dec 1) R L)]
+                  <> [(dec n, stepX (dec n) (dec 1) R L) | n <- [2,3]]
+                  <> [(dec n, stepX (dec n) (dec 4) R L) | n <- [4,8..44]]
                   )
                   (dec 48 - 1)
     where
       stepX = mkStep lit1 addX mulX
 
-      addX val _ = \f n → E.add (f val) (add0 val f $ n - val)
+      addX val _ = \f n -> Add (f val) (add0 val f $ n - val)
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 48 - 1 in (negate x, x)
 
-cardinalRepr ∷ Repr i
+cardinalRepr :: Repr
 cardinalRepr = defaultRepr
-               { reprAdd = Just $ \_ _ _ → ""
-               , reprMul = Just $ \_ _ _ → ""
+               { reprAdd = Just $ \_ _ _ -> ""
+               , reprMul = Just $ \_ _ _ -> ""
                }
 
 
@@ -121,7 +106,7 @@ cardinalRepr = defaultRepr
 -- Traditional Characters
 --------------------------------------------------------------------------------
 
-trad_entry ∷ Entry
+trad_entry :: Entry
 trad_entry = entry
     { entVariant  = Just "traditional"
     , entCardinal = Just Conversion
@@ -130,27 +115,27 @@ trad_entry = entry
                     }
     }
 
-trad_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-trad_cardinal inf = trad_cardinalRepr inf ∘ struct
+trad_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+trad_cardinal inf = trad_cardinalRepr inf . struct
 
-trad_cardinalRepr ∷ i → Exp i → Maybe Text
+trad_cardinalRepr :: Inflection -> Exp -> Maybe Text
 trad_cardinalRepr =
     render cardinalRepr
-           { reprValue = \_ n → M.lookup n trad_syms
-           , reprNeg = Just $ \_ _ → "負"
+           { reprValue = \_ n -> M.lookup n trad_syms
+           , reprNeg = Just $ \_ _ -> "負"
            }
 
-trad_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
+trad_syms :: (Integral a) => M.Map a (Ctx Exp -> Text)
 trad_syms =
     M.fromList
-    [ (0, \c → case c of
-                 CtxEmpty → "零"
-                 _        → "〇"
+    [ (0, \c -> case c of
+                 CtxEmpty -> "零"
+                 _        -> "〇"
       )
     , (1, const "一")
-    , (2, \c → case c of
-                 CtxMul _ (Lit n) _ | n ≥ 1000 → "兩"
-                 _ → "二"
+    , (2, \c -> case c of
+                 CtxMul _ (Lit n) _ | n >= 1000 -> "兩"
+                 _ -> "二"
       )
     , (3, const "三")
     , (4, const "四")
@@ -180,7 +165,7 @@ trad_syms =
 -- Simplified Characters
 --------------------------------------------------------------------------------
 
-simpl_entry ∷ Entry
+simpl_entry :: Entry
 simpl_entry = entry
     { entVariant  = Just "simplified"
     , entCardinal = Just Conversion
@@ -189,22 +174,22 @@ simpl_entry = entry
                     }
     }
 
-simpl_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-simpl_cardinal inf = simpl_cardinalRepr inf ∘ struct
+simpl_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+simpl_cardinal inf = simpl_cardinalRepr inf . struct
 
-simpl_cardinalRepr ∷ i → Exp i → Maybe Text
+simpl_cardinalRepr :: Inflection -> Exp -> Maybe Text
 simpl_cardinalRepr =
     render cardinalRepr
-           { reprValue = \_ n → M.lookup n (simpl_syms ∪ trad_syms)
-           , reprNeg = Just $ \_ _ → "负"
+           { reprValue = \_ n -> M.lookup n (simpl_syms `M.union` trad_syms)
+           , reprNeg = Just $ \_ _ -> "负"
            }
 
-simpl_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
+simpl_syms :: (Integral a) => M.Map a (Ctx Exp -> Text)
 simpl_syms =
     M.fromList
-    [ (2, \c → case c of
-                 CtxMul _ (Lit n) _ | n ≥ 1000 → "两"
-                 _ → "二"
+    [ (2, \c -> case c of
+                 CtxMul _ (Lit n) _ | n >= 1000 -> "两"
+                 _ -> "二"
       )
     , (dec 4, const "万")
     , (dec 8, const "亿")
@@ -215,7 +200,7 @@ simpl_syms =
 -- Financial Characters (Traditional)
 --------------------------------------------------------------------------------
 
-finance_trad_entry ∷ Entry
+finance_trad_entry :: Entry
 finance_trad_entry = entry
     { entVariant  = Just "finance traditional"
     , entCardinal = Just Conversion
@@ -224,17 +209,17 @@ finance_trad_entry = entry
                     }
     }
 
-finance_trad_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-finance_trad_cardinal inf = finance_trad_cardinalRepr inf ∘ struct
+finance_trad_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+finance_trad_cardinal inf = finance_trad_cardinalRepr inf . struct
 
-finance_trad_cardinalRepr ∷ i → Exp i → Maybe Text
+finance_trad_cardinalRepr :: Inflection -> Exp -> Maybe Text
 finance_trad_cardinalRepr =
     render cardinalRepr
-           { reprValue = \_ n → M.lookup n (finance_trad_syms ∪ trad_syms)
-           , reprNeg = Just $ \_ _ → "負"
+           { reprValue = \_ n -> M.lookup n (finance_trad_syms `M.union` trad_syms)
+           , reprNeg = Just $ \_ _ -> "負"
            }
 
-finance_trad_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
+finance_trad_syms :: (Integral a) => M.Map a (Ctx Exp -> Text)
 finance_trad_syms =
     M.fromList
     [ (0, const "零")
@@ -259,7 +244,7 @@ finance_trad_syms =
 -- Financial Characters (Simplified)
 --------------------------------------------------------------------------------
 
-finance_simpl_entry ∷ Entry
+finance_simpl_entry :: Entry
 finance_simpl_entry = entry
     { entVariant  = Just "finance simplified"
     , entCardinal = Just Conversion
@@ -268,20 +253,20 @@ finance_simpl_entry = entry
                     }
     }
 
-finance_simpl_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-finance_simpl_cardinal inf = finance_simpl_cardinalRepr inf ∘ struct
+finance_simpl_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+finance_simpl_cardinal inf = finance_simpl_cardinalRepr inf . struct
 
-finance_simpl_cardinalRepr ∷ i → Exp i → Maybe Text
+finance_simpl_cardinalRepr :: Inflection -> Exp -> Maybe Text
 finance_simpl_cardinalRepr =
     render cardinalRepr
-           { reprValue = \_ n → M.lookup n ( finance_simpl_syms
-                                           ∪ finance_trad_syms
-                                           ∪ trad_syms
-                                           )
-           , reprNeg = Just $ \_ _ → "负"
+           { reprValue = \_ n -> M.lookup n ( finance_simpl_syms
+                                            `M.union` finance_trad_syms
+                                            `M.union` trad_syms
+                                            )
+           , reprNeg = Just $ \_ _ -> "负"
            }
   where
-    finance_simpl_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
+    finance_simpl_syms :: (Integral a) => M.Map a (Ctx Exp -> Text)
     finance_simpl_syms =
         M.fromList
         [ (2, const "贰")
@@ -295,7 +280,7 @@ finance_simpl_cardinalRepr =
 -- Pinyin
 --------------------------------------------------------------------------------
 
-pinyin_entry ∷ Entry
+pinyin_entry :: Entry
 pinyin_entry = entry
     { entVariant  = Just "pinyin"
     , entCardinal = Just Conversion
@@ -304,28 +289,28 @@ pinyin_entry = entry
                     }
     }
 
-pinyin_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-pinyin_cardinal inf = pinyin_cardinalRepr inf ∘ struct
+pinyin_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+pinyin_cardinal inf = pinyin_cardinalRepr inf . struct
 
-pinyin_cardinalRepr ∷ i → Exp i → Maybe Text
+pinyin_cardinalRepr :: Inflection -> Exp -> Maybe Text
 pinyin_cardinalRepr =
     render cardinalRepr
-           { reprValue = \_ n → M.lookup n pinyin_syms
-           , reprNeg = Just $ \_ _ → "fù"
+           { reprValue = \_ n -> M.lookup n pinyin_syms
+           , reprNeg = Just $ \_ _ -> "fù"
            , reprAdd = Just (⊞)
            }
   where
     (Lit 10 ⊞ _) _ = ""
     (_      ⊞ _) _ = " "
 
-    pinyin_syms ∷ (Integral α) ⇒ M.Map α (Ctx (Exp i) → Text)
+    pinyin_syms :: (Integral a) => M.Map a (Ctx Exp -> Text)
     pinyin_syms =
         M.fromList
         [ (0, const "líng")
         , (1, const "yī")
-        , (2, \c → case c of
-                     CtxMul _ (Lit n) _ | n ≥ 1000 → "liǎng"
-                     _ → "èr"
+        , (2, \c -> case c of
+                     CtxMul _ (Lit n) _ | n >= 1000 -> "liǎng"
+                     _ -> "èr"
           )
         , (3, const "sān")
         , (4, const "sì")

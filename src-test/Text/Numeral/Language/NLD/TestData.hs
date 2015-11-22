@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        nl
 
@@ -28,9 +22,8 @@ module Text.Numeral.Language.NLD.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
 import "numerals" Text.Numeral.Grammar
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -39,7 +32,7 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "singular"
     , singular defaultInflection
@@ -228,7 +221,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i) ⇒ TestData i
+ordinals :: (Integral i) => TestData i
 ordinals =
   [ ( "default"
     , defaultInflection
@@ -336,7 +329,7 @@ ordinals =
     )
   ]
 
-partitives ∷ (Integral i) ⇒ TestData (i, i)
+partitives :: (Integral i) => TestData (i, i)
 partitives =
   [ ("singular", singular defaultInflection, testData)
   , ("ignored plural", plural defaultInflection, testData)
@@ -365,7 +358,7 @@ partitives =
       , ((-3, -5), "min drie min vijfde")
       ]
 
-multiplicatives ∷ (Integral i) ⇒ TestData i
+multiplicatives :: (Integral i) => TestData i
 multiplicatives =
   [ ("singular", singular defaultInflection, testData)
   , ("ignored plural", plural defaultInflection, testData)

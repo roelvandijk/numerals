@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        en
 
@@ -38,17 +32,10 @@ module Text.Numeral.Language.ENG
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Ord      ( (<) )
-import "base" Prelude       ( (+), (-), div, subtract, negate, (^), error, Integral )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Prelude.Unicode ( ℤ, (⋅) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum as BN
-import qualified "this" Text.Numeral.Exp    as E
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
@@ -58,7 +45,7 @@ import "text" Data.Text ( Text )
 -- ENG
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "en"
     , entIso639_2    = ["eng"]
@@ -67,7 +54,7 @@ entry = emptyEntry
     , entEnglishName = Just "English"
     }
 
-gb_entry ∷ Entry
+gb_entry :: Entry
 gb_entry = entry
     { entVariant  = Just "en-GB"
     , entCardinal = Just Conversion
@@ -80,7 +67,7 @@ gb_entry = entry
                     }
     }
 
-us_entry ∷ Entry
+us_entry :: Entry
 us_entry = entry
     { entVariant  = Just "en-US"
     , entCardinal = Just Conversion
@@ -93,40 +80,33 @@ us_entry = entry
                     }
     }
 
-gb_cardinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
-gb_cardinal inf = render (cardinalRepr "minus " gb_add) inf ∘ shortScaleStruct
+gb_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+gb_cardinal inf = render (cardinalRepr "minus " gb_add) inf . shortScaleStruct
 
-gb_ordinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
-gb_ordinal inf = render (ordinalRepr gb_add) inf ∘ shortScaleStruct
+gb_ordinal :: (Integral a) => Inflection -> a -> Maybe Text
+gb_ordinal inf = render (ordinalRepr gb_add) inf . shortScaleStruct
 
-gbPelletier_cardinal ∷ (Integral α, E.Scale α)
-                     ⇒ i → α → Maybe Text
+gbPelletier_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
 gbPelletier_cardinal inf = render (cardinalRepr "minus " gb_add) { reprScale = pelletierRepr } inf
-                         ∘ pelletierScaleStruct
+                         . pelletierScaleStruct
   where
-    pelletierRepr = BN.pelletierRepr (\_ _ → "illion")
-                                     (\_ _ → "illiard")
+    pelletierRepr = BN.pelletierRepr (\_ _ -> "illion")
+                                     (\_ _ -> "illiard")
                                      []
 
-us_cardinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
-us_cardinal inf = render (cardinalRepr "negative " us_add) inf ∘ shortScaleStruct
+us_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+us_cardinal inf = render (cardinalRepr "negative " us_add) inf . shortScaleStruct
 
-us_ordinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
-us_ordinal inf = render (ordinalRepr us_add) inf ∘ shortScaleStruct
+us_ordinal :: (Integral a) => Inflection -> a -> Maybe Text
+us_ordinal inf = render (ordinalRepr us_add) inf . shortScaleStruct
 
-shortScaleStruct ∷ ( Integral α, E.Scale α
-                   , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
-                   )
-                 ⇒ α → β
+shortScaleStruct :: (Integral a) => a -> Exp
 shortScaleStruct = pos $ fix $ rule `combine` shortScale1 R L BN.rule
 
-pelletierScaleStruct ∷ ( Integral α, E.Scale α
-                       , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
-                       )
-                     ⇒ α → β
+pelletierScaleStruct :: (Integral a) => a -> Exp
 pelletierScaleStruct = pos $ fix $ rule `combine` pelletierScale1 R L BN.rule
 
-rule ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ Rule α β
+rule :: (Integral a) => Rule a
 rule = findRule (   0, lit       )
               [ (  13, add 10 L  )
               , (  20, mul 10 R L)
@@ -135,11 +115,11 @@ rule = findRule (   0, lit       )
               ]
                 (dec 6 - 1)
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 30003 - 1 in (negate x, x)
 
-genericRepr ∷ (Exp i → Exp i → Ctx (Exp i) → Text) -- ^ Add representation.
-            → Repr i
+genericRepr :: (Exp -> Exp -> Ctx Exp -> Text) -- ^ Add representation.
+            -> Repr
 genericRepr f =
     defaultRepr
     { reprAdd   = Just f
@@ -149,38 +129,26 @@ genericRepr f =
       (_ ⊞ Lit 10) _ = ""
       (_ ⊞ _     ) _ = " "
 
-eval ∷ Exp i → ℤ
-eval (Lit x)       = x
-eval (Add x y)     = eval x + eval y
-eval (Mul x y)     = eval x ⋅ eval y
-eval (Sub x y)     = subtract (eval x) (eval y)
-eval (Neg x)       = negate (eval x)
-eval (Frac n d)    = eval n `div` eval d
-eval (Scale b o r) = 10 ^ (eval r ⋅ b + o)
-eval (Inflection _ x) = eval x
-eval Unknown       = error "eval: unknown"
-
-
-gb_add ∷ Exp i → Exp i → Ctx (Exp i) → Text
+gb_add :: Exp -> Exp -> Ctx Exp -> Text
 ((_ `Mul` Lit 10) `gb_add` _) _ = "-"
 ((_ `Mul` _     ) `gb_add` x) _
-    | eval x < (100 ∷ ℤ)        = " and "
+    -- | eval x < (100 :: Integer) = " and "
     | otherwise                 = " "
 (_                `gb_add` _) _ = ""
 
-us_add ∷ Exp i → Exp i → Ctx (Exp i) → Text
+us_add :: Exp -> Exp -> Ctx Exp -> Text
 ((_ `Mul` Lit 10) `us_add` _) _ = "-"
 ((_ `Mul` _     ) `us_add` _) _ = " "
 (_                `us_add` _) _ = ""
 
-cardinalRepr ∷ Text -- ^ Negative number prefix.
-             → (Exp i → Exp i → Ctx (Exp i) → Text)
-             → Repr i
+cardinalRepr :: Text -- ^ Negative number prefix.
+             -> (Exp -> Exp -> Ctx Exp -> Text)
+             -> Repr
 cardinalRepr neg f =
     (genericRepr f)
-    { reprValue = \_ n → M.lookup n syms
-    , reprScale = BN.scaleRepr (\_ _ → "illion") []
-    , reprNeg   = Just $ \_ _ → neg
+    { reprValue = \_ n -> M.lookup n syms
+    , reprScale = BN.scaleRepr (\_ _ -> "illion") []
+    , reprNeg   = Just $ \_ _ -> neg
     }
   where
     syms =
@@ -195,10 +163,10 @@ cardinalRepr neg f =
         , (7, const "seven")
         , (8, ten   "eight" "eigh" "eigh")
         , (9, const "nine")
-        , (10, \c → case c of
-                      CtxAdd _ (Lit _) _ → "teen"
-                      CtxMul R _       _ → "ty"
-                      _                  → "ten"
+        , (10, \c -> case c of
+                      CtxAdd _ (Lit _) _ -> "teen"
+                      CtxMul R _       _ -> "ty"
+                      _                  -> "ten"
           )
         , (11,   const "eleven")
         , (12,   const "twelve")
@@ -206,15 +174,15 @@ cardinalRepr neg f =
         , (1000, const "thousand")
         ]
 
-    ten ∷ s → s → s → Ctx (Exp i) → s
-    ten n a m = \c → case c of
-                       CtxAdd _ (Lit 10) _ → a
-                       CtxMul _ (Lit 10) _ → m
-                       _                   → n
+    ten :: s -> s -> s -> Ctx Exp -> s
+    ten n a m = \c -> case c of
+                       CtxAdd _ (Lit 10) _ -> a
+                       CtxMul _ (Lit 10) _ -> m
+                       _                   -> n
 
-ordinalRepr ∷ (Exp i → Exp i → Ctx (Exp i) → Text) → Repr i
+ordinalRepr :: (Exp -> Exp -> Ctx Exp -> Text) -> Repr
 ordinalRepr f = (genericRepr f)
-                { reprValue = \_ n → M.lookup n syms
+                { reprValue = \_ n -> M.lookup n syms
                 , reprScale = BN.scaleRepr (BN.ordQuantityName "illion" "illionth"
                                                                "illion" "illionth"
                                            )
@@ -224,40 +192,41 @@ ordinalRepr f = (genericRepr f)
       syms =
           M.fromList
           [ (0, const "zeroth")
-          , (1, \c → case c of
-                       _ | isOutside R c → "first"
-                         | otherwise     → "one"
+          , (1, \c -> case c of
+                       _ | isOutside R c -> "first"
+                         | otherwise     -> "one"
             )
           , (2, ten   "second" "two"   "two"  "twen")
           , (3, ten   "third"  "three" "thir" "thir")
           , (4, ten   "fourth" "four"  "four" "for")
           , (5, ten   "fifth"  "five"  "fif"  "fif")
-          , (6, \c → if isOutside R c then "sixth"   else "six")
-          , (7, \c → if isOutside R c then "seventh" else "seven")
+          , (6, \c -> if isOutside R c then "sixth"   else "six")
+          , (7, \c -> if isOutside R c then "seventh" else "seven")
           , (8, ten   "eighth" "eight" "eigh" "eigh")
-          , (9, \c → if isOutside R c then "ninth"   else "nine")
-          , (10, \c → case c of
-                        CtxAdd _ (Lit _) _ | isOutside R c → "teenth"
-                                           | otherwise     → "teen"
-                        CtxMul R _       _ | isOutside R c → "tieth"
-                                           | otherwise     → "ty"
-                        _                  | isOutside R c → "tenth"
-                                           | otherwise     → "ten"
+          , (9, \c -> if isOutside R c then "ninth"   else "nine")
+          , (10, \c -> case c of
+                        CtxAdd _ (Lit _) _ | isOutside R c -> "teenth"
+                                           | otherwise     -> "teen"
+                        CtxMul R _       _ | isOutside R c -> "tieth"
+                                           | otherwise     -> "ty"
+                        _                  | isOutside R c -> "tenth"
+                                           | otherwise     -> "ten"
             )
-          , (11,   \c → if isOutside R c then "eleventh"   else "eleven")
-          , (12,   \c → if isOutside R c then "twelfth"    else "twelf")
-          , (100,  \c → if isOutside R c then "hundreth"   else "hundred")
-          , (1000, \c → if isOutside R c then "thousandth" else "thousand")
+          , (11,   \c -> if isOutside R c then "eleventh"   else "eleven")
+          , (12,   \c -> if isOutside R c then "twelfth"    else "twelf")
+          , (100,  \c -> if isOutside R c then "hundreth"   else "hundred")
+          , (1000, \c -> if isOutside R c then "thousandth" else "thousand")
           ]
 
-      ten ∷ s -- ^ Ordinal form.
-          → s -- ^ Cardinal form; normal.
-          → s -- ^ Cardinal form; added to ten.
-          → s -- ^ Cardinal form; multiplied with ten.
-          → Ctx (Exp i)
-          → s
-      ten o n a m ctx = case ctx of
-                          _ | isOutside R ctx → o
-                          CtxAdd _ (Lit 10) _ → a
-                          CtxMul _ (Lit 10) _ → m
-                          _                   → n
+      ten :: s -- ^ Ordinal form.
+          -> s -- ^ Cardinal form; normal.
+          -> s -- ^ Cardinal form; added to ten.
+          -> s -- ^ Cardinal form; multiplied with ten.
+          -> Ctx Exp
+          -> s
+      ten o n a m ctx =
+          case ctx of
+            _ | isOutside R ctx -> o
+            CtxAdd _ (Lit 10) _ -> a
+            CtxMul _ (Lit 10) _ -> m
+            _                   -> n

@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -30,13 +25,9 @@ module Text.Numeral.Language.NEN
 -- Imports
 -------------------------------------------------------------------------------
 
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Integral, (-) )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
+import "this" Text.Numeral
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 
@@ -45,7 +36,7 @@ import "text" Data.Text ( Text )
 -- NEN
 -------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_3    = Just "nen"
     , entEnglishName = Just "Nengone"
@@ -55,10 +46,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = checkPos
        $ fix
        $ findRule ( 0, lit     )
@@ -72,12 +63,12 @@ struct = checkPos
                 ]
                    30
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = (0, 30)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
+               { reprValue = \_ n -> M.lookup n syms
                , reprAdd   = Just (⊞)
                }
     where
@@ -90,16 +81,15 @@ cardinalRepr = render defaultRepr
           , (2, forms "rewe" "rew")
           , (3, forms "tini" "tin")
           , (4, forms "ece"  "ec")
-          , (5, \c → case c of
-                       CtxAdd _ _ (CtxAdd _ (Lit 20) _) → "sedo"
-                       _ → "sedong"
+          , (5, \c -> case c of
+                       CtxAdd _ _ (CtxAdd _ (Lit 20) _) -> "sedo"
+                       _ -> "sedong"
             )
           , (10, const "ruenin")
           , (15, const "adenin")
           , (20, const "sarengom")
           ]
         where
-          forms ∷ s → s → Ctx (Exp i) → s
+          forms :: s -> s -> Ctx Exp -> s
           forms _ a (CtxAdd _ _ _) = a
           forms n _ _              = n
-

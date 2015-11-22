@@ -54,7 +54,7 @@ import qualified "this" Text.Numeral.Language.ZHO as ZHO
 -- Language entries
 --------------------------------------------------------------------------------
 
-entries ∷ [Entry]
+entries :: [Entry]
 entries =
   [ AFR.entry
   , AMP.entry

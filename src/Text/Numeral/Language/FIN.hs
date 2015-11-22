@@ -1,10 +1,3 @@
-{-# LANGUAGE ConstraintKinds   #-}
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        fi
 
@@ -36,19 +29,10 @@ module Text.Numeral.Language.FIN
 -- Imports
 -------------------------------------------------------------------------------
 
-import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( ($), fix, flip )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Num, Integral, (-), negate, divMod )
-import "base-unicode-symbols" Data.Bool.Unicode     ( (∧) )
-import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Data.Ord.Unicode      ( (≤) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum  as BN
-import qualified "this" Text.Numeral.Exp     as E
-import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
@@ -58,7 +42,7 @@ import "text" Data.Text ( Text )
 -- FIN
 -------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "fi"
     , entIso639_2    = ["fin"]
@@ -75,50 +59,13 @@ entry = emptyEntry
                        }
     }
 
-type Inflection i =
-  ( G.Singular i
-  , G.Plural i
-  , G.Abessive i
-  , G.Accusative i
-  , G.Comitative i
-  , G.Delative i
-  , G.Distributive i
-  , G.DistributiveTemporal i
-  , G.Essive i
-  , G.Genitive i
-  , G.Instructive i
-  , G.Lative i
-  , G.LocativeInessive i
-  , G.LocativeElative i
-  , G.LocativeIllative i
-  , G.LocativeAdessive i
-  , G.LocativeAblative i
-  , G.LocativeAllative i
-  , G.Multiplicative i
-  , G.Nominative i
-  , G.Partitive i
-  , G.Sublative i
-  , G.SuperEssive i
-  , G.Translative i
-  )
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-cardinal ∷ (Inflection i, Integral α, E.Scale α)
-         ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+ordinal :: (Integral a) => Inflection -> a -> Maybe Text
+ordinal inf = ordinalRepr inf . struct
 
-ordinal ∷ (Inflection i, Integral α, E.Scale α)
-        ⇒ i → α → Maybe Text
-ordinal inf = ordinalRepr inf ∘ struct
-
-struct ∷ ( Integral α, E.Scale α
-         , E.Unknown β, E.Lit β, E.Add β, E.Mul β
-         , E.Inflection β, E.Scale β
-         , G.Singular   (E.Inf β)
-         , G.Nominative (E.Inf β)
-         , G.Accusative (E.Inf β)
-         , G.Partitive  (E.Inf β)
-         )
-       ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = fix $ rule `combine` pelletierScale R L BN.rule
     where
       rule = findRule (   0, lit)
@@ -131,44 +78,35 @@ struct = fix $ rule `combine` pelletierScale R L BN.rule
 
 -- | Like the normal 'mul' rule with the difference that the value
 -- that is multiplied is changed to the partitive case.
-fi_mul ∷ ( Integral α
-         , E.Add β, E.Mul β, E.Inflection β
-         , G.Singular   (E.Inf β)
-         , G.Nominative (E.Inf β)
-         , G.Accusative (E.Inf β)
-         , G.Partitive  (E.Inf β)
-         )
-       ⇒ α → Rule α β
+fi_mul :: (Integral a) => a -> Rule a
 fi_mul val =
-    \f n → let (m, a) = n `divMod` val
-               mval = E.mul (f m) (E.inflection toPartitive $ f val)
-           in if a ≡ 0
-              then mval
-              else (flip E.add) (f a) mval
-  where
-    toPartitive ∷ (G.Singular i, G.Nominative i, G.Accusative i, G.Partitive i)
-                ⇒ i → i
-    toPartitive inf | G.isSingular inf ∧ G.isNominative inf = G.partitive inf
-                    | G.isSingular inf ∧ G.isAccusative inf = G.partitive inf
-                    | otherwise = inf
+    \f n -> let (m, a) = n `divMod` val
+                mval = Mul (f m) (ChangeCase (Just Partitive) $ f val)
+            in if a == 0
+               then mval
+               else (flip Add) (f a) mval
+  -- where
+  --   toPartitive :: Inflection -> Inflection
+  --   toPartitive inf | G.isSingular inf && (G.isNominative inf || G.isAccusative inf) = G.partitive inf
+  --                   | otherwise = inf
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 15 - 1 in (negate x, x)
 
-cardinalRepr ∷ (Inflection i) ⇒ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \inf n → M.lookup n (syms inf)
+               { reprValue = \inf n -> M.lookup n (syms inf)
                , reprScale = BN.pelletierRepr
                                (BN.quantityName "iljoona" "iljoonaa")
                                (BN.quantityName "iljardi" "iljardia")
                                []
-               , reprAdd   = Just $ \_ _ _ → ""
-               , reprMul   = Just $ \_ _ _ → ""
+               , reprAdd   = Just $ \_ _ _ -> ""
+               , reprMul   = Just $ \_ _ _ -> ""
                }
     where
       syms inf =
           M.fromList
-          [ (0, \c → infForms inf c
+          [ (0, \c -> infForms inf c
                               -- singular
                               "nolla"    {- nom -} "nolla"    {- acc -}
                               "nollan"   {- gen -} "nollaa"   {- ptv -}
@@ -189,7 +127,7 @@ cardinalRepr = render defaultRepr
                               "nollin"   {- instr -}
                               "?"        {- other -}
             )
-         , (1, \c → infForms inf c
+         , (1, \c -> infForms inf c
                              -- singular
                              "yksi"     {- nom -} "yksi"     {- acc -}
                              "yhden"    {- gen -} "yhtä"     {- ptv -}
@@ -199,12 +137,12 @@ cardinalRepr = render defaultRepr
                              "yhdeltä"  {- abl -} "yhdelle"  {- all -}
                              "yhdettä"  {- abe -}
                              (case inf of
-                                _ | G.isSuperEssive    inf → "yhtäällä"
-                                  | G.isDelative       inf → "yhtäältä"
-                                  | G.isSublative      inf → "yhtäälle"
-                                  | G.isLative         inf → "yhä"
-                                  | G.isMultiplicative inf → "yhdesti"
-                                  | otherwise              → "?"
+                                _ | isSuperEssive    inf -> "yhtäällä"
+                                  | isDelative       inf -> "yhtäältä"
+                                  | isSublative      inf -> "yhtäälle"
+                                  | isLative         inf -> "yhä"
+                                  | isMultiplicative inf -> "yhdesti"
+                                  | otherwise            -> "?"
                              )
                              -- plural
                              "yhdet"    {- nom -} "yhdet"    {- acc -}
@@ -216,11 +154,11 @@ cardinalRepr = render defaultRepr
                              "yksittä"  {- abe -} "yksine"   {- com -}
                              "yksin"    {- instr -}
                              (case inf of
-                                _ | G.isDistributive inf → "yksittäin"
-                                  | otherwise            → "?"
+                                _ | isDistributive inf -> "yksittäin"
+                                  | otherwise          -> "?"
                              )
            )
-          , (2, \c → infForms inf c
+          , (2, \c -> infForms inf c
                               -- singular
                               "kaksi"    {- nom -} "kaksi"    {- acc -}
                               "kahden"   {- gen -} "kahta"    {- ptv -}
@@ -230,13 +168,13 @@ cardinalRepr = render defaultRepr
                               "kahdelta" {- abl -} "kahdelle" {- all -}
                               "kahdetta" {- abe -}
                               (case inf of
-                                 _ | G.isInstructive    inf → "kahden"
-                                   | G.isSuperEssive    inf → "kahtaalla"
-                                   | G.isDelative       inf → "kahtaalta"
-                                   | G.isSublative      inf → "kahtaalle"
-                                   | G.isLative         inf → "kahtia"
-                                   | G.isMultiplicative inf → "kahdesti"
-                                   | otherwise              → "?"
+                                 _ | isInstructive    inf -> "kahden"
+                                   | isSuperEssive    inf -> "kahtaalla"
+                                   | isDelative       inf -> "kahtaalta"
+                                   | isSublative      inf -> "kahtaalle"
+                                   | isLative         inf -> "kahtia"
+                                   | isMultiplicative inf -> "kahdesti"
+                                   | otherwise            -> "?"
                               )
                               -- plural
                               "kahdet"   {- nom -} "kahdet"   {- acc -}
@@ -248,11 +186,11 @@ cardinalRepr = render defaultRepr
                               "kaksitta" {- abe -} "kaksine"  {- com -}
                               "kaksin"   {- instr -}
                               (case inf of
-                                 _ | G.isDistributive inf → "kaksittain"
-                                   | otherwise            → "?"
+                                 _ | isDistributive inf -> "kaksittain"
+                                   | otherwise          -> "?"
                               )
             )
-          , (3, \c → infForms inf c
+          , (3, \c -> infForms inf c
                               -- singular
                               "kolme"    {- nom -} "kolme"    {- acc -}
                               "kolmen"   {- gen -} "kolmea"   {- ptv -}
@@ -262,10 +200,10 @@ cardinalRepr = render defaultRepr
                               "kolmelta" {- abl -} "kolmelle" {- all -}
                               "kolmetta" {- abe -}
                               (case inf of
-                                 _ | G.isInstructive    inf → "kolmen"
-                                   | G.isLative         inf → "kolmia"
-                                   | G.isMultiplicative inf → "kolmesti"
-                                   | otherwise              → "?"
+                                 _ | isInstructive    inf -> "kolmen"
+                                   | isLative         inf -> "kolmia"
+                                   | isMultiplicative inf -> "kolmesti"
+                                   | otherwise            -> "?"
                               )
                               -- plural
                               "kolmet"   {- nom -} "kolmet"   {- acc -}
@@ -277,12 +215,12 @@ cardinalRepr = render defaultRepr
                               "kolmitta" {- abe -} "kolmine"  {- com -}
                               "kolmin"   {- instr -}
                               (case inf of
-                                 _ | G.isDistributive         inf → "kolmittain"
-                                   | G.isDistributiveTemporal inf → "kolmisin"
-                                   | otherwise                    → "?"
+                                 _ | isDistributive         inf -> "kolmittain"
+                                   | isDistributiveTemporal inf -> "kolmisin"
+                                   | otherwise                  -> "?"
                               )
             )
-          , (4, \c → infForms inf c
+          , (4, \c -> infForms inf c
                               -- singular
                               "neljä"    {- nom -} "neljä"    {- acc -}
                               "neljän"   {- gen -} "neljää"   {- ptv -}
@@ -303,7 +241,7 @@ cardinalRepr = render defaultRepr
                               "neljin"   {- instr -}
                               "?"        {- other -}
             )
-          , (5, \c → infForms inf c
+          , (5, \c -> infForms inf c
                               -- singular
                               "viisi"    {- nom -} "viisi"    {- acc -}
                               "viiden"   {- gen -} "viittä"   {- ptv -}
@@ -324,7 +262,7 @@ cardinalRepr = render defaultRepr
                               "viisin"   {- instr -}
                               "?"        {- other -}
             )
-          , (6, \c → infForms inf c
+          , (6, \c -> infForms inf c
                               -- singular
                               "kuusi"    {- nom -} "kuusi"    {- acc -}
                               "kuuden"   {- gen -} "kuutta"   {- ptv -}
@@ -345,7 +283,7 @@ cardinalRepr = render defaultRepr
                               "kuusin"   {- instr -}
                               "?"        {- other -}
             )
-          , (7, \c → infForms inf c
+          , (7, \c -> infForms inf c
                               -- singular
                               "seitsemän"   {- nom -} "seitsemän"   {- acc -}
                               "seitsemän"   {- gen -} "seitsemää"   {- ptv -}
@@ -366,7 +304,7 @@ cardinalRepr = render defaultRepr
                               "seitsemin"   {- instr -}
                               "?"           {- other -}
             )
-          , (8, \c → infForms inf c
+          , (8, \c -> infForms inf c
                               -- singular
                               "kahdeksan"   {- nom -} "kahdeksan"   {- acc -}
                               "kahdeksan"   {- gen -} "kahdeksaa"   {- ptv -}
@@ -387,7 +325,7 @@ cardinalRepr = render defaultRepr
                               "kahdeksin"   {- instr -}
                               "?"           {- other -}
             )
-          , (9, \c → infForms inf c
+          , (9, \c -> infForms inf c
                               -- singular
                               "yhdeksän"   {- nom -} "yhdeksän"   {- acc -}
                               "yhdeksän"   {- gen -} "yhdeksää"   {- ptv -}
@@ -409,9 +347,9 @@ cardinalRepr = render defaultRepr
                               "?"          {- other -}
             )
 
-          , (10, \c → case c of
-                        CtxAdd _ (Lit _) _ → "toista" -- singular partitive ordinal 2
-                        _ → infForms inf c
+          , (10, \c -> case c of
+                        CtxAdd _ (Lit _) _ -> "toista" -- singular partitive ordinal 2
+                        _ -> infForms inf c
                               -- singular
                               "kymmenen"   {- nom -} "kymmenen"   {- acc -}
                               "kymmenen"   {- gen -} "kymmentä"   {- ptv -}
@@ -432,10 +370,10 @@ cardinalRepr = render defaultRepr
                               "kymmenin"   {- instr -}
                               "?"          {- other -}
             )
-          , (100, \c → case c of
+          , (100, \c -> case c of
                          CtxMul _ (Lit n) _
-                             | n ≤ 9        → "sataa"
-                         _ → infForms inf c
+                             | n <= 9 -> "sataa"
+                         _ -> infForms inf c
                                -- singular
                                "sata"    {- nom -} "sata"    {- acc -}
                                "sadan"   {- gen -} "sataa"   {- ptv -}
@@ -456,9 +394,9 @@ cardinalRepr = render defaultRepr
                                "sadoin"   {- instr -}
                                "?"        {- other -}
             )
-          , (1000, \c → case c of
-                          CtxMul {} → "tuhatta"
-                          _ → infForms inf c
+          , (1000, \c -> case c of
+                          CtxMul {} -> "tuhatta"
+                          _ -> infForms inf c
                                 -- singular
                                 "tuhat"      {- nom -} "tuhat"      {- acc -}
                                 "tuhannen"   {- gen -} "tuhatta"    {- ptv -}
@@ -481,20 +419,20 @@ cardinalRepr = render defaultRepr
             )
           ]
 
-ordinalRepr ∷ (Inflection i) ⇒ i → Exp i → Maybe Text
+ordinalRepr :: Inflection -> Exp -> Maybe Text
 ordinalRepr = render defaultRepr
-              { reprValue = \inf n → M.lookup n (syms inf)
+              { reprValue = \inf n -> M.lookup n (syms inf)
               , reprScale = BN.pelletierRepr
                               (BN.quantityName "iljoona" "iljoonaa")
                               (BN.quantityName "iljardi" "iljardia")
                               []
-              , reprAdd   = Just $ \_ _ _ → ""
-              , reprMul   = Just $ \_ _ _ → ""
+              , reprAdd   = Just $ \_ _ _ -> ""
+              , reprMul   = Just $ \_ _ _ -> ""
               }
     where
       syms inf =
           M.fromList
-          [ (0, \c → infForms inf c
+          [ (0, \c -> infForms inf c
                               -- singular
                               "nollas"      {- nom -} "nollas"      {- acc -}
                               "nollannen"   {- gen -} "nollatta"    {- ptv -}
@@ -515,8 +453,8 @@ ordinalRepr = render defaultRepr
                               "nollansin"   {- instr -}
                               "?"           {- other -}
             )
-          , (1, \c → case c of
-                       CtxAdd _ (Lit 10) _ →
+          , (1, \c -> case c of
+                       CtxAdd _ (Lit 10) _ ->
                            infForms inf c
                               -- singular
                               "yhdes"      {- nom -} "yhdes"      {- acc -}
@@ -537,7 +475,7 @@ ordinalRepr = render defaultRepr
                               "yhdensittä" {- abe -} "yhdensine"  {- com -}
                               "yhdensin"   {- instr -}
                               "?"          {- other -}
-                       _ → infForms inf c
+                       _ -> infForms inf c
                               -- singular
                               "ensimmäinen"   {- nom -} "ensimmäinen"   {- acc -}
                               "ensimmäisen"   {- gen -} "ensimmäistä"   {- ptv -}
@@ -558,8 +496,8 @@ ordinalRepr = render defaultRepr
                               "ensimmäisin"   {- instr -}
                               "?"             {- other -}
             )
-          , (2, \c → case c of
-                       CtxAdd _ (Lit 10) _ →
+          , (2, \c -> case c of
+                       CtxAdd _ (Lit 10) _ ->
                            infForms inf c
                               -- singular
                               "kahdes"      {- nom -} "kahdes"      {- acc -}
@@ -580,7 +518,7 @@ ordinalRepr = render defaultRepr
                               "kahdensitta" {- abe -} "kahdensine"  {- com -}
                               "kahdensin"   {- instr -}
                               "?"           {- other -}
-                       _ → infForms inf c
+                       _ -> infForms inf c
                               -- singular
                               "toinen"   {- nom -} "toinen"   {- acc -}
                               "toisen"   {- gen -} "toista"   {- ptv -}
@@ -601,7 +539,7 @@ ordinalRepr = render defaultRepr
                               "toisin"   {- instr -}
                               "?"        {- other -}
             )
-          , (3, \c → infForms inf c
+          , (3, \c -> infForms inf c
                               -- singular
                               "kolmas"      {- nom -} "kolmas"      {- acc -}
                               "kolmannen"   {- gen -} "kolmatta"    {- ptv -}
@@ -622,7 +560,7 @@ ordinalRepr = render defaultRepr
                               "kolmansin"   {- instr -}
                               "?"           {- other -}
             )
-          , (4, \c → infForms inf c
+          , (4, \c -> infForms inf c
                               -- singular
                               "neljäs"      {- nom -} "neljäs"      {- acc -}
                               "neljännen"   {- gen -} "neljättä"    {- ptv -}
@@ -632,9 +570,9 @@ ordinalRepr = render defaultRepr
                               "neljänneltä" {- abl -} "neljännelle" {- all -}
                               "neljännettä" {- abe -}
                               (case inf of
-                                 _ | G.isComitative  inf → "neljänsine"
-                                   | G.isInstructive inf → "neljänsin"
-                                   | otherwise → "?"
+                                 _ | isComitative  inf -> "neljänsine"
+                                   | isInstructive inf -> "neljänsin"
+                                   | otherwise         -> "?"
                               )
                               -- plural
                               "neljännet"   {- nom -} "neljännet"   {- acc -}
@@ -647,7 +585,7 @@ ordinalRepr = render defaultRepr
                               "neljänsin"   {- instr -}
                               "?"           {- other -}
             )
-          , (5, \c → infForms inf c
+          , (5, \c -> infForms inf c
                               -- singular
                               "viides"      {- nom -} "viides"      {- acc -}
                               "viidennen"   {- gen -} "viidettä"    {- ptv -}
@@ -668,7 +606,7 @@ ordinalRepr = render defaultRepr
                               "viidensin"   {- instr -}
                               "?"           {- other -}
             )
-          , (6, \c → infForms inf c
+          , (6, \c -> infForms inf c
                               -- singular
                               "kuudes"      {- nom -} "kuudes"      {- acc -}
                               "kuudennen"   {- gen -} "kuudetta"    {- ptv -}
@@ -689,7 +627,7 @@ ordinalRepr = render defaultRepr
                               "kuudensin"   {- instr -}
                               "?"           {- other -}
             )
-          , (7, \c → infForms inf c
+          , (7, \c -> infForms inf c
                               -- singular
                               "seitsemäs"      {- nom -} "seitsemäs"      {- acc -}
                               "seitsemännen"   {- gen -} "seitsemättä"    {- ptv -}
@@ -710,7 +648,7 @@ ordinalRepr = render defaultRepr
                               "seitsemänsin"   {- instr -}
                               "?"              {- other -}
             )
-          , (8, \c → infForms inf c
+          , (8, \c -> infForms inf c
                               -- singular
                               "kahdeksas"      {- nom -} "kahdeksas"      {- acc -}
                               "kahdeksannen"   {- gen -} "kahdeksatta"    {- ptv -}
@@ -731,7 +669,7 @@ ordinalRepr = render defaultRepr
                               "kahdeksansin"   {- instr -}
                               "?"              {- other -}
             )
-          , (9, \c → infForms inf c
+          , (9, \c -> infForms inf c
                               -- singular
                               "yhdeksäs"      {- nom -} "yhdeksäs"      {- acc -}
                               "yhdeksännen"   {- gen -} "yhdeksättä"    {- ptv -}
@@ -752,9 +690,9 @@ ordinalRepr = render defaultRepr
                               "yhdeksänsin"   {- instr -}
                               "?"             {- other -}
             )
-          , (10, \c → case c of
-                        CtxAdd _ (Lit _) _ → "toista" -- singular partitive ordinal 2
-                        _ → infForms inf c
+          , (10, \c -> case c of
+                        CtxAdd _ (Lit _) _ -> "toista" -- singular partitive ordinal 2
+                        _ -> infForms inf c
                                  -- singular
                                  "kymmenes"      {- nom -} "kymmenes"      {- acc -}
                                  "kymmenennen"   {- gen -} "kymmenettä"    {- ptv -}
@@ -775,8 +713,8 @@ ordinalRepr = render defaultRepr
                                  "kymmenensin"   {- instr -}
                                  "?"             {- other -}
             )
-          , (100, \c → case c of
-                         _ → infForms inf c
+          , (100, \c -> case c of
+                         _ -> infForms inf c
                                -- singular
                                "sadas"      {- nom -} "sadas"      {- acc -}
                                "sadannen"   {- gen -} "sadatta"    {- ptv -}
@@ -797,8 +735,8 @@ ordinalRepr = render defaultRepr
                                "sadansin"   {- instr -}
                                "?"          {- other -}
             )
-          , (1000, \c → case c of
-                         _ → infForms inf c
+          , (1000, \c -> case c of
+                         _ -> infForms inf c
                                -- singular
                                "tuhannes"      {- nom -} "tuhannes"      {- acc -}
                                "tuhannennen"   {- gen -} "tuhannetta"    {- ptv -}
@@ -821,11 +759,10 @@ ordinalRepr = render defaultRepr
             )
           ]
 
-infForms ∷ (Inflection i)
-         ⇒ i → Ctx (Exp i)
-         → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text
-         → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text
-         → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text → Text
+infForms :: Inflection -> Ctx Exp
+         -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text
+         -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text
+         -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text -> Text
 infForms inf _
          s_nom s_acc s_gen s_ptv s_ess s_transl
          s_ine s_ela s_ill s_ade s_abl s_all s_abe
@@ -833,39 +770,39 @@ infForms inf _
          p_nom p_acc p_gen p_ptv p_ess p_transl
          p_ine p_ela p_ill p_ade p_abl p_all p_abe p_com p_instr
          p_other
-    | G.isSingular inf = singularForms
-    | G.isPlural   inf = pluralForms
+    | isSingular inf = singularForms
+    | isPlural   inf = pluralForms
     | otherwise        = "?"
   where
     singularForms
-        | G.isNominative       inf = s_nom
-        | G.isAccusative       inf = s_acc
-        | G.isGenitive         inf = s_gen
-        | G.isPartitive        inf = s_ptv
-        | G.isEssive           inf = s_ess
-        | G.isTranslative      inf = s_transl
-        | G.isLocativeInessive inf = s_ine
-        | G.isLocativeElative  inf = s_ela
-        | G.isLocativeIllative inf = s_ill
-        | G.isLocativeAdessive inf = s_ade
-        | G.isLocativeAblative inf = s_abl
-        | G.isLocativeAllative inf = s_all
-        | G.isAbessive         inf = s_abe
-        | otherwise                = s_other
+        | isNominative       inf = s_nom
+        | isAccusative       inf = s_acc
+        | isGenitive         inf = s_gen
+        | isPartitive        inf = s_ptv
+        | isEssive           inf = s_ess
+        | isTranslative      inf = s_transl
+        | isLocativeInessive inf = s_ine
+        | isLocativeElative  inf = s_ela
+        | isLocativeIllative inf = s_ill
+        | isLocativeAdessive inf = s_ade
+        | isLocativeAblative inf = s_abl
+        | isLocativeAllative inf = s_all
+        | isAbessive         inf = s_abe
+        | otherwise              = s_other
     pluralForms
-        | G.isNominative       inf = p_nom
-        | G.isAccusative       inf = p_acc
-        | G.isGenitive         inf = p_gen
-        | G.isPartitive        inf = p_ptv
-        | G.isEssive           inf = p_ess
-        | G.isTranslative      inf = p_transl
-        | G.isLocativeInessive inf = p_ine
-        | G.isLocativeElative  inf = p_ela
-        | G.isLocativeIllative inf = p_ill
-        | G.isLocativeAdessive inf = p_ade
-        | G.isLocativeAblative inf = p_abl
-        | G.isLocativeAllative inf = p_all
-        | G.isAbessive         inf = p_abe
-        | G.isComitative       inf = p_com
-        | G.isInstructive      inf = p_instr
-        | otherwise                = p_other
+        | isNominative       inf = p_nom
+        | isAccusative       inf = p_acc
+        | isGenitive         inf = p_gen
+        | isPartitive        inf = p_ptv
+        | isEssive           inf = p_ess
+        | isTranslative      inf = p_transl
+        | isLocativeInessive inf = p_ine
+        | isLocativeElative  inf = p_ela
+        | isLocativeIllative inf = p_ill
+        | isLocativeAdessive inf = p_ade
+        | isLocativeAblative inf = p_abl
+        | isLocativeAllative inf = p_all
+        | isAbessive         inf = p_abe
+        | isComitative       inf = p_com
+        | isInstructive      inf = p_instr
+        | otherwise              = p_other

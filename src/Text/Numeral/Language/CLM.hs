@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -31,13 +26,9 @@ module Text.Numeral.Language.CLM
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Integral )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
+import "this" Text.Numeral
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 
@@ -46,7 +37,7 @@ import "text" Data.Text ( Text )
 -- CLM
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_3    = Just "clm"
     , entNativeNames = ["nəxʷsƛ̕ay̕əmúcən"]
@@ -57,10 +48,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = fix
        $ findRule (   1, lit            )
                 [ (  11, add 10 R       )
@@ -73,13 +64,13 @@ struct = fix
                 ]
                   1000
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = (1, 1000)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
-               , reprAdd   = Just $ \_ _ _ → " ʔiʔ "
+               { reprValue = \_ n -> M.lookup n syms
+               , reprAdd   = Just $ \_ _ _ -> " ʔiʔ "
                , reprMul   = Just (⊡)
                }
     where
@@ -97,18 +88,18 @@ cardinalRepr = render defaultRepr
           , (7, forms "c̕úʔkʷs" "c̕aʔkʷs")
           , (8, forms "táʔcs"  "taʔcs" )
           , (9, forms "tə́kʷxʷ" "təkʷxʷ")
-          , (10, \c → case c of
-                        CtxMul R _ _ → "ɬšáʔ"
-                        _            → "ʔúpən"
+          , (10, \c -> case c of
+                        CtxMul R _ _ -> "ɬšáʔ"
+                        _            -> "ʔúpən"
             )
           , (20, const "nəc̕xʷk̕ʷə́s")
           , (100, const "snáč̕əwəč")
           ]
 
-      forms ∷ s
-            → s
-            → Ctx (Exp i)
-            → s
+      forms :: s
+            -> s
+            -> Ctx Exp
+            -> s
       forms n t ctx = case ctx of
-                        CtxMul _ (Lit 10) _ → t
-                        _                   → n
+                        CtxMul _ (Lit 10) _ -> t
+                        _                   -> n

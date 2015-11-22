@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        et
 
@@ -24,7 +18,7 @@ module Text.Numeral.Language.EKK.TestData (cardinals) where
 --------------------------------------------------------------------------------
 
 import "base" Prelude ( Integral )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 
@@ -32,7 +26,7 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

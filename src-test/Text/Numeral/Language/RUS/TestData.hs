@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        ru
 
@@ -23,9 +17,7 @@ module Text.Numeral.Language.RUS.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -42,7 +34,7 @@ Sources:
   http://www.waytorussia.net/WhatIsRussia/Russian/Part1a.html
 -}
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection
@@ -183,10 +175,10 @@ cardinals =
       , (300020, "триста тысяч двадцать")
       , (300825, "триста тысячь восемьсот двадцать пять")
       , (dec 6, "один миллион")
-      , (2 ⋅ dec 6, "два миллиона")
-      , (5 ⋅ dec 6, "пять миллионов")
+      , (2 * dec 6, "два миллиона")
+      , (5 * dec 6, "пять миллионов")
       , (dec 9, "один миллиард")
-      , (2 ⋅ dec 9, "два миллиарда")
+      , (2 * dec 9, "два миллиарда")
       ]
     )
   ]

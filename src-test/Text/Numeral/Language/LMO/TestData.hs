@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -21,8 +16,7 @@ module Text.Numeral.Language.LMO.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude ( Num )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 
@@ -38,7 +32,7 @@ Note: The test data is probably Western Lombard (lom-wes) as oposed to
 Eastern Lombard (lom-eas).
 -}
 
-cardinals ∷ (Num i) ⇒ TestData i
+cardinals :: (Num i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        nb
 
@@ -31,14 +26,10 @@ module Text.Numeral.Language.NOB
 -- Imports
 -------------------------------------------------------------------------------
 
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Integral, (-), negate )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum as BN
-import qualified "this" Text.Numeral.Exp    as E
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
@@ -48,7 +39,7 @@ import "text" Data.Text ( Text )
 -- NOB
 -------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "nb"
     , entIso639_2    = ["nob"]
@@ -61,13 +52,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α, E.Scale α) ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ ( Integral α, E.Scale α
-         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
-         )
-       ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = pos
        $ fix
        $ findRule (   0, lit               )
@@ -81,16 +69,16 @@ struct = pos
                   (dec 6 - 1)
          `combine` pelletierScale R L BN.rule
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
+               { reprValue = \_ n -> M.lookup n syms
                , reprScale = BN.scaleRepr (BN.quantityName "illion" "illioner") []
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ _   → "minus "
+               , reprNeg   = Just $ \_ _   -> "minus "
                }
     where
       (Lit 100  ⊞ _) _ = " "
@@ -104,9 +92,9 @@ cardinalRepr = render defaultRepr
       syms =
           M.fromList
           [ (0,  const "null")
-          , (1,  \c → case c of
-                        CtxEmpty → "én"
-                        _        → "en"
+          , (1,  \c -> case c of
+                        CtxEmpty -> "én"
+                        _        -> "en"
             )
           , (2,  const "to")
           , (3,  tenForms   "tre"  "tret" "tret")
@@ -116,9 +104,9 @@ cardinalRepr = render defaultRepr
           , (7,  tenForms   "sju"  "syt"  "syt")
           , (8,  tenForms   "åtte" "at"   "åt")
           , (9,  tenForms   "ni"   "nit"  "nit")
-          , (10, \c → case c of
-                        CtxAdd {} → "ten"
-                        _         → "ti"
+          , (10, \c -> case c of
+                        CtxAdd {} -> "ten"
+                        _         -> "ti"
             )
           , (11, const "elleve")
           , (12, const "tolv")
@@ -127,9 +115,9 @@ cardinalRepr = render defaultRepr
           , (1000, const "tusen")
           ]
 
-      tenForms n a m = \c → case c of
-                              CtxAdd _ (Lit 10  ) _ → a
-                              CtxMul _ (Lit 100 ) _ → n
-                              CtxMul _ (Lit 1000) _ → n
-                              CtxMul {}             → m
-                              _                     → n
+      tenForms n a m = \c -> case c of
+                              CtxAdd _ (Lit 10  ) _ -> a
+                              CtxMul _ (Lit 100 ) _ -> n
+                              CtxMul _ (Lit 1000) _ -> n
+                              CtxMul {}             -> m
+                              _                     -> n

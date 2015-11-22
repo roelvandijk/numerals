@@ -1,7 +1,15 @@
-{ mkDerivation, base, base-unicode-symbols, containers
-, containers-unicode-symbols, fingertree, HUnit, integer-gmp
-, QuickCheck, stdenv, test-framework, test-framework-hunit
-, test-framework-quickcheck2, text
+{ mkDerivation
+, base
+, containers
+, fingertree
+, HUnit
+, integer-gmp
+, QuickCheck
+, stdenv
+, test-framework
+, test-framework-hunit
+, test-framework-quickcheck2
+, text
 
 , criterion
 }:
@@ -11,13 +19,22 @@ mkDerivation {
   src = ./.;
 
   libraryHaskellDepends = [
-    base base-unicode-symbols containers containers-unicode-symbols
-    fingertree integer-gmp text
+    base
+    containers
+    fingertree
+    integer-gmp
+    text
   ];
 
   testHaskellDepends = [
-    base base-unicode-symbols HUnit integer-gmp QuickCheck
-    test-framework test-framework-hunit test-framework-quickcheck2 text
+    base
+    HUnit
+    integer-gmp
+    QuickCheck
+    test-framework
+    test-framework-hunit
+    test-framework-quickcheck2
+    text
 
     criterion
   ];

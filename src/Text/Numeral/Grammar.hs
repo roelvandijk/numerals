@@ -1,195 +1,145 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-{-# LANGUAGE PackageImports    #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Text.Numeral.Grammar
-    ( -- * Grammatical categories
+    ( -- * Inflection
+      Inflection(..)
+    , defaultInflection
+      -- * Grammatical categories
+    , Case(..)
+    , Gender(..)
+    , Number(..)
+
+      -- * Grammatical categories
       -- ** Case
-      NoCase               (noCase,               hasNoCase)
-    , Ablative             (ablative,             isAblative)
-    , Abessive             (abessive,             isAbessive)
-    , Accusative           (accusative,           isAccusative)
-    , Comitative           (comitative,           isComitative)
-    , Dative               (dative,               isDative)
-    , Delative             (delative,             isDelative)
-    , Distributive         (distributive,         isDistributive)
-    , DistributiveTemporal (distributiveTemporal, isDistributiveTemporal)
-    , Essive               (essive,               isEssive)
-    , Genitive             (genitive,             isGenitive)
-    , Instrumental         (instrumental,         isInstrumental)
-    , Instructive          (instructive,          isInstructive)
-    , Lative               (lative,               isLative)
-    , Locative             (locative,             isLocative)
-    , Multiplicative       (multiplicative,       isMultiplicative)
-    , Nominative           (nominative,           isNominative)
-    , Partitive            (partitive,            isPartitive)
-    , SuperEssive          (superEssive,          isSuperEssive)
-    , Sublative            (sublative,            isSublative)
-    , Translative          (translative,          isTranslative)
-    , Vocative             (vocative,             isVocative)
+    , noCase,               hasNoCase
+    , ablative,             isAblative
+    , abessive,             isAbessive
+    , accusative,           isAccusative
+    , comitative,           isComitative
+    , dative,               isDative
+    , delative,             isDelative
+    , distributive,         isDistributive
+    , distributiveTemporal, isDistributiveTemporal
+    , essive,               isEssive
+    , genitive,             isGenitive
+    , instrumental,         isInstrumental
+    , instructive,          isInstructive
+    , lative,               isLative
+    , locative,             isLocative
+    , multiplicative,       isMultiplicative
+    , nominative,           isNominative
+    , partitive,            isPartitive
+    , superEssive,          isSuperEssive
+    , sublative,            isSublative
+    , translative,          isTranslative
+    , vocative,             isVocative
       -- *** Locative cases
-    , LocativeInessive (locativeInessive, isLocativeInessive)
-    , LocativeElative  (locativeElative,  isLocativeElative)
-    , LocativeIllative (locativeIllative, isLocativeIllative)
-    , LocativeAdessive (locativeAdessive, isLocativeAdessive)
-    , LocativeAblative (locativeAblative, isLocativeAblative)
-    , LocativeAllative (locativeAllative, isLocativeAllative)
+    , locativeInessive, isLocativeInessive
+    , locativeElative,  isLocativeElative
+    , locativeIllative, isLocativeIllative
+    , locativeAdessive, isLocativeAdessive
+    , locativeAblative, isLocativeAblative
+    , locativeAllative, isLocativeAllative
       -- ** Gender
-    , NoGender  (noGender,  hasNoGender)
-    , Neuter    (neuter,    isNeuter)
-    , Masculine (masculine, isMasculine)
-    , Feminine  (feminine,  isFeminine)
-    , Common    (common,    isCommon)
+    , noGender,  hasNoGender
+    , neuter,    isNeuter
+    , masculine, isMasculine
+    , feminine,  isFeminine
+    , common,    isCommon
       -- ** Number
-    , NoNumber (noNumber, hasNoNumber)
-    , Singular (singular, isSingular)
-    , Dual     (dual,     isDual)
-    , Trial    (trial,    isTrial)
-    , Paucal   (paucal,   isPaucal)
-    , Plural   (plural,   isPlural)
+    , noNumber, hasNoNumber
+    , singular, isSingular
+    , dual,     isDual
+    , trial,    isTrial
+    , paucal,   isPaucal
+    , plural,   isPlural
     ) where
 
+-------------------------------------------------------------------------------
+-- Inflection
+-------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------
--- Imports
---------------------------------------------------------------------------------
+data Inflection = Inflection { iCase   :: Maybe Case
+                             , iGender :: Maybe Gender
+                             , iNumber :: Maybe Number
+                             } deriving (Show, Eq)
 
-import "base" Data.Bool ( Bool )
+defaultInflection :: Inflection
+defaultInflection = Inflection Nothing Nothing Nothing
 
 
---------------------------------------------------------------------------------
--- Case
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Grammatical categories
+-------------------------------------------------------------------------------
 
-class NoCase α where
-    noCase ∷ α → α
-    hasNoCase ∷ α → Bool
-
--- | The ablative case (abbreviated abl) indicates movement from
--- something, or cause.
-class Ablative α where
-    ablative ∷ α → α
-    isAblative ∷ α → Bool
-
+data Case =
 -- | In linguistics, abessive (abbreviated abe or abess), caritive and privative
 -- (abbreviated priv) are names for a grammatical case expressing the lack or
 -- absence of the marked noun.
-class Abessive α where
-    abessive ∷ α → α
-    isAbessive ∷ α → Bool
-
+    Abessive
+-- | The ablative case (abbreviated abl) indicates movement from
+-- something, or cause.
+          | Ablative
 -- | The accusative case (abbreviated acc) indicates the direct object
 -- of a verb.
-class Accusative α where
-    accusative ∷ α → α
-    isAccusative ∷ α → Bool
-
+          | Accusative
 -- | The comitative case (abbreviated com), also known as the associative case
 -- (abbreviated ass), is a grammatical case that denotes companionship, and is
 -- used where English would typically use preposition "with" in the sense of "in
 -- company with" or "together with" (other uses of "with," e.g. with the meaning
 -- of "using," "by means of" (I cut bread with a knife) would correspond to the
 -- instrumental case or related cases).
-class Comitative α where
-    comitative ∷ α → α
-    isComitative ∷ α → Bool
-
+          | Comitative
 -- | The dative case (abbreviated dat, or sometimes d when it is a
 -- core argument) indicates the indirect object of a verb.
-class Dative α where
-    dative ∷ α → α
-    isDative ∷ α → Bool
-
+          | Dative
 -- | The delative case (abbreviated del; from Latin deferre "to bear or bring
 -- away or down") in the Hungarian language can originally express the movement
 -- from the surface of something (e.g. "off the table"), but it is used in
 -- several other meanings (e.g. "about people"), some of them related to the
 -- original (e.g. "from the post office").
-class Delative α where
-    delative ∷ α → α
-    isDelative ∷ α → Bool
-
+          | Delative
 -- | The distributive case (abbreviated distr) is used on nouns for the meanings
 -- of per or each.
-class Distributive α where
-    distributive ∷ α → α
-    isDistributive ∷ α → Bool
-
+          | Distributive
 -- | The distributive-temporal case specifies when something is done.
-class DistributiveTemporal α where
-    distributiveTemporal ∷ α → α
-    isDistributiveTemporal ∷ α → Bool
-
+          | DistributiveTemporal
 -- | The essive or similaris case (abbreviated ess) carries the meaning of a
 -- temporary location or state of being, often equivalent to the English "as a
 -- (child)".
-class Essive α where
-    essive ∷ α → α
-    isEssive ∷ α → Bool
-
+          | Essive
 -- | The genitive case (abbreviated gen; also called the possessive
 -- case or second case), which roughly corresponds to English's
 -- possessive case and preposition of, indicates the possessor of
 -- another noun.
-class Genitive α where
-    genitive ∷ α → α
-    isGenitive ∷ α → Bool
-
+          | Genitive
 -- | The instrumental case (abbreviated ins or instr; also called the
 -- eighth case) indicates an object used in performing an action.
-class Instrumental α where
-    instrumental ∷ α → α
-    isInstrumental ∷ α → Bool
-
+          | Instrumental
 -- | In the Finnish language and Estonian language, the instructive case has the
 -- basic meaning of "by means of". It is a comparatively rarely used case,
--- though it is found in some commonly used expressions, such as omin silmin →
+-- though it is found in some commonly used expressions, such as omin silmin ->
 -- "with one's own eyes".
-class Instructive α where
-    instructive ∷ α → α
-    isInstructive ∷ α → Bool
-
+          | Instructive
 -- | Lative (abbreviated lat) is a case which indicates motion to a location. It
 -- corresponds to the English prepositions "to" and "into". The lative case
 -- belongs to the group of the general local cases together with the locative
 -- and separative case. The term derives from the Latin lat-, the participle
 -- stem of ferre, "to bring".
-class Lative α where
-    lative ∷ α → α
-    isLative ∷ α → Bool
-
+          | Lative
 -- | The locative case (abbreviated loc) indicates a location.
-class Locative α where
-    locative ∷ α → α
-    isLocative ∷ α → Bool
-
+          | Locative (Maybe Locative)
 -- | The multiplicative case is a grammatical case used for marking a number of
 -- something ("three times").
-class Multiplicative α where
-    multiplicative ∷ α → α
-    isMultiplicative ∷ α → Bool
-
+          | Multiplicative
 -- | The nominative case (abbreviated nom) indicates the subject of a
 -- finite verb.
-class Nominative α where
-    nominative ∷ α → α
-    isNominative ∷ α → Bool
-
+          | Nominative
 -- | The partitive case (abbreviated ptv or more ambiguously part)
 -- denotes "partialness", "without result", or "without specific
 -- identity". It is also used in contexts where a subgroup is selected
 -- from a larger group, or with numbers.
-class Partitive α where
-    partitive ∷ α → α
-    isPartitive ∷ α → Bool
-
--- | The Superessive case (abbreviated supe) is a grammatical declension
--- indicating location on top of, or on the surface of something. Its name comes
--- from Latin supersum, superesse: to be over and above.
-class SuperEssive α where
-    superEssive ∷ α → α
-    isSuperEssive ∷ α → Bool
-
+          | Partitive
 -- | The term sublative case (abbreviated subl) is used to refer to grammatical
 -- cases expressing different situations: In Hungarian, it expresses the
 -- destination of the movement, originally to the surface of something (e.g. sit
@@ -198,121 +148,318 @@ class SuperEssive α where
 -- Caucasian languages it denotes a movement towards the bottomsides or the area
 -- under an object. The sublative case is used in the Finnish, Tsez and
 -- Hungarian languages.
-class Sublative α where
-    sublative ∷ α → α
-    isSublative ∷ α → Bool
-
+          | Sublative
+-- | The Superessive case (abbreviated supe) is a grammatical declension
+-- indicating location on top of, or on the surface of something. Its name comes
+-- from Latin supersum, superesse: to be over and above.
+          | SuperEssive
 -- | The translative case (abbreviated transl) is a grammatical case that
 -- indicates a change in state of a noun, with the general sense of "becoming X"
 -- or "change to X".
-class Translative α where
-    translative ∷ α → α
-    isTranslative ∷ α → Bool
-
+          | Translative
 -- | The vocative case indicates an addressee.
-class Vocative α where
-    vocative ∷ α → α
-    isVocative ∷ α → Bool
+          | Vocative
+            deriving (Eq, Show)
 
-
---------------------------------------------------------------------------------
--- Locative cases
---------------------------------------------------------------------------------
-
--- | Inessive case (abbreviated ine; from Latin inesse "to be in or at") is a
--- locative grammatical case. This case carries the basic meaning of "in".
-class Locative α ⇒ LocativeInessive α where
-    locativeInessive ∷ α → α
-    isLocativeInessive ∷ α → Bool
-
--- | Elative (abbreviated ela; from Latin efferre "to bring or carry out") is a
--- locative case with the basic meaning "out of".
-class Locative α ⇒ LocativeElative α where
-    locativeElative ∷ α → α
-    isLocativeElative ∷ α → Bool
-
+data Locative =
 -- | Illative (abbreviated ill; from Latin illatus "brought in") is, in the
 -- Finnish language, Estonian language and the Hungarian language, the third of
 -- the locative cases with the basic meaning of "into (the inside of)".
-class Locative α ⇒ LocativeIllative α where
-    locativeIllative ∷ α → α
-    isLocativeIllative ∷ α → Bool
-
+                LocativeIllative
+-- | Inessive case (abbreviated ine; from Latin inesse "to be in or at") is a
+-- locative grammatical case. This case carries the basic meaning of "in".
+              | LocativeInessive
+-- | Elative (abbreviated ela; from Latin efferre "to bring or carry out") is a
+-- locative case with the basic meaning "out of".
+              | LocativeElative
+-- | Allative case (abbreviated all; from Latin allāt-, afferre "to bring to")
+-- is a type of the locative cases used in several languages. The term allative
+-- is generally used for the lative case in the majority of languages which do
+-- not make finer distinctions.
+              | LocativeAllative
 -- | In Uralic languages, such as Finnish, Estonian and Hungarian, the adessive
 -- case (abbreviated ade; from Latin adesse "to be present") is the fourth of
 -- the locative cases with the basic meaning of "on".
-class Locative α ⇒ LocativeAdessive α where
-    locativeAdessive ∷ α → α
-    isLocativeAdessive ∷ α → Bool
-
+              | LocativeAdessive
 -- | In linguistics, ablative case (abbreviated abl) is a name given to cases in
 -- various languages whose common characteristic is that they mark motion away
 -- from something, though the details in each language may differ. The name
 -- "ablative" derives from the Latin ablatus, the (irregular) perfect passive
 -- participle of auferre "to carry away".
-class Locative α ⇒ LocativeAblative α where
-    locativeAblative ∷ α → α
-    isLocativeAblative ∷ α → Bool
+              | LocativeAblative
+                deriving (Eq, Show)
 
--- | Allative case (abbreviated all; from Latin allāt-, afferre "to bring to")
--- is a type of the locative cases used in several languages. The term allative
--- is generally used for the lative case in the majority of languages which do
--- not make finer distinctions.
-class Locative α ⇒ LocativeAllative α where
-    locativeAllative ∷ α → α
-    isLocativeAllative ∷ α → Bool
+data Gender = Neuter
+            | Masculine
+            | Feminine
+            | Common
+              deriving (Eq, Show)
+
+data Number = Singular
+            | Dual
+            | Trial
+            | Paucal
+            | Plural
+              deriving (Eq, Show)
+
+-------------------------------------------------------------------------------
+-- Smart case constructors
+-------------------------------------------------------------------------------
+
+noCase :: Inflection -> Inflection
+noCase inf = inf { iCase = Nothing }
+
+hasNoCase :: Inflection -> Bool
+hasNoCase (Inflection {iCase}) = iCase == Nothing
+
+ablative :: Inflection -> Inflection
+ablative inf = inf { iCase = Just Ablative }
+
+isAblative :: Inflection -> Bool
+isAblative (Inflection {iCase}) = iCase == Just Ablative
+
+abessive :: Inflection -> Inflection
+abessive inf = inf { iCase = Just Abessive }
+
+isAbessive :: Inflection -> Bool
+isAbessive (Inflection {iCase}) = iCase == Just Abessive
+
+accusative :: Inflection -> Inflection
+accusative inf = inf { iCase = Just Accusative }
+
+isAccusative :: Inflection -> Bool
+isAccusative (Inflection {iCase}) = iCase == Just Accusative
+
+comitative :: Inflection -> Inflection
+comitative inf = inf { iCase = Just Comitative }
+
+isComitative :: Inflection -> Bool
+isComitative (Inflection {iCase}) = iCase == Just Comitative
+
+dative :: Inflection -> Inflection
+dative inf = inf { iCase = Just Dative }
+
+isDative :: Inflection -> Bool
+isDative (Inflection {iCase}) = iCase == Just Dative
+
+delative :: Inflection -> Inflection
+delative inf = inf { iCase = Just Delative }
+
+isDelative :: Inflection -> Bool
+isDelative (Inflection {iCase}) = iCase == Just Delative
+
+distributive :: Inflection -> Inflection
+distributive inf = inf { iCase = Just Distributive }
+
+isDistributive :: Inflection -> Bool
+isDistributive (Inflection {iCase}) = iCase == Just Distributive
+
+distributiveTemporal :: Inflection -> Inflection
+distributiveTemporal inf = inf { iCase = Just DistributiveTemporal }
+
+isDistributiveTemporal :: Inflection -> Bool
+isDistributiveTemporal (Inflection {iCase}) = iCase == Just DistributiveTemporal
+
+essive :: Inflection -> Inflection
+essive inf = inf { iCase = Just Essive }
+
+isEssive :: Inflection -> Bool
+isEssive (Inflection {iCase}) = iCase == Just Essive
+
+genitive :: Inflection -> Inflection
+genitive inf = inf { iCase = Just Genitive }
+
+isGenitive :: Inflection -> Bool
+isGenitive (Inflection {iCase}) = iCase == Just Genitive
+
+instrumental :: Inflection -> Inflection
+instrumental inf = inf { iCase = Just Instrumental }
+
+isInstrumental :: Inflection -> Bool
+isInstrumental (Inflection {iCase}) = iCase == Just Instrumental
+
+instructive :: Inflection -> Inflection
+instructive inf = inf { iCase = Just Instructive }
+
+isInstructive :: Inflection -> Bool
+isInstructive (Inflection {iCase}) = iCase == Just Instructive
+
+lative :: Inflection -> Inflection
+lative inf = inf { iCase = Just Lative }
+
+isLative :: Inflection -> Bool
+isLative (Inflection {iCase}) = iCase == Just Lative
+
+locative :: Inflection -> Inflection
+locative inf = inf { iCase = Just (Locative Nothing) }
+
+isLocative :: Inflection -> Bool
+isLocative (Inflection {iCase}) =
+        case iCase of
+          Just (Locative _) -> True
+          _                 -> False
+
+multiplicative :: Inflection -> Inflection
+multiplicative inf = inf { iCase = Just Multiplicative }
+
+isMultiplicative :: Inflection -> Bool
+isMultiplicative (Inflection {iCase}) = iCase == Just Multiplicative
+
+nominative :: Inflection -> Inflection
+nominative inf = inf { iCase = Just Nominative }
+
+isNominative :: Inflection -> Bool
+isNominative (Inflection {iCase}) = iCase == Just Nominative
+
+partitive :: Inflection -> Inflection
+partitive inf = inf { iCase = Just Partitive }
+
+isPartitive :: Inflection -> Bool
+isPartitive (Inflection {iCase}) = iCase == Just Partitive
+
+superEssive :: Inflection -> Inflection
+superEssive inf = inf { iCase = Just SuperEssive }
+
+isSuperEssive :: Inflection -> Bool
+isSuperEssive (Inflection {iCase}) = iCase == Just SuperEssive
+
+sublative :: Inflection -> Inflection
+sublative inf = inf { iCase = Just Sublative }
+
+isSublative :: Inflection -> Bool
+isSublative (Inflection {iCase}) = iCase == Just Sublative
+
+translative :: Inflection -> Inflection
+translative inf = inf { iCase = Just Translative }
+
+isTranslative :: Inflection -> Bool
+isTranslative (Inflection {iCase}) = iCase == Just Translative
+
+vocative :: Inflection -> Inflection
+vocative inf = inf { iCase = Just Vocative }
+
+isVocative :: Inflection -> Bool
+isVocative (Inflection {iCase}) = iCase == Just Vocative
 
 
---------------------------------------------------------------------------------
--- Gender
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Smart locative case constructors
+-------------------------------------------------------------------------------
 
-class NoGender α where
-    noGender ∷ α → α
-    hasNoGender ∷ α → Bool
+locativeInessive :: Inflection -> Inflection
+locativeInessive inf = inf {iCase = Just $ Locative $ Just LocativeInessive}
 
-class Neuter α where
-    neuter ∷ α → α
-    isNeuter ∷ α → Bool
+isLocativeInessive :: Inflection -> Bool
+isLocativeInessive (Inflection {iCase}) =
+        iCase == (Just $ Locative $ Just LocativeInessive)
 
-class Masculine α where
-    masculine ∷ α → α
-    isMasculine ∷ α → Bool
+locativeElative :: Inflection -> Inflection
+locativeElative inf = inf {iCase = Just $ Locative $ Just LocativeElative}
 
-class Feminine α where
-    feminine ∷ α → α
-    isFeminine ∷ α → Bool
+isLocativeElative :: Inflection -> Bool
+isLocativeElative (Inflection {iCase}) =
+        iCase == (Just $ Locative $ Just LocativeElative)
 
-class Common α where
-    common ∷ α → α
-    isCommon ∷ α → Bool
+locativeIllative :: Inflection -> Inflection
+locativeIllative inf = inf {iCase = Just $ Locative $ Just LocativeIllative}
+
+isLocativeIllative :: Inflection -> Bool
+isLocativeIllative (Inflection {iCase}) =
+        iCase == (Just $ Locative $ Just LocativeIllative)
+
+locativeAdessive :: Inflection -> Inflection
+locativeAdessive inf = inf {iCase = Just $ Locative $ Just LocativeAdessive}
+
+isLocativeAdessive :: Inflection -> Bool
+isLocativeAdessive (Inflection {iCase}) =
+        iCase == (Just $ Locative $ Just LocativeAdessive)
+
+locativeAblative :: Inflection -> Inflection
+locativeAblative inf = inf {iCase = Just $ Locative $ Just LocativeAblative}
+
+isLocativeAblative :: Inflection -> Bool
+isLocativeAblative (Inflection {iCase}) =
+        iCase == (Just $ Locative $ Just LocativeAblative)
+
+locativeAllative :: Inflection -> Inflection
+locativeAllative inf = inf {iCase = Just $ Locative $ Just LocativeAllative}
+
+isLocativeAllative :: Inflection -> Bool
+isLocativeAllative (Inflection {iCase}) =
+        iCase == (Just $ Locative $ Just LocativeAllative)
 
 
---------------------------------------------------------------------------------
--- Number
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Smart gender constructors
+-------------------------------------------------------------------------------
 
-class NoNumber α where
-    noNumber ∷ α → α
-    hasNoNumber ∷ α → Bool
+noGender :: Inflection -> Inflection
+noGender inf = inf { iGender = Nothing }
 
-class Singular α where
-    singular ∷ α → α
-    isSingular ∷ α → Bool
+hasNoGender :: Inflection -> Bool
+hasNoGender (Inflection {iGender}) = iGender == Nothing
 
-class Dual α where
-    dual ∷ α → α
-    isDual ∷ α → Bool
+neuter :: Inflection -> Inflection
+neuter inf = inf { iGender = Just Neuter }
 
-class Trial α where
-    trial ∷ α → α
-    isTrial ∷ α → Bool
+isNeuter :: Inflection -> Bool
+isNeuter (Inflection {iGender}) = iGender == Just Neuter
 
-class Paucal α where
-    paucal ∷ α → α
-    isPaucal ∷ α → Bool
+masculine :: Inflection -> Inflection
+masculine inf = inf { iGender = Just Masculine }
 
-class Plural α where
-    plural ∷ α → α
-    isPlural ∷ α → Bool
+isMasculine :: Inflection -> Bool
+isMasculine (Inflection {iGender}) = iGender == Just Masculine
 
+feminine :: Inflection -> Inflection
+feminine inf = inf { iGender = Just Feminine }
+
+isFeminine :: Inflection -> Bool
+isFeminine (Inflection {iGender}) = iGender == Just Feminine
+
+common :: Inflection -> Inflection
+common inf = inf { iGender = Just Common }
+
+isCommon :: Inflection -> Bool
+isCommon (Inflection {iGender}) = iGender == Just Common
+
+
+-------------------------------------------------------------------------------
+-- Smart number constructors
+-------------------------------------------------------------------------------
+
+noNumber :: Inflection -> Inflection
+noNumber inf = inf { iNumber = Nothing }
+
+hasNoNumber :: Inflection -> Bool
+hasNoNumber (Inflection {iNumber}) = iNumber == Nothing
+
+singular :: Inflection -> Inflection
+singular inf = inf { iNumber = Just Singular }
+
+isSingular :: Inflection -> Bool
+isSingular (Inflection {iNumber}) = iNumber == Just Singular
+
+dual :: Inflection -> Inflection
+dual inf = inf { iNumber = Just Dual }
+
+isDual :: Inflection -> Bool
+isDual (Inflection {iNumber}) = iNumber == Just Dual
+
+trial :: Inflection -> Inflection
+trial inf = inf { iNumber = Just Trial }
+
+isTrial :: Inflection -> Bool
+isTrial (Inflection {iNumber}) = iNumber == Just Trial
+
+paucal :: Inflection -> Inflection
+paucal inf = inf { iNumber = Just Paucal }
+
+isPaucal :: Inflection -> Bool
+isPaucal (Inflection {iNumber}) = iNumber == Just Paucal
+
+plural :: Inflection -> Inflection
+plural inf = inf { iNumber = Just Plural }
+
+isPlural :: Inflection -> Bool
+isPlural (Inflection {iNumber}) = iNumber == Just Plural

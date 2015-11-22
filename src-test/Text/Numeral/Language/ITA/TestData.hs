@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        it
 
@@ -23,10 +17,8 @@ module Text.Numeral.Language.ITA.TestData (cardinals, ordinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "numerals" Text.Numeral.Grammar
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -41,7 +33,7 @@ import "this" Text.Numeral.Test ( TestData )
 --   http://italian.about.com/library/weekly/aa042600a.htm
 --   http://www.suite101.com/content/how-to-count-in-italian-a146487
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "neuter"
     , neuter defaultInflection
@@ -174,15 +166,15 @@ cardinals =
       , (10000, "diecimila")
       , (11000, "undicimila")
       , (100000, "centomila")
-      , (1 ⋅ dec 6, "milione")
-      , (2 ⋅ dec 6, "due milioni")
-      , (125 ⋅ dec 5, "dodici milioni cinquecentomila")
-      , (43152 ⋅ dec 3, "quarantatré milioni centocinquantaduemila")
-      , (132 ⋅ dec 6, "centotrentadue milioni")
-      , (28375 ⋅ dec 4, "duecentottantatré milioni settecentocinquantamila")
-      , (680 ⋅ dec 6, "seicentottanta milioni")
-      , (1 ⋅ dec 9, "miliardo")
-      , (2 ⋅ dec 9, "due miliardi")
+      , (1 * dec 6, "milione")
+      , (2 * dec 6, "due milioni")
+      , (125 * dec 5, "dodici milioni cinquecentomila")
+      , (43152 * dec 3, "quarantatré milioni centocinquantaduemila")
+      , (132 * dec 6, "centotrentadue milioni")
+      , (28375 * dec 4, "duecentottantatré milioni settecentocinquantamila")
+      , (680 * dec 6, "seicentottanta milioni")
+      , (1 * dec 9, "miliardo")
+      , (2 * dec 9, "due miliardi")
       , (dec 12, "bilione")
       , (dec 15, "biliardo")
       , (dec 18, "trilione")
@@ -215,7 +207,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i) ⇒ TestData i
+ordinals :: (Integral i) => TestData i
 ordinals =
   [ ( "default"
     , defaultInflection

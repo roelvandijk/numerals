@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        cs
 
@@ -25,9 +19,7 @@ module Text.Numeral.Language.CES.TestData (cardinals, ordinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -36,7 +28,7 @@ import "this" Text.Numeral.Test ( TestData )
 -- Test data
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection
@@ -173,17 +165,17 @@ cardinals =
       , (dec 5, "sto tisíc")
       , (138000, "sto třicet osm tisíc")
       , (dec 6, "milión")
-      , (2 ⋅ dec 6, "dva milióny")
-      , (5 ⋅ dec 6, "pět miliónů")
-      , (6 ⋅ dec 6, "šest miliónů")
-      , (7 ⋅ dec 6, "sedm miliónů")
+      , (2 * dec 6, "dva milióny")
+      , (5 * dec 6, "pět miliónů")
+      , (6 * dec 6, "šest miliónů")
+      , (7 * dec 6, "sedm miliónů")
       , (dec 9, "miliarda")
       , (dec 12, "bilión")
       ]
     )
   ]
 
-ordinals ∷ (Integral i) ⇒ TestData i
+ordinals :: (Integral i) => TestData i
 ordinals =
   [ ( "default"
     , defaultInflection

@@ -1,9 +1,3 @@
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        es
 
@@ -31,18 +25,10 @@ module Text.Numeral.Language.SPA
 -- Imports
 -------------------------------------------------------------------------------
 
-import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Ord      ( (<) )
-import "base" Prelude       ( (-), negate, Integral )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Prelude.Unicode       ( ℤ )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum  as BN
-import qualified "this" Text.Numeral.Exp     as E
-import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
@@ -52,7 +38,7 @@ import "text" Data.Text ( Text )
 -- SPA
 -------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "es"
     , entIso639_2    = ["spa"]
@@ -65,17 +51,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ ( G.Feminine i, G.Masculine i
-           , Integral α, E.Scale α
-           )
-         ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ ( Integral α, E.Scale α
-         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
-         , E.Inflection β, G.Masculine (E.Inf β)
-         )
-       ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = pos $ fix $ rule `combine` longScale1_es
     where
       rule = findRule (   0, lit       )
@@ -91,27 +70,22 @@ struct = pos $ fix $ rule `combine` longScale1_es
 
 -- | Like 'longScale1' with the difference that all scale elements are
 -- masculine.
-longScale1_es ∷ ( Integral α, E.Scale α
-                , E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β
-                , E.Inflection β, G.Masculine (E.Inf β)
-                )
-              ⇒ Rule α β
+longScale1_es :: (Integral a) => Rule a
 longScale1_es = mulScale1_es 6 0 R L BN.rule
     where
-      mulScale1_es = mulScale_ $ \f m s _ → masculineMul (f m) s
-      masculineMul x y = E.inflection (G.masculine) $ E.mul x y
+      mulScale1_es = mulScale_ $ \f m s _ -> masculineMul (f m) s
+      masculineMul x y = ChangeGender (Just Masculine) $ Mul x y
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-cardinalRepr ∷ ( G.Feminine i, G.Masculine i)
-             ⇒ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \inf n → M.lookup n (syms inf)
+               { reprValue = \inf n -> M.lookup n (syms inf)
                , reprScale = longScaleRepr
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ _ → "menos "
+               , reprNeg   = Just $ \_ _ -> "menos "
                }
     where
       (_                    ⊞ Lit 10) _ = ""
@@ -126,80 +100,80 @@ cardinalRepr = render defaultRepr
       syms inf =
           M.fromList
           [ (0, const "cero")
-          , (1, \c → case c of
-                       CtxAdd _ (Lit 10)  _    → "on"
+          , (1, \c -> case c of
+                       CtxAdd _ (Lit 10)  _  -> "on"
                        CtxAdd _ (Lit 20)  _
-                           | G.isMasculine inf → "ún"
-                       _   | G.isFeminine  inf → "una"
-                           | G.isMasculine inf → "un"
-                           | otherwise         → "uno"
+                           | isMasculine inf -> "ún"
+                       _   | isFeminine  inf -> "una"
+                           | isMasculine inf -> "un"
+                           | otherwise       -> "uno"
             )
-          , (2, \c → case c of
-                       CtxAdd _ (Lit 10)  _ → "do"
-                       CtxAdd _ (Lit 20)  _ → "dós"
-                       _                    → "dos"
+          , (2, \c -> case c of
+                       CtxAdd _ (Lit 10)  _ -> "do"
+                       CtxAdd _ (Lit 20)  _ -> "dós"
+                       _                    -> "dos"
             )
-          , (3, \c → case c of
-                       CtxAdd _ (Lit 10)  _ → "tre"
-                       CtxAdd _ (Lit 20)  _ → "trés"
-                       CtxMul _ (Lit 10)  _ → "trein"
-                       _                    → "tres"
+          , (3, \c -> case c of
+                       CtxAdd _ (Lit 10)  _ -> "tre"
+                       CtxAdd _ (Lit 20)  _ -> "trés"
+                       CtxMul _ (Lit 10)  _ -> "trein"
+                       _                    -> "tres"
             )
-          , (4, \c → case c of
-                       CtxAdd _ (Lit 10)  _ → "cator"
-                       CtxMul _ (Lit 10)  _ → "cuaren"
-                       _                    → "cuatro"
+          , (4, \c -> case c of
+                       CtxAdd _ (Lit 10)  _ -> "cator"
+                       CtxMul _ (Lit 10)  _ -> "cuaren"
+                       _                    -> "cuatro"
             )
-          , (5, \c → case c of
-                       CtxAdd _ (Lit 10)  _ → "quin"
-                       CtxMul _ (Lit 10)  _ → "cincuen"
-                       CtxMul _ (Lit 100) _ → "quin"
-                       _                    → "cinco"
+          , (5, \c -> case c of
+                       CtxAdd _ (Lit 10)  _ -> "quin"
+                       CtxMul _ (Lit 10)  _ -> "cincuen"
+                       CtxMul _ (Lit 100) _ -> "quin"
+                       _                    -> "cinco"
             )
-          , (6, \c → case c of
-                       CtxAdd _ (Lit 10)  _ → "séis"
-                       CtxAdd _ (Lit 20)  _ → "séis"
-                       CtxMul _ (Lit 10)  _ → "sesen"
-                       _                    → "seis"
+          , (6, \c -> case c of
+                       CtxAdd _ (Lit 10)  _ -> "séis"
+                       CtxAdd _ (Lit 20)  _ -> "séis"
+                       CtxMul _ (Lit 10)  _ -> "sesen"
+                       _                    -> "seis"
             )
-          , (7, \c → case c of
-                       CtxMul _ (Lit 10)  _ → "seten"
-                       CtxMul _ (Lit 100) _ → "sete"
-                       _                    → "siete"
+          , (7, \c -> case c of
+                       CtxMul _ (Lit 10)  _ -> "seten"
+                       CtxMul _ (Lit 100) _ -> "sete"
+                       _                    -> "siete"
             )
-          , (8, \c → case c of
-                       CtxMul _ (Lit 10)  _ → "ochen"
-                       _                    → "ocho"
+          , (8, \c -> case c of
+                       CtxMul _ (Lit 10)  _ -> "ochen"
+                       _                    -> "ocho"
             )
-          , (9, \c → case c of
-                       CtxMul _ (Lit 10)  _ → "noven"
-                       CtxMul _ (Lit 100) _ → "nove"
-                       _                    → "nueve"
+          , (9, \c -> case c of
+                       CtxMul _ (Lit 10)  _ -> "noven"
+                       CtxMul _ (Lit 100) _ -> "nove"
+                       _                    -> "nueve"
             )
-          , (10, \c → case c of
-                        CtxAdd R (Lit _)  _ → "ce"
-                        CtxAdd L (Lit _)  _ → "dieci"
-                        CtxMul R _        _ → "ta"
-                        _                   → "diez"
+          , (10, \c -> case c of
+                        CtxAdd R (Lit _)  _ -> "ce"
+                        CtxAdd L (Lit _)  _ -> "dieci"
+                        CtxMul R _        _ -> "ta"
+                        _                   -> "diez"
             )
-          , (20, \c → case c of
-                        CtxAdd _ (Lit _)  _ → "veinti"
-                        _                   → "veinte"
+          , (20, \c -> case c of
+                        CtxAdd _ (Lit _)  _ -> "veinti"
+                        _                   -> "veinte"
             )
-          , (100, \c → case c of
-                         CtxEmpty             → "cien"
-                         CtxAdd {}            → "ciento"
+          , (100, \c -> case c of
+                         CtxEmpty           -> "cien"
+                         CtxAdd {}          -> "ciento"
                          CtxMul _ (Lit 5) _
-                           | G.isFeminine inf → "ientas"
-                           | otherwise        → "ientos"
-                         CtxMul L _       _   → "cien"
-                         _ | G.isFeminine inf → "cientas"
-                           | otherwise        → "cientos"
+                           | isFeminine inf -> "ientas"
+                           | otherwise      -> "ientos"
+                         CtxMul L _       _ -> "cien"
+                         _ | isFeminine inf -> "cientas"
+                           | otherwise      -> "cientos"
             )
           , (1000, const "mil")
           ]
 
-longScaleRepr ∷ i → ℤ → ℤ → (Exp i) → Ctx (Exp i) → Maybe Text
+longScaleRepr :: Inflection -> Integer -> Integer -> Exp -> Ctx Exp -> Maybe Text
 longScaleRepr =
     BN.scaleRepr (BN.quantityName "illón" "illones")
                  [ (4, BN.forms "cuatr" "cuator" "cuator" "cuatra" "cuatri")

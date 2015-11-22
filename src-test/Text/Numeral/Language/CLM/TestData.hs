@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -22,15 +17,14 @@ module Text.Numeral.Language.CLM.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Num )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 --------------------------------------------------------------------------------
 -- Test data
 --------------------------------------------------------------------------------
 
-cardinals ∷ (Num i) ⇒ TestData i
+cardinals :: (Num i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

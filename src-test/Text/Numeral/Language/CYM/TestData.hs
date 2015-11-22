@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        cy
 
@@ -25,8 +19,7 @@ module Text.Numeral.Language.CYM.TestData (cardinals, ordinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -38,7 +31,7 @@ import "this" Text.Numeral.Test ( TestData )
 -- Sources:
 --   http://mylanguages.org/welsh_numbers.php
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection
@@ -149,7 +142,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i) ⇒ TestData i
+ordinals :: (Integral i) => TestData i
 ordinals =
   [ ( "default"
     , defaultInflection

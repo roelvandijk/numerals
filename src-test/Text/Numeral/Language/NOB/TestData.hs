@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        nb
 
@@ -23,9 +17,7 @@ module Text.Numeral.Language.NOB.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -38,7 +30,7 @@ import "this" Text.Numeral.Test ( TestData )
 --   http://en.wikibooks.org/wiki/Norwegian_Numbers
 --   http://www.sf.airnet.ne.jp/~ts/language/number/norwegian.html
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection
@@ -164,7 +156,7 @@ cardinals =
       , (9000, "nitusen")
       , (10000, "titusen")
       , (dec 6, "million")
-      , (2 ⋅ dec 6, "to millioner")
+      , (2 * dec 6, "to millioner")
       ]
     )
   ]

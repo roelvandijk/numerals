@@ -36,10 +36,10 @@ import "positional-numerals" Text.Numeral.Positional ( toPositional )
 -- TO
 --------------------------------------------------------------------------------
 
-cardinal ∷ (Monoid s, IsString s) ⇒ Integer → Maybe s
+cardinal :: (Monoid s, IsString s) => Integer -> Maybe s
 cardinal n = toPositional f 10 n
     where
-      f ∷ Integer → s
+      f :: Integer -> s
       f 0 = "noa"
       f 1 = "taha"
       f 2 = "ua"
@@ -51,4 +51,3 @@ cardinal n = toPositional f 10 n
       f 8 = "valu"
       f 9 = "hiva"
       f _ = "?"
-

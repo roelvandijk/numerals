@@ -13,9 +13,10 @@ module Text.Numeral
       -- ** Rendering
       -- $render
 
-      module Text.Numeral.Exp.Reified
+      module Text.Numeral.Exp
     , module Text.Numeral.Render
     , module Text.Numeral.Rules
+    , module Text.Numeral.Grammar
     )
     where
 
@@ -23,9 +24,10 @@ module Text.Numeral
 -- Imports
 -------------------------------------------------------------------------------
 
-import "this" Text.Numeral.Exp.Reified
+import "this" Text.Numeral.Exp
 import "this" Text.Numeral.Render
 import "this" Text.Numeral.Rules
+import "this" Text.Numeral.Grammar
 
 -------------------------------------------------------------------------------
 -- Documentation

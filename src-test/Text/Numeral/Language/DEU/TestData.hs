@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        de
 
@@ -25,9 +19,7 @@ module Text.Numeral.Language.DEU.TestData (cardinals, ordinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -42,7 +34,7 @@ Sources:
   http://german.about.com/library/blzahlen.htm
 -}
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection
@@ -301,9 +293,9 @@ cardinals =
       , (20000, "zwanzigtausend")
       , (dec 5, "hunderttausend")
       , (dec 6, "million")
-      , (2 ⋅ dec 6, "zwei millionen")
+      , (2 * dec 6, "zwei millionen")
       , (dec 9, "milliarde")
-      , (6 ⋅ dec 9, "sechs milliarden")
+      , (6 * dec 9, "sechs milliarden")
       , (dec 12, "billion")
       , (dec 15, "billiarde")
       , (dec 18, "trillion")
@@ -340,7 +332,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i) ⇒ TestData i
+ordinals :: (Integral i) => TestData i
 ordinals =
   [ ( "default"
     , defaultInflection
@@ -467,7 +459,7 @@ ordinals =
       , (20000, "zwanzigtausendste")
       , (dec 5, "hunderttausendste")
       , (dec 6, "millionste")
-      , (2 ⋅ dec 6, "zwei millionste")
+      , (2 * dec 6, "zwei millionste")
       , (dec 9, "milliardste")
       , (dec 12, "billionste")
       ]

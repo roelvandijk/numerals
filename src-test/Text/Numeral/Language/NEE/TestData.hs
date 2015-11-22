@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -21,8 +16,7 @@ module Text.Numeral.Language.NEE.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude ( Num )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 
 
@@ -38,7 +32,7 @@ Note: This data uses only one Nêlêmwa numerical classifier. There are
 22 categories.
 -}
 
-cardinals ∷ (Num i) ⇒ TestData i
+cardinals :: (Num i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection

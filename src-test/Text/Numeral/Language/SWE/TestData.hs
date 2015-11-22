@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        sv
 
@@ -27,9 +21,7 @@ module Text.Numeral.Language.SWE.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Grammar ( neuter, common )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
@@ -62,7 +54,7 @@ import "this" Text.Numeral.Test ( TestData )
 -- the words tusen, miljon, miljard, and so on always stand on their
 -- own: tjugofem miljarder tre miljoner
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "neuter"
     , neuter defaultInflection
@@ -193,10 +185,10 @@ cardinals =
       , (50000, "femtio tusen")
       , (dec 5, "etthundra tusen")
       , (dec 6, "en miljon")
-      , (2 ⋅ dec 6, "två miljoner")
-      , (10 ⋅ dec 6, "tio miljoner")
+      , (2 * dec 6, "två miljoner")
+      , (10 * dec 6, "tio miljoner")
       , (dec 8, "etthundra miljoner")
-      , (2 ⋅ dec 8, "tvåhundra miljoner")
+      , (2 * dec 8, "tvåhundra miljoner")
       , (dec 9, "en miljard")
       , (dec 12, "en biljon")
       , (dec 15, "en biljard")
@@ -228,7 +220,7 @@ cardinals =
     )
   ]
 
-ordinals ∷ (Integral i) ⇒ TestData i
+ordinals :: (Integral i) => TestData i
 ordinals =
   [ ( "neuter"
     , neuter defaultInflection
@@ -280,7 +272,7 @@ ordinals =
     )
   ]
 
-partitives ∷ (Integral i) ⇒ TestData (i, i)
+partitives :: (Integral i) => TestData (i, i)
 partitives =
   [ ( "default"
     , defaultInflection

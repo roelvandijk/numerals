@@ -1,9 +1,3 @@
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        sv
 
@@ -33,16 +27,10 @@ module Text.Numeral.Language.SWE
 -- Imports
 -------------------------------------------------------------------------------
 
-import "base" Data.Bool     ( otherwise )
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Num, Integral, (-), div, negate, even )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum as BN
-import qualified "this" Text.Numeral.Exp    as E
-import qualified "this" Text.Numeral.Grammar as G
 import           "this" Text.Numeral.Misc ( dec, intLog )
 import "this" Text.Numeral.Entry
 import "this" Text.Numeral.Render.Utils ( addCtx, mulCtx, outsideCtx )
@@ -53,7 +41,7 @@ import "text" Data.Text ( Text )
 -- SWE
 -------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "sv"
     , entIso639_2    = ["swe"]
@@ -70,19 +58,13 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (G.Common i, G.Neuter i, Integral α, E.Scale α)
-         ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-ordinal ∷ (G.Common i, G.Neuter i, Integral α, E.Scale α)
-        ⇒ i → α → Maybe Text
-ordinal inf = ordinalRepr inf ∘ struct
+ordinal :: (Integral a) => Inflection -> a -> Maybe Text
+ordinal inf = ordinalRepr inf . struct
 
-struct ∷ ( Integral α, E.Scale α
-         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
-         , E.Inflection β, G.Common (E.Inf β)
-         )
-       ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = pos $ fix $ rule `combine` pelletierScale1_sv
     where
       rule = findRule (   0, lit       )
@@ -97,35 +79,31 @@ struct = pos $ fix $ rule `combine` pelletierScale1_sv
 
 -- | Like 'pelletierScale1' with the difference that all scale
 -- elements are of the common gender.
-pelletierScale1_sv ∷ ( Integral α, E.Scale α
-                     , E.Unknown β, E.Lit β, E.Add β, E.Mul β, E.Scale β
-                     , E.Inflection β, G.Common (E.Inf β)
-                     )
-                   ⇒ Rule α β
+pelletierScale1_sv :: (Integral a) => Rule a
 pelletierScale1_sv =
-    conditional (\n → even $ intLog n `div` 3)
+    conditional (\n -> even $ intLog n `div` 3)
                 (mulScale1_sv 6 0 R L BN.rule)
                 (mulScale1_sv 6 3 R L BN.rule)
   where
-    mulScale1_sv = mulScale_ $ \f m s _ → commonMul (f m) s
-    commonMul m s = E.inflection (G.common) $ E.mul m s
+    mulScale1_sv = mulScale_ $ \f m s _ -> commonMul (f m) s
+    commonMul m s = ChangeGender (Just Common) $ Mul m s
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 60000 - 1 in (negate x, x)
 
-cardinalRepr ∷ (G.Common i, G.Neuter i) ⇒ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \ctx n → M.lookup n (syms ctx)
+               { reprValue = \ctx n -> M.lookup n (syms ctx)
                , reprScale = BN.pelletierRepr
                                (BN.quantityName "iljon"  "iljoner")
                                (BN.quantityName "iljard" "iljarder")
                                bigNumSyms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ _   → "minus "
+               , reprNeg   = Just $ \_ _   -> "minus "
                }
     where
-      (Inflection _ _ ⊞ _) _ = " "
+      (ChangeGender _ _ ⊞ _) _ = " "
       (_ ⊞ _) _ = ""
 
       (_ ⊡ Lit  100) CtxEmpty = " "
@@ -136,12 +114,12 @@ cardinalRepr = render defaultRepr
       syms ctx =
           M.fromList
           [ (0, const "noll")
-          , (1, \c → case c of
-                       CtxMul _ (Lit 1000) CtxEmpty → "ett"
-                       CtxMul _ (Lit 1000) _ → "et"
-                       _ | G.isCommon ctx → "en"
-                         | G.isNeuter ctx → "ett"
-                         | otherwise      → "?"
+          , (1, \c -> case c of
+                       CtxMul _ (Lit 1000) CtxEmpty -> "ett"
+                       CtxMul _ (Lit 1000) _ -> "et"
+                       _ | isCommon ctx -> "en"
+                         | isNeuter ctx -> "ett"
+                         | otherwise    -> "?"
             )
           , (2, const "två")
           , (3, addCtx 10 "tret" $ mulCtx 10 "tret" $ const "tre")
@@ -151,9 +129,9 @@ cardinalRepr = render defaultRepr
           , (7, addCtx 10 "sjut" $ mulCtx 10 "sjut" $ const "sju")
           , (8, addCtx 10 "ar"   $ mulCtx 10 "åt"   $ const "åtta")
           , (9, addCtx 10 "nit"  $ mulCtx 10 "nit"  $ const "nio")
-          , (10, \c → case c of
-                        CtxAdd {} → "ton"
-                        _         → "tio"
+          , (10, \c -> case c of
+                        CtxAdd {} -> "ton"
+                        _         -> "tio"
             )
           , (11, const "elva")
           , (12, const "tolv")
@@ -162,19 +140,19 @@ cardinalRepr = render defaultRepr
           , (1000, const "tusen")
           ]
 
-ordinalRepr ∷ (G.Common i, G.Neuter i) ⇒ i → Exp i → Maybe Text
+ordinalRepr :: Inflection -> Exp -> Maybe Text
 ordinalRepr = render defaultRepr
-              { reprValue = \ctx n → M.lookup n (syms ctx)
+              { reprValue = \ctx n -> M.lookup n (syms ctx)
               , reprScale = BN.pelletierRepr
                                (BN.ordQuantityName "iljon" "iljonte" "iljoner" "iljonte")
                                (BN.quantityName "iljard" "iljarder")
                                bigNumSyms
               , reprAdd   = Just (⊞)
               , reprMul   = Just (⊡)
-              , reprNeg   = Just $ \_ _   → "minus "
+              , reprNeg   = Just $ \_ _   -> "minus "
               }
     where
-      (Inflection _ _ ⊞ _) _ = " "
+      (ChangeGender _ _ ⊞ _) _ = " "
       (_ ⊞ _) _ = ""
 
       (_ ⊡ Lit  100) CtxEmpty = " "
@@ -186,12 +164,12 @@ ordinalRepr = render defaultRepr
           M.fromList
           [ (0, outsideCtx R "nollte" $ const "noll")
           , (1, outsideCtx R "första"
-                $ \c → case c of
-                         CtxMul _ (Lit 1000) CtxEmpty → "ett"
-                         CtxMul _ (Lit 1000) _ → "et"
-                         _ | G.isCommon ctx → "en"
-                           | G.isNeuter ctx → "ett"
-                           | otherwise      → "?"
+                $ \c -> case c of
+                         CtxMul _ (Lit 1000) CtxEmpty -> "ett"
+                         CtxMul _ (Lit 1000) _ -> "et"
+                         _ | isCommon ctx -> "en"
+                           | isNeuter ctx -> "ett"
+                           | otherwise    -> "?"
             )
           , (2, outsideCtx R "andra"   $ const "två")
           , (3, outsideCtx R "tredje"  $ addCtx 10 "tret" $ mulCtx 10 "tret" $ const "tre")
@@ -201,12 +179,12 @@ ordinalRepr = render defaultRepr
           , (7, outsideCtx R "sjunde"  $ addCtx 10 "sjut" $ mulCtx 10 "sjut" $ const "sju")
           , (8, outsideCtx R "åttonde" $ addCtx 10 "ar"   $ mulCtx 10 "åt"   $ const "åtta")
           , (9, outsideCtx R "nionde"  $ addCtx 10 "nit"  $ mulCtx 10 "nit"  $ const "nio")
-          , (10, \c → case c of
+          , (10, \c -> case c of
                         CtxAdd {}
-                          | isOutside R c → "tonde"
-                          | otherwise     → "ton"
-                        _ | isOutside R c → "tionde"
-                          | otherwise     → "tio"
+                          | isOutside R c -> "tonde"
+                          | otherwise     -> "ton"
+                        _ | isOutside R c -> "tionde"
+                          | otherwise     -> "tio"
             )
           , (11, outsideCtx R "elfte"    $ const "elva")
           , (12, outsideCtx R "tolfte"   $ const "tolv")
@@ -215,7 +193,7 @@ ordinalRepr = render defaultRepr
           , (1000, outsideCtx R "tusende" $ const "tusen")
           ]
 
-bigNumSyms ∷ (Num α) ⇒ [(α, Ctx (Exp i) → Text)]
+bigNumSyms :: (Num a) => [(a, Ctx Exp -> Text)]
 bigNumSyms =
     [ (4, BN.forms "kvadr" "kvattuor" "kvattuor" "kvadra"  "kvadri")
     , (5, BN.forms "kvint" "kvin"     "kvinkva"  "kvinkva" "kvin")

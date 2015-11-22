@@ -37,7 +37,7 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base-unicode-symbols" Data.Function.Unicode ( (.) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.Exp as E
@@ -56,7 +56,7 @@ Need new Exp constructor to express
 Probably also need a constructor to express "4 obj" as opposed to just "4".
 -}
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_2    = ["paa"]
     , entIso639_3    = Just "hui"
@@ -67,10 +67,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α, Monoid s, IsString s) ⇒ α → Maybe s
-cardinal = cardinalRepr ∘ struct
+cardinal :: (Integral a, Monoid s, IsString s) => a -> Maybe s
+cardinal = cardinalRepr . struct
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β
+struct :: (Integral a, E.Unknown b, E.Lit b, E.Add b, E.Mul b) => a -> b
 struct = checkPos
        $ fix
        $ findRule ( 1, lit       )
@@ -80,12 +80,12 @@ struct = checkPos
                 ]
                   100
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = (1, 100)
 
-cardinalRepr ∷ (Monoid s, IsString s) ⇒ Exp → Maybe s
+cardinalRepr :: (Monoid s, IsString s) => Exp -> Maybe s
 cardinalRepr = render defaultRepr
-               { reprValue = \n → M.lookup n syms
+               { reprValue = \n -> M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
                }
@@ -98,9 +98,9 @@ cardinalRepr = render defaultRepr
       syms =
           M.fromList
           [ ( 1, const "mbira")
-          , ( 2, \c → case c of
-                        CtxMul {} → "ki"
-                        _         → "kira"
+          , ( 2, \c -> case c of
+                        CtxMul {} -> "ki"
+                        _         -> "kira"
             )
           , ( 3, const "tebira")
           , ( 4, const "maria")
@@ -114,8 +114,8 @@ cardinalRepr = render defaultRepr
           , (12, const "hombearia")
           , (13, const "haleria")
           , (14, const "deria")
-          , (15, \c → case c of
-                        CtxMul {} → "ngui"
-                        _         → "nguira"
+          , (15, \c -> case c of
+                        CtxMul {} -> "ngui"
+                        _         -> "nguira"
             )
           ]

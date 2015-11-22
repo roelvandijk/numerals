@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        bg
 
@@ -23,10 +17,7 @@ module Text.Numeral.Language.BUL.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral, (+) )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
 import "numerals" Text.Numeral.Grammar
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -42,7 +33,7 @@ Sources:
   http://bg.wikipedia.org/wiki/Имена_на_числата
 -}
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "neuter"
     , neuter defaultInflection
@@ -198,13 +189,13 @@ cardinals =
       , (1000216, "един милион двеста и шестнадесет")
       , (1000074, "един милион седемдесет и четири")
       , (1000004, "един милион и четири")
-      , (2 ⋅ dec 6, "два милиона")
-      , (5 ⋅ dec 6, "пет милиона")
+      , (2 * dec 6, "два милиона")
+      , (5 * dec 6, "пет милиона")
       , (dec 9, "един милиард")
-      , (2 ⋅ dec 9, "два милиарда")
-      , (3 ⋅ dec 12, "три трилиона")
+      , (2 * dec 9, "два милиарда")
+      , (3 * dec 12, "три трилиона")
       , (dec 15, "един квадрилион")
-      , (15 ⋅ dec 15 + 41, "петнадесет квадрилиона четиридесет и едно")
+      , (15 * dec 15 + 41, "петнадесет квадрилиона четиридесет и едно")
       , (dec 18, "един квинтилион")
       , (dec 21, "един секстилион")
       , (dec 24, "един септилион")
@@ -215,7 +206,7 @@ cardinals =
       , (dec 39, "един дуодецилион")
       , (dec 42, "един тридецилион")
       , (dec 45, "един куадродецилион")
-      , (900 ⋅ dec 45, "деветстотин куадродецилиона")
+      , (900 * dec 45, "деветстотин куадродецилиона")
       ]
     )
     , ( "feminine"

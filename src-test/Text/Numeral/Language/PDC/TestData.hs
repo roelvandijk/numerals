@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-3@]        pdc
 
@@ -17,9 +12,7 @@ module Text.Numeral.Language.PDC.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -32,7 +25,7 @@ Sources:
   http://www.languagesandnumbers.com/how-to-count-in-pennsylvania-german/en/pdc/
 -}
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection
@@ -163,7 +156,7 @@ cardinals =
       , (524288, "fimf hunnert vierunzwansich dausend zwee hunnert achtunachtzich")
       , (dec 6, "en millyon")
       , (1048576, "en millyon achtunvazich dausend fimf hunnert sexunsiwwezich")
-      , (5 ⋅ dec 6, "fimf millyon")
+      , (5 * dec 6, "fimf millyon")
       , (123456789, "en hunnert dreiunzwansich millyon vier hunnert sexunfuffzich dausend siwwe hunnert neinunachtzich")
       ]
     )

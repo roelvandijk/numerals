@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -31,13 +26,9 @@ module Text.Numeral.Language.NQM
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Integral )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
+import "this" Text.Numeral
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 
@@ -46,7 +37,7 @@ import "text" Data.Text ( Text )
 -- NQM
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_3    = Just "nqm"
     , entEnglishName = Just "Ndom"
@@ -56,10 +47,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = checkPos
        $ fix
        $ findRule (  1, lit       )
@@ -73,13 +64,13 @@ struct = checkPos
                 ]
                    107
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = (1, 107)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
-               , reprAdd   = Just $ \_ _ _ → " abo "
+               { reprValue = \_ n -> M.lookup n syms
+               , reprAdd   = Just $ \_ _ _ -> " abo "
                , reprMul   = Just (⊡)
                }
     where

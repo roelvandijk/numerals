@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        ja
 
@@ -38,16 +33,11 @@ module Text.Numeral.Language.JPN
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.List     ( map )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Num, Integral, (-), negate )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
+import "base" Data.Monoid ( (<>) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
-import           "this" Text.Numeral.Misc  ( dec )
+import "this" Text.Numeral
+import "this" Text.Numeral.Misc  ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 
@@ -56,7 +46,7 @@ import "text" Data.Text ( Text )
 -- JPN
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1       = Just "ja"
     , entIso639_2       = ["jpn"]
@@ -65,7 +55,7 @@ entry = emptyEntry
     , entEnglishName    = Just "Japanese"
     }
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = pos
        $ fix
        $ findRule (   0, lit             )
@@ -74,14 +64,14 @@ struct = pos
                 , ( 100, step  100 10 R L)
                 , (1000, step 1000 10 R L)
                 ]
-              ⊕ [ (n, step1 n (dec 4) R L) | n ← map dec [4,8..68] ]
+              <> [ (n, step1 n (dec 4) R L) | n <- map dec [4,8..68] ]
               )
              (dec 72 - 1)
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 72 - 1 in (negate x, x)
 
-daiji_bounds ∷ (Integral α) ⇒ (α, α)
+daiji_bounds :: (Integral a) => (a, a)
 daiji_bounds = let x = dec 4 - 1 in (negate x, x)
 
 
@@ -89,7 +79,7 @@ daiji_bounds = let x = dec 4 - 1 in (negate x, x)
 -- Kanji
 --------------------------------------------------------------------------------
 
-kanji_entry ∷ Entry
+kanji_entry :: Entry
 kanji_entry = entry
     { entVariant  = Just "kanji"
     , entCardinal = Just Conversion
@@ -98,15 +88,15 @@ kanji_entry = entry
                     }
     }
 
-kanji_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-kanji_cardinal inf = kanji_cardinal_repr inf ∘ struct
+kanji_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+kanji_cardinal inf = kanji_cardinal_repr inf . struct
 
-kanji_cardinal_repr ∷ i → Exp i → Maybe Text
+kanji_cardinal_repr :: Inflection -> Exp -> Maybe Text
 kanji_cardinal_repr = render defaultRepr
-                      { reprValue = \_ n → M.lookup n syms
-                      , reprAdd   = Just $ \_ _ _ → ""
-                      , reprMul   = Just $ \_ _ _ → ""
-                      , reprNeg   = Just $ \_ _   → "マイナス"
+                      { reprValue = \_ n -> M.lookup n syms
+                      , reprAdd   = Just $ \_ _ _ -> ""
+                      , reprMul   = Just $ \_ _ _ -> ""
+                      , reprNeg   = Just $ \_ _   -> "マイナス"
                       }
     where
       syms =
@@ -148,7 +138,7 @@ kanji_cardinal_repr = render defaultRepr
 -- Daiji
 --------------------------------------------------------------------------------
 
-daiji_entry ∷ Entry
+daiji_entry :: Entry
 daiji_entry = entry
     { entVariant  = Just "daiji"
     , entCardinal = Just Conversion
@@ -157,15 +147,15 @@ daiji_entry = entry
                     }
     }
 
-daiji_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-daiji_cardinal inf = daiji_cardinal_repr inf ∘ struct
+daiji_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+daiji_cardinal inf = daiji_cardinal_repr inf . struct
 
-daiji_cardinal_repr ∷ i → Exp i → Maybe Text
+daiji_cardinal_repr :: Inflection -> Exp -> Maybe Text
 daiji_cardinal_repr = render defaultRepr
-                      { reprValue = \_ n → M.lookup n syms
-                      , reprAdd   = Just $ \_ _ _ → ""
-                      , reprMul   = Just $ \_ _ _ → ""
-                      , reprNeg   = Just $ \_ _   → "マイナス"
+                      { reprValue = \_ n -> M.lookup n syms
+                      , reprAdd   = Just $ \_ _ _ -> ""
+                      , reprMul   = Just $ \_ _ _ -> ""
+                      , reprNeg   = Just $ \_ _   -> "マイナス"
                       }
     where
       syms =
@@ -191,12 +181,12 @@ daiji_cardinal_repr = render defaultRepr
 -- Generic reading
 --------------------------------------------------------------------------------
 
-generic_repr ∷ Text → Text → Repr i
+generic_repr :: Text -> Text -> Repr
 generic_repr four seven = defaultRepr
-                          { reprValue = \_ n → M.lookup n syms
-                          , reprAdd   = Just $ \_ _ _ → " "
-                          , reprMul   = Just $ \_ _ _ → ""
-                          , reprNeg   = Just $ \_ _   → "mainasu "
+                          { reprValue = \_ n -> M.lookup n syms
+                          , reprAdd   = Just $ \_ _ _ -> " "
+                          , reprMul   = Just $ \_ _ _ -> ""
+                          , reprNeg   = Just $ \_ _   -> "mainasu "
                           }
     where
       syms =
@@ -212,9 +202,9 @@ generic_repr four seven = defaultRepr
           , (8, const "hachi")
           , (9, const "kyū")
           , (10, const "jū")
-          , (100, \c → case c of
-                         (CtxMul _ (Lit 3) _) → "byaku" -- rendaku
-                         _                    → "hyaku"
+          , (100, \c -> case c of
+                         (CtxMul _ (Lit 3) _) -> "byaku" -- rendaku
+                         _                    -> "hyaku"
             )
           , (dec 3, const "sen")
           , (dec 4, const "man")
@@ -241,7 +231,7 @@ generic_repr four seven = defaultRepr
 -- On'yomi
 --------------------------------------------------------------------------------
 
-on'yomi_entry ∷ Entry
+on'yomi_entry :: Entry
 on'yomi_entry = entry
     { entVariant  = Just "on'yomi"
     , entCardinal = Just Conversion
@@ -250,10 +240,10 @@ on'yomi_entry = entry
                     }
     }
 
-on'yomi_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-on'yomi_cardinal inf = on'yomi_cardinal_repr inf ∘ struct
+on'yomi_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+on'yomi_cardinal inf = on'yomi_cardinal_repr inf . struct
 
-on'yomi_cardinal_repr ∷ i → Exp i → Maybe Text
+on'yomi_cardinal_repr :: Inflection -> Exp -> Maybe Text
 on'yomi_cardinal_repr = render (generic_repr "shi" "shichi")
 
 
@@ -261,7 +251,7 @@ on'yomi_cardinal_repr = render (generic_repr "shi" "shichi")
 -- Preferred reading
 --------------------------------------------------------------------------------
 
-preferred_entry ∷ Entry
+preferred_entry :: Entry
 preferred_entry = entry
     { entVariant  = Just "preferred"
     , entCardinal = Just Conversion
@@ -270,8 +260,8 @@ preferred_entry = entry
                     }
     }
 
-preferred_cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-preferred_cardinal inf = preferred_cardinal_repr inf ∘ struct
+preferred_cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+preferred_cardinal inf = preferred_cardinal_repr inf . struct
 
-preferred_cardinal_repr ∷ i → Exp i → Maybe Text
+preferred_cardinal_repr :: Inflection -> Exp -> Maybe Text
 preferred_cardinal_repr = render (generic_repr "yon" "nana")

@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        ru
 
@@ -31,17 +26,10 @@ module Text.Numeral.Language.RUS
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Data.Ord      ( (<), (>) )
-import "base" Prelude       ( Integral, (-), negate )
-import "base-unicode-symbols" Data.Eq.Unicode       ( (≡) )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Data.Ord.Unicode      ( (≤), (≥) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
-import           "this" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral
+import "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 
@@ -50,7 +38,7 @@ import "text" Data.Text ( Text )
 -- RUS
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "ru"
     , entIso639_2    = ["rus"]
@@ -63,10 +51,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = pos
        $ fix
        $ findRule (   0, lit               )
@@ -80,88 +68,88 @@ struct = pos
                 ]
                   (dec 6 - 1)
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = dec 6 - 1 in (negate x, x)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
+               { reprValue = \_ n -> M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ _ → "минус "
+               , reprNeg   = Just $ \_ _ -> "минус "
                }
     where
       (Lit n ⊞ Lit 10) _ | n < 10 = "на"
       (_     ⊞ _     ) _          = " "
 
-      (_ ⊡ Lit n) _ | n ≤ 100 = ""
-      (_ ⊡ _    ) _           = " "
+      (_ ⊡ Lit n) _ | n <= 100 = ""
+      (_ ⊡ _    ) _            = " "
 
       syms =
           M.fromList
           [ (0, const "ноль")
-          , (1, \c → case c of
-                       CtxAdd _ (Lit 40)    (CtxMul {}) → "одна"
-                       CtxAdd _ (_ `Mul` _) (CtxMul {}) → "одна"
-                       _                                → "один"
+          , (1, \c -> case c of
+                       CtxAdd _ (Lit 40)    (CtxMul {}) -> "одна"
+                       CtxAdd _ (_ `Mul` _) (CtxMul {}) -> "одна"
+                       _                                -> "один"
             )
-          , (2, \c → case c of
-                       CtxAdd _ (Lit 10)    _           → "две"
-                       CtxAdd _ (Lit 40)    (CtxMul {}) → "две"
-                       CtxAdd _ (_ `Mul` _) (CtxMul {}) → "две"
-                       CtxMul _ (Lit n)     _ | n > 10  → "две"
-                       _                                → "два"
+          , (2, \c -> case c of
+                       CtxAdd _ (Lit 10)    _           -> "две"
+                       CtxAdd _ (Lit 40)    (CtxMul {}) -> "две"
+                       CtxAdd _ (_ `Mul` _) (CtxMul {}) -> "две"
+                       CtxMul _ (Lit n)     _ | n > 10  -> "две"
+                       _                                -> "два"
             )
           , (3, const "три")
-          , (4, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "четыр"
-                       _                   → "четыре"
+          , (4, \c -> case c of
+                       CtxAdd _ (Lit 10) _ -> "четыр"
+                       _                   -> "четыре"
             )
-          , (5, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "пят"
-                       _                   → "пять"
+          , (5, \c -> case c of
+                       CtxAdd _ (Lit 10) _ -> "пят"
+                       _                   -> "пять"
             )
-          , (6, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "шест"
-                       _                   → "шесть"
+          , (6, \c -> case c of
+                       CtxAdd _ (Lit 10) _ -> "шест"
+                       _                   -> "шесть"
             )
-          , (7, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "сем"
-                       _                   → "семь"
+          , (7, \c -> case c of
+                       CtxAdd _ (Lit 10) _ -> "сем"
+                       _                   -> "семь"
             )
-          , (8, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "восем"
-                       _                   → "восемь"
+          , (8, \c -> case c of
+                       CtxAdd _ (Lit 10) _ -> "восем"
+                       _                   -> "восемь"
             )
-          , (9, \c → case c of
-                       CtxAdd _ (Lit 10) _ → "девят"
-                       CtxMul _ (Lit 10) _ → "девя"
-                       _                   → "девять"
+          , (9, \c -> case c of
+                       CtxAdd _ (Lit 10) _ -> "девят"
+                       CtxMul _ (Lit 10) _ -> "девя"
+                       _                   -> "девять"
             )
-          , (10, \c → case c of
-                        CtxAdd _ (Lit n) _ | n ≤ 9 → "дцать"
-                        CtxMul _ (Lit n) _ | n < 4 → "дцать"
-                                           | n < 9 → "десят"
-                                           | n ≡ 9 → "носто"
-                        _                          → "десять"
+          , (10, \c -> case c of
+                        CtxAdd _ (Lit n) _ | n <= 9 -> "дцать"
+                        CtxMul _ (Lit n) _ | n <  4 -> "дцать"
+                                           | n <  9 -> "десят"
+                                           | n == 9 -> "носто"
+                        _                           -> "десять"
             )
           , (40, const "сорок")
-          , (100, \c → case c of
-                         CtxMul _ (Lit n) _ | n ≡ 2 → "сти"
-                                            | n ≤ 4 → "ста"
-                                            | n ≤ 9 → "сот"
-                         _                          → "сто"
+          , (100, \c -> case c of
+                         CtxMul _ (Lit n) _ | n == 2 -> "сти"
+                                            | n <= 4 -> "ста"
+                                            | n <= 9 -> "сот"
+                         _                           -> "сто"
             )
-          , (1000, \c → case c of
-                          CtxMul _ (Lit 40    `Add` Lit n) _ | n ≡ 1 → "тысяча"
-                                                             | n ≤ 4 → "тысячи"
-                                                             | n ≥ 5 → "тысяч"
-                          CtxMul _ (_ `Mul` _ `Add` Lit n) _ | n ≡ 1 → "тысяча"
-                                                             | n ≤ 4 → "тысячи"
-                                                             | n ≥ 5 → "тысяч"
-                          CtxMul _ (Lit n) _ | n ≤ 4 → "тысячи"
-                          CtxMul {}                  → "тысяч"
-                          _                          → "тысяча"
+          , (1000, \c -> case c of
+                          CtxMul _ (Lit 40    `Add` Lit n) _ | n == 1 -> "тысяча"
+                                                             | n <= 4 -> "тысячи"
+                                                             | n >= 5 -> "тысяч"
+                          CtxMul _ (_ `Mul` _ `Add` Lit n) _ | n == 1 -> "тысяча"
+                                                             | n <= 4 -> "тысячи"
+                                                             | n >= 5 -> "тысяч"
+                          CtxMul _ (Lit n) _ | n <= 4 -> "тысячи"
+                          CtxMul {}                   -> "тысяч"
+                          _                           -> "тысяча"
             )
           , (dec 6, const "миллион")
           , (dec 9, const "миллиард")

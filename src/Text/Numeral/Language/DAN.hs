@@ -37,7 +37,7 @@ import "base" Data.Maybe    ( Maybe(Just) )
 import "base" Data.Monoid   ( Monoid )
 import "base" Data.String   ( IsString )
 import "base" Prelude       ( Integral, (-), negate )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base-unicode-symbols" Data.Function.Unicode ( (.) )
 import qualified "containers" Data.Map as M ( fromList, lookup )
 import           "this" Text.Numeral
 import qualified "this" Text.Numeral.BigNum as BN
@@ -50,7 +50,7 @@ import "this" Text.Numeral.Entry
 -- DA
 -------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_1    = Just "da"
     , entIso639_2    = ["dan"]
@@ -63,14 +63,14 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α, E.Scale α, Monoid s, IsString s)
-         ⇒ i → α → Maybe s
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a, E.Scale a, Monoid s, IsString s)
+         => Inflection -> a -> Maybe s
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ ( Integral α, E.Scale α
-         , E.Unknown β, E.Lit β, E.Neg β, E.Add β, E.Mul β, E.Scale β
+struct :: ( Integral a, E.Scale a
+         , E.Unknown b, E.Lit b, E.Neg b, E.Add b, E.Mul b, E.Scale b
          )
-       ⇒ α → β
+       => a -> b
 struct = pos
        $ fix
        $ findRule (   0, lit               )
@@ -89,16 +89,16 @@ struct = pos
                   (dec 6 - 1)
          `combine` pelletierScale R L BN.rule
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = let x = 100 in (negate x, x)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
+               { reprValue = \_ n -> M.lookup n syms
                , reprScale = BN.scaleRepr (BN.quantityName "illion" "illioner") []
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
-               , reprNeg   = Just $ \_ _   → "minus "
+               , reprNeg   = Just $ \_ _   -> "minus "
                }
     where
       (_ ⊞ Lit 20) _ = "og"
@@ -112,53 +112,53 @@ cardinalRepr = render defaultRepr
       syms =
           M.fromList
           [ (0,  const "nul")
-          , (1,  \c → case c of
-                        CtxAdd {} → "én"
-                        _ → "en"
+          , (1,  \c -> case c of
+                        CtxAdd {} -> "én"
+                        _ -> "en"
             )
-          , (2,  \c → case c of
-                        _ → "to"
+          , (2,  \c -> case c of
+                        _ -> "to"
             )
-          , (3,  \c → case c of
-                        CtxAdd _ (Lit 10) _ → "tret"
-                        _ → "tre"
+          , (3,  \c -> case c of
+                        CtxAdd _ (Lit 10) _ -> "tret"
+                        _ -> "tre"
             )
-          , (4,  \c → case c of
-                        CtxAdd _ (Lit 10) _ → "fjor"
-                        CtxMul _ (Lit 10) _ → "fyrre"
-                        CtxMul _ (Lit 20) _ → "fir"
-                        _ → "fire"
+          , (4,  \c -> case c of
+                        CtxAdd _ (Lit 10) _ -> "fjor"
+                        CtxMul _ (Lit 10) _ -> "fyrre"
+                        CtxMul _ (Lit 20) _ -> "fir"
+                        _ -> "fire"
             )
-          , (5,  \c → case c of
-                        CtxAdd _ (Lit 10) _ → "fem"
-                        _ → "fem"
+          , (5,  \c -> case c of
+                        CtxAdd _ (Lit 10) _ -> "fem"
+                        _ -> "fem"
             )
-          , (6,  \c → case c of
-                        _ → "seks"
+          , (6,  \c -> case c of
+                        _ -> "seks"
             )
-          , (7,  \c → case c of
-                        CtxAdd _ (Lit 10) _ → "syt"
-                        _ → "syv"
+          , (7,  \c -> case c of
+                        CtxAdd _ (Lit 10) _ -> "syt"
+                        _ -> "syv"
             )
-          , (8,  \c → case c of
-                        CtxAdd _ (Lit 10) _ → "at"
-                        _ → "otte"
+          , (8,  \c -> case c of
+                        CtxAdd _ (Lit 10) _ -> "at"
+                        _ -> "otte"
             )
-          , (9,  \c → case c of
-                        CtxAdd _ (Lit 10) _ → "nit"
-                        _ → "ni"
+          , (9,  \c -> case c of
+                        CtxAdd _ (Lit 10) _ -> "nit"
+                        _ -> "ni"
             )
-          , (10, \c → case c of
-                        CtxAdd R _ _ → "ten"
-                        CtxMul _ (Lit 4) _ → "" -- or "tyve"
-                        CtxMul {} → "dive"
-                        _ → "ti"
+          , (10, \c -> case c of
+                        CtxAdd R _ _ -> "ten"
+                        CtxMul _ (Lit 4) _ -> "" -- or "tyve"
+                        CtxMul {} -> "dive"
+                        _ -> "ti"
             )
           , (11, const "elleve")
           , (12, const "tolv")
-          , (20, \c → case c of
-                        CtxMul {} → "" -- or "tyve" but only when prefix with "-sinds-"
-                        _ → "tyve"
+          , (20, \c -> case c of
+                        CtxMul {} -> "" -- or "tyve" but only when prefix with "-sinds-"
+                        _ -> "tyve"
             )
           , (100, const "hundrede")
           ]

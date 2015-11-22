@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        pl
 
@@ -23,9 +17,7 @@ module Text.Numeral.Language.POL.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral )
-import "base-unicode-symbols" Prelude.Unicode ( (⋅) )
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
+import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
@@ -38,7 +30,7 @@ import "this" Text.Numeral.Test ( TestData )
 --   Krzysztof Skrzętnicki
 --   http://www.polishforums.com/archives/2009/general-language-17/numbers-polish-language-6722/
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection
@@ -178,25 +170,25 @@ cardinals =
       , (500000, "pięćset tysięcy")
       , (1000000, "milion")
       , (1048576, "milion czterdzieści osiem tysięcy pięćset siedemdziesiąt sześć")
-      , (2 ⋅ dec 6, "dwa miliony")
-      , (3 ⋅ dec 6, "trzy miliony")
-      , (4 ⋅ dec 6, "cztery miliony")
-      , (5 ⋅ dec 6, "pięć milionów")
-      , (6 ⋅ dec 6, "sześć milionów")
-      , (7 ⋅ dec 6, "siedem milionów")
-      , (8 ⋅ dec 6, "osiem milionów")
-      , (9 ⋅ dec 6, "dziewięć milionów")
+      , (2 * dec 6, "dwa miliony")
+      , (3 * dec 6, "trzy miliony")
+      , (4 * dec 6, "cztery miliony")
+      , (5 * dec 6, "pięć milionów")
+      , (6 * dec 6, "sześć milionów")
+      , (7 * dec 6, "siedem milionów")
+      , (8 * dec 6, "osiem milionów")
+      , (9 * dec 6, "dziewięć milionów")
       , (dec 7, "dziesięć milionów")
       , (dec 8, "sto milionów")
       , (dec 9, "miliard")
-      , (2 ⋅ dec 9, "dwa miliardy")
-      , (3 ⋅ dec 9, "trzy miliardy")
-      , (4 ⋅ dec 9, "cztery miliardy")
-      , (5 ⋅ dec 9, "pięć miliardów")
-      , (6 ⋅ dec 9, "sześć miliardów")
-      , (7 ⋅ dec 9, "siedem miliardów")
-      , (8 ⋅ dec 9, "osiem miliardów")
-      , (9 ⋅ dec 9, "dziewięć miliardów")
+      , (2 * dec 9, "dwa miliardy")
+      , (3 * dec 9, "trzy miliardy")
+      , (4 * dec 9, "cztery miliardy")
+      , (5 * dec 9, "pięć miliardów")
+      , (6 * dec 9, "sześć miliardów")
+      , (7 * dec 9, "siedem miliardów")
+      , (8 * dec 9, "osiem miliardów")
+      , (9 * dec 9, "dziewięć miliardów")
       , (dec 10, "dziesięć miliardów")
       , (dec 11, "sto miliardów")
       ]

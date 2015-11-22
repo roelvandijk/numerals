@@ -1,7 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 module Text.Numeral.Entry
     ( Conversion(..)
     , Entry(..)
@@ -12,10 +8,8 @@ module Text.Numeral.Entry
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Maybe  ( Maybe(Nothing) )
-import "base-unicode-symbols" Prelude.Unicode ( ℤ )
-import "this" Text.Numeral.Exp.Reified ( Exp )
-import "this" Text.Numeral.Grammar.Reified ( Inflection )
+import "this" Text.Numeral.Exp ( Exp )
+import "this" Text.Numeral.Grammar ( Inflection )
 import "text" Data.Text ( Text )
 
 
@@ -23,25 +17,25 @@ import "text" Data.Text ( Text )
 -- Language entry
 --------------------------------------------------------------------------------
 
-data Conversion α = Conversion
-    { toNumeral   ∷ Inflection → α → Maybe Text
-    , toStructure ∷ α → Exp Inflection
+data Conversion a = Conversion
+    { toNumeral   :: Inflection -> a -> Maybe Text
+    , toStructure :: a -> Exp
     }
 
 data Entry = Entry
-    { entIso639_1       ∷ Maybe Text
-    , entIso639_2       ∷ [Text]
-    , entIso639_3       ∷ Maybe Text
-    , entNativeNames    ∷ [Text]
-    , entEnglishName    ∷ Maybe Text
-    , entVariant        ∷ Maybe Text
-    , entCardinal       ∷ Maybe (Conversion ℤ)
-    , entOrdinal        ∷ Maybe (Conversion ℤ)
-    , entPartitive      ∷ Maybe (Conversion (ℤ, ℤ))
-    , entMultiplicative ∷ Maybe (Conversion ℤ)
+    { entIso639_1       :: Maybe Text
+    , entIso639_2       :: [Text]
+    , entIso639_3       :: Maybe Text
+    , entNativeNames    :: [Text]
+    , entEnglishName    :: Maybe Text
+    , entVariant        :: Maybe Text
+    , entCardinal       :: Maybe (Conversion Integer)
+    , entOrdinal        :: Maybe (Conversion Integer)
+    , entPartitive      :: Maybe (Conversion (Integer, Integer))
+    , entMultiplicative :: Maybe (Conversion Integer)
     }
 
-emptyEntry ∷ Entry
+emptyEntry :: Entry
 emptyEntry = Entry
     { entIso639_1       = Nothing
     , entIso639_2       = []

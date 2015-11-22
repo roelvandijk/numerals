@@ -1,9 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE PackageImports      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax       #-}
-
 {-|
 [@ISO639-1@]        pt
 
@@ -24,13 +18,8 @@ module Text.Numeral.Language.POR.TestData (cardinals, ordinals) where
 --------------------------------------------------------------------------------
 
 import "base" Control.Arrow ( second )
-import "base" Data.List     ( map )
-import "base" Prelude       ( Integral )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
-import "base-unicode-symbols" Data.Monoid.Unicode   ( (⊕) )
-import "base-unicode-symbols" Prelude.Unicode       ( (⋅) )
+import "base" Data.Monoid ( (<>) )
 import "numerals" Text.Numeral.Grammar
-import "numerals" Text.Numeral.Grammar.Reified ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 import "text" Data.Text ( Text )
@@ -44,7 +33,7 @@ import "text" Data.Text ( Text )
 --   http://www.sonia-portuguese.com/text/numerals.htm
 --   http://www.smartphrase.com/Portuguese/po_numbers_voc.shtml
 
-base_cardinals ∷ (Integral i) ⇒ [(i, Text)]
+base_cardinals :: (Integral i) => [(i, Text)]
 base_cardinals =
   [ (0, "zero")
   , (3, "três")
@@ -142,7 +131,7 @@ base_cardinals =
   , (125000, "cento e vinte e cinco mil")
   , (735346, "setecentos e trinta e cinco mil trezentos e quarenta e seis")
   , (dec 6, "um milhão")
-  , (2 ⋅ dec 6, "dois milhões")
+  , (2 * dec 6, "dois milhões")
   , (dec 7, "dez milhões")
   , (dec 9, "um bilhão")
   , (dec 10, "dez bilhões")
@@ -161,12 +150,12 @@ base_cardinals =
   , (dec 100, "dez duotrigintilhões")
   ]
 
-cardinals ∷ (Integral i) ⇒ TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "masculine"
     , masculine defaultInflection
     , base_cardinals
-      ⊕ [ (1, "um")
+      <> [ (1, "um")
         , (2, "dois")
         , (21, "vinte e um")
         , (22, "vinte e dois")
@@ -209,7 +198,7 @@ cardinals =
   , ( "feminine"
     , feminine defaultInflection
     , base_cardinals
-      ⊕ [ (1, "uma")
+      <> [ (1, "uma")
         , (2, "duas")
         , (21, "vinte e uma")
         , (22, "vinte e duas")
@@ -254,7 +243,7 @@ cardinals =
 -- These are the base forms of the ordinals, stripped of their
 -- ending. Append "o", "os", "a" or "as" to form combinations of
 -- masculine, feminine, singular and plural ordinals.
-base_ordinals ∷ (Integral i) ⇒ [(i, Text)]
+base_ordinals :: (Integral i) => [(i, Text)]
 base_ordinals =
   [ (1, "primeir")
   , (2, "segund")
@@ -290,13 +279,13 @@ base_ordinals =
   , (1000, "milésim")
   ]
 
-ordinals ∷ (Integral i) ⇒ TestData i
-ordinals = map (\(n, f, e) → ( n
+ordinals :: (Integral i) => TestData i
+ordinals = map (\(n, f, e) -> ( n
                              , f defaultInflection
-                             , map (second (⊕ e)) base_ordinals)
+                             , map (second (<> e)) base_ordinals)
                              )
-               [ ("masculine singular", masculine ∘ singular, "o")
-               , ("masculine plural",   masculine ∘ plural,   "os")
-               , ("feminine singular",  feminine  ∘ singular, "a")
-               , ("feminine plural",    feminine  ∘ plural,   "as")
+               [ ("masculine singular", masculine . singular, "o")
+               , ("masculine plural",   masculine . plural,   "os")
+               , ("feminine singular",  feminine  . singular, "a")
+               , ("feminine plural",    feminine  . plural,   "as")
                ]

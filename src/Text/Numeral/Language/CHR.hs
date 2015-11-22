@@ -1,8 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports    #-}
-{-# LANGUAGE UnicodeSyntax     #-}
-
 {-|
 [@ISO639-1@]        -
 
@@ -33,15 +28,10 @@ module Text.Numeral.Language.CHR
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Char     ( Char )
-import "base" Data.Function ( ($), const, fix )
-import "base" Data.Maybe    ( Maybe(Just) )
-import "base" Prelude       ( Integral, (-), String )
-import "base-unicode-symbols" Data.Function.Unicode ( (∘) )
+import "base" Data.Function ( fix )
 import qualified "containers" Data.Map as M ( fromList, lookup )
-import           "this" Text.Numeral
-import qualified "this" Text.Numeral.Exp as E
-import           "this" Text.Numeral.Misc ( dec )
+import "this" Text.Numeral
+import "this" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Entry
 import "text" Data.Text ( Text )
 import qualified "text" Data.Text as T ( concatMap, singleton )
@@ -51,7 +41,7 @@ import qualified "text" Data.Text as T ( concatMap, singleton )
 -- CHR
 --------------------------------------------------------------------------------
 
-entry ∷ Entry
+entry :: Entry
 entry = emptyEntry
     { entIso639_2    = ["chr"]
     , entIso639_3    = Just "chr"
@@ -63,10 +53,10 @@ entry = emptyEntry
                        }
     }
 
-cardinal ∷ (Integral α) ⇒ i → α → Maybe Text
-cardinal inf = cardinalRepr inf ∘ struct
+cardinal :: (Integral a) => Inflection -> a -> Maybe Text
+cardinal inf = cardinalRepr inf . struct
 
-struct ∷ (Integral α, E.Unknown β, E.Lit β, E.Add β, E.Mul β) ⇒ α → β
+struct :: (Integral a) => a -> Exp
 struct = checkPos
        $ fix
        $ findRule (   0, lit                )
@@ -77,12 +67,12 @@ struct = checkPos
                 ]
                   (dec 6 - 1)
 
-bounds ∷ (Integral α) ⇒ (α, α)
+bounds :: (Integral a) => (a, a)
 bounds = (0, dec 6 - 1)
 
-cardinalRepr ∷ i → Exp i → Maybe Text
+cardinalRepr :: Inflection -> Exp -> Maybe Text
 cardinalRepr = render defaultRepr
-               { reprValue = \_ n → M.lookup n syms
+               { reprValue = \_ n -> M.lookup n syms
                , reprAdd   = Just (⊞)
                , reprMul   = Just (⊡)
                }
@@ -99,50 +89,50 @@ cardinalRepr = render defaultRepr
       syms =
           M.fromList
           [ (0, const "Ꮭ ᎪᏍᏗ")
-          , (1, \c → case c of
-                       CtxAdd L (Lit 10) _ → "Ꮜ"
-                       CtxAdd R _        _ → "ᏌᏬ"
-                       _                   → "ᏐᏬ"
+          , (1, \c -> case c of
+                       CtxAdd L (Lit 10) _ -> "Ꮜ"
+                       CtxAdd R _        _ -> "ᏌᏬ"
+                       _                   -> "ᏐᏬ"
             )
           , (2, const "ᏔᎵ")
-          , (3, \c → case c of
-                       CtxAdd L (Lit 10)  _ → "ᏦᎦ"
-                       CtxMul _ (Lit 100) CtxEmpty → "Ꮶ"
-                       CtxMul _ (Lit 100) _ → "ᏦᎢ"
-                       _                    → "ᏦᎢ"
+          , (3, \c -> case c of
+                       CtxAdd L (Lit 10)  _ -> "ᏦᎦ"
+                       CtxMul _ (Lit 100) CtxEmpty -> "Ꮶ"
+                       CtxMul _ (Lit 100) _ -> "ᏦᎢ"
+                       _                    -> "ᏦᎢ"
             )
-          , (4, \c → case c of
-                       CtxAdd L (Lit 10) _ → "ᏂᎦ"
-                       _                   → "ᏅᎩ"
+          , (4, \c -> case c of
+                       CtxAdd L (Lit 10) _ -> "ᏂᎦ"
+                       _                   -> "ᏅᎩ"
             )
-          , (5, \c → case c of
-                       CtxAdd L (Lit 10) _ → "ᎯᏍᎦ"
-                       _                   → "ᎯᏍᎩ"
+          , (5, \c -> case c of
+                       CtxAdd L (Lit 10) _ -> "ᎯᏍᎦ"
+                       _                   -> "ᎯᏍᎩ"
             )
-          , (6, \c → case c of
-                       CtxAdd L (Lit 10) _ → "ᏓᎳ"
-                       _                   → "ᏑᏓᎵ"
+          , (6, \c -> case c of
+                       CtxAdd L (Lit 10) _ -> "ᏓᎳ"
+                       _                   -> "ᏑᏓᎵ"
             )
-          , (7, \c → case c of
-                       CtxAdd L (Lit 10)  _ → "ᎦᎵᏆ"
-                       CtxMul _ (Lit 100) CtxEmpty → "ᎦᎵᏆ"
-                       CtxMul _ (Lit 100) _ → "ᎦᎵᏉᎩ"
-                       CtxMul _ _         _ → "ᎦᎵᏆ"
-                       _                    → "ᎦᎵᏉᎩ"
+          , (7, \c -> case c of
+                       CtxAdd L (Lit 10)  _ -> "ᎦᎵᏆ"
+                       CtxMul _ (Lit 100) CtxEmpty -> "ᎦᎵᏆ"
+                       CtxMul _ (Lit 100) _ -> "ᎦᎵᏉᎩ"
+                       CtxMul _ _         _ -> "ᎦᎵᏆ"
+                       _                    -> "ᎦᎵᏉᎩ"
             )
-          , (8, \c → case c of
-                       CtxAdd L (Lit 10)  _ → "ᏁᎳ"
-                       CtxMul _ (Lit 100) CtxEmpty → "ᏧᏁᎵ"
-                       _                    → "ᏧᏁᎳ"
+          , (8, \c -> case c of
+                       CtxAdd L (Lit 10)  _ -> "ᏁᎳ"
+                       CtxMul _ (Lit 100) CtxEmpty -> "ᏧᏁᎵ"
+                       _                    -> "ᏧᏁᎳ"
             )
-          , (9, \c → case c of
-                       CtxMul _ (Lit 100) _ → "ᏐᏁᎵ"
-                       _                    → "ᏐᏁᎳ"
+          , (9, \c -> case c of
+                       CtxMul _ (Lit 100) _ -> "ᏐᏁᎵ"
+                       _                    -> "ᏐᏁᎳ"
             )
-          , (10, \c → case c of
-                        CtxAdd R (Lit _) _           → "Ꮪ"
-                        CtxMul R (Lit _) (CtxAdd {}) → "ᏍᎪ"
-                        _                            → "ᏍᎪᎯ"
+          , (10, \c -> case c of
+                        CtxAdd R (Lit _) _           -> "Ꮪ"
+                        CtxMul R (Lit _) (CtxAdd {}) -> "ᏍᎪ"
+                        _                            -> "ᏍᎪᎯ"
             )
           , (100, const "ᏍᎪᎯᏥᏆ")
           , (1000, const "ᎢᏯᎦᏴᎵ")
@@ -150,10 +140,10 @@ cardinalRepr = render defaultRepr
 
 -- | Transliterates a string written in the Cherokee syllabary to the
 -- latin alphabet.
-transliterate ∷ Text → Text
+transliterate :: Text -> Text
 transliterate xs = T.concatMap f xs
     where
-      f ∷ Char → Text
+      f :: Char -> Text
       f 'Ꭰ' = "a"
       f 'Ꭱ' = "e"
       f 'Ꭲ' = "i"
@@ -240,4 +230,3 @@ transliterate xs = T.concatMap f xs
       f 'Ᏻ' = "yu"
       f 'Ᏼ' = "yv"
       f c   = T.singleton c
-

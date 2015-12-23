@@ -31,6 +31,7 @@ module Text.Numeral.Language.NLD
 
 import "base" Data.Function ( fix )
 import "base" Data.Monoid ( (<>) )
+import "base" Control.Applicative ( pure )
 import qualified "containers" Data.Map as M
 import           "this" Text.Numeral hiding ( partitive, multiplicative )
 import qualified "this" Text.Numeral.BigNum  as BN

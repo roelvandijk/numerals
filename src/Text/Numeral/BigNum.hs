@@ -19,6 +19,7 @@ module Text.Numeral.BigNum
 -------------------------------------------------------------------------------
 
 import "base" Data.Function ( fix )
+import "base" Control.Applicative ( (<$>) )
 import "base" Data.Monoid ( (<>) )
 import qualified "containers" Data.Map as M
 import "this" Text.Numeral

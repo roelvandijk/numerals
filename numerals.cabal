@@ -134,6 +134,7 @@ library
                  , Text.Numeral.Language.CHN
                  , Text.Numeral.Language.CHR
                  , Text.Numeral.Language.CLM
+                 , Text.Numeral.Language.CRO
                  , Text.Numeral.Language.DEU
                  , Text.Numeral.Language.ENG
                  , Text.Numeral.Language.EPO
@@ -203,6 +204,7 @@ test-suite test-numerals
                , Text.Numeral.Language.CHR.TestData
                , Text.Numeral.Language.CKU.TestData
                , Text.Numeral.Language.CLM.TestData
+               , Text.Numeral.Language.CRO.TestData
                , Text.Numeral.Language.COD.TestData
                , Text.Numeral.Language.COO.TestData
                , Text.Numeral.Language.COS.TestData

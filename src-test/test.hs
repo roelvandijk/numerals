@@ -34,6 +34,7 @@ import qualified "numerals" Text.Numeral.Language.CES as CES
 import qualified "numerals" Text.Numeral.Language.CHN as CHN
 import qualified "numerals" Text.Numeral.Language.CHR as CHR
 import qualified "numerals" Text.Numeral.Language.CLM as CLM
+import qualified "numerals" Text.Numeral.Language.CRO as CRO
 import qualified "numerals" Text.Numeral.Language.DEU as DEU
 import qualified "numerals" Text.Numeral.Language.ENG as ENG
 import qualified "numerals" Text.Numeral.Language.EPO as EPO
@@ -86,6 +87,7 @@ import qualified "this" Text.Numeral.Language.CHN.TestData as CHN
 import qualified "this" Text.Numeral.Language.CHR.TestData as CHR
 import qualified "this" Text.Numeral.Language.CKU.TestData as CKU
 import qualified "this" Text.Numeral.Language.CLM.TestData as CLM
+import qualified "this" Text.Numeral.Language.CRO.TestData as CRO
 import qualified "this" Text.Numeral.Language.COD.TestData as COD
 import qualified "this" Text.Numeral.Language.COO.TestData as COO
 import qualified "this" Text.Numeral.Language.COS.TestData as COS
@@ -309,6 +311,11 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (CLM.cardinals :: TestData Integer)]
     , mkTests "cardinal" CLM.cardinal (CLM.cardinals :: TestData Integer)
+    ]
+  , testGroup "CRO"
+    [ testGroup "unique data"
+      [testUnique "cardinal" (CRO.cardinals :: TestData Integer)]
+    , mkTests "cardinal" CRO.cardinal (CRO.cardinals :: TestData Integer)
     ]
   , testGroup "COS"
     [ testGroup "unique data"

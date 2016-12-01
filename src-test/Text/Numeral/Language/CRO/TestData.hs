@@ -110,6 +110,7 @@ cardinals =
       , (17999, "sedamnaest tisuća devetsto devedeset devet")
       , (25358, "dvadeset pet tisuća tristo pedeset osam")
       , (105358, "sto pet tisuća tristo pedeset osam")
+      , (246912, "dvjesto četrdeset šest tisuća devetsto dvanaest")
       ]
     )
   ]

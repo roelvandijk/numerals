@@ -108,7 +108,7 @@ cardinalRepr neg f =
         M.fromList
         [ (0, const "nula")
         , (1, ten "jedan" "jeda" "jedan")
-        , (2, const "dva")
+        , (2, hun "dva" "dva" "dvje" "dva")
         , (3, const "tri")
         , (4, ten "četiri" "četr" "četr")
         , (5, ten "pet" "pet" "pe")

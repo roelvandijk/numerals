@@ -23,6 +23,7 @@ module Text.Numeral.Render
 import "base" Control.Applicative ( (<$>) )
 #endif
 import "base" Data.Monoid ( (<>) )
+import "base" Control.Applicative ( (<$>) )
 import "text" Data.Text ( Text )
 import "this" Text.Numeral.Exp ( Exp(..), Side(L, R) )
 import "this" Text.Numeral.Grammar ( Inflection(..) )

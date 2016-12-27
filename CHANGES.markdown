@@ -2,8 +2,26 @@ Changelog for numerals
 ======================
 
 
+0.4.1
+-----
+
+*Tue Dec 27 2016*
+
+- Made expressions and inflections monomorphic. Should make the code a
+  lot simpler to understand.
+- Changed language codes from ISO 639-1 to to ISO 639-3.
+- Simple performance benchmark suite.
+- Added flag to choose between integer-simple and integer-gmp.
+- Bumped dependency bounds.
+- Added lots of testing data for as of yet unimplemented languages.
+- New languages
+  + Nengone (NEN)
+  + Croatian (CRO) (Thanks to Nikola Henezi)
+
 0.4
 ---
+
+*Fri Jan 17 2014*
 
 - Added language entries for all supported languages.
 - Merged numerals-base into numerals.

@@ -59,10 +59,12 @@ module Text.Numeral.Grammar
 -- Inflection
 -------------------------------------------------------------------------------
 
-data Inflection = Inflection { iCase   :: Maybe Case
-                             , iGender :: Maybe Gender
-                             , iNumber :: Maybe Number
-                             } deriving (Show, Eq)
+data Inflection
+   = Inflection
+     { iCase   :: Maybe Case
+     , iGender :: Maybe Gender
+     , iNumber :: Maybe Number
+     } deriving (Show, Eq)
 
 defaultInflection :: Inflection
 defaultInflection = Inflection Nothing Nothing Nothing
@@ -72,135 +74,139 @@ defaultInflection = Inflection Nothing Nothing Nothing
 -- Grammatical categories
 -------------------------------------------------------------------------------
 
-data Case =
--- | In linguistics, abessive (abbreviated abe or abess), caritive and privative
--- (abbreviated priv) are names for a grammatical case expressing the lack or
--- absence of the marked noun.
-    Abessive
--- | The ablative case (abbreviated abl) indicates movement from
--- something, or cause.
-          | Ablative
--- | The accusative case (abbreviated acc) indicates the direct object
--- of a verb.
-          | Accusative
--- | The comitative case (abbreviated com), also known as the associative case
--- (abbreviated ass), is a grammatical case that denotes companionship, and is
--- used where English would typically use preposition "with" in the sense of "in
--- company with" or "together with" (other uses of "with," e.g. with the meaning
--- of "using," "by means of" (I cut bread with a knife) would correspond to the
--- instrumental case or related cases).
-          | Comitative
--- | The dative case (abbreviated dat, or sometimes d when it is a
--- core argument) indicates the indirect object of a verb.
-          | Dative
--- | The delative case (abbreviated del; from Latin deferre "to bear or bring
--- away or down") in the Hungarian language can originally express the movement
--- from the surface of something (e.g. "off the table"), but it is used in
--- several other meanings (e.g. "about people"), some of them related to the
--- original (e.g. "from the post office").
-          | Delative
--- | The distributive case (abbreviated distr) is used on nouns for the meanings
--- of per or each.
-          | Distributive
--- | The distributive-temporal case specifies when something is done.
-          | DistributiveTemporal
--- | The essive or similaris case (abbreviated ess) carries the meaning of a
--- temporary location or state of being, often equivalent to the English "as a
--- (child)".
-          | Essive
--- | The genitive case (abbreviated gen; also called the possessive
--- case or second case), which roughly corresponds to English's
--- possessive case and preposition of, indicates the possessor of
--- another noun.
-          | Genitive
--- | The instrumental case (abbreviated ins or instr; also called the
--- eighth case) indicates an object used in performing an action.
-          | Instrumental
--- | In the Finnish language and Estonian language, the instructive case has the
--- basic meaning of "by means of". It is a comparatively rarely used case,
--- though it is found in some commonly used expressions, such as omin silmin ->
--- "with one's own eyes".
-          | Instructive
--- | Lative (abbreviated lat) is a case which indicates motion to a location. It
--- corresponds to the English prepositions "to" and "into". The lative case
--- belongs to the group of the general local cases together with the locative
--- and separative case. The term derives from the Latin lat-, the participle
--- stem of ferre, "to bring".
-          | Lative
--- | The locative case (abbreviated loc) indicates a location.
-          | Locative (Maybe Locative)
--- | The multiplicative case is a grammatical case used for marking a number of
--- something ("three times").
-          | Multiplicative
--- | The nominative case (abbreviated nom) indicates the subject of a
--- finite verb.
-          | Nominative
--- | The partitive case (abbreviated ptv or more ambiguously part)
--- denotes "partialness", "without result", or "without specific
--- identity". It is also used in contexts where a subgroup is selected
--- from a larger group, or with numbers.
-          | Partitive
--- | The term sublative case (abbreviated subl) is used to refer to grammatical
--- cases expressing different situations: In Hungarian, it expresses the
--- destination of the movement, originally to the surface of something (e.g. sit
--- down on the ground, climb the tree), but in other figurative meanings as well
--- (e.g. to university, for two nights), while in Tsez and other Northeast
--- Caucasian languages it denotes a movement towards the bottomsides or the area
--- under an object. The sublative case is used in the Finnish, Tsez and
--- Hungarian languages.
-          | Sublative
--- | The Superessive case (abbreviated supe) is a grammatical declension
--- indicating location on top of, or on the surface of something. Its name comes
--- from Latin supersum, superesse: to be over and above.
-          | SuperEssive
--- | The translative case (abbreviated transl) is a grammatical case that
--- indicates a change in state of a noun, with the general sense of "becoming X"
--- or "change to X".
-          | Translative
--- | The vocative case indicates an addressee.
-          | Vocative
-            deriving (Eq, Show)
+data Case
+   = Abessive
+     -- ^ In linguistics, abessive (abbreviated abe or abess), caritive and
+     -- privative (abbreviated priv) are names for a grammatical case expressing
+     -- the lack or absence of the marked noun.
+   | Ablative
+     -- ^ The ablative case (abbreviated abl) indicates movement from something,
+     -- or cause.
+   | Accusative
+     -- ^ The accusative case (abbreviated acc) indicates the direct object of a
+     -- verb.
+   | Comitative
+     -- ^ The comitative case (abbreviated com), also known as the associative
+     -- case (abbreviated ass), is a grammatical case that denotes
+     -- companionship, and is used where English would typically use preposition
+     -- "with" in the sense of "in company with" or "together with" (other uses
+     -- of "with," e.g. with the meaning of "using," "by means of" (I cut bread
+     -- with a knife) would correspond to the instrumental case or related
+     -- cases).
+   | Dative
+     -- ^ The dative case (abbreviated dat, or sometimes d when it is a core
+     -- argument) indicates the indirect object of a verb.
+   | Delative
+     -- ^ The delative case (abbreviated del; from Latin deferre "to bear or
+     -- bring away or down") in the Hungarian language can originally express
+     -- the movement from the surface of something (e.g. "off the table"), but
+     -- it is used in several other meanings (e.g. "about people"), some of them
+     -- related to the original (e.g. "from the post office").
+   | Distributive
+     -- ^ The distributive case (abbreviated distr) is used on nouns for the
+     -- meanings of per or each.
+   | DistributiveTemporal
+     -- ^ The distributive-temporal case specifies when something is done.
+   | Essive
+     -- ^ The essive or similaris case (abbreviated ess) carries the meaning of
+     -- a temporary location or state of being, often equivalent to the English
+     -- "as a (child)".
+   | Genitive
+     -- ^ The genitive case (abbreviated gen; also called the possessive case or
+     -- second case), which roughly corresponds to English's possessive case and
+     -- preposition of, indicates the possessor of another noun.
+   | Instrumental
+     -- ^ The instrumental case (abbreviated ins or instr; also called the
+     -- eighth case) indicates an object used in performing an action.
+   | Instructive
+     -- ^ In the Finnish language and Estonian language, the instructive case
+     -- has the basic meaning of "by means of". It is a comparatively rarely
+     -- used case, though it is found in some commonly used expressions, such as
+     -- omin silmin -> "with one's own eyes".
+   | Lative
+     -- ^ Lative (abbreviated lat) is a case which indicates motion to a
+     -- location. It corresponds to the English prepositions "to" and
+     -- "into". The lative case belongs to the group of the general local cases
+     -- together with the locative and separative case. The term derives from
+     -- the Latin lat-, the participle stem of ferre, "to bring".
+   | Locative (Maybe Locative)
+     -- ^ The locative case (abbreviated loc) indicates a location.
+   | Multiplicative
+     -- ^ The multiplicative case is a grammatical case used for marking a
+     -- number of something ("three times").
+   | Nominative
+     -- ^ The nominative case (abbreviated nom) indicates the subject of a
+     -- finite verb.
+   | Partitive
+     -- ^ The partitive case (abbreviated ptv or more ambiguously part) denotes
+     -- "partialness", "without result", or "without specific identity". It is
+     -- also used in contexts where a subgroup is selected from a larger group,
+     -- or with numbers.
+   | Sublative
+     -- ^ The term sublative case (abbreviated subl) is used to refer to
+     -- grammatical cases expressing different situations: In Hungarian, it
+     -- expresses the destination of the movement, originally to the surface of
+     -- something (e.g. sit down on the ground, climb the tree), but in other
+     -- figurative meanings as well (e.g. to university, for two nights), while
+     -- in Tsez and other Northeast Caucasian languages it denotes a movement
+     -- towards the bottomsides or the area under an object. The sublative case
+     -- is used in the Finnish, Tsez and Hungarian languages.
+   | SuperEssive
+     -- ^ The Superessive case (abbreviated supe) is a grammatical declension
+     -- indicating location on top of, or on the surface of something. Its name
+     -- comes from Latin supersum, superesse: to be over and above.
+   | Translative
+     -- ^ The translative case (abbreviated transl) is a grammatical case that
+     -- indicates a change in state of a noun, with the general sense of
+     -- "becoming X" or "change to X".
+   | Vocative
+     -- ^ The vocative case indicates an addressee.
+     deriving (Eq, Show)
 
-data Locative =
--- | Illative (abbreviated ill; from Latin illatus "brought in") is, in the
--- Finnish language, Estonian language and the Hungarian language, the third of
--- the locative cases with the basic meaning of "into (the inside of)".
-                LocativeIllative
--- | Inessive case (abbreviated ine; from Latin inesse "to be in or at") is a
--- locative grammatical case. This case carries the basic meaning of "in".
-              | LocativeInessive
--- | Elative (abbreviated ela; from Latin efferre "to bring or carry out") is a
--- locative case with the basic meaning "out of".
-              | LocativeElative
--- | Allative case (abbreviated all; from Latin allāt-, afferre "to bring to")
--- is a type of the locative cases used in several languages. The term allative
--- is generally used for the lative case in the majority of languages which do
--- not make finer distinctions.
-              | LocativeAllative
--- | In Uralic languages, such as Finnish, Estonian and Hungarian, the adessive
--- case (abbreviated ade; from Latin adesse "to be present") is the fourth of
--- the locative cases with the basic meaning of "on".
-              | LocativeAdessive
--- | In linguistics, ablative case (abbreviated abl) is a name given to cases in
--- various languages whose common characteristic is that they mark motion away
--- from something, though the details in each language may differ. The name
--- "ablative" derives from the Latin ablatus, the (irregular) perfect passive
--- participle of auferre "to carry away".
-              | LocativeAblative
-                deriving (Eq, Show)
+data Locative
+   = LocativeIllative
+     -- ^ Illative (abbreviated ill; from Latin illatus "brought in") is, in the
+     -- Finnish language, Estonian language and the Hungarian language, the
+     -- third of the locative cases with the basic meaning of "into (the inside
+     -- of)".
+   | LocativeInessive
+     -- ^ Inessive case (abbreviated ine; from Latin inesse "to be in or at") is
+     -- a locative grammatical case. This case carries the basic meaning of
+     -- "in".
+   | LocativeElative
+     -- ^ Elative (abbreviated ela; from Latin efferre "to bring or carry out")
+     -- is a locative case with the basic meaning "out of".
+   | LocativeAllative
+     -- ^ Allative case (abbreviated all; from Latin allāt-, afferre "to bring
+     -- to") is a type of the locative cases used in several languages. The term
+     -- allative is generally used for the lative case in the majority of
+     -- languages which do not make finer distinctions.
+   | LocativeAdessive
+     -- ^ In Uralic languages, such as Finnish, Estonian and Hungarian, the
+     -- adessive case (abbreviated ade; from Latin adesse "to be present") is
+     -- the fourth of the locative cases with the basic meaning of "on".
+   | LocativeAblative
+     -- ^ In linguistics, ablative case (abbreviated abl) is a name given to
+     -- cases in various languages whose common characteristic is that they mark
+     -- motion away from something, though the details in each language may
+     -- differ. The name "ablative" derives from the Latin ablatus, the
+     -- (irregular) perfect passive participle of auferre "to carry away".
+   deriving (Eq, Show)
 
-data Gender = Neuter
-            | Masculine
-            | Feminine
-            | Common
-              deriving (Eq, Show)
+data Gender
+   = Neuter
+   | Masculine
+   | Feminine
+   | Common
+     deriving (Eq, Show)
 
-data Number = Singular
-            | Dual
-            | Trial
-            | Paucal
-            | Plural
-              deriving (Eq, Show)
+data Number
+   = Singular
+   | Dual
+   | Trial
+   | Paucal
+   | Plural
+     deriving (Eq, Show)
 
 -------------------------------------------------------------------------------
 -- Smart case constructors

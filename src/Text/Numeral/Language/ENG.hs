@@ -131,8 +131,8 @@ genericRepr f =
 
 gb_add :: Exp -> Exp -> Ctx Exp -> Text
 ((_ `Mul` Lit 10) `gb_add` _) _ = "-"
-((_ `Mul` _     ) `gb_add` x) _
-    -- | eval x < (100 :: Integer) = " and "
+((_ `Mul` _     ) `gb_add` _x) _
+    --  | eval x < (100 :: Integer) = " and "
     | otherwise                 = " "
 (_                `gb_add` _) _ = ""
 

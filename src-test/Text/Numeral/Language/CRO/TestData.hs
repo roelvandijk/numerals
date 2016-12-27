@@ -19,10 +19,8 @@ module Text.Numeral.Language.CRO.TestData
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Data.Monoid ( (<>) )
 import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
-import "text" Data.Text ( Text )
 
 
 --------------------------------------------------------------------------------

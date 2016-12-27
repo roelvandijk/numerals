@@ -17,7 +17,7 @@ module Text.Numeral.Language.SPA.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Num, (+), Integral )
+import "base" Prelude ( (+), Integral )
 import "numerals" Text.Numeral.Misc ( dec )
 import "numerals" Text.Numeral.Grammar
 import "numerals" Text.Numeral.Grammar ( defaultInflection )

@@ -17,7 +17,7 @@ module Text.Numeral.Language.HOP.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral, (+) )
+import "base" Prelude ( Integral )
 import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "this" Text.Numeral.Test ( TestData )
 

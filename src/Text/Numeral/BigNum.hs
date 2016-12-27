@@ -1,3 +1,5 @@
+{-# language CPP #-}
+
 module Text.Numeral.BigNum
   ( cardinal
   , rule
@@ -18,6 +20,9 @@ module Text.Numeral.BigNum
 -- Imports
 -------------------------------------------------------------------------------
 
+#if !(MIN_VERSION_base(4,8,0))
+import "base" Control.Applicative ( (<$>) )
+#endif
 import "base" Data.Function ( fix )
 import "base" Data.Monoid ( (<>) )
 import qualified "containers" Data.Map as M

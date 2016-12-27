@@ -1,3 +1,5 @@
+{-# language CPP #-}
+
 {-|
 [@ISO639-1@]        nl
 
@@ -29,6 +31,9 @@ module Text.Numeral.Language.NLD
 -- Imports
 --------------------------------------------------------------------------------
 
+#if !(MIN_VERSION_base(4,8,0))
+import "base" Control.Applicative ( pure )
+#endif
 import "base" Data.Function ( fix )
 import "base" Data.Monoid ( (<>) )
 import qualified "containers" Data.Map as M

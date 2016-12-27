@@ -1,4 +1,5 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# language CPP #-}
+{-# language RecordWildCards #-}
 
 module Text.Numeral.Render
     ( -- * Rendering numerals
@@ -18,6 +19,9 @@ module Text.Numeral.Render
 -- Imports
 -------------------------------------------------------------------------------
 
+#if !(MIN_VERSION_base(4,8,0))
+import "base" Control.Applicative ( (<$>) )
+#endif
 import "base" Data.Monoid ( (<>) )
 import "text" Data.Text ( Text )
 import "this" Text.Numeral.Exp ( Exp(..), Side(L, R) )

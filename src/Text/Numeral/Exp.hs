@@ -1,3 +1,5 @@
+{-# language CPP #-}
+
 module Text.Numeral.Exp
     ( Exp(..)
     , showExp
@@ -10,6 +12,9 @@ module Text.Numeral.Exp
 -- Imports
 -------------------------------------------------------------------------------
 
+#if !(MIN_VERSION_base(4,8,0))
+import "base" Control.Applicative ( (<$>) )
+#endif
 import qualified "this" Text.Numeral.Grammar as G
 
 -------------------------------------------------------------------------------

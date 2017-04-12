@@ -10,7 +10,7 @@
 [@English name@]    Danish
 -}
 
-module Text.Numeral.Language.DA.TestData (cardinals) where
+module Text.Numeral.Language.DAN.TestData (cardinals) where
 
 
 --------------------------------------------------------------------------------

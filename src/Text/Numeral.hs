@@ -67,16 +67,16 @@ such as case, gender or number.
 The use of this package is best understood with some examples. First some
 English number names, both British and US variants:
 
->>> import qualified Text.Numeral.Language.EN as EN
->>> EN.uk_cardinal defaultInflection 123 :: Maybe Text
+>>> import qualified Text.Numeral.Language.ENG as ENG
+>>> ENG.gb_cardinal defaultInflection 123 :: Maybe Text
 Just "one hundred and twenty-three"
->>> EN.us_cardinal defaultInflection (10^50 + 42) :: Maybe Text
+>>> ENG.us_cardinal defaultInflection (10^50 + 42) :: Maybe Text
 Just "one hundred quindecillion forty-two"
 
 French, which contains some traces of a base 20 system:
 
->>> import qualified Text.Numeral.Language.FR as FR
->>> FR.cardinal defaultInflection (-99) :: Maybe Text
+>>> import qualified Text.Numeral.Language.FRA as FRA
+>>> FRA.cardinal defaultInflection (-99) :: Maybe Text
 Just "moins quatre-vingt-dix-neuf"
 
 Conversions can fail. Alamblak, a language spoken by a few people in Papua New
@@ -92,34 +92,32 @@ the Latin script using Pinyin.
 
 Traditional Chinese characters:
 
->>> import qualified Text.Numeral.Language.ZH as ZH
->>> ZH.trad_cardinal defaultInflection 123456 :: Maybe Text
+>>> import qualified Text.Numeral.Language.ZHO as ZHO
+>>> ZHO.trad_cardinal defaultInflection 123456 :: Maybe Text
 Just "十二萬三千四百五十六"
 
 Simplified characters for use in financial contexts:
 
->>> ZH.finance_simpl_cardinal defaultInflection 123456 :: Maybe Text
+>>> ZHO.finance_simpl_cardinal defaultInflection 123456 :: Maybe Text
 Just "拾贰万参仟肆伯伍拾陆"
 
 Transcribed using Pinyin:
 
->>> ZH.pinyin_cardinal defaultInflection 123456 :: Maybe Text
+>>> ZHO.pinyin_cardinal defaultInflection 123456 :: Maybe Text
 Just "shíèrwàn sānqiān sìbǎi wǔshí liù"
 
 Using the 'struct' functions you can see the grammatical structure of number
 names. Because the results of these functions are polymorphic you need to
 specify a specific type.
 
->>> import qualified Text.Numeral.Language.NL as NL
->>> NL.struct 123 :: Integer
-123
+>>> import qualified Text.Numeral.Language.NLD as NLD
 >>> import Text.Numeral
->>> NL.struct 123 :: Exp
+>>> NLD.struct 123 :: Exp
 Add (Lit 100) (Add (Lit 3) (Mul (Lit 2) (Lit 10)))
 
 Compare with:
 
->>> NL.cardinal defaultInflection 123 :: Maybe Text
+>>> NLD.cardinal defaultInflection 123 :: Maybe Text
 Just "honderddrieëntwintig"
 
 100 (honderd) + (3 (drie) + (ën) 2 (twin) * 10 (tig))

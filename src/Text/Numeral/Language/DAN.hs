@@ -16,7 +16,7 @@
 [@English name@]    Danish
 -}
 
-module Text.Numeral.Language.DA
+module Text.Numeral.Language.DAN
     ( -- * Language entry
       entry
       -- * Conversions
@@ -47,7 +47,7 @@ import "this" Text.Numeral.Entry
 
 
 -------------------------------------------------------------------------------
--- DA
+-- DAN
 -------------------------------------------------------------------------------
 
 entry :: Entry

@@ -22,28 +22,28 @@ import Text.Numeral
 import Text.Numeral.Misc
 import qualified Text.Numeral.Language.AMP as AMP
 import qualified Text.Numeral.Language.CHN as CHN
-import qualified Text.Numeral.Language.DE  as DE
-import qualified Text.Numeral.Language.EN  as EN
-import qualified Text.Numeral.Language.EO  as EO
-import qualified Text.Numeral.Language.ES  as ES
-import qualified Text.Numeral.Language.FR  as FR
-import qualified Text.Numeral.Language.GV  as GV
-import qualified Text.Numeral.Language.IT  as IT
-import qualified Text.Numeral.Language.JA  as JA
-import qualified Text.Numeral.Language.LA  as LA
-import qualified Text.Numeral.Language.MG  as MG
-import qualified Text.Numeral.Language.NL  as NL
-import qualified Text.Numeral.Language.NO  as NO
+import qualified Text.Numeral.Language.DEU  as DEU
+import qualified Text.Numeral.Language.ENG  as ENG
+import qualified Text.Numeral.Language.EPO  as EPO
+import qualified Text.Numeral.Language.SPA  as SPA
+import qualified Text.Numeral.Language.FRA  as FRA
+import qualified Text.Numeral.Language.GLV  as GLV
+import qualified Text.Numeral.Language.ITA  as ITA
+import qualified Text.Numeral.Language.JPN  as JPN
+import qualified Text.Numeral.Language.LAT  as LAT
+import qualified Text.Numeral.Language.MLG  as MLG
+import qualified Text.Numeral.Language.NLD  as NLD
+import qualified Text.Numeral.Language.NOR  as NOR
 import qualified Text.Numeral.Language.NQM as NQM
-import qualified Text.Numeral.Language.OJ  as OJ
+import qualified Text.Numeral.Language.OJI  as OJI
 import qualified Text.Numeral.Language.PAA as PAA
-import qualified Text.Numeral.Language.PT  as PT
-import qualified Text.Numeral.Language.RU  as RU
-import qualified Text.Numeral.Language.SV  as SV
-import qualified Text.Numeral.Language.TR  as TR
-import qualified Text.Numeral.Language.WO  as WO
+import qualified Text.Numeral.Language.POR  as POR
+import qualified Text.Numeral.Language.RUS  as RUS
+import qualified Text.Numeral.Language.SWE  as SWE
+import qualified Text.Numeral.Language.TUR  as TUR
+import qualified Text.Numeral.Language.WOL  as WOL
 import qualified Text.Numeral.Language.YOR as YOR
-import qualified Text.Numeral.Language.ZH  as ZH
+import qualified Text.Numeral.Language.ZHO  as ZHO
 
 import qualified Text.Numeral.BigNum as BN
 

@@ -88,7 +88,8 @@ cardinalRepr = render defaultRepr
                , reprNeg   = Just $ \_ _ -> "menos "
                }
     where
-      (_                    ⊞ Lit 10) _ = ""
+      (Lit n                ⊞ Lit 10) _
+        | n < 10                        = ""
       (Lit 10               ⊞ _     ) _ = ""
       (Lit 20               ⊞ _     ) _ = ""
       ((Lit _ `Mul` Lit 10) ⊞ _     ) _ = " y "
@@ -151,7 +152,8 @@ cardinalRepr = render defaultRepr
                        _                    -> "nueve"
             )
           , (10, \c -> case c of
-                        CtxAdd R (Lit _)  _ -> "ce"
+                        CtxAdd R (Lit n)  _
+                           | n < 10         -> "ce"
                         CtxAdd L (Lit _)  _ -> "dieci"
                         CtxMul R _        _ -> "ta"
                         _                   -> "diez"

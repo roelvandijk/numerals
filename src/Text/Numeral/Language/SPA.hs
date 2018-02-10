@@ -159,7 +159,8 @@ cardinalRepr = render defaultRepr
                         _                   -> "diez"
             )
           , (20, \c -> case c of
-                        CtxAdd _ (Lit _)  _ -> "veinti"
+                        CtxAdd _ (Lit n)  _
+                           | n < 10         -> "veinti"
                         _                   -> "veinte"
             )
           , (100, \c -> case c of

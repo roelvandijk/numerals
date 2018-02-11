@@ -1,5 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# language OverloadedStrings #-}
+{-# language ScopedTypeVariables #-}
 
 module Text.Numeral.Debug where
 
@@ -12,10 +12,6 @@ module Text.Numeral.Debug where
 import Control.Monad ( forM_ )
 import Data.Function ( fix )
 import Data.Maybe    ( fromMaybe )
-
--- from base-unicode-symbols:
-import Data.Monoid.Unicode ( (⊕) )
-import Prelude.Unicode     ( ℤ )
 
 -- from numerals-base:
 import Text.Numeral
@@ -51,37 +47,36 @@ import qualified Text.Numeral.BigNum as BN
 import qualified Text.Numeral.Exp.Classes as C
 import qualified Text.Repr as R
 import qualified Prelude.Repr as R
-import Prelude.Unicode ( (⋅), (∘) )
 import Text.Show ( Show )
 
 --------------------------------------------------------------------------------
 -- Debug and test stuff
 --------------------------------------------------------------------------------
 
-test ∷ (ℤ → Maybe (R.Repr ℤ)) → (ℤ → Maybe String) → [ℤ] → IO ()
+test :: (Integer -> Maybe (R.Repr Integer)) -> (Integer -> Maybe String) -> [Integer] -> IO ()
 test struct num xs =
-    forM_ xs $ \x → do putStr $ (show x) ⊕ " = "
+    forM_ xs $ \x -> do putStr $ (show x) <> " = "
                        case struct x of
-                         Nothing → putStrLn "error"
-                         Just e → do putStr $ show e
+                         Nothing -> putStrLn "error"
+                         Just e -> do putStr $ show e
                                      putStr " = "
                                      putStrLn $ fromMaybe "error" (num x)
 
 -- | Like 'test' but doesn't print the numbers that are converted.
-test2 ∷ (ℤ → Maybe (R.Repr ℤ)) → (ℤ → Maybe String) → [ℤ] → IO ()
+test2 :: (Integer -> Maybe (R.Repr Integer)) -> (Integer -> Maybe String) -> [Integer] -> IO ()
 test2 struct num xs =
-    forM_ xs $ \x → case struct x of
-                      Nothing → putStrLn "error"
-                      Just e → do putStr $ show e
-                                  putStr " = "
-                                  putStrLn $ fromMaybe "error" (num x)
+    forM_ xs $ \x -> case struct x of
+                      Nothing -> putStrLn "error"
+                      Just e -> do putStr $ show e
+                                   putStr " = "
+                                   putStrLn $ fromMaybe "error" (num x)
 
-instance (C.Lit α, Show α) ⇒ C.Lit (R.Repr α) where lit = R.pure ∘ C.lit
-instance (C.Neg α) ⇒ C.Neg (R.Repr α) where neg = R.app C.neg "neg"
-instance (C.Add α) ⇒ C.Add (R.Repr α) where add = R.infx R.L 6 C.add "+"
-instance (C.Mul α) ⇒ C.Mul (R.Repr α) where mul = R.infx R.L 7 C.mul "×"
-instance (C.Sub α) ⇒ C.Sub (R.Repr α) where sub = R.infx R.L 9 C.sub "`sub`"
-instance (C.Scale α, Integral α) ⇒ C.Scale (R.Repr α) where
+instance (C.Lit a, Show a) => C.Lit (R.Repr a) where lit = R.pure . C.lit
+instance (C.Neg a) => C.Neg (R.Repr a) where neg = R.app C.neg "neg"
+instance (C.Add a) => C.Add (R.Repr a) where add = R.infx R.L 6 C.add "+"
+instance (C.Mul a) => C.Mul (R.Repr a) where mul = R.infx R.L 7 C.mul "×"
+instance (C.Sub a) => C.Sub (R.Repr a) where sub = R.infx R.L 9 C.sub "`sub`"
+instance (C.Scale a, Integral a) => C.Scale (R.Repr a) where
     scale b o r = R.repr (C.scale b o $ R.extract r) (R.renderer x)
         where
-          x = 10 R.^ (r ⋅ fromInteger b + fromInteger o)
+          x = 10 R.^ (r * fromInteger b + fromInteger o)

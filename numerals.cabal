@@ -82,6 +82,7 @@ library
                  , Text.Numeral.Language.GSW
                  , Text.Numeral.Language.HEB
                  , Text.Numeral.Language.HOP
+                 , Text.Numeral.Language.IBO
                  , Text.Numeral.Language.ITA
                  , Text.Numeral.Language.JPN
                  , Text.Numeral.Language.LAT

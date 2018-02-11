@@ -45,6 +45,7 @@ import qualified "numerals" Text.Numeral.Language.GLV as GLV
 import qualified "numerals" Text.Numeral.Language.GSW as GSW
 import qualified "numerals" Text.Numeral.Language.HEB as HEB
 import qualified "numerals" Text.Numeral.Language.HOP as HOP
+import qualified "numerals" Text.Numeral.Language.IBO as IBO
 import qualified "numerals" Text.Numeral.Language.ITA as ITA
 import qualified "numerals" Text.Numeral.Language.JPN as JPN
 import qualified "numerals" Text.Numeral.Language.LAT as LAT
@@ -493,7 +494,11 @@ tests =
     ]
   , testGroup "IBO"
     [ testGroup "unique data"
-      [testUnique "cardinal" (IBO.cardinals :: TestData Integer)]
+      [ testUnique "cardinal" (IBO.cardinals :: TestData Integer)
+      , testUnique "ordinal"  (IBO.ordinals  :: TestData Integer)
+      ]
+    , mkTests "cardinal" IBO.cardinal (IBO.cardinals :: TestData Integer)
+    , mkTests "ordinal"  IBO.ordinal  (IBO.ordinals  :: TestData Integer)
     ]
   , testGroup "INH"
     [ testGroup "unique data"

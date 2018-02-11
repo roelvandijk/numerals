@@ -506,7 +506,9 @@ tests =
     ]
   , testGroup "ITA"
     [ testGroup "unique data"
-      [testUnique "cardinal" (ITA.cardinals :: TestData Integer)]
+      [ testUnique "cardinal" (ITA.cardinals :: TestData Integer)
+      , testUnique "ordinal"  (ITA.ordinals  :: TestData Integer)
+      ]
     , mkTests "cardinal" ITA.cardinal (ITA.cardinals :: TestData Integer)
     , mkTests "ordinal"  ITA.ordinal  (ITA.ordinals  :: TestData Integer)
     ]
@@ -675,7 +677,9 @@ tests =
     ]
   , testGroup "POR"
     [ testGroup "unique data"
-      [testUnique "cardinal" (POR.cardinals :: TestData Integer)]
+      [ testUnique "cardinal" (POR.cardinals :: TestData Integer)
+      , testUnique "ordinal"  (POR.ordinals  :: TestData Integer)
+      ]
     , mkTests "cardinal" POR.cardinal (POR.cardinals  :: TestData Integer)
     , mkTests "ordinal"  POR.ordinal  (POR.ordinals   :: TestData Integer)
     ]

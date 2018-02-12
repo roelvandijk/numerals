@@ -221,6 +221,7 @@ test-suite test-numerals
                , Text.Numeral.Language.SMN.TestData
                , Text.Numeral.Language.SPA.TestData
                , Text.Numeral.Language.SWE.TestData
+               , Text.Numeral.Language.SQI.TestData
                , Text.Numeral.Language.TAR.TestData
                , Text.Numeral.Language.TGS.TestData
                , Text.Numeral.Language.TUR.TestData

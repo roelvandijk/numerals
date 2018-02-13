@@ -92,6 +92,7 @@ library
                  , Text.Numeral.Language.NLD
                  , Text.Numeral.Language.NOB
                  , Text.Numeral.Language.NQM
+                 , Text.Numeral.Language.NRF
                  , Text.Numeral.Language.OJI
                  , Text.Numeral.Language.PDC
                  , Text.Numeral.Language.POL
@@ -157,7 +158,6 @@ test-suite test-numerals
                , Text.Numeral.Language.FAO.TestData
                , Text.Numeral.Language.FIN.TestData
                , Text.Numeral.Language.FRA.TestData
-               , Text.Numeral.Language.FRA_JER.TestData
                , Text.Numeral.Language.FRR.TestData
                , Text.Numeral.Language.FUR.TestData
                , Text.Numeral.Language.GCF_MTQ.TestData
@@ -204,6 +204,7 @@ test-suite test-numerals
                , Text.Numeral.Language.NLD.TestData
                , Text.Numeral.Language.NOB.TestData
                , Text.Numeral.Language.NQM.TestData
+               , Text.Numeral.Language.NRF.TestData
                , Text.Numeral.Language.OCI.TestData
                , Text.Numeral.Language.OJI.TestData
                , Text.Numeral.Language.ONE.TestData

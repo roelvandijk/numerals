@@ -55,6 +55,7 @@ import qualified "numerals" Text.Numeral.Language.NEN as NEN
 import qualified "numerals" Text.Numeral.Language.NLD as NLD
 import qualified "numerals" Text.Numeral.Language.NOB as NOB
 import qualified "numerals" Text.Numeral.Language.NQM as NQM
+import qualified "numerals" Text.Numeral.Language.NRF as NRF
 import qualified "numerals" Text.Numeral.Language.OJI as OJI
 import qualified "numerals" Text.Numeral.Language.PDC as PDC
 import qualified "numerals" Text.Numeral.Language.POL as POL
@@ -103,7 +104,6 @@ import qualified "this" Text.Numeral.Language.EPO.TestData as EPO
 import qualified "this" Text.Numeral.Language.FAO.TestData as FAO
 import qualified "this" Text.Numeral.Language.FIN.TestData as FIN
 import qualified "this" Text.Numeral.Language.FRA.TestData as FRA
-import qualified "this" Text.Numeral.Language.FRA_JER.TestData as FRA_JER
 import qualified "this" Text.Numeral.Language.FRR.TestData as FRR
 import qualified "this" Text.Numeral.Language.FUR.TestData as FUR
 import qualified "this" Text.Numeral.Language.GCF_MTQ.TestData as GCF_MTQ
@@ -150,6 +150,7 @@ import qualified "this" Text.Numeral.Language.NEN.TestData as NEN
 import qualified "this" Text.Numeral.Language.NLD.TestData as NLD
 import qualified "this" Text.Numeral.Language.NOB.TestData as NOB
 import qualified "this" Text.Numeral.Language.NQM.TestData as NQM
+import qualified "this" Text.Numeral.Language.NRF.TestData as NRF
 import qualified "this" Text.Numeral.Language.OCI.TestData as OCI
 import qualified "this" Text.Numeral.Language.OJI.TestData as OJI
 import qualified "this" Text.Numeral.Language.ONE.TestData as ONE
@@ -419,10 +420,6 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (FRR.cardinals :: TestData Integer)]
     ]
-  , testGroup "FRA_JER"
-    [ testGroup "unique data"
-      [testUnique "cardinal" (FRA_JER.cardinals :: TestData Integer)]
-    ]
   , testGroup "FUR"
     [ testGroup "unique data"
       [testUnique "cardinal" (FUR.cardinals :: TestData Integer)]
@@ -609,6 +606,10 @@ tests =
     [ testGroup "unique data"
       [testUnique "cardinal" (MOH.cardinals :: TestData Integer)]
     ]
+  , testGroup "NAV"
+    [ testGroup "unique data"
+      [testUnique "cardinal" (NAV.cardinals :: TestData Integer)]
+    ]
   , testGroup "NEE"
     [ testGroup "unique data"
       [testUnique "cardinal" (NEE.cardinals :: TestData Integer)]
@@ -633,16 +634,17 @@ tests =
   , testGroup "NOB"
     [ testGroup "unique data"
       [testUnique "cardinal" (NOB.cardinals :: TestData Integer)]
-    , mkTests "cardinal" NOB.cardinal (NOB.cardinals  :: TestData Integer)
+    , mkTests "cardinal" NOB.cardinal (NOB.cardinals :: TestData Integer)
     ]
   , testGroup "NQM"
     [ testGroup "unique data"
       [testUnique "cardinal" (NQM.cardinals :: TestData Integer)]
     , mkTests "cardinal" NQM.cardinal (NQM.cardinals :: TestData Integer)
     ]
-  , testGroup "NAV"
+  , testGroup "NRF"
     [ testGroup "unique data"
-      [testUnique "cardinal" (NAV.cardinals :: TestData Integer)]
+      [testUnique "cardinal" (NRF.cardinals :: TestData Integer)]
+    , mkTests "cardinal" NRF.cardinal (NRF.cardinals :: TestData Integer)
     ]
   , testGroup "OCI"
     [ testGroup "unique data"
@@ -651,7 +653,7 @@ tests =
   , testGroup "OJI"
     [ testGroup "unique data"
       [testUnique "cardinal" (OJI.cardinals :: TestData Integer)]
-    , mkTests "cardinal" OJI.cardinal (OJI.cardinals  :: TestData Integer)
+    , mkTests "cardinal" OJI.cardinal (OJI.cardinals :: TestData Integer)
     ]
   , testGroup "ONE"
     [ testGroup "unique data"

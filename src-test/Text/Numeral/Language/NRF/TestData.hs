@@ -3,13 +3,13 @@
 
 [@ISO639-2@]        -
 
-[@ISO639-3@]        -
+[@ISO639-3@]        nrf
 
-[@Native name@]     -
+[@Native name@]     Jèrriais
 
-[@English name@]    Jèrriais
+[@English name@]    Jersey French / Jersey Norman French
 -}
-module Text.Numeral.Language.FRA_JER.TestData (cardinals) where
+module Text.Numeral.Language.NRF.TestData (cardinals) where
 
 
 --------------------------------------------------------------------------------
@@ -17,6 +17,7 @@ module Text.Numeral.Language.FRA_JER.TestData (cardinals) where
 --------------------------------------------------------------------------------
 
 import "numerals" Text.Numeral.Grammar ( defaultInflection )
+import "numerals" Text.Numeral.Misc ( dec )
 import "this" Text.Numeral.Test ( TestData )
 
 
@@ -27,9 +28,11 @@ import "this" Text.Numeral.Test ( TestData )
 {-
 Sources:
   http://www.languagesandnumbers.com/how-to-count-in-jerriais/en/fra-jer/
+  https://www.omniglot.com/language/numbers/jerriais.htm
+  http://officedujerriais.blogspot.nl/2012/02/numbers-in-jerriais.html
 -}
 
-cardinals :: (Num i) => TestData i
+cardinals :: (Integral i) => TestData i
 cardinals =
   [ ( "default"
     , defaultInflection
@@ -83,7 +86,7 @@ cardinals =
       , (48, "quarante-huit")
       , (49, "quarante-neuf")
       , (50, "chînquante")
-      , (51, "chînquante tch’ieune")
+      , (51, "chînquante’tch’ieune")
       , (52, "chînquante-deux")
       , (53, "chînquante-trais")
       , (54, "chînquante-quat’")
@@ -93,7 +96,7 @@ cardinals =
       , (58, "chînquante-huit")
       , (59, "chînquante-neuf")
       , (60, "souaixante")
-      , (61, "souaixante tch’ieune")
+      , (61, "souaixante’tch’ieune")
       , (62, "souaixante-deux")
       , (63, "souaixante-trais")
       , (64, "souaixante-quat’")
@@ -103,7 +106,7 @@ cardinals =
       , (68, "souaixante-huit")
       , (69, "souaixante-neuf")
       , (70, "septante")
-      , (71, "septante tch’ieune")
+      , (71, "septante’tch’ieune")
       , (72, "septante-deux")
       , (73, "septante-trais")
       , (74, "septante-quat’")
@@ -112,18 +115,18 @@ cardinals =
       , (77, "septante-sept")
       , (78, "septante-huit")
       , (79, "septante-neuf")
-      , (80, "quatre-vîngts")
-      , (81, "quatre-vîngt-ieune")
-      , (82, "quatre-vîngt-deux")
-      , (83, "quatre-vîngt-trais")
-      , (84, "quatre-vîngt-quat’")
-      , (85, "quatre-vîngt-chîn")
-      , (86, "quatre-vîngt-six")
-      , (87, "quatre-vîngt-sept")
-      , (88, "quatre-vîngt-huit")
-      , (89, "quatre-vîngt-neuf")
+      , (80, "quat’-vîngts")
+      , (81, "quat’-vîngt-ieune")
+      , (82, "quat’-vîngt-deux")
+      , (83, "quat’-vîngt-trais")
+      , (84, "quat’-vîngt-quat’")
+      , (85, "quat’-vîngt-chîn")
+      , (86, "quat’-vîngt-six")
+      , (87, "quat’-vîngt-sept")
+      , (88, "quat’-vîngt-huit")
+      , (89, "quat’-vîngt-neuf")
       , (90, "nénante")
-      , (91, "nénante tch’ieune")
+      , (91, "nénante’tch’ieune")
       , (92, "nénante-deux")
       , (93, "nénante-trais")
       , (94, "nénante-quat’")
@@ -157,6 +160,15 @@ cardinals =
       , (990, "neu chents nénante")
       , (999, "neu chents nénante-neuf")
       , (1000, "mille")
+      , (2000, "deux mille")
+      , (3000, "trais mille")
+      , (4000, "quat' mille")
+      , (5000, "chîn mille")
+      , (6000, "siêx mille")
+      , (7000, "sept mille")
+      , (8000, "huit mille")
+      , (9000, "neuf mille")
+      , (dec 6, "un million")
       ]
     )
   ]

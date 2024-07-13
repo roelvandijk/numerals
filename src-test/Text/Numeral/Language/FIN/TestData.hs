@@ -23,7 +23,7 @@ module Text.Numeral.Language.FIN.TestData
 --------------------------------------------------------------------------------
 
 import "base" Data.Function ( ($) )
-import "base" Prelude     ( Integral, (+) )
+import "base" Prelude     ( Integral, (+), (*) )
 import "numerals" Text.Numeral.Grammar
 import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )

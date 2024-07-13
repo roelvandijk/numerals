@@ -1,5 +1,5 @@
 name:          numerals
-version:       0.4.1
+version:       0.4.2
 cabal-version: >= 1.9.2
 build-type:    Simple
 stability:     experimental

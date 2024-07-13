@@ -17,7 +17,7 @@ module Text.Numeral.Language.LLD.TestData (cardinals) where
 -- Imports
 --------------------------------------------------------------------------------
 
-import "base" Prelude     ( Integral, (+) )
+import "base" Prelude     ( Integral, (+), (*) )
 import "numerals" Text.Numeral.Grammar
 import "numerals" Text.Numeral.Grammar ( defaultInflection )
 import "numerals" Text.Numeral.Misc ( dec )

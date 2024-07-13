@@ -1,6 +1,16 @@
 Changelog for numerals
 ======================
 
+0.4.2
+-----
+
+*Sat Jul 13 2024*
+
+- Removed dependency upper bounds for easier maintenance.
+- Removed unicode symbols from Debug module.
+- Added Igbo (IBO) cardinals and ordinals.
+- Default to GHC-8.2.2 when building with Nix.
+- Fix test build errors.
 
 0.4.1
 -----
